@@ -25,7 +25,7 @@ router.post('/register', (req, res) => {
   const passwordHash = bcrypt.hashSync(password, 10);
   const user = query('users').insert({ name, email, password_hash: passwordHash });
 
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'cardlink-fallback-secret', { expiresIn: '7d' });
 
   res.status(201).json({
     token,
@@ -45,7 +45,7 @@ router.post('/login', (req, res) => {
     return res.status(401).json({ error: 'Email ou senha incorretos' });
   }
 
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'cardlink-fallback-secret', { expiresIn: '7d' });
 
   res.json({
     token,
