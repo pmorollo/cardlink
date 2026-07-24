@@ -4,6 +4,10 @@
   "description": "CardLink - Cartao de visita digital",
   "main": "backend/server.js",
   "scripts": {
-    "start": "node backend/server.js"
+    "start": "node backend/server.js",
+    "postinstall": "cd backend && npm install"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
