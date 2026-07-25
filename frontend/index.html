@@ -441,6 +441,9 @@
         <button class="btn btn-secondary btn-sm" onclick="shareCard()" id="share-btn">
           📤 Compartilhar
         </button>
+        <button class="btn btn-primary btn-sm" onclick="installFromCard()" id="install-card-btn" style="display:none;">
+          📲 Fixar na Tela
+        </button>
       </div>
       <div class="card-qr" id="cardQr">
         <img id="qrCodeImg" alt="QR Code do cartão" src="" />
@@ -474,21 +477,6 @@
     <span id="toast-message"></span>
   </div>
 
-  <!-- PWA Install Banner -->
-  <div class="install-banner" id="installBanner">
-    <div class="install-banner-content">
-      <div class="install-banner-icon">📲</div>
-      <div class="install-banner-text">
-        <strong>Adicionar à tela</strong>
-        <span id="install-banner-desc">Acesse seus cartões mais rápido!</span>
-      </div>
-    </div>
-    <div class="install-banner-actions" id="install-banner-actions">
-      <button class="install-btn-install" onclick="installPWA()">Instalar</button>
-      <button class="install-btn-dismiss" onclick="dismissInstall()">Agora não</button>
-    </div>
-  </div>
-
   <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
@@ -502,49 +490,30 @@
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      const dismissed = localStorage.getItem('cardlink_install_dismissed');
-      if (!dismissed && !isStandalone) {
-        setTimeout(() => {
-          document.getElementById('installBanner').classList.add('show');
-        }, 4000);
+      if (!isStandalone) {
+        const btn = document.getElementById('install-card-btn');
+        if (btn) btn.style.display = '';
       }
     });
 
-    function installPWA() {
-      if (!deferredPrompt) {
-        if (isIOS) {
-          document.getElementById('install-banner-desc').textContent = 'Toque no botão de compartilhar e depois "Adicionar à Tela de Início"';
-          document.getElementById('install-banner-actions').innerHTML = '<button class="install-btn-dismiss" onclick="dismissInstall()">Entendi</button>';
-        }
-        return;
+    function installFromCard() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+        });
+      } else if (isIOS) {
+        showToast('📲', 'iPhone: toque em Compartilhar e depois "Adicionar à Tela de Início"');
+      } else {
+        showToast('📲', 'Menu do navegador → "Instalar app" ou "Adicionar à tela"');
       }
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choice) => {
-        deferredPrompt = null;
-        document.getElementById('installBanner').classList.remove('show');
-      });
-    }
-
-    function dismissInstall() {
-      localStorage.setItem('cardlink_install_dismissed', '1');
-      document.getElementById('installBanner').classList.remove('show');
     }
 
     window.addEventListener('appinstalled', () => {
-      document.getElementById('installBanner').classList.remove('show');
       deferredPrompt = null;
+      const btn = document.getElementById('install-card-btn');
+      if (btn) btn.style.display = 'none';
     });
-
-    if (isIOS && !isStandalone) {
-      const dismissed = localStorage.getItem('cardlink_install_dismissed');
-      if (!dismissed) {
-        setTimeout(() => {
-          document.getElementById('install-banner-desc').textContent = 'Toque em compartilhar e depois "Adicionar à Tela"';
-          document.getElementById('install-banner-actions').innerHTML = '<button class="install-btn-install" onclick="dismissInstall()">OK, entendi</button>';
-          document.getElementById('installBanner').classList.add('show');
-        }, 5000);
-      }
-    }
   </script>
 </body>
 </html>
