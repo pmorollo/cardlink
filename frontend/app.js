@@ -500,12 +500,24 @@ async function loadPublicCard(slug) {
     }
 
     const editBtn = document.getElementById('edit-card-btn');
-    if (editBtn) {
-      if (currentUser && card.user_id === currentUser.id) {
+    const dashBtn = document.getElementById('dashboard-card-btn');
+    if (editBtn && dashBtn) {
+      if (authToken && currentUser && card.user_id === currentUser.id) {
         editBtn.style.display = '';
         editBtn.setAttribute('onclick', `editCard(${card.id})`);
+        dashBtn.style.display = '';
+      } else if (authToken && !currentUser) {
+        try {
+          currentUser = await api('/auth/me');
+          if (card.user_id === currentUser.id) {
+            editBtn.style.display = '';
+            editBtn.setAttribute('onclick', `editCard(${card.id})`);
+            dashBtn.style.display = '';
+          }
+        } catch(e) {}
       } else {
         editBtn.style.display = 'none';
+        dashBtn.style.display = 'none';
       }
     }
   } catch (err) {
