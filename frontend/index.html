@@ -192,8 +192,8 @@
           <h1 class="auth-title">Entrar no <span class="text-gradient">CardLink</span></h1>
           <p class="auth-subtitle">Acesse seus cartões de visita</p>
           <div class="form-group">
-            <label class="form-label" for="login-email">Email</label>
-            <input class="form-input" type="email" id="login-email" placeholder="seu@email.com">
+            <label class="form-label" for="login-whatsapp">WhatsApp</label>
+            <input class="form-input" type="tel" id="login-whatsapp" placeholder="5511999999999">
           </div>
           <div class="form-group">
             <label class="form-label" for="login-password">Senha</label>
@@ -216,8 +216,8 @@
             <input class="form-input" type="text" id="register-name" placeholder="Seu nome completo">
           </div>
           <div class="form-group">
-            <label class="form-label" for="register-email">Email</label>
-            <input class="form-input" type="email" id="register-email" placeholder="seu@email.com">
+            <label class="form-label" for="register-whatsapp">WhatsApp</label>
+            <input class="form-input" type="tel" id="register-whatsapp" placeholder="5511999999999">
           </div>
           <div class="form-group">
             <label class="form-label" for="register-password">Senha</label>
@@ -474,10 +474,10 @@
       <div class="install-banner-icon">📲</div>
       <div class="install-banner-text">
         <strong>Adicionar à tela</strong>
-        <span>Acesse seus cartões mais rápido!</span>
+        <span id="install-banner-desc">Acesse seus cartões mais rápido!</span>
       </div>
     </div>
-    <div class="install-banner-actions">
+    <div class="install-banner-actions" id="install-banner-actions">
       <button class="install-btn-install" onclick="installPWA()">Instalar</button>
       <button class="install-btn-dismiss" onclick="dismissInstall()">Agora não</button>
     </div>
@@ -489,20 +489,29 @@
       navigator.serviceWorker.register('/service-worker.js').catch(() => {});
     }
 
-    let deferredPrompt;
+    let deferredPrompt = null;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       const dismissed = localStorage.getItem('cardlink_install_dismissed');
-      if (!dismissed) {
+      if (!dismissed && !isStandalone) {
         setTimeout(() => {
           document.getElementById('installBanner').classList.add('show');
-        }, 3000);
+        }, 4000);
       }
     });
 
     function installPWA() {
-      if (!deferredPrompt) return;
+      if (!deferredPrompt) {
+        if (isIOS) {
+          document.getElementById('install-banner-desc').textContent = 'Toque no botão de compartilhar e depois "Adicionar à Tela de Início"';
+          document.getElementById('install-banner-actions').innerHTML = '<button class="install-btn-dismiss" onclick="dismissInstall()">Entendi</button>';
+        }
+        return;
+      }
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then((choice) => {
         deferredPrompt = null;
@@ -519,6 +528,17 @@
       document.getElementById('installBanner').classList.remove('show');
       deferredPrompt = null;
     });
+
+    if (isIOS && !isStandalone) {
+      const dismissed = localStorage.getItem('cardlink_install_dismissed');
+      if (!dismissed) {
+        setTimeout(() => {
+          document.getElementById('install-banner-desc').textContent = 'Toque em compartilhar e depois "Adicionar à Tela"';
+          document.getElementById('install-banner-actions').innerHTML = '<button class="install-btn-install" onclick="dismissInstall()">OK, entendi</button>';
+          document.getElementById('installBanner').classList.add('show');
+        }, 5000);
+      }
+    }
   </script>
 </body>
 </html>

@@ -128,18 +128,18 @@ function toggleAuthForm(form) {
 }
 
 async function handleLogin() {
-  const email = document.getElementById('login-email').value.trim();
+  const whatsapp = document.getElementById('login-whatsapp').value.trim();
   const password = document.getElementById('login-password').value;
 
-  if (!email || !password) {
-    showToast('⚠️', 'Preencha email e senha');
+  if (!whatsapp || !password) {
+    showToast('⚠️', 'Preencha WhatsApp e senha');
     return;
   }
 
   try {
     const data = await api('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ whatsapp, password })
     });
     authToken = data.token;
     currentUser = data.user;
@@ -153,10 +153,10 @@ async function handleLogin() {
 
 async function handleRegister() {
   const name = document.getElementById('register-name').value.trim();
-  const email = document.getElementById('register-email').value.trim();
+  const whatsapp = document.getElementById('register-whatsapp').value.trim();
   const password = document.getElementById('register-password').value;
 
-  if (!name || !email || !password) {
+  if (!name || !whatsapp || !password) {
     showToast('⚠️', 'Preencha todos os campos');
     return;
   }
@@ -164,7 +164,7 @@ async function handleRegister() {
   try {
     const data = await api('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ name, whatsapp, password })
     });
     authToken = data.token;
     currentUser = data.user;
@@ -252,7 +252,6 @@ async function loadDashboard() {
             <div class="dash-card-slug">${card.title ? escapeHtml(card.title) + ' · ' : ''}${card.business ? escapeHtml(card.business) : 'Cartão Digital'}</div>
           </div>
           <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
-            <button class="btn btn-primary btn-sm" onclick="window.open('/#card/${escapeHtml(card.slug)}','_blank')">🔗 Ver Cartão</button>
             <button class="btn btn-secondary btn-sm" onclick="editCard(${card.id})">✏️ Editar</button>
             <button class="btn btn-outline btn-sm" onclick="copyToClipboard('${escapeHtml(cardLink)}')">📋 Copiar Link</button>
           </div>
@@ -261,7 +260,7 @@ async function loadDashboard() {
         <div class="dash-card-mini-preview" id="dash-mini-preview"></div>
 
         <div class="dash-card-actions-bar">
-          <button class="btn btn-secondary btn-sm" onclick="shareCard()">📤 Compartilhar</button>
+          <button class="btn btn-secondary btn-sm" onclick="shareCard('${escapeHtml(card.slug)}')">📤 Compartilhar</button>
           <button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">📩 Ver Contatos (${stats.contacts})</button>
           <button class="btn btn-outline btn-sm" style="color:#ef4444;border-color:rgba(239,68,68,0.3);" onclick="deleteCard(${card.id})">🗑️ Excluir</button>
         </div>
@@ -685,13 +684,13 @@ function fallbackCopy(text) {
   document.body.removeChild(textarea);
 }
 
-function shareCard() {
-  const url = window.location.href;
-  const title = document.title;
+function shareCard(slug) {
+  const cardLink = window.location.origin + '/#card/' + slug;
+  const title = 'Confira meu cartão de visita digital';
   if (navigator.share) {
-    navigator.share({ title, url }).catch(() => {});
+    navigator.share({ title, url: cardLink }).catch(() => {});
   } else {
-    copyCardLink();
+    copyToClipboard(cardLink);
   }
 }
 
