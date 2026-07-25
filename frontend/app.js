@@ -128,11 +128,16 @@ function toggleAuthForm(form) {
 }
 
 async function handleLogin() {
-  const whatsapp = document.getElementById('login-whatsapp').value.trim();
+  const whatsapp = '+55' + document.getElementById('login-whatsapp').value.trim().replace(/\D/g, '');
   const password = document.getElementById('login-password').value;
 
-  if (!whatsapp || !password) {
-    showToast('⚠️', 'Preencha WhatsApp e senha');
+  if (!whatsapp || whatsapp === '+55') {
+    showToast('⚠️', 'Preencha o WhatsApp e a senha');
+    return;
+  }
+
+  if (!password) {
+    showToast('⚠️', 'Preencha a senha');
     return;
   }
 
@@ -153,11 +158,21 @@ async function handleLogin() {
 
 async function handleRegister() {
   const name = document.getElementById('register-name').value.trim();
-  const whatsapp = document.getElementById('register-whatsapp').value.trim();
+  const whatsapp = '+55' + document.getElementById('register-whatsapp').value.trim().replace(/\D/g, '');
   const password = document.getElementById('register-password').value;
 
-  if (!name || !whatsapp || !password) {
-    showToast('⚠️', 'Preencha todos os campos');
+  if (!name) {
+    showToast('⚠️', 'Preencha o nome');
+    return;
+  }
+
+  if (!whatsapp || whatsapp === '+55') {
+    showToast('⚠️', 'Preencha o WhatsApp');
+    return;
+  }
+
+  if (!password || password.length < 6) {
+    showToast('⚠️', 'Senha deve ter pelo menos 6 caracteres');
     return;
   }
 
