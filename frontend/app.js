@@ -498,6 +498,16 @@ async function loadPublicCard(slug) {
       fab.title = 'Conversar no WhatsApp';
       document.body.appendChild(fab);
     }
+
+    const editBtn = document.getElementById('edit-card-btn');
+    if (editBtn) {
+      if (currentUser && card.user_id === currentUser.id) {
+        editBtn.style.display = '';
+        editBtn.setAttribute('onclick', `editCard(${card.id})`);
+      } else {
+        editBtn.style.display = 'none';
+      }
+    }
   } catch (err) {
     rendered.innerHTML = '<p style="text-align:center;color:#ef4444;padding:var(--space-3xl);">Cartão não encontrado</p>';
   }
