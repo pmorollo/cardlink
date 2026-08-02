@@ -72,6 +72,43 @@ app.use('/api/cards', apiLimiter, cardRoutes);
 app.use('/api', apiLimiter, contactRoutes);
 app.use('/api/upload', apiLimiter, uploadRoutes);
 
+app.get('/uploads/:filename', async (req, res, next) => {
+  const filename = req.params.filename;
+  const localFilePath = path.join(__dirname, 'uploads', filename);
+
+  if (fs.existsSync(localFilePath)) {
+    return res.sendFile(localFilePath);
+  }
+
+  if (process.env.R2_ACCESS_KEY_ID && process.env.R2_SECRET_ACCESS_KEY && process.env.CLOUDFLARE_ACCOUNT_ID) {
+    try {
+      const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+      const s3 = new S3Client({
+        region: 'auto',
+        endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+        credentials: {
+          accessKeyId: process.env.R2_ACCESS_KEY_ID,
+          secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+        },
+      });
+
+      const command = new GetObjectCommand({
+        Bucket: process.env.R2_BUCKET || 'cardlink-uploads',
+        Key: filename,
+      });
+
+      const data = await s3.send(command);
+      res.setHeader('Content-Type', data.ContentType || 'image/webp');
+      res.setHeader('Cache-Control', 'public, max-age=31536000');
+      return data.Body.pipe(res);
+    } catch (err) {
+      console.error('R2 fetch error:', err.message);
+    }
+  }
+
+  next();
+});
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 app.use(express.static(path.join(__dirname, '..')));

@@ -57,6 +57,9 @@ router.post('/', authMiddleware, upload.single('photo'), async (req, res) => {
   }
 
   try {
+    const ext = path.extname(req.file.originalname).toLowerCase() || '.webp';
+    const filename = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
+
     if (isR2Configured() && S3Client) {
       const s3 = new S3Client({
         region: 'auto',
@@ -67,8 +70,6 @@ router.post('/', authMiddleware, upload.single('photo'), async (req, res) => {
         },
       });
 
-      const ext = path.extname(req.file.originalname).toLowerCase() || '.webp';
-      const filename = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
       const bucketName = process.env.R2_BUCKET || 'cardlink-uploads';
 
       const command = new PutObjectCommand({
@@ -80,15 +81,11 @@ router.post('/', authMiddleware, upload.single('photo'), async (req, res) => {
 
       await s3.send(command);
 
-      const publicBaseUrl = process.env.R2_PUBLIC_URL
-        ? process.env.R2_PUBLIC_URL.replace(/\/$/, '')
-        : `https://${bucketName}.${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-
-      const url = `${publicBaseUrl}/${filename}`;
+      const url = '/uploads/' + filename;
       return res.json({ url });
     } else {
       // Local file fallback
-      const url = '/uploads/' + req.file.filename;
+      const url = '/uploads/' + (req.file.filename || filename);
       return res.json({ url });
     }
   } catch (err) {
