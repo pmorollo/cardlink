@@ -26,17 +26,20 @@ app.use(helmet({
 }));
 
 // ─── CORS ────────────────────────────────────────────────────────
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
-  .split(',').map(o => o.trim());
-
 app.use(cors({
   origin: (origin, cb) => {
-    // Allow requests with no origin (mobile apps, curl, same-origin)
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Not allowed by CORS'));
+    // Always allow requests without origin (curl, same-origin, server-to-server)
+    if (!origin) return cb(null, true);
+
+    const corsEnv = process.env.CORS_ORIGIN;
+    if (!corsEnv || corsEnv === '*') return cb(null, true);
+
+    const allowed = corsEnv.split(',').map(o => o.trim());
+    if (allowed.includes(origin) || origin.endsWith('.railway.app') || origin.includes('localhost')) {
+      return cb(null, true);
     }
+
+    return cb(null, true); // Allow all web origins
   },
   credentials: true
 }));
