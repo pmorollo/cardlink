@@ -240,10 +240,13 @@ function renderAbout(d) {
   const aboutTitle = document.getElementById('about-title');
   if (aboutTitle) aboutTitle.innerHTML = `Quem é <span class="text-gradient">${esc(name)}</span>?`;
 
-  // Avatar image
+  // About image: use professional stock photo so self photo isn't duplicated from Hero
   const imgWrap = document.getElementById('about-image');
-  if (imgWrap && d.photo_url) {
-    imgWrap.innerHTML = `<img src="${esc(d.photo_url)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<div class=lp-about-image-placeholder><span style=font-size:5rem>👤</span></div>'">`;
+  if (imgWrap) {
+    const aboutImg = (d.gallery && d.gallery.length > 0)
+      ? d.gallery[0]
+      : 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80';
+    imgWrap.innerHTML = `<img src="${esc(aboutImg)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<div class=lp-about-image-placeholder><span style=font-size:5rem>👤</span></div>'">`;
   }
 
   // Badge
