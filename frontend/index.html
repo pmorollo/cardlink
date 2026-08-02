@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="CardLink — Crie seu cartão de visita digital em segundos. Compartilhe com um link e conecte-se com seus clientes via WhatsApp.">
   <title>CardLink — Cartão de Visita Digital</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=3">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💳</text></svg>">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#8b5cf6">
@@ -32,7 +32,7 @@
       </div>
       <div class="navbar-cta" id="nav-cta">
         <button class="btn btn-primary" onclick="navigateTo('auth')" id="nav-cta-btn">
-          ✨ <span class="hide-mobile">Criar Meu Cartão</span><span class="show-mobile" style="display:none;">Criar</span>
+          ✨ <span class="hide-mobile">Cartão</span><span class="show-mobile" style="display:none;">Cartão</span>
         </button>
       </div>
     </div>
@@ -58,8 +58,8 @@
           Compartilhe com um link e conecte-se com seus clientes.
         </p>
         <div class="hero-buttons">
-          <button class="btn btn-primary btn-lg" onclick="navigateTo('auth')">
-            ✨ Criar Meu Cartão
+          <button class="btn btn-primary btn-lg" onclick="handleHeroCta()">
+            ✨ Cartão
           </button>
           <button class="btn btn-secondary btn-lg" onclick="document.querySelector('.features').scrollIntoView({behavior:'smooth'})">
             Saiba Mais ↓
@@ -166,8 +166,8 @@
         <div class="cta-box">
           <h2>Pronto para criar seu <span class="text-gradient">cartão digital</span>?</h2>
           <p>É grátis e instantâneo. Comece agora!</p>
-          <button class="btn btn-primary btn-lg" onclick="navigateTo('auth')">
-            ✨ Criar Meu Cartão Agora
+          <button class="btn btn-primary btn-lg" onclick="handleHeroCta()">
+            ✨ Cartão
           </button>
         </div>
       </div>
@@ -192,11 +192,8 @@
           <h1 class="auth-title">Entrar no <span class="text-gradient">CardLink</span></h1>
           <p class="auth-subtitle">Acesse seus cartões de visita</p>
           <div class="form-group">
-            <label class="form-label" for="login-whatsapp">WhatsApp</label>
-            <div style="display:flex;align-items:center;gap:0;">
-              <span style="padding:12px 14px;background:rgba(139,92,246,0.15);border:1px solid var(--border-subtle);border-right:none;border-radius:12px 0 0 12px;color:var(--text-primary);font-weight:600;font-size:0.95rem;white-space:nowrap;">+55</span>
-              <input class="form-input" type="tel" id="login-whatsapp" placeholder="11 99999-9999" style="border-radius:0 12px 12px 0;">
-            </div>
+            <label class="form-label" for="login-email">E-mail</label>
+            <input class="form-input" type="email" id="login-email" placeholder="seu@email.com">
           </div>
           <div class="form-group">
             <label class="form-label" for="login-password">Senha</label>
@@ -219,15 +216,12 @@
             <input class="form-input" type="text" id="register-name" placeholder="Seu nome completo">
           </div>
           <div class="form-group">
-            <label class="form-label" for="register-whatsapp">WhatsApp</label>
-            <div style="display:flex;align-items:center;gap:0;">
-              <span style="padding:12px 14px;background:rgba(139,92,246,0.15);border:1px solid var(--border-subtle);border-right:none;border-radius:12px 0 0 12px;color:var(--text-primary);font-weight:600;font-size:0.95rem;white-space:nowrap;">+55</span>
-              <input class="form-input" type="tel" id="register-whatsapp" placeholder="11 99999-9999" style="border-radius:0 12px 12px 0;">
-            </div>
+            <label class="form-label" for="register-email">E-mail</label>
+            <input class="form-input" type="email" id="register-email" placeholder="seu@email.com">
           </div>
           <div class="form-group">
             <label class="form-label" for="register-password">Senha</label>
-            <input class="form-input" type="password" id="register-password" placeholder="Mínimo 6 caracteres">
+            <input class="form-input" type="password" id="register-password" placeholder="Mínimo 8 caracteres">
           </div>
           <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleRegister()">
             Criar Conta
@@ -318,6 +312,10 @@
               <label class="form-label" for="field-address">Endereço</label>
               <input class="form-input" type="text" id="field-address" placeholder="Rua, número, cidade — SP" data-field="address">
             </div>
+            <div class="form-group">
+              <label class="form-label" for="field-message">Mensagem</label>
+              <textarea class="form-input" id="field-message" placeholder="Ex: Agende pelo WhatsApp ou visite-nos no fim de semana" data-field="message" rows="3"></textarea>
+            </div>
           </div>
 
           <!-- WhatsApp -->
@@ -325,7 +323,10 @@
             <div class="form-section-title"><span class="icon">💬</span> WhatsApp</div>
             <div class="form-group">
               <label class="form-label" for="field-whatsapp">Número do WhatsApp (com DDD + código do país)</label>
-              <input class="form-input" type="tel" id="field-whatsapp" placeholder="5511999999999" data-field="whatsapp">
+              <input class="form-input" type="tel" id="field-whatsapp" placeholder="+55 (11) 9 9999-9999" data-field="whatsapp">
+              <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">
+                Ex: <strong style="color:var(--text-secondary)">+55 (11) 9 9999-9999</strong> — inclua o código do país (+55) e o DDD
+              </small>
             </div>
             <div class="form-group">
               <label class="form-label" for="field-whatsapp-group">Link do Grupo WhatsApp (opcional)</label>
@@ -369,6 +370,47 @@
                 <input class="form-input" type="text" id="field-twitter" placeholder="@seuuser" data-field="twitter">
               </div>
             </div>
+          </div>
+
+          <!-- Landing Page / Site Config (Optional) -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="icon">🌐</span> Botão do Site (Opcional)</div>
+            <div class="form-group">
+              <label class="form-label" for="field-site-button">Texto do Botão de Expansão no Cartão</label>
+              <input class="form-input" type="text" id="field-site-button" placeholder="Vá para o site" data-field="site_button_text">
+              <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">
+                Este botão só aparecerá no seu cartão se você cadastrar produtos, fotos ou depoimentos abaixo.
+              </small>
+            </div>
+          </div>
+
+          <!-- Products / Services -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="icon">🛍️</span> Produtos & Serviços (Vitrine)</div>
+            <div id="builder-products-container"></div>
+            <button class="btn btn-secondary btn-sm" type="button" onclick="addProductRow()" style="margin-top:8px;">
+              + Adicionar Produto / Serviço
+            </button>
+          </div>
+
+          <!-- Photo Gallery -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="icon">🖼️</span> Galeria de Fotos</div>
+            <div id="gallery-upload-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;"></div>
+            <button class="btn btn-secondary btn-sm" type="button" onclick="addGallerySlot()" style="width:100%;">
+              📷 Adicionar Foto
+            </button>
+            <!-- Hidden field keeps URL list for save/load compatibility -->
+            <input type="hidden" id="field-gallery">
+          </div>
+
+          <!-- Testimonials -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="icon">⭐</span> Depoimentos de Clientes</div>
+            <div id="builder-testimonials-container"></div>
+            <button class="btn btn-secondary btn-sm" type="button" onclick="addTestimonialRow()" style="margin-top:8px;">
+              + Adicionar Depoimento
+            </button>
           </div>
 
           <!-- Theme -->
@@ -488,11 +530,19 @@
     <span id="toast-message"></span>
   </div>
 
-  <script src="app.js"></script>
   <script>
+    // Unregister all service workers and clear caches before loading app
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(reg => reg.unregister());
+      });
+      if (window.caches) {
+        caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+      }
     }
+  </script>
+  <script src="app.js?v=19"></script>
+  <script>
 
     let deferredPrompt = null;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;

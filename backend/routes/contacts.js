@@ -12,7 +12,9 @@ router.get('/public/:slug', (req, res) => {
 
   query('cards').update(card.id, { views_count: (card.views_count || 0) + 1 });
 
-  res.json(card);
+  // Only expose fields needed for public display — never expose user_id or internals
+  const { user_id, views_count, created_at, updated_at, ...publicCard } = card;
+  res.json(publicCard);
 });
 
 router.post('/public/:slug/contact', (req, res) => {
@@ -21,9 +23,18 @@ router.post('/public/:slug/contact', (req, res) => {
     return res.status(404).json({ error: 'Cartão não encontrado' });
   }
 
-  const { name, email, phone, message } = req.body;
+  const name    = (req.body.name    || '').trim().substring(0, 100);
+  const email   = (req.body.email   || '').trim().substring(0, 200);
+  const phone   = (req.body.phone   || '').trim().substring(0, 30);
+  const message = (req.body.message || '').trim().substring(0, 1000);
+
   if (!name) {
     return res.status(400).json({ error: 'Nome é obrigatório' });
+  }
+
+  // Basic anti-spam: reject if name looks like HTML/script injection
+  if (/<[^>]*>/.test(name) || /<[^>]*>/.test(message)) {
+    return res.status(400).json({ error: 'Conteúdo inválido' });
   }
 
   query('contacts').insert({

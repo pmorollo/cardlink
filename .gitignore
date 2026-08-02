@@ -1,6 +1,28 @@
+# Dependências
 node_modules/
+
+# Variáveis de ambiente — NUNCA commitar
+.env
+.env.local
+.env.production
+
+# Banco de dados local
+backend/db/data.json
+backend/db/*.sqlite
+backend/db/*.db
+
+# Uploads locais
 backend/uploads/*
 !backend/uploads/.gitkeep
-backend/db/data.json
-.env
+
+# Logs
 *.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

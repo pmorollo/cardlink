@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Landing page profissional criada com CardLink">
+  <title>Carregando...</title>
+  <link rel="stylesheet" href="/landing.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💳</text></svg>">
+</head>
+<body>
+
+  <!-- ============================================
+       NAVBAR
+       ============================================ -->
+  <nav class="lp-nav" id="lp-nav">
+    <div class="container">
+      <div class="lp-nav-brand" onclick="scrollToTop()">
+        <div class="logo-icon">💳</div>
+        <span id="nav-business-name">CardLink</span>
+      </div>
+      <ul class="lp-nav-links" id="lp-nav-links">
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#servicos">Serviços</a></li>
+        <li><a href="#galeria">Galeria</a></li>
+        <li><a href="#depoimentos">Avaliações</a></li>
+        <li><a href="#contato">Contato</a></li>
+      </ul>
+      <div class="lp-nav-cta">
+        <a href="#contato" class="btn btn-primary btn-sm" id="nav-contact-btn">💬 Fale Comigo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================
+       HERO
+       ============================================ -->
+  <section class="lp-hero" id="hero" data-theme="midnight">
+    <div class="hero-orb"></div>
+    <div class="hero-orb"></div>
+    <div class="container">
+      <div class="lp-hero-content">
+        <!-- Text side -->
+        <div class="lp-hero-text">
+          <div class="lp-hero-badge">
+            <span class="dot"></span>
+            <span id="hero-badge-text">Profissional</span>
+          </div>
+          <h1 class="lp-hero-title" id="hero-title">
+            Bem-vindo ao meu<br><span class="text-gradient" id="hero-name">espaço profissional</span>
+          </h1>
+          <p class="lp-hero-subtitle" id="hero-subtitle">
+            Conheça meu trabalho, serviços e entre em contato comigo.
+          </p>
+          <div class="lp-hero-actions">
+            <a href="#contato" class="btn btn-primary btn-lg" id="hero-cta-btn">💬 Falar no WhatsApp</a>
+            <a href="#servicos" class="btn btn-outline btn-lg">Ver Serviços ↓</a>
+          </div>
+        </div>
+
+        <!-- Visual side -->
+        <div class="lp-hero-visual">
+          <div>
+            <div class="lp-hero-avatar-wrap">
+              <div class="lp-hero-avatar-ring"></div>
+              <div class="lp-hero-avatar" id="hero-avatar">?</div>
+            </div>
+            <div class="lp-hero-stats" id="hero-stats"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       SOBRE MIM
+       ============================================ -->
+  <section class="lp-section" id="sobre">
+    <div class="container">
+      <div class="lp-about-grid">
+        <div class="lp-about-image-wrap animate-in">
+          <div class="lp-about-image" id="about-image">
+            <div class="lp-about-image-placeholder" id="about-image-placeholder">
+              <span style="font-size:5rem;">👤</span>
+            </div>
+          </div>
+          <div class="lp-about-badge" id="about-badge">
+            <div class="lp-about-badge-value" id="about-badge-value">✨</div>
+            <div class="lp-about-badge-label" id="about-badge-label">Profissional</div>
+          </div>
+        </div>
+
+        <div class="lp-about-text animate-in" style="transition-delay:0.15s;">
+          <span class="lp-section-tag">Sobre mim</span>
+          <h2 id="about-title">Quem sou eu</h2>
+          <div id="about-content">
+            <p id="about-description"></p>
+          </div>
+          <div class="lp-about-highlights" id="about-highlights"></div>
+          <div id="about-placeholder-hint"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       SERVIÇOS
+       ============================================ -->
+  <section class="lp-section lp-section-alt" id="servicos">
+    <div class="container">
+      <div class="lp-section-header animate-in">
+        <span class="lp-section-tag">O que ofereço</span>
+        <h2 class="lp-section-title">Meus <span class="text-gradient">Serviços</span></h2>
+        <p class="lp-section-desc" id="services-desc">Soluções pensadas para atender você com qualidade e atenção.</p>
+        <div id="services-placeholder-hint"></div>
+      </div>
+      <div class="lp-services-grid" id="services-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       GALERIA
+       ============================================ -->
+  <section class="lp-section" id="galeria">
+    <div class="container">
+      <div class="lp-section-header animate-in">
+        <span class="lp-section-tag">Portfólio</span>
+        <h2 class="lp-section-title">Galeria de <span class="text-gradient">Fotos</span></h2>
+        <p class="lp-section-desc">Conheça nosso trabalho e resultados.</p>
+        <div id="gallery-placeholder-hint"></div>
+      </div>
+      <div class="lp-gallery-grid" id="gallery-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       DEPOIMENTOS
+       ============================================ -->
+  <section class="lp-section lp-section-alt" id="depoimentos">
+    <div class="container">
+      <div class="lp-section-header animate-in">
+        <span class="lp-section-tag">O que dizem</span>
+        <h2 class="lp-section-title">Avaliações de <span class="text-gradient">Clientes</span></h2>
+        <p class="lp-section-desc">Veja o que nossos clientes estão falando.</p>
+        <div id="testimonials-placeholder-hint"></div>
+      </div>
+      <div class="lp-testimonials-grid" id="testimonials-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       REDES SOCIAIS
+       ============================================ -->
+  <section class="lp-section" id="redes" style="padding:60px 0;">
+    <div class="container">
+      <div class="lp-section-header animate-in" style="margin-bottom:32px;">
+        <h2 class="lp-section-title" style="font-size:1.5rem;">Me siga nas redes</h2>
+      </div>
+      <div class="lp-social-strip" id="social-strip"></div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       CONTATO
+       ============================================ -->
+  <section class="lp-section lp-section-alt" id="contato">
+    <div class="container">
+      <div class="lp-contact-wrap">
+        <!-- Info -->
+        <div class="animate-in">
+          <span class="lp-section-tag">Entre em contato</span>
+          <h2 id="contact-title">Vamos <span class="text-gradient">conversar?</span></h2>
+          <p id="contact-desc" style="color:var(--text-secondary);line-height:1.7;margin:16px 0 32px;">
+            Estou disponível para atendimento. Entre em contato e responderei o mais breve possível.
+          </p>
+          <div class="lp-contact-links" id="contact-links"></div>
+        </div>
+
+        <!-- Form -->
+        <div class="lp-contact-form animate-in" style="transition-delay:0.15s;">
+          <h3>📩 Envie uma Mensagem</h3>
+          <div class="form-group">
+            <label class="form-label">Seu nome *</label>
+            <input class="form-input" type="text" id="cf-name" placeholder="João Silva">
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input class="form-input" type="email" id="cf-email" placeholder="joao@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp / Telefone</label>
+            <input class="form-input" type="tel" id="cf-phone" placeholder="(11) 99999-9999">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mensagem</label>
+            <textarea class="form-input" id="cf-message" rows="4" placeholder="Como posso te ajudar?"></textarea>
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="submitForm()">
+            📤 Enviar Mensagem
+          </button>
+          <div id="form-success" style="display:none;text-align:center;padding:32px 0;">
+            <div style="font-size:3rem;margin-bottom:12px;">✅</div>
+            <h4 style="font-weight:700;margin-bottom:8px;">Mensagem enviada!</h4>
+            <p style="color:var(--text-secondary);font-size:0.9rem;">Em breve entraremos em contato.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer class="lp-footer">
+    <div class="container">
+      <div class="lp-footer-inner">
+        <div class="lp-footer-brand">
+          <span>💳</span>
+          <span id="footer-name">CardLink</span>
+        </div>
+        <nav class="lp-footer-nav" id="footer-nav"></nav>
+        <p class="lp-footer-copy">
+          Criado com <span style="color:var(--accent);">♥</span> usando
+          <a href="/" style="color:var(--accent);font-weight:600;">CardLink</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span id="toast-icon">✅</span>
+    <span id="toast-message"></span>
+  </div>
+
+  <script src="/landing.js?v=1"></script>
+</body>
+</html>
