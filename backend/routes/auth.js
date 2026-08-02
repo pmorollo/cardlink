@@ -48,10 +48,6 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'E-mail e senha são obrigatórios' });
   }
 
-  if (password.length < 8) {
-    return res.status(400).json({ error: 'Senha deve ter pelo menos 8 caracteres' });
-  }
-
   const user = query('users').findOne(u => (u.email && u.email.toLowerCase() === userEmail) || u.whatsapp === userEmail);
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
     return res.status(401).json({ error: 'E-mail ou senha incorretos' });

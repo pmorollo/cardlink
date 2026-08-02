@@ -85,12 +85,9 @@ app.get('*', (req, res) => {
 
 // ─── Global error handler ─────────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  const status = err.status || 500;
-  const message = process.env.NODE_ENV === 'production'
-    ? 'Erro interno do servidor'
-    : err.message;
-  res.status(status).json({ error: message });
+  console.error(err.stack || err);
+  const status = err.status || err.statusCode || 500;
+  res.status(status).json({ error: err.message || 'Erro no servidor' });
 });
 
 app.listen(PORT, () => {
