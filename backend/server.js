@@ -71,6 +71,7 @@ app.use('/api/upload', apiLimiter, uploadRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
+app.use(express.static(path.join(__dirname, '..')));
 
 // Landing page route — serves landing.html for /site/:slug
 app.get('/site/:slug', (req, res) => {
