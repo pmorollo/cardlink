@@ -1190,3 +1190,83 @@ function initIntersectionObserver() {
   }, { threshold: 0.1 });
   document.querySelectorAll('.animate-in').forEach(el => { el.style.animationPlayState = 'paused'; observer.observe(el); });
 }
+
+// ============================================
+// AI Generation (NVIDIA API & Skill Tones)
+// ============================================
+async function generateWithAI() {
+  const profInput = document.getElementById('ai-profession');
+  const skillSelect = document.getElementById('ai-skill');
+  const btn = document.getElementById('ai-generate-btn');
+
+  const profession = profInput?.value.trim();
+  const skill = skillSelect?.value || 'vendedora';
+
+  if (!profession) {
+    showToast('⚠️', 'Digite sua profissão ou negócio!');
+    if (profInput) profInput.focus();
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = '🤖 IA gerando conteúdo...'; }
+  showToast('⏳', 'IA gerando seu cartão e site...');
+
+  try {
+    const res = await api('/ai/generate', {
+      method: 'POST',
+      body: JSON.stringify({ profession, skill, mode: 'full' })
+    });
+
+    if (res.title) setFieldValue('field-title', res.title);
+    if (res.description) setFieldValue('field-description', res.description);
+    if (res.message) setFieldValue('field-message', res.message);
+    if (res.site_button_text) setFieldValue('field-site-button', res.site_button_text);
+
+    // Products / Services
+    if (res.products && Array.isArray(res.products) && res.products.length > 0) {
+      const prodContainer = document.getElementById('builder-products-container');
+      if (prodContainer) {
+        prodContainer.innerHTML = '';
+        res.products.forEach(p => addProductRow(p));
+      }
+    }
+
+    updatePreview();
+    showToast('✨', 'Cartão e site preenchidos pela IA!');
+  } catch (err) {
+    showToast('❌', 'Erro na IA: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '✨ Preencher Cartão & Site com IA'; }
+  }
+}
+
+async function improveFieldWithAI(fieldId) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+  const currentText = input.value.trim();
+  const profession = document.getElementById('ai-profession')?.value.trim() || document.getElementById('field-title')?.value.trim() || 'Profissional';
+  const skill = document.getElementById('ai-skill')?.value || 'vendedora';
+
+  if (!currentText) {
+    showToast('⚠️', 'Digite algum texto no campo antes de melhorar!');
+    input.focus();
+    return;
+  }
+
+  showToast('⏳', 'Melhorando texto com IA...');
+
+  try {
+    const res = await api('/ai/generate', {
+      method: 'POST',
+      body: JSON.stringify({ profession, skill, mode: 'improve', textToImprove: currentText })
+    });
+
+    if (res.improvedText) {
+      input.value = res.improvedText;
+      updatePreview();
+      showToast('✨', 'Texto melhorado com sucesso!');
+    }
+  } catch (err) {
+    showToast('❌', 'Erro ao melhorar texto: ' + err.message);
+  }
+}

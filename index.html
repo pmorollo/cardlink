@@ -261,6 +261,34 @@
             <button class="btn btn-secondary btn-sm" onclick="navigateTo('dashboard')">← Voltar</button>
           </div>
 
+          <!-- AI Assistant Banner -->
+          <div class="form-section" style="background:linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.12));border:1.5px solid var(--accent);border-radius:var(--radius-lg);padding:20px;margin-bottom:var(--space-xl);">
+            <div class="form-section-title" style="color:var(--accent);font-size:1.1rem;margin-bottom:10px;">
+              <span class="icon">🤖</span> Assistente de IA (NVIDIA)
+            </div>
+            <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:14px;line-height:1.5;">
+              Digite sua profissão e escolha a <strong>Skill / Tom de Voz</strong> para preencher seu cartão e site automaticamente!
+            </p>
+            <div class="form-row">
+              <div class="form-group" style="flex:2;">
+                <label class="form-label" for="ai-profession">Sua Profissão ou Negócio</label>
+                <input class="form-input" type="text" id="ai-profession" placeholder="Ex: Cabeleireira em SP, Advogado Trabalhista, Fotógrafo...">
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label class="form-label" for="ai-skill">Skill / Tom de Voz</label>
+                <select class="form-input" id="ai-skill" style="cursor:pointer;">
+                  <option value="vendedora">⚡ Skill Vendedora</option>
+                  <option value="corporativa">💼 Skill Corporativa</option>
+                  <option value="criativa">🎨 Skill Criativa</option>
+                  <option value="acolhedora">🌿 Skill Acolhedora</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" type="button" id="ai-generate-btn" onclick="generateWithAI()" style="width:100%;margin-top:8px;">
+              ✨ Preencher Cartão & Site com IA
+            </button>
+          </div>
+
           <!-- Personal Info -->
           <div class="form-section">
             <div class="form-section-title"><span class="icon">👤</span> Informações Pessoais</div>
@@ -292,6 +320,7 @@
             <div class="form-group">
               <label class="form-label" for="field-description">Descrição</label>
               <textarea class="form-input" id="field-description" placeholder="Uma breve descrição sobre você ou seu negócio..." data-field="description" rows="3"></textarea>
+              <button type="button" class="btn btn-outline btn-sm" onclick="improveFieldWithAI('field-description')" style="margin-top:6px;font-size:0.75rem;">✨ Melhorar Descrição com IA</button>
             </div>
           </div>
 
@@ -315,6 +344,7 @@
             <div class="form-group">
               <label class="form-label" for="field-message">Mensagem</label>
               <textarea class="form-input" id="field-message" placeholder="Ex: Agende pelo WhatsApp ou visite-nos no fim de semana" data-field="message" rows="3"></textarea>
+              <button type="button" class="btn btn-outline btn-sm" onclick="improveFieldWithAI('field-message')" style="margin-top:6px;font-size:0.75rem;">✨ Melhorar Mensagem com IA</button>
             </div>
           </div>
 
