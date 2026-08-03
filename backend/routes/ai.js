@@ -151,4 +151,102 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem código markdown, sem explicaç
   }
 });
 
+// ============================================
+// Public AI Assistant Chat for Card & Landing Page
+// ============================================
+router.post('/public/:slug/chat', async (req, res) => {
+  const { slug } = req.params;
+  const { message, history = [] } = req.body;
+
+  if (!message || !message.trim()) {
+    return res.status(400).json({ error: 'Mensagem é obrigatória' });
+  }
+
+  const { query } = require('../db/database');
+  const card = query('cards').findOne(c => c.slug === slug);
+  if (!card) {
+    return res.status(404).json({ error: 'Cartão não encontrado' });
+  }
+
+  const servicesList = (card.products || []).map((p, i) =>
+    `${i+1}. ${p.name || 'Serviço'}${p.price ? ' (R$ ' + p.price + ')' : ''}${p.description ? ' - ' + p.description : ''}`
+  ).join('\n') || 'Nenhum serviço cadastrado individualmente.';
+
+  const systemPrompt = `Você é o Atendente Virtual IA de ${card.name}${card.business ? ' (' + card.business + ')' : ''}.
+Seu objetivo é responder dúvidas de potenciais clientes sobre serviços, preços, atendimento e localização de forma educada, amigável e humana.
+
+DADOS DO PROFISSIONAL:
+- Nome: ${card.name}
+- Cargo/Título: ${card.title || 'Profissional'}
+- Empresa: ${card.business || 'N/A'}
+- Descrição: ${card.description || 'N/A'}
+- Telefone: ${card.phone || 'N/A'}
+- WhatsApp: ${card.whatsapp || 'N/A'}
+- E-mail: ${card.email || 'N/A'}
+- Endereço: ${card.address || 'N/A'}
+
+SERVIÇOS / PRODUTOS DISPONÍVEIS:
+${servicesList}
+
+REGRAS DE RESPOSTA:
+1. Responda em português brasileiro de forma simpática, clara e objetiva.
+2. Use as informações acima para responder. Se a informação não estiver disponível, responda educadamente e convide a conversar no WhatsApp.
+3. Respostas curtas (no máximo 2 a 3 parágrafos).
+4. Quando fizer sentido, convide o visitante a clicar no botão de WhatsApp para agendar.`;
+
+  const apiKey = process.env.NVIDIA_API_KEY;
+
+  if (!apiKey) {
+    const msg = message.toLowerCase();
+    let reply = `Olá! Sou o assistente virtual de ${card.name}. `;
+    if (msg.includes('preço') || msg.includes('valor') || msg.includes('quanto') || msg.includes('serviço')) {
+      reply += `Nossos serviços principais são:\n${servicesList}\n\nPara agendar ou tirar dúvidas específicas, fale conosco no WhatsApp!`;
+    } else if (msg.includes('onde') || msg.includes('endereço') || msg.includes('local')) {
+      reply += card.address ? `Estamos localizados em: ${card.address}.` : `Atendemos via WhatsApp e telefone. Entre em contato!`;
+    } else if (msg.includes('contato') || msg.includes('telefone') || msg.includes('whatsapp')) {
+      reply += `Você pode falar conosco pelo WhatsApp: ${card.whatsapp || card.phone || 'no botão abaixo'}.`;
+    } else {
+      reply += `Como posso te ajudar hoje? Para atendimento imediato, clique no botão de WhatsApp.`;
+    }
+    return res.json({ reply });
+  }
+
+  try {
+    const messages = [
+      { role: 'user', content: systemPrompt },
+      { role: 'assistant', content: `Olá! Sou o assistente virtual de ${card.name}. Como posso te ajudar hoje?` }
+    ];
+
+    (history || []).slice(-4).forEach(h => {
+      if (h.sender && h.text) {
+        messages.push({ role: h.sender === 'user' ? 'user' : 'assistant', content: h.text });
+      }
+    });
+
+    messages.push({ role: 'user', content: message });
+
+    const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'meta/llama-3.1-70b-instruct',
+        messages,
+        temperature: 0.5,
+        max_tokens: 400
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content?.trim() || `Olá! Para um atendimento personalizado com ${card.name}, entre em contato pelo WhatsApp.`;
+    return res.json({ reply });
+  } catch (err) {
+    console.error('NVIDIA Chat API Error:', err.message);
+    return res.json({ reply: `Olá! Como posso te ajudar? Para falar diretamente com ${card.name}, clique no botão do WhatsApp.` });
+  }
+});
+
 module.exports = router;
+

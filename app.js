@@ -743,7 +743,10 @@ async function loadPublicCard(slug) {
         dashBtn.style.display = 'none';
       }
     }
+
+    initAiChatWidget(slug, card.name || 'Profissional');
   } catch (err) {
+
     rendered.innerHTML = '<p style="text-align:center;color:#ef4444;padding:var(--space-3xl);">Cartão não encontrado</p>';
   }
 }
@@ -1270,3 +1273,104 @@ async function improveFieldWithAI(fieldId) {
     showToast('❌', 'Erro ao melhorar texto: ' + err.message);
   }
 }
+
+// ============================================
+// Public AI Assistant Chat Widget
+// ============================================
+let chatHistory = [];
+let currentSlugForChat = '';
+
+function initAiChatWidget(slug, name) {
+  currentSlugForChat = slug;
+  chatHistory = [];
+  if (document.getElementById('ai-chat-widget')) return;
+
+  const container = document.createElement('div');
+  container.id = 'ai-chat-widget';
+  container.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;';
+
+  container.innerHTML = `
+    <button id="ai-chat-toggle-btn" onclick="toggleAiChatWindow()" style="background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;border:none;padding:12px 18px;border-radius:30px;font-weight:600;font-size:0.9rem;box-shadow:0 8px 24px rgba(0,0,0,0.3);cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform 0.2s;">
+      <span>🤖</span> Chat com IA
+    </button>
+    <div id="ai-chat-window" style="display:none;position:absolute;bottom:60px;right:0;width:320px;max-width:calc(100vw - 32px);height:430px;background:rgba(15,23,42,0.96);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.15);border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.5);flex-direction:column;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,rgba(139,92,246,0.3),rgba(6,182,212,0.3));padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);">
+        <div style="display:flex;align-items:center;gap:8px;color:#fff;font-weight:600;font-size:0.9rem;">
+          <span>🤖</span> Atendente de ${escapeHtml(name)}
+        </div>
+        <button onclick="toggleAiChatWindow()" style="background:none;border:none;color:#94a3b8;font-size:1.1rem;cursor:pointer;">✕</button>
+      </div>
+      <div id="ai-chat-messages" style="flex:1;padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;font-size:0.85rem;color:#e2e8f0;">
+        <div style="background:rgba(255,255,255,0.08);padding:10px 12px;border-radius:12px 12px 12px 2px;max-width:85%;align-self:flex-start;line-height:1.4;">
+          Olá! Sou o atendente virtual de ${escapeHtml(name)}. Como posso te ajudar hoje? 😊
+        </div>
+      </div>
+      <div style="padding:10px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:6px;background:rgba(0,0,0,0.2);">
+        <input type="text" id="ai-chat-input" placeholder="Tire uma dúvida..." style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:8px 12px;color:#fff;font-size:0.85rem;outline:none;" onkeypress="if(event.key==='Enter') sendAiChatMessage()">
+        <button onclick="sendAiChatMessage()" style="background:#8b5cf6;color:#fff;border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9rem;">➤</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(container);
+}
+
+function toggleAiChatWindow() {
+  const win = document.getElementById('ai-chat-window');
+  if (!win) return;
+  const isHidden = win.style.display === 'none';
+  win.style.display = isHidden ? 'flex' : 'none';
+  if (isHidden) {
+    const input = document.getElementById('ai-chat-input');
+    if (input) input.focus();
+  }
+}
+
+async function sendAiChatMessage() {
+  const input = document.getElementById('ai-chat-input');
+  const msgs = document.getElementById('ai-chat-messages');
+  if (!input || !msgs) return;
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  const userBubble = document.createElement('div');
+  userBubble.style.cssText = 'background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;padding:10px 12px;border-radius:12px 12px 2px 12px;max-width:85%;align-self:flex-end;line-height:1.4;word-break:break-word;';
+  userBubble.textContent = text;
+  msgs.appendChild(userBubble);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const typing = document.createElement('div');
+  typing.id = 'ai-chat-typing';
+  typing.style.cssText = 'background:rgba(255,255,255,0.08);padding:10px 12px;border-radius:12px 12px 12px 2px;max-width:85%;align-self:flex-start;color:#94a3b8;font-style:italic;';
+  typing.textContent = '🤖 Digitando...';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const res = await fetch(`${API}/ai/public/${currentSlugForChat}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, history: chatHistory })
+    });
+    const data = await res.json();
+    typing.remove();
+
+    const replyText = data.reply || 'Como posso te ajudar hoje?';
+    chatHistory.push({ sender: 'user', text });
+    chatHistory.push({ sender: 'assistant', text: replyText });
+
+    const aiBubble = document.createElement('div');
+    aiBubble.style.cssText = 'background:rgba(255,255,255,0.08);padding:10px 12px;border-radius:12px 12px 12px 2px;max-width:85%;align-self:flex-start;line-height:1.4;word-break:break-word;white-space:pre-wrap;';
+    aiBubble.textContent = replyText;
+    msgs.appendChild(aiBubble);
+    msgs.scrollTop = msgs.scrollHeight;
+  } catch (err) {
+    if (typing) typing.remove();
+    const errBubble = document.createElement('div');
+    errBubble.style.cssText = 'background:rgba(239,68,68,0.2);color:#fca5a5;padding:8px 12px;border-radius:8px;align-self:center;font-size:0.8rem;';
+    errBubble.textContent = 'Erro ao enviar mensagem. Tente novamente.';
+    msgs.appendChild(errBubble);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+}
+
