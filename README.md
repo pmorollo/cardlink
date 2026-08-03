@@ -22,13 +22,15 @@ Aplicação de cartão de visita digital com backend em Node/Express e frontend 
 
 ## Como compartilhar o aplicativo
 
-- O link público do cartão local é `http://localhost:3000/#card/<slug>`.
+- O link principal é a página profissional: `http://localhost:3000/site/<slug>`.
+- O cartão compacto continua disponível em `http://localhost:3000/#card/<slug>` para visualização complementar.
 - Para outras pessoas acessarem, é necessário hospedar o app em um servidor público ou usar um túnel como `ngrok`.
 
 ## Melhorias incluídas
 
 - `/` serve o frontend e `/api` serve a API backend.
-- Tela pública de cartão com QR code e botões de compartilhamento.
+- Compartilhamento e QR code direcionam para a página profissional completa.
+- Ação principal pelo WhatsApp e opção secundária para salvar o contato no celular (`.vcf`).
 - Copiar link para área de transferência com fallback.
 - Suporte a `navigator.share` em dispositivos compatíveis.
 

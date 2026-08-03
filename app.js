@@ -73,16 +73,21 @@ function fallbackCopy(text) {
   document.body.removeChild(ta);
 }
 
+function getPrimaryPublicUrl(slug) {
+  const resolvedSlug = slug || (window.location.hash.startsWith('#card/') ? window.location.hash.substring(6) : '');
+  return resolvedSlug ? `${window.location.origin}/site/${resolvedSlug}` : window.location.href;
+}
+
 function shareCard(slug) {
-  const cardLink = slug ? window.location.origin + '/#card/' + slug : window.location.href;
+  const cardLink = getPrimaryPublicUrl(slug);
   if (navigator.share) {
-    navigator.share({ title: 'Meu cartão de visita digital', url: cardLink }).catch(() => copyToClipboard(cardLink));
+    navigator.share({ title: 'Minha página profissional', url: cardLink }).catch(() => copyToClipboard(cardLink));
   } else {
     copyToClipboard(cardLink);
   }
 }
 
-function copyCardLink() { copyToClipboard(window.location.href); }
+function copyCardLink() { copyToClipboard(getPrimaryPublicUrl()); }
 
 // ============================================
 // Navigation / Routing
@@ -402,14 +407,14 @@ async function loadDashboard() {
 
     const stats = data.stats;
     const initials = (card.name || 'C').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-    const cardLink = window.location.origin + '/#card/' + card.slug;
+    const cardLink = window.location.origin + '/site/' + card.slug;
     const recentContacts = stats.recentContacts || [];
 
     content.innerHTML = `
       <div class="dashboard-header">
         <div>
-          <h1 class="builder-title">Meu <span class="text-gradient">Cartão</span></h1>
-          <p class="builder-subtitle">Olá, ${escapeHtml(userName)}! Gerencie seu cartão digital.</p>
+          <h1 class="builder-title">Minha <span class="text-gradient">Página</span></h1>
+          <p class="builder-subtitle">Olá, ${escapeHtml(userName)}! Gerencie sua presença profissional em um único link.</p>
         </div>
       </div>
 
@@ -427,7 +432,7 @@ async function loadDashboard() {
         <div class="stat-card" onclick="window.open('/site/${escapeHtml(card.slug)}', '_blank')" style="cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor=''">
           <div class="stat-icon">🌐</div>
           <div class="stat-value" style="font-size:1rem;">Ver</div>
-          <div class="stat-label">Landing Page</div>
+          <div class="stat-label">Página profissional</div>
         </div>
       </div>
 
@@ -442,7 +447,7 @@ async function loadDashboard() {
           </div>
           <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm" onclick="editCard(${card.id})">✏️ Editar</button>
-            <a class="btn btn-primary btn-sm" href="/site/${escapeHtml(card.slug)}" target="_blank" rel="noopener">🌐 Landing Page</a>
+            <a class="btn btn-primary btn-sm" href="/site/${escapeHtml(card.slug)}" target="_blank" rel="noopener">🌐 Abrir página</a>
             <button class="btn btn-outline btn-sm" onclick="copyToClipboard('${escapeHtml(cardLink)}')">📋 Copiar Link</button>
           </div>
         </div>
@@ -451,7 +456,7 @@ async function loadDashboard() {
 
         <div class="dash-card-actions-bar">
           <button class="btn btn-secondary btn-sm" onclick="shareCard('${escapeHtml(card.slug)}')">📤 Compartilhar</button>
-          <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('${window.location.origin}/site/${escapeHtml(card.slug)}')">🌐 Copiar Link Landing</button>
+          <a class="btn btn-secondary btn-sm" href="/#card/${escapeHtml(card.slug)}" target="_blank" rel="noopener">👁️ Ver cartão compacto</a>
           <button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">📩 Contatos (${stats.contacts})</button>
           <button class="btn btn-outline btn-sm" style="color:#ef4444;border-color:rgba(239,68,68,0.3);" onclick="deleteCard(${card.id})">🗑️ Excluir</button>
         </div>
@@ -779,7 +784,7 @@ async function loadPublicCard(slug) {
     rendered.innerHTML = renderCard(card, false);
 
     const qrImg = document.getElementById('qrCodeImg');
-    if (qrImg) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(window.location.href)}&bgcolor=ffffff&color=000000`;
+    if (qrImg) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(getPrimaryPublicUrl(card.slug))}&bgcolor=ffffff&color=000000`;
 
     const existingFab = document.querySelector('.fab-whatsapp');
     if (existingFab) existingFab.remove();
@@ -1436,4 +1441,3 @@ async function sendAiChatMessage() {
     msgs.scrollTop = msgs.scrollHeight;
   }
 }
-

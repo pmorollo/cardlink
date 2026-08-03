@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Landing page profissional criada com CardLink">
   <title>Carregando...</title>
-  <link rel="stylesheet" href="/landing.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💳</text></svg>">
+  <link rel="stylesheet" href="/landing.css?v=3">
+  <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
 </head>
 <body>
 
@@ -16,7 +16,7 @@
   <nav class="lp-nav" id="lp-nav">
     <div class="container">
       <div class="lp-nav-brand" onclick="scrollToTop()">
-        <div class="logo-icon">💳</div>
+        <div class="logo-icon" id="nav-brand-mark">C</div>
         <span id="nav-business-name">CardLink</span>
       </div>
       <ul class="lp-nav-links" id="lp-nav-links">
@@ -27,7 +27,7 @@
         <li><a href="#contato">Contato</a></li>
       </ul>
       <div class="lp-nav-cta">
-        <a href="#contato" class="btn btn-primary btn-sm" id="nav-contact-btn">💬 Fale Comigo</a>
+        <a href="#contato" class="btn btn-whatsapp-action btn-sm" id="nav-contact-btn">WhatsApp</a>
       </div>
     </div>
   </nav>
@@ -53,9 +53,10 @@
             Conheça meu trabalho, serviços e entre em contato comigo.
           </p>
           <div class="lp-hero-actions">
-            <a href="#contato" class="btn btn-primary btn-lg" id="hero-cta-btn">💬 Falar no WhatsApp</a>
-            <a href="#servicos" class="btn btn-outline btn-lg">Ver Serviços ↓</a>
+            <a href="#contato" class="btn btn-whatsapp-action btn-lg" id="hero-cta-btn">Falar no WhatsApp</a>
+            <button type="button" class="btn btn-outline btn-lg" id="save-contact-btn">Salvar contato</button>
           </div>
+          <a href="#servicos" class="lp-hero-services-link">Conhecer serviços ↓</a>
         </div>
 
         <!-- Visual side -->
@@ -178,7 +179,7 @@
 
         <!-- Form -->
         <div class="lp-contact-form animate-in" style="transition-delay:0.15s;">
-          <h3>📩 Envie uma Mensagem</h3>
+          <h3>Envie uma mensagem</h3>
           <div class="form-group">
             <label class="form-label">Seu nome *</label>
             <input class="form-input" type="text" id="cf-name" placeholder="João Silva">
@@ -196,7 +197,7 @@
             <textarea class="form-input" id="cf-message" rows="4" placeholder="Como posso te ajudar?"></textarea>
           </div>
           <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="submitForm()">
-            📤 Enviar Mensagem
+            Enviar mensagem <span aria-hidden="true">→</span>
           </button>
           <div id="form-success" style="display:none;text-align:center;padding:32px 0;">
             <div style="font-size:3rem;margin-bottom:12px;">✅</div>
@@ -215,7 +216,7 @@
     <div class="container">
       <div class="lp-footer-inner">
         <div class="lp-footer-brand">
-          <span>💳</span>
+          <span class="footer-brand-mark" id="footer-brand-mark">C</span>
           <span id="footer-name">CardLink</span>
         </div>
         <nav class="lp-footer-nav" id="footer-nav"></nav>
@@ -233,6 +234,6 @@
     <span id="toast-message"></span>
   </div>
 
-  <script src="/landing.js?v=2"></script>
+  <script src="/landing.js?v=3"></script>
 </body>
 </html>

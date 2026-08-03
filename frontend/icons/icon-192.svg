@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="CardLink">
+  <defs>
+    <linearGradient id="g" x1="24" y1="18" x2="166" y2="176" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="48" fill="#0b0b10"/>
+  <path d="M126 61a49 49 0 1 0 0 70" fill="none" stroke="url(#g)" stroke-width="19" stroke-linecap="round"/>
+  <path d="M111 96h45" fill="none" stroke="#f4f4f5" stroke-width="13" stroke-linecap="round"/>
+  <circle cx="158" cy="96" r="10" fill="#06b6d4"/>
+</svg>

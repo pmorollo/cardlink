@@ -77,6 +77,60 @@ function esc(str) {
 
 function cleanPhone(num) { return (num || '').replace(/\D/g, ''); }
 
+const WHATSAPP_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a9.7 9.7 0 0 0-8.4 14.6L2 22l5.5-1.5A9.8 9.8 0 1 0 12 2Zm0 17.8a8 8 0 0 1-4.1-1.1l-.3-.2-3.2.9.9-3.1-.2-.3A8 8 0 1 1 12 19.8Zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.3 0-.5.1-.6l.5-.6c.1-.2.1-.4 0-.6l-.7-1.7c-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.2.2 1.8 2.8 4.5 3.8 1.7.7 2.8.8 3.8.5.6-.2 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.2-.1-.4-.2-.6-.3Z"/></svg>';
+
+function escapeVCard(value) {
+  return String(value || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/\n/g, '\\n')
+    .replace(/,/g, '\\,')
+    .replace(/;/g, '\\;');
+}
+
+function saveContact() {
+  if (!cardData) return;
+
+  const d = cardData;
+  const whatsapp = cleanPhone(d.whatsapp);
+  const phone = cleanPhone(d.phone);
+  const lines = [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    `FN:${escapeVCard(d.name || d.business || 'Contato')}`,
+    d.business ? `ORG:${escapeVCard(d.business)}` : '',
+    d.title ? `TITLE:${escapeVCard(d.title)}` : '',
+    whatsapp ? `TEL;TYPE=CELL:${whatsapp}` : '',
+    phone && phone !== whatsapp ? `TEL;TYPE=WORK,VOICE:${phone}` : '',
+    d.email ? `EMAIL;TYPE=INTERNET:${escapeVCard(d.email)}` : '',
+    d.address ? `ADR;TYPE=WORK:;;${escapeVCard(d.address)};;;;` : '',
+    `URL:${window.location.origin}/site/${encodeURIComponent(d.slug || slug)}`,
+    'END:VCARD'
+  ].filter(Boolean);
+
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/vcard;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const filename = (d.name || d.business || 'contato')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9_-]+/g, '-')
+    .replace(/^-|-$/g, '') || 'contato';
+
+  link.href = url;
+  link.download = `${filename}.vcf`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+
+  const button = document.getElementById('save-contact-btn');
+  if (button) {
+    const original = button.innerHTML;
+    button.innerHTML = '✅ Contato pronto para salvar';
+    window.setTimeout(() => { button.innerHTML = original; }, 2500);
+  }
+  toast('✅', 'Contato gerado. Confirme para adicioná-lo à agenda.');
+}
+
 let toastTimer;
 function toast(icon, msg) {
   const el = document.getElementById('toast');
@@ -156,13 +210,15 @@ function applyTheme(theme) {
 function renderNav(d) {
   const brandEl = document.getElementById('nav-business-name');
   if (brandEl) brandEl.textContent = d.business || d.name || 'CardLink';
+  const brandMark = document.getElementById('nav-brand-mark');
+  if (brandMark) brandMark.textContent = (d.business || d.name || 'C').trim().charAt(0).toUpperCase();
 
   const ctaBtn = document.getElementById('nav-contact-btn');
   if (ctaBtn && d.whatsapp) {
     ctaBtn.href = `https://wa.me/${cleanPhone(d.whatsapp)}`;
     ctaBtn.target = '_blank';
     ctaBtn.rel = 'noopener';
-    ctaBtn.innerHTML = '💬 WhatsApp';
+    ctaBtn.innerHTML = `${WHATSAPP_ICON}<span>WhatsApp</span>`;
   }
 }
 
@@ -181,7 +237,7 @@ function renderHero(d) {
 
   // Title
   const titleEl = document.getElementById('hero-title');
-  if (titleEl) titleEl.innerHTML = `Bem-vindo ao espaço de<br><span class="text-gradient">${esc(name)}</span>`;
+  if (titleEl) titleEl.innerHTML = `Olá, eu sou<br><span class="text-gradient">${esc(name)}</span>`;
 
   // Subtitle
   const subEl = document.getElementById('hero-subtitle');
@@ -198,14 +254,22 @@ function renderHero(d) {
       ctaBtn.href = `https://wa.me/${cleanPhone(d.whatsapp)}`;
       ctaBtn.target = '_blank';
       ctaBtn.rel = 'noopener';
-      ctaBtn.innerHTML = '💬 Falar no WhatsApp';
+      ctaBtn.className = 'btn btn-whatsapp-action btn-lg';
+      ctaBtn.innerHTML = `${WHATSAPP_ICON}<span>Falar no WhatsApp</span>`;
     } else if (d.phone) {
       ctaBtn.href = `tel:${d.phone}`;
-      ctaBtn.innerHTML = '📞 Ligar Agora';
+      ctaBtn.className = 'btn btn-primary btn-lg';
+      ctaBtn.innerHTML = 'Ligar agora';
     } else {
       ctaBtn.href = '#contato';
-      ctaBtn.innerHTML = '📩 Entrar em Contato';
+      ctaBtn.className = 'btn btn-primary btn-lg';
+      ctaBtn.innerHTML = 'Entrar em contato';
     }
+  }
+
+  const saveBtn = document.getElementById('save-contact-btn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', saveContact);
   }
 
   // Avatar
@@ -222,9 +286,9 @@ function renderHero(d) {
   const statsEl = document.getElementById('hero-stats');
   if (statsEl) {
     const pills = [];
-    if (d.phone || d.whatsapp) pills.push(`📞 <strong>Atendimento</strong>`);
-    if (title) pills.push(`🎓 <strong>${esc(title)}</strong>`);
-    if (business) pills.push(`🏢 <strong>${esc(business)}</strong>`);
+    if (d.phone || d.whatsapp) pills.push(`<strong>Atendimento direto</strong>`);
+    if (title) pills.push(`<strong>${esc(title)}</strong>`);
+    if (business) pills.push(`<strong>${esc(business)}</strong>`);
     statsEl.innerHTML = pills.map(p => `<div class="lp-stat-pill">${p}</div>`).join('');
   }
 }
@@ -303,20 +367,20 @@ function renderServices(d) {
   grid.innerHTML = services.map((s, i) => {
     const waMsg = encodeURIComponent(`Olá! Tenho interesse no serviço: ${s.name}${s.price ? ' (R$ ' + s.price + ')' : ''}`);
     const waUrl = d.whatsapp ? `https://wa.me/${cleanPhone(d.whatsapp)}?text=${waMsg}` : '#contato';
-    const emoji = ['🎯','✨','🚀','💡','🏆','🎨'][i % 6];
+    const serviceNumber = String(i + 1).padStart(2, '0');
 
     return `
       <div class="lp-service-card animate-in">
         ${s.photo_url
           ? `<img src="${esc(s.photo_url)}" class="lp-service-img" alt="${esc(s.name)}" onerror="this.style.display='none'">`
-          : `<div class="lp-service-img-placeholder">${emoji}</div>`}
+          : `<div class="lp-service-img-placeholder"><span>${serviceNumber}</span></div>`}
         <div class="lp-service-body">
           <div class="lp-service-name">${esc(s.name)}</div>
           ${s.description ? `<div class="lp-service-desc">${esc(s.description)}</div>` : ''}
           <div class="lp-service-footer">
             ${s.price ? `<div class="lp-service-price">R$ ${esc(s.price)}</div>` : '<div></div>'}
             <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm">
-              🛒 Encomendar
+              ${WHATSAPP_ICON}<span>Solicitar</span>
             </a>
           </div>
         </div>
@@ -340,7 +404,7 @@ function renderGallery(d) {
   grid.innerHTML = photos.slice(0, 6).map((url, i) => `
     <div class="lp-gallery-item animate-in">
       <img src="${esc(url)}" alt="Foto ${i + 1}" loading="lazy" onerror="this.parentElement.style.display='none'">
-      <div class="lp-gallery-overlay">🔍</div>
+      <div class="lp-gallery-overlay" aria-hidden="true">+</div>
     </div>`).join('');
 }
 
@@ -387,27 +451,27 @@ function renderSocial(d) {
   const socials = [];
   if (d.instagram) {
     const url = d.instagram.startsWith('@') ? `https://instagram.com/${d.instagram.substring(1)}` : d.instagram.includes('instagram.com') ? (d.instagram.startsWith('http') ? d.instagram : `https://${d.instagram}`) : `https://instagram.com/${d.instagram}`;
-    socials.push({ url, icon: '📷', label: 'Instagram' });
+    socials.push({ url, icon: 'IG', label: 'Instagram' });
   }
   if (d.facebook) {
     const url = d.facebook.includes('facebook.com') ? (d.facebook.startsWith('http') ? d.facebook : `https://${d.facebook}`) : `https://facebook.com/${d.facebook}`;
-    socials.push({ url, icon: '📘', label: 'Facebook' });
+    socials.push({ url, icon: 'f', label: 'Facebook' });
   }
   if (d.linkedin) {
     const url = d.linkedin.includes('linkedin.com') ? (d.linkedin.startsWith('http') ? d.linkedin : `https://${d.linkedin}`) : `https://linkedin.com/in/${d.linkedin}`;
-    socials.push({ url, icon: '💼', label: 'LinkedIn' });
+    socials.push({ url, icon: 'in', label: 'LinkedIn' });
   }
   if (d.tiktok) {
     const url = d.tiktok.startsWith('@') ? `https://tiktok.com/${d.tiktok}` : `https://tiktok.com/@${d.tiktok}`;
-    socials.push({ url, icon: '🎵', label: 'TikTok' });
+    socials.push({ url, icon: 'TT', label: 'TikTok' });
   }
   if (d.youtube) {
     const url = d.youtube.includes('youtube.com') ? (d.youtube.startsWith('http') ? d.youtube : `https://${d.youtube}`) : `https://youtube.com/@${d.youtube}`;
-    socials.push({ url, icon: '▶️', label: 'YouTube' });
+    socials.push({ url, icon: 'YT', label: 'YouTube' });
   }
   if (d.twitter) {
     const url = d.twitter.startsWith('@') ? `https://x.com/${d.twitter.substring(1)}` : `https://x.com/${d.twitter}`;
-    socials.push({ url, icon: '✖️', label: 'X (Twitter)' });
+    socials.push({ url, icon: 'X', label: 'X' });
   }
 
   if (socials.length === 0) {
@@ -417,7 +481,7 @@ function renderSocial(d) {
 
   strip.innerHTML = socials.map(s => `
     <a href="${esc(s.url)}" target="_blank" rel="noopener" class="lp-social-btn">
-      ${s.icon} ${s.label}
+      <span class="lp-social-mark">${s.icon}</span><span>${s.label}</span>
     </a>`).join('');
 }
 
@@ -462,6 +526,8 @@ function renderContact(d) {
 function renderFooter(d) {
   const nameEl = document.getElementById('footer-name');
   if (nameEl) nameEl.textContent = d.business || d.name || 'CardLink';
+  const footerMark = document.getElementById('footer-brand-mark');
+  if (footerMark) footerMark.textContent = (d.business || d.name || 'C').trim().charAt(0).toUpperCase();
 
   const nav = document.getElementById('footer-nav');
   if (nav) {
@@ -484,7 +550,7 @@ function renderFab(d) {
   fab.href = `https://wa.me/${cleanPhone(d.whatsapp)}`;
   fab.target = '_blank';
   fab.rel = 'noopener';
-  fab.innerHTML = '💬';
+  fab.innerHTML = `${WHATSAPP_ICON}<span>WhatsApp</span>`;
   fab.title = 'WhatsApp';
   document.body.appendChild(fab);
 }
@@ -640,4 +706,3 @@ async function sendAiChatMessage() {
     msgs.scrollTop = msgs.scrollHeight;
   }
 }
-
