@@ -70,4 +70,68 @@ router.get('/me', authMiddleware, (req, res) => {
   res.json(safe);
 });
 
+// ─── Password Reset ──────────────────────────────────────────────────
+router.post('/forgot-password', (req, res) => {
+  const { email } = req.body;
+  const userEmail = (email || '').trim().toLowerCase();
+
+  if (!userEmail) {
+    return res.status(400).json({ error: 'Informe o seu e-mail' });
+  }
+
+  const user = query('users').findOne(u => u.email && u.email.toLowerCase() === userEmail);
+  if (!user) {
+    return res.status(404).json({ error: 'E-mail não encontrado na nossa base de dados' });
+  }
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+
+  query('users').update(user.id, {
+    reset_code: code,
+    reset_expires: expiresAt
+  });
+
+  return res.json({
+    message: 'Código de recuperação gerado com sucesso!',
+    code
+  });
+});
+
+router.post('/reset-password', (req, res) => {
+  const { email, code, newPassword } = req.body;
+  const userEmail = (email || '').trim().toLowerCase();
+
+  if (!userEmail || !code || !newPassword) {
+    return res.status(400).json({ error: 'E-mail, código e nova senha são obrigatórios' });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: 'Nova senha deve ter pelo menos 8 caracteres' });
+  }
+
+  const user = query('users').findOne(u => u.email && u.email.toLowerCase() === userEmail);
+  if (!user) {
+    return res.status(404).json({ error: 'Usuário não encontrado' });
+  }
+
+  if (!user.reset_code || user.reset_code !== code.trim()) {
+    return res.status(400).json({ error: 'Código de recuperação inválido' });
+  }
+
+  if (new Date() > new Date(user.reset_expires)) {
+    return res.status(400).json({ error: 'Código de recuperação expirado. Gere um novo.' });
+  }
+
+  const passwordHash = bcrypt.hashSync(newPassword, 10);
+  query('users').update(user.id, {
+    password_hash: passwordHash,
+    reset_code: null,
+    reset_expires: null
+  });
+
+  return res.json({ message: 'Senha redefinida com sucesso! Você já pode fazer login.' });
+});
+
 module.exports = router;
+

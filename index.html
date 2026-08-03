@@ -198,6 +198,9 @@
           <div class="form-group">
             <label class="form-label" for="login-password">Senha</label>
             <input class="form-input" type="password" id="login-password" placeholder="Sua senha">
+            <div style="text-align:right;margin-top:4px;">
+              <a href="#" onclick="toggleAuthForm('forgot');return false;" style="color:var(--accent);font-size:0.8rem;text-decoration:none;">Esqueceu a senha?</a>
+            </div>
           </div>
           <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleLogin()">
             Entrar
@@ -230,6 +233,42 @@
             Já tem conta? <a href="#" onclick="toggleAuthForm('login');return false;">Entrar</a>
           </p>
         </div>
+
+        <!-- Forgot Password Form -->
+        <div id="forgot-form" style="display:none;">
+          <h1 class="auth-title">Recuperar <span class="text-gradient">Senha</span></h1>
+          <p class="auth-subtitle">Digite seu e-mail para redefinir sua senha</p>
+
+          <div id="forgot-step-1">
+            <div class="form-group">
+              <label class="form-label" for="forgot-email">E-mail Cadastrado</label>
+              <input class="form-input" type="email" id="forgot-email" placeholder="seu@email.com">
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleForgotPassword()">
+              Gerar Código de Recuperação
+            </button>
+          </div>
+
+          <div id="forgot-step-2" style="display:none;margin-top:12px;">
+            <div id="forgot-code-banner" style="background:rgba(139,92,246,0.15);border:1px solid var(--accent);border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.85rem;color:var(--text-primary);text-align:center;"></div>
+            <div class="form-group">
+              <label class="form-label" for="forgot-code">Código de 6 Dígitos</label>
+              <input class="form-input" type="text" id="forgot-code" placeholder="Ex: 123456" style="letter-spacing:4px;font-weight:700;text-align:center;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="forgot-new-password">Nova Senha</label>
+              <input class="form-input" type="password" id="forgot-new-password" placeholder="Mínimo 8 caracteres">
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleResetPassword()">
+              Redefinir Senha
+            </button>
+          </div>
+
+          <p class="auth-toggle">
+            Lembrou da senha? <a href="#" onclick="toggleAuthForm('login');return false;">Voltar para o Login</a>
+          </p>
+        </div>
+
       </div>
     </div>
   </section>

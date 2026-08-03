@@ -230,8 +230,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 function toggleAuthForm(form) {
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
+  const forgotForm = document.getElementById('forgot-form');
+
   if (loginForm) loginForm.style.display = form === 'login' ? '' : 'none';
   if (registerForm) registerForm.style.display = form === 'register' ? '' : 'none';
+  if (forgotForm) forgotForm.style.display = form === 'forgot' ? '' : 'none';
 }
 
 async function handleLogin() {
@@ -288,9 +291,69 @@ async function handleRegister() {
     currentUserCardId = null;
     createNewCard();
   } catch (err) {
+    if (err.message && err.message.includes('cadastrado')) {
+      showToast('⚠️', 'E-mail já cadastrado! Redirecionando para login...');
+      const loginEmail = document.getElementById('login-email');
+      if (loginEmail) loginEmail.value = email;
+      toggleAuthForm('login');
+    } else {
+      showToast('❌', err.message);
+    }
+  }
+}
+
+async function handleForgotPassword() {
+  const email = document.getElementById('forgot-email')?.value.trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    showToast('⚠️', 'Informe um e-mail válido!');
+    return;
+  }
+
+  showToast('⏳', 'Gerando código de recuperação...');
+  try {
+    const res = await api('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
+    const step1 = document.getElementById('forgot-step-1');
+    const step2 = document.getElementById('forgot-step-2');
+    const banner = document.getElementById('forgot-code-banner');
+
+    if (step1) step1.style.display = 'none';
+    if (step2) step2.style.display = 'block';
+    if (banner && res.code) {
+      banner.innerHTML = `🔑 Código de Recuperação Gerado:<br><strong style="font-size:1.4rem;letter-spacing:4px;color:var(--accent);">${res.code}</strong>`;
+    }
+    showToast('✅', 'Código gerado! Digite o código e a nova senha.');
+  } catch (err) {
     showToast('❌', err.message);
   }
 }
+
+async function handleResetPassword() {
+  const email = document.getElementById('forgot-email')?.value.trim().toLowerCase();
+  const code = document.getElementById('forgot-code')?.value.trim();
+  const newPassword = document.getElementById('forgot-new-password')?.value;
+
+  if (!email || !code || !newPassword) {
+    showToast('⚠️', 'Preencha o e-mail, código e a nova senha!');
+    return;
+  }
+
+  if (newPassword.length < 8) {
+    showToast('⚠️', 'Nova senha deve ter pelo menos 8 caracteres!');
+    return;
+  }
+
+  showToast('⏳', 'Redefinindo senha...');
+  try {
+    const res = await api('/auth/reset-password', { method: 'POST', body: JSON.stringify({ email, code, newPassword }) });
+    showToast('✅', res.message || 'Senha redefinida!');
+    const loginEmail = document.getElementById('login-email');
+    if (loginEmail) loginEmail.value = email;
+    toggleAuthForm('login');
+  } catch (err) {
+    showToast('❌', err.message);
+  }
+}
+
 
 function handleLogout() {
   authToken = null;
