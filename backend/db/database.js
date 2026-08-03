@@ -105,6 +105,12 @@ async function initPostgres(pool) {
 
     console.log('✅ Tabelas PostgreSQL verificadas/criadas com sucesso');
 
+    if (process.env.RESET_DB === 'true') {
+      console.log('🧹 RESET_DB ativo: Limpando tabelas PostgreSQL...');
+      await pool.query('TRUNCATE TABLE contacts, cards, users RESTART IDENTITY CASCADE;');
+      console.log('✅ Tabelas PostgreSQL limpas com sucesso!');
+    }
+
     // 2. Check if DB has users
     const resUsers = await pool.query('SELECT * FROM users ORDER BY id ASC');
     const resCards = await pool.query('SELECT * FROM cards ORDER BY id ASC');
