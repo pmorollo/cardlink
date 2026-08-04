@@ -544,16 +544,10 @@ function renderFooter(d) {
 // WhatsApp FAB
 // ============================================
 function renderFab(d) {
-  if (!d.whatsapp) return;
-  const fab = document.createElement('a');
-  fab.className = 'fab-whatsapp';
-  fab.href = `https://wa.me/${cleanPhone(d.whatsapp)}`;
-  fab.target = '_blank';
-  fab.rel = 'noopener';
-  fab.innerHTML = `${WHATSAPP_ICON}<span>WhatsApp</span>`;
-  fab.title = 'WhatsApp';
-  document.body.appendChild(fab);
+  // Suppressed floating WhatsApp button to avoid overlapping with Chat IA widget
+  return;
 }
+
 
 // ============================================
 // Contact Form Submit

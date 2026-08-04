@@ -788,16 +788,7 @@ async function loadPublicCard(slug) {
 
     const existingFab = document.querySelector('.fab-whatsapp');
     if (existingFab) existingFab.remove();
-    if (card.whatsapp) {
-      const fab = document.createElement('a');
-      fab.className = 'fab-whatsapp';
-      fab.href = `https://wa.me/${cleanWhatsapp(card.whatsapp)}`;
-      fab.target = '_blank';
-      fab.rel = 'noopener';
-      fab.innerHTML = '💬';
-      fab.title = 'Conversar no WhatsApp';
-      document.body.appendChild(fab);
-    }
+
 
     const editBtn = document.getElementById('edit-card-btn');
     const dashBtn = document.getElementById('dashboard-card-btn');
