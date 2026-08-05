@@ -71,6 +71,40 @@ router.get('/me', authMiddleware, (req, res) => {
 });
 
 // ─── Password Reset ──────────────────────────────────────────────────
+router.put('/profile', authMiddleware, (req, res) => {
+  const user = query('users').findById(req.userId);
+  if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+  const name = (req.body.name || '').trim().substring(0, 100);
+  const email = (req.body.email || '').trim().toLowerCase().substring(0, 200);
+  if (!name || !email || !email.includes('@')) {
+    return res.status(400).json({ error: 'Informe um nome e um e-mail válido' });
+  }
+
+  const duplicate = query('users').findOne(u => u.id !== user.id && u.email && u.email.toLowerCase() === email);
+  if (duplicate) return res.status(409).json({ error: 'Este e-mail já está cadastrado' });
+
+  const updated = query('users').update(user.id, { name, email });
+  res.json({ id: updated.id, name: updated.name, email: updated.email });
+});
+
+router.put('/change-password', authMiddleware, (req, res) => {
+  const user = query('users').findById(req.userId);
+  if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+  const currentPassword = req.body.currentPassword || '';
+  const newPassword = req.body.newPassword || '';
+  if (!bcrypt.compareSync(currentPassword, user.password_hash)) {
+    return res.status(400).json({ error: 'A senha atual está incorreta' });
+  }
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: 'A nova senha deve ter pelo menos 8 caracteres' });
+  }
+
+  query('users').update(user.id, { password_hash: bcrypt.hashSync(newPassword, 10) });
+  res.json({ message: 'Senha atualizada com sucesso' });
+});
+
 router.post('/forgot-password', (req, res) => {
   const { email } = req.body;
   const userEmail = (email || '').trim().toLowerCase();
@@ -134,4 +168,3 @@ router.post('/reset-password', (req, res) => {
 });
 
 module.exports = router;
-

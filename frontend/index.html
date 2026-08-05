@@ -285,7 +285,7 @@
   </section>
 
   <!-- ============================================
-       VIEW 4: BUILDER
+       VIEW 4: CONFIGURAÇÕES DA PÁGINA
        ============================================ -->
   <section class="view" id="builder-view">
     <div class="container">
@@ -294,19 +294,30 @@
         <div class="builder-form-panel">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
             <div>
-              <h1 class="builder-title">Crie seu <span class="text-gradient">Cartão</span></h1>
-              <p class="builder-subtitle">Preencha os campos e veja o preview ao vivo →</p>
+              <h1 class="builder-title">Configurações da <span class="text-gradient">página</span></h1>
+              <p class="builder-subtitle">Organize as informações que seus clientes encontrarão.</p>
             </div>
             <button class="btn btn-secondary btn-sm" onclick="navigateTo('dashboard')">← Voltar</button>
           </div>
 
+          <nav class="settings-nav" aria-label="Áreas de configuração">
+            <button class="settings-nav-item active" type="button" data-settings-target="profile" onclick="showSettingsSection('profile')">Perfil</button>
+            <button class="settings-nav-item" type="button" data-settings-target="contact" onclick="showSettingsSection('contact')">Contato</button>
+            <button class="settings-nav-item" type="button" data-settings-target="services" onclick="showSettingsSection('services')">Serviços</button>
+            <button class="settings-nav-item" type="button" data-settings-target="gallery" onclick="showSettingsSection('gallery')">Imagens</button>
+            <button class="settings-nav-item" type="button" data-settings-target="testimonials" onclick="showSettingsSection('testimonials')">Avaliações</button>
+            <button class="settings-nav-item" type="button" data-settings-target="social" onclick="showSettingsSection('social')">Redes</button>
+            <button class="settings-nav-item" type="button" data-settings-target="appearance" onclick="showSettingsSection('appearance')">Aparência</button>
+            <button class="settings-nav-item" type="button" data-settings-target="assistant" onclick="showSettingsSection('assistant')">Assistente de conteúdo</button>
+          </nav>
+
           <!-- AI Assistant Banner -->
-          <div class="form-section" style="background:linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.12));border:1.5px solid var(--accent);border-radius:var(--radius-lg);padding:20px;margin-bottom:var(--space-xl);">
+          <div class="form-section settings-section" data-settings-section="assistant" style="background:linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.12));border:1.5px solid var(--accent);border-radius:var(--radius-lg);padding:20px;margin-bottom:var(--space-xl);">
             <div class="form-section-title" style="color:var(--accent);font-size:1.1rem;margin-bottom:10px;">
-              <span class="icon">🤖</span> Assistente de IA (NVIDIA)
+              <span class="icon">✦</span> Assistente de conteúdo
             </div>
             <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:14px;line-height:1.5;">
-              Digite sua profissão e escolha a <strong>Skill / Tom de Voz</strong> para preencher seu cartão e site automaticamente!
+              Receba sugestões para sua apresentação e seus serviços. Nada será aplicado sem sua confirmação.
             </p>
             <div class="form-row">
               <div class="form-group" style="flex:2;">
@@ -314,22 +325,22 @@
                 <input class="form-input" type="text" id="ai-profession" placeholder="Ex: Cabeleireira em SP, Advogado Trabalhista, Fotógrafo...">
               </div>
               <div class="form-group" style="flex:1;">
-                <label class="form-label" for="ai-skill">Skill / Tom de Voz</label>
+                <label class="form-label" for="ai-skill">Tom de voz</label>
                 <select class="form-input" id="ai-skill" style="cursor:pointer;">
-                  <option value="vendedora">⚡ Skill Vendedora</option>
-                  <option value="corporativa">💼 Skill Corporativa</option>
-                  <option value="criativa">🎨 Skill Criativa</option>
-                  <option value="acolhedora">🌿 Skill Acolhedora</option>
+                  <option value="vendedora">Comercial</option>
+                  <option value="corporativa">Corporativo</option>
+                  <option value="criativa">Criativo</option>
+                  <option value="acolhedora">Acolhedor</option>
                 </select>
               </div>
             </div>
             <button class="btn btn-primary" type="button" id="ai-generate-btn" onclick="generateWithAI()" style="width:100%;margin-top:8px;">
-              ✨ Preencher Cartão & Site com IA
+              Gerar sugestões de conteúdo
             </button>
           </div>
 
           <!-- Personal Info -->
-          <div class="form-section">
+          <div class="form-section settings-section active" data-settings-section="profile">
             <div class="form-section-title"><span class="icon">👤</span> Informações Pessoais</div>
             <div class="form-group">
               <label class="form-label" for="field-name">Nome *</label>
@@ -364,7 +375,7 @@
           </div>
 
           <!-- Contact -->
-          <div class="form-section">
+          <div class="form-section settings-section" data-settings-section="contact">
             <div class="form-section-title"><span class="icon">📞</span> Contato</div>
             <div class="form-row">
               <div class="form-group">
@@ -388,7 +399,7 @@
           </div>
 
           <!-- WhatsApp -->
-          <div class="form-section">
+          <div class="form-section settings-section" data-settings-section="contact">
             <div class="form-section-title"><span class="icon">💬</span> WhatsApp</div>
             <div class="form-group">
               <label class="form-label" for="field-whatsapp">Número do WhatsApp (com DDD + código do país)</label>
@@ -407,7 +418,7 @@
           </div>
 
           <!-- Social Media -->
-          <div class="form-section">
+          <div class="form-section settings-section" data-settings-section="social">
             <div class="form-section-title"><span class="icon">🌐</span> Redes Sociais</div>
             <div class="form-row">
               <div class="form-group">
@@ -442,7 +453,7 @@
           </div>
 
           <!-- Landing Page / Site Config (Optional) -->
-          <div class="form-section">
+          <div class="form-section settings-section" data-settings-section="appearance">
             <div class="form-section-title"><span class="icon">🌐</span> Botão do Site (Opcional)</div>
             <div class="form-group">
               <label class="form-label" for="field-site-button">Texto do Botão de Expansão no Cartão</label>
@@ -454,7 +465,7 @@
           </div>
 
           <!-- Products / Services -->
-          <div class="form-section">
+          <div class="form-section settings-section" data-settings-section="services">
             <div class="form-section-title"><span class="icon">🛍️</span> Produtos & Serviços (Vitrine)</div>
             <div id="builder-products-container"></div>
             <button class="btn btn-secondary btn-sm" type="button" onclick="addProductRow()" style="margin-top:8px;">
@@ -463,7 +474,7 @@
           </div>
 
           <!-- Photo Gallery -->
-          <div class="form-section">
+          <div class="form-section settings-section" data-settings-section="gallery">
             <div class="form-section-title"><span class="icon">🖼️</span> Galeria de Fotos</div>
             <div id="gallery-upload-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;"></div>
             <button class="btn btn-secondary btn-sm" type="button" onclick="addGallerySlot()" style="width:100%;">
@@ -474,7 +485,7 @@
           </div>
 
           <!-- Testimonials -->
-          <div class="form-section">
+          <div class="form-section settings-section" data-settings-section="testimonials">
             <div class="form-section-title"><span class="icon">⭐</span> Depoimentos de Clientes</div>
             <div id="builder-testimonials-container"></div>
             <button class="btn btn-secondary btn-sm" type="button" onclick="addTestimonialRow()" style="margin-top:8px;">
@@ -483,7 +494,7 @@
           </div>
 
           <!-- Theme -->
-          <div class="form-section">
+          <div class="form-section settings-section" data-settings-section="appearance">
             <div class="form-section-title"><span class="icon">🎨</span> Tema do Cartão</div>
             <div class="theme-grid" id="themeGrid">
               <div>
@@ -516,7 +527,7 @@
           <!-- Generate Buttons -->
           <div class="generate-section">
             <button class="btn btn-primary btn-lg" onclick="saveCard()" id="generate-btn">
-              💾 Salvar Cartão
+              Salvar alterações
             </button>
             <button class="btn btn-secondary btn-lg" onclick="navigateTo('dashboard')">
               Cancelar
@@ -527,7 +538,7 @@
         <!-- Preview Panel -->
         <div class="builder-preview-panel">
           <div class="preview-container">
-            <div class="preview-label">📱 Preview ao Vivo</div>
+            <div class="preview-label">Visualização da página</div>
             <div id="preview-card" data-theme="midnight">
             </div>
           </div>
@@ -546,9 +557,6 @@
         </div>
       </div>
       <div class="card-share-bar" id="cardShareBar">
-        <button class="btn btn-primary btn-sm" onclick="editCard()" id="edit-card-btn" style="display:none;">
-          ✏️ Editar
-        </button>
         <button class="btn btn-secondary btn-sm" onclick="copyCardLink()" id="copy-link-btn">
           📋 Copiar Link
         </button>
@@ -559,7 +567,7 @@
           📲 Fixar na Tela
         </button>
         <button class="btn btn-outline btn-sm" onclick="navigateTo('dashboard')" id="dashboard-card-btn" style="display:none;">
-          🏠 Dashboard
+          Visão geral
         </button>
       </div>
       <div class="card-qr" id="cardQr">
@@ -593,6 +601,48 @@
     </div>
   </section>
 
+  <!-- ============================================
+       VIEW 7: MINHA CONTA
+       ============================================ -->
+  <section class="view" id="account-view">
+    <div class="container account-page">
+      <div class="dashboard-header">
+        <div>
+          <h1 class="builder-title">Minha <span class="text-gradient">conta</span></h1>
+          <p class="builder-subtitle">Dados usados para entrar e administrar o CardLink. Eles não alteram sua página pública.</p>
+        </div>
+      </div>
+
+      <div class="account-grid">
+        <div class="account-card">
+          <h2>Dados de acesso</h2>
+          <div class="form-group">
+            <label class="form-label" for="account-name">Seu nome</label>
+            <input class="form-input" type="text" id="account-name" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="account-email">E-mail de acesso</label>
+            <input class="form-input" type="email" id="account-email" autocomplete="email">
+          </div>
+          <button class="btn btn-primary" type="button" onclick="saveAccountProfile()">Salvar dados da conta</button>
+        </div>
+
+        <div class="account-card">
+          <h2>Alterar senha</h2>
+          <div class="form-group">
+            <label class="form-label" for="account-current-password">Senha atual</label>
+            <input class="form-input" type="password" id="account-current-password" autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="account-new-password">Nova senha</label>
+            <input class="form-input" type="password" id="account-new-password" minlength="8" autocomplete="new-password" placeholder="Mínimo de 8 caracteres">
+          </div>
+          <button class="btn btn-secondary" type="button" onclick="changeAccountPassword()">Atualizar senha</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Toast -->
   <div class="toast" id="toast">
     <span id="toast-icon">✅</span>
@@ -610,7 +660,7 @@
       }
     }
   </script>
-  <script src="app.js?v=20"></script>
+  <script src="app.js?v=21"></script>
   <script>
 
     let deferredPrompt = null;

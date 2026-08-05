@@ -31,6 +31,11 @@ Aplicação de cartão de visita digital com backend em Node/Express e frontend 
 - `/` serve o frontend e `/api` serve a API backend.
 - Compartilhamento e QR code direcionam para a página profissional completa.
 - Ação principal pelo WhatsApp e opção secundária para salvar o contato no celular (`.vcf`).
+- O login abre uma visão geral; o menu da conta reúne Configurações, Contatos, Minha conta e Sair.
+- As configurações públicas são separadas dos dados de login e organizadas por Perfil, Contato, Serviços, Imagens, Avaliações, Redes e Aparência.
+- A IA é exclusiva da área autenticada, com o nome Assistente de conteúdo, e pede confirmação antes de aplicar sugestões.
+- Não existe atendente de IA na página pública; o atendimento do visitante acontece pelo WhatsApp.
+- Seções sem conteúdo real ficam ocultas para visitantes, evitando produtos, imagens ou depoimentos demonstrativos.
 - Copiar link para área de transferência com fallback.
 - Suporte a `navigator.share` em dispositivos compatíveis.
 

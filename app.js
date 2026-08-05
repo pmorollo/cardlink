@@ -9,6 +9,8 @@ let currentUser = null;
 let currentTheme = 'midnight';
 let editingCardId = null;
 let currentUserCardId = null;
+let activeSettingsSection = 'profile';
+let settingsLoadInProgress = false;
 
 // ============================================
 // API Helper
@@ -93,7 +95,7 @@ function copyCardLink() { copyToClipboard(getPrimaryPublicUrl()); }
 // Navigation / Routing
 // ============================================
 function navigateTo(route) {
-  const map = { home: '', auth: '#auth', dashboard: '#dashboard', builder: '#builder', contacts: '#contacts' };
+  const map = { home: '', auth: '#auth', dashboard: '#dashboard', settings: '#settings', builder: '#settings', contacts: '#contacts', account: '#account' };
   const target = map[route] !== undefined ? map[route] : '';
   if (window.location.hash === target || (target === '' && (window.location.hash === '' || window.location.hash === '#'))) {
     handleRoute();
@@ -133,18 +135,33 @@ function handleRoute() {
     if (bgAnimated) bgAnimated.style.display = '';
     loadDashboard();
     updateNavAuth();
-  } else if (hash === '#builder') {
+  } else if (hash === '#settings' || hash === '#builder') {
     if (!authToken) { navigateTo('auth'); return; }
+    if (hash === '#builder') {
+      window.location.hash = '#settings';
+      return;
+    }
     document.getElementById('builder-view').classList.add('active');
     if (navbar) navbar.style.display = '';
     if (bgAnimated) bgAnimated.style.display = '';
     updateNavAuth();
+    showSettingsSection(activeSettingsSection);
+    if (currentUserCardId && editingCardId !== currentUserCardId && !settingsLoadInProgress) {
+      editCard(currentUserCardId);
+    }
   } else if (hash === '#contacts') {
     if (!authToken) { navigateTo('auth'); return; }
     document.getElementById('contacts-view').classList.add('active');
     if (navbar) navbar.style.display = '';
     if (bgAnimated) bgAnimated.style.display = '';
     updateNavAuth();
+  } else if (hash === '#account') {
+    if (!authToken) { navigateTo('auth'); return; }
+    document.getElementById('account-view').classList.add('active');
+    if (navbar) navbar.style.display = '';
+    if (bgAnimated) bgAnimated.style.display = '';
+    updateNavAuth();
+    loadAccountView();
   } else {
     if (authToken) {
       document.getElementById('dashboard-view').classList.add('active');
@@ -169,31 +186,54 @@ function handleRoute() {
 // ============================================
 function handleHeroCta() {
   if (authToken) {
-    openMyCardEditor();
+    openPageSettings();
   } else {
     navigateTo('auth');
     toggleAuthForm('register');
   }
 }
 
-function openMyCardEditor() {
+function openPageSettings(section = 'profile') {
+  activeSettingsSection = section;
   if (currentUserCardId) {
-    editCard(currentUserCardId);
+    navigateTo('settings');
   } else {
     createNewCard();
   }
 }
 
+function toggleUserMenu(event) {
+  if (event) event.stopPropagation();
+  document.getElementById('user-menu')?.classList.toggle('open');
+}
+
+function closeUserMenu() {
+  document.getElementById('user-menu')?.classList.remove('open');
+}
+
+document.addEventListener('click', closeUserMenu);
+
 function updateNavAuth() {
   const navCta = document.getElementById('nav-cta');
   if (!navCta) return;
   if (authToken && currentUser) {
-    const editBtnText = currentUserCardId ? '✏️ Editar Cartão' : '✨ Criar Cartão';
+    const initials = (currentUser.name || 'U').split(' ').map(part => part[0]).join('').substring(0, 2).toUpperCase();
     navCta.innerHTML = `
-      <span style="color:var(--text-secondary);font-size:0.85rem;" class="hide-mobile">Olá, ${escapeHtml(currentUser.name)}</span>
-      <button class="btn btn-primary btn-sm" onclick="openMyCardEditor()">${editBtnText}</button>
-      <button class="btn btn-secondary btn-sm" onclick="navigateTo('dashboard')">📊 Painel</button>
-      <button class="btn btn-secondary btn-sm" onclick="handleLogout()">Sair</button>
+      <div class="user-menu" id="user-menu" onclick="event.stopPropagation()">
+        <button class="user-menu-trigger" type="button" onclick="toggleUserMenu(event)" aria-label="Abrir menu da conta">
+          <span class="user-menu-avatar">${initials}</span>
+          <span class="user-menu-name">${escapeHtml(currentUser.name)}</span>
+          <span class="user-menu-chevron">⌄</span>
+        </button>
+        <div class="user-menu-dropdown">
+          <button type="button" onclick="navigateTo('dashboard');closeUserMenu()"><span>Visão geral</span></button>
+          <button type="button" onclick="openPageSettings();closeUserMenu()"><span>Configurações da página</span></button>
+          ${currentUserCardId ? `<button type="button" onclick="viewContacts(${currentUserCardId}, 'Minha página');closeUserMenu()"><span>Contatos recebidos</span></button>` : ''}
+          <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Minha conta</span></button>
+          <div class="user-menu-divider"></div>
+          <button type="button" class="danger" onclick="handleLogout()"><span>Sair</span></button>
+        </div>
+      </div>
     `;
   } else {
     navCta.innerHTML = `
@@ -369,9 +409,78 @@ function handleLogout() {
   navigateTo('home');
 }
 
+function showSettingsSection(section) {
+  activeSettingsSection = section || 'profile';
+  document.querySelectorAll('[data-settings-section]').forEach(el => {
+    el.classList.toggle('active', el.dataset.settingsSection === activeSettingsSection);
+  });
+  document.querySelectorAll('[data-settings-target]').forEach(button => {
+    button.classList.toggle('active', button.dataset.settingsTarget === activeSettingsSection);
+  });
+  document.querySelector('.builder-form-panel')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function loadAccountView() {
+  if (!currentUser) return;
+  setFieldValue('account-name', currentUser.name || '');
+  setFieldValue('account-email', currentUser.email || '');
+  setFieldValue('account-current-password', '');
+  setFieldValue('account-new-password', '');
+}
+
+async function saveAccountProfile() {
+  const name = document.getElementById('account-name')?.value.trim();
+  const email = document.getElementById('account-email')?.value.trim();
+  if (!name || !email) {
+    showToast('⚠️', 'Informe seu nome e e-mail');
+    return;
+  }
+  try {
+    currentUser = await api('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify({ name, email })
+    });
+    updateNavAuth();
+    showToast('✅', 'Dados da conta atualizados');
+  } catch (err) {
+    showToast('❌', err.message);
+  }
+}
+
+async function changeAccountPassword() {
+  const currentPassword = document.getElementById('account-current-password')?.value || '';
+  const newPassword = document.getElementById('account-new-password')?.value || '';
+  if (!currentPassword || newPassword.length < 8) {
+    showToast('⚠️', 'Informe a senha atual e uma nova senha com 8 caracteres');
+    return;
+  }
+  try {
+    await api('/auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+    setFieldValue('account-current-password', '');
+    setFieldValue('account-new-password', '');
+    showToast('✅', 'Senha atualizada com sucesso');
+  } catch (err) {
+    showToast('❌', err.message);
+  }
+}
+
 // ============================================
 // Dashboard
 // ============================================
+function getPageCompletion(card) {
+  const checks = [
+    card.name, card.title, card.photo_url, card.description,
+    card.whatsapp || card.phone, card.email,
+    card.products && card.products.length,
+    card.gallery && card.gallery.length
+  ];
+  const completed = checks.filter(Boolean).length;
+  return Math.round((completed / checks.length) * 100);
+}
+
 async function loadDashboard() {
   const content = document.getElementById('dashboard-content');
   if (!content) return;
@@ -393,9 +502,9 @@ async function loadDashboard() {
             Bem-vindo, <span class="text-gradient">${escapeHtml(userName)}</span>!
           </h1>
           <p style="color:var(--text-secondary);font-size:1.1rem;margin-bottom:var(--space-2xl);max-width:400px;margin-left:auto;margin-right:auto;">
-            Crie seu cartão de visita digital para compartilhar com seus contatos.
+            Configure sua página profissional para compartilhar com clientes e contatos.
           </p>
-          <button class="btn btn-primary btn-lg" onclick="createNewCard()">✨ Cartão</button>
+          <button class="btn btn-primary btn-lg" onclick="createNewCard()">Configurar minha página</button>
         </div>`;
       updateNavAuth();
       return;
@@ -409,13 +518,23 @@ async function loadDashboard() {
     const initials = (card.name || 'C').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
     const cardLink = window.location.origin + '/site/' + card.slug;
     const recentContacts = stats.recentContacts || [];
+    const completion = getPageCompletion(card);
 
     content.innerHTML = `
       <div class="dashboard-header">
         <div>
           <h1 class="builder-title">Minha <span class="text-gradient">Página</span></h1>
-          <p class="builder-subtitle">Olá, ${escapeHtml(userName)}! Gerencie sua presença profissional em um único link.</p>
+          <p class="builder-subtitle">Olá, ${escapeHtml(userName)}. Aqui está o resumo da sua página profissional.</p>
         </div>
+      </div>
+
+      <div class="page-status-card">
+        <div>
+          <span class="page-status-label">Situação da página</span>
+          <strong>${completion >= 75 ? 'Publicada e bem configurada' : 'Publicada, mas ainda pode ser completada'}</strong>
+          <p>${completion}% das informações essenciais preenchidas</p>
+        </div>
+        <div class="page-status-progress" aria-label="${completion}% concluído"><span style="width:${completion}%"></span></div>
       </div>
 
       <div class="stats-grid">
@@ -446,19 +565,16 @@ async function loadDashboard() {
             <div class="dash-card-slug">${card.title ? escapeHtml(card.title) + ' · ' : ''}${card.business ? escapeHtml(card.business) : 'Cartão Digital'}</div>
           </div>
           <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
-            <button class="btn btn-secondary btn-sm" onclick="editCard(${card.id})">✏️ Editar</button>
-            <a class="btn btn-primary btn-sm" href="/site/${escapeHtml(card.slug)}" target="_blank" rel="noopener">🌐 Abrir página</a>
-            <button class="btn btn-outline btn-sm" onclick="copyToClipboard('${escapeHtml(cardLink)}')">📋 Copiar Link</button>
+            <a class="btn btn-primary btn-sm" href="/site/${escapeHtml(card.slug)}" target="_blank" rel="noopener">Abrir página</a>
+            <button class="btn btn-outline btn-sm" onclick="copyToClipboard('${escapeHtml(cardLink)}')">Copiar link</button>
           </div>
         </div>
 
         <div class="dash-card-mini-preview" id="dash-mini-preview"></div>
 
         <div class="dash-card-actions-bar">
-          <button class="btn btn-secondary btn-sm" onclick="shareCard('${escapeHtml(card.slug)}')">📤 Compartilhar</button>
-          <a class="btn btn-secondary btn-sm" href="/#card/${escapeHtml(card.slug)}" target="_blank" rel="noopener">👁️ Ver cartão compacto</a>
-          <button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">📩 Contatos (${stats.contacts})</button>
-          <button class="btn btn-outline btn-sm" style="color:#ef4444;border-color:rgba(239,68,68,0.3);" onclick="deleteCard(${card.id})">🗑️ Excluir</button>
+          <button class="btn btn-secondary btn-sm" onclick="shareCard('${escapeHtml(card.slug)}')">Compartilhar</button>
+          <button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">Contatos recebidos (${stats.contacts})</button>
         </div>
       </div>
 
@@ -524,12 +640,15 @@ function createNewCard() {
   } catch (err) {
     console.error('createNewCard error:', err);
   } finally {
-    navigateTo('builder');
+    activeSettingsSection = 'profile';
+    navigateTo('settings');
+    showSettingsSection('profile');
   }
 }
 
 async function editCard(id) {
-  navigateTo('builder');
+  settingsLoadInProgress = true;
+  navigateTo('settings');
   try {
     const card = await api('/cards/' + id);
     editingCardId = id;
@@ -584,6 +703,8 @@ async function editCard(id) {
   } catch (err) {
     console.error('editCard error:', err);
     showToast('❌', err.message);
+  } finally {
+    settingsLoadInProgress = false;
   }
 }
 
@@ -722,23 +843,23 @@ async function saveCard() {
   }
 
   const btn = document.getElementById('generate-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Salvando...'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
 
   try {
     if (editingCardId) {
       await api('/cards/' + editingCardId, { method: 'PUT', body: JSON.stringify(data) });
-      showToast('✅', 'Cartão atualizado!');
+      showToast('✅', 'Configurações atualizadas!');
     } else {
       const card = await api('/cards', { method: 'POST', body: JSON.stringify(data) });
       currentUserCardId = card.id;
       editingCardId = card.id;
-      showToast('✅', 'Cartão criado com sucesso!');
+      showToast('✅', 'Página criada com sucesso!');
     }
     navigateTo('dashboard');
   } catch (err) {
     showToast('❌', err.message || 'Erro ao salvar');
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '💾 Salvar Cartão'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Salvar alterações'; }
   }
 }
 
@@ -788,22 +909,23 @@ async function loadPublicCard(slug) {
 
     const existingFab = document.querySelector('.fab-whatsapp');
     if (existingFab) existingFab.remove();
-
-
-    const editBtn = document.getElementById('edit-card-btn');
-    const dashBtn = document.getElementById('dashboard-card-btn');
-    if (editBtn && dashBtn) {
-      if (authToken && currentUser && card.user_id === currentUser.id) {
-        editBtn.style.display = '';
-        editBtn.setAttribute('onclick', `editCard(${card.id})`);
-        dashBtn.style.display = '';
-      } else {
-        editBtn.style.display = 'none';
-        dashBtn.style.display = 'none';
-      }
+    if (card.whatsapp) {
+      const fab = document.createElement('a');
+      fab.className = 'fab-whatsapp';
+      fab.href = `https://wa.me/${cleanWhatsapp(card.whatsapp)}`;
+      fab.target = '_blank';
+      fab.rel = 'noopener';
+      fab.innerHTML = '💬';
+      fab.title = 'Conversar no WhatsApp';
+      document.body.appendChild(fab);
     }
 
-    initAiChatWidget(slug, card.name || 'Profissional');
+    const dashBtn = document.getElementById('dashboard-card-btn');
+    if (dashBtn) {
+      dashBtn.style.display = authToken && currentUserCardId === card.id ? '' : 'none';
+    }
+
+    // O visitante é direcionado ao WhatsApp; não há chat de IA público.
   } catch (err) {
 
     rendered.innerHTML = '<p style="text-align:center;color:#ef4444;padding:var(--space-3xl);">Cartão não encontrado</p>';
@@ -1270,14 +1392,21 @@ async function generateWithAI() {
     return;
   }
 
-  if (btn) { btn.disabled = true; btn.textContent = '🤖 IA gerando conteúdo...'; }
-  showToast('⏳', 'IA gerando seu cartão e site...');
+  if (btn) { btn.disabled = true; btn.textContent = 'Preparando sugestões...'; }
+  showToast('⏳', 'Preparando sugestões de conteúdo...');
 
   try {
     const res = await api('/ai/generate', {
       method: 'POST',
       body: JSON.stringify({ profession, skill, mode: 'full' })
     });
+
+    const summary = [res.title, res.description, ...(res.products || []).map(p => p.name)].filter(Boolean).join('\n\n');
+    const approved = window.confirm(`Sugestão do Assistente de conteúdo:\n\n${summary}\n\nDeseja aplicar estas sugestões à sua página?`);
+    if (!approved) {
+      showToast('ℹ️', 'Sugestões descartadas. Nenhuma informação foi alterada.');
+      return;
+    }
 
     if (res.title) setFieldValue('field-title', res.title);
     if (res.description) setFieldValue('field-description', res.description);
@@ -1294,11 +1423,11 @@ async function generateWithAI() {
     }
 
     updatePreview();
-    showToast('✨', 'Cartão e site preenchidos pela IA!');
+    showToast('✨', 'Sugestões aplicadas. Revise antes de salvar.');
   } catch (err) {
     showToast('❌', 'Erro na IA: ' + err.message);
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '✨ Preencher Cartão & Site com IA'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Gerar sugestões de conteúdo'; }
   }
 }
 
@@ -1323,7 +1452,7 @@ async function improveFieldWithAI(fieldId) {
       body: JSON.stringify({ profession, skill, mode: 'improve', textToImprove: currentText })
     });
 
-    if (res.improvedText) {
+    if (res.improvedText && window.confirm(`Texto sugerido:\n\n${res.improvedText}\n\nDeseja substituir o texto atual?`)) {
       input.value = res.improvedText;
       updatePreview();
       showToast('✨', 'Texto melhorado com sucesso!');
@@ -1334,101 +1463,3 @@ async function improveFieldWithAI(fieldId) {
 }
 
 // ============================================
-// Public AI Assistant Chat Widget
-// ============================================
-let chatHistory = [];
-let currentSlugForChat = '';
-
-function initAiChatWidget(slug, name) {
-  currentSlugForChat = slug;
-  chatHistory = [];
-  if (document.getElementById('ai-chat-widget')) return;
-
-  const container = document.createElement('div');
-  container.id = 'ai-chat-widget';
-  container.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;';
-
-  container.innerHTML = `
-    <button id="ai-chat-toggle-btn" onclick="toggleAiChatWindow()" style="background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;border:none;padding:12px 18px;border-radius:30px;font-weight:600;font-size:0.9rem;box-shadow:0 8px 24px rgba(0,0,0,0.3);cursor:pointer;display:flex;align-items:center;gap:8px;transition:transform 0.2s;">
-      <span>🤖</span> Chat com IA
-    </button>
-    <div id="ai-chat-window" style="display:none;position:absolute;bottom:60px;right:0;width:320px;max-width:calc(100vw - 32px);height:430px;background:rgba(15,23,42,0.96);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.15);border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.5);flex-direction:column;overflow:hidden;">
-      <div style="background:linear-gradient(135deg,rgba(139,92,246,0.3),rgba(6,182,212,0.3));padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);">
-        <div style="display:flex;align-items:center;gap:8px;color:#fff;font-weight:600;font-size:0.9rem;">
-          <span>🤖</span> Atendente de ${escapeHtml(name)}
-        </div>
-        <button onclick="toggleAiChatWindow()" style="background:none;border:none;color:#94a3b8;font-size:1.1rem;cursor:pointer;">✕</button>
-      </div>
-      <div id="ai-chat-messages" style="flex:1;padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;font-size:0.85rem;color:#e2e8f0;">
-        <div style="background:rgba(255,255,255,0.08);padding:10px 12px;border-radius:12px 12px 12px 2px;max-width:85%;align-self:flex-start;line-height:1.4;">
-          Olá! Sou o atendente virtual de ${escapeHtml(name)}. Como posso te ajudar hoje? 😊
-        </div>
-      </div>
-      <div style="padding:10px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:6px;background:rgba(0,0,0,0.2);">
-        <input type="text" id="ai-chat-input" placeholder="Tire uma dúvida..." style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:8px 12px;color:#fff;font-size:0.85rem;outline:none;" onkeypress="if(event.key==='Enter') sendAiChatMessage()">
-        <button onclick="sendAiChatMessage()" style="background:#8b5cf6;color:#fff;border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9rem;">➤</button>
-      </div>
-    </div>`;
-
-  document.body.appendChild(container);
-}
-
-function toggleAiChatWindow() {
-  const win = document.getElementById('ai-chat-window');
-  if (!win) return;
-  const isHidden = win.style.display === 'none';
-  win.style.display = isHidden ? 'flex' : 'none';
-  if (isHidden) {
-    const input = document.getElementById('ai-chat-input');
-    if (input) input.focus();
-  }
-}
-
-async function sendAiChatMessage() {
-  const input = document.getElementById('ai-chat-input');
-  const msgs = document.getElementById('ai-chat-messages');
-  if (!input || !msgs) return;
-  const text = input.value.trim();
-  if (!text) return;
-
-  input.value = '';
-  const userBubble = document.createElement('div');
-  userBubble.style.cssText = 'background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;padding:10px 12px;border-radius:12px 12px 2px 12px;max-width:85%;align-self:flex-end;line-height:1.4;word-break:break-word;';
-  userBubble.textContent = text;
-  msgs.appendChild(userBubble);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  const typing = document.createElement('div');
-  typing.id = 'ai-chat-typing';
-  typing.style.cssText = 'background:rgba(255,255,255,0.08);padding:10px 12px;border-radius:12px 12px 12px 2px;max-width:85%;align-self:flex-start;color:#94a3b8;font-style:italic;';
-  typing.textContent = '🤖 Digitando...';
-  msgs.appendChild(typing);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  try {
-    const res = await fetch(`${API}/ai/public/${currentSlugForChat}/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, history: chatHistory })
-    });
-    const data = await res.json();
-    typing.remove();
-
-    const replyText = data.reply || 'Como posso te ajudar hoje?';
-    chatHistory.push({ sender: 'user', text });
-    chatHistory.push({ sender: 'assistant', text: replyText });
-
-    const aiBubble = document.createElement('div');
-    aiBubble.style.cssText = 'background:rgba(255,255,255,0.08);padding:10px 12px;border-radius:12px 12px 12px 2px;max-width:85%;align-self:flex-start;line-height:1.4;word-break:break-word;white-space:pre-wrap;';
-    aiBubble.textContent = replyText;
-    msgs.appendChild(aiBubble);
-    msgs.scrollTop = msgs.scrollHeight;
-  } catch (err) {
-    if (typing) typing.remove();
-    const errBubble = document.createElement('div');
-    errBubble.style.cssText = 'background:rgba(239,68,68,0.2);color:#fca5a5;padding:8px 12px;border-radius:8px;align-self:center;font-size:0.8rem;';
-    errBubble.textContent = 'Erro ao enviar mensagem. Tente novamente.';
-    msgs.appendChild(errBubble);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-}
