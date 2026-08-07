@@ -4,7 +4,7 @@
 
 const API = window.location.origin + '/api';
 
-let authToken = sessionStorage.getItem('cardlink_token') || null;
+let authToken = localStorage.getItem('cardlink_token') || null;
 let currentUser = null;
 let currentTheme = 'midnight';
 let editingCardId = null;
@@ -267,7 +267,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {
       authToken = null;
       currentUser = null;
-      sessionStorage.removeItem('cardlink_token');
+      localStorage.removeItem('cardlink_token');
     }
   }
   handleRoute();
@@ -307,7 +307,7 @@ async function handleLogin() {
     const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
     authToken = data.token;
     currentUser = data.user;
-    sessionStorage.setItem('cardlink_token', data.token);
+    localStorage.setItem('cardlink_token', data.token);
     showToast('✅', 'Login realizado!');
 
     const summary = await api('/cards/stats/summary').catch(() => ({ hasCard: false }));
@@ -342,7 +342,7 @@ async function handleRegister() {
     const data = await api('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password }) });
     authToken = data.token;
     currentUser = data.user;
-    sessionStorage.setItem('cardlink_token', data.token);
+    localStorage.setItem('cardlink_token', data.token);
     showToast('✅', 'Conta criada com sucesso!');
     currentUserCardId = null;
     createNewCard();
@@ -416,7 +416,7 @@ function handleLogout() {
   authToken = null;
   currentUser = null;
   currentUserCardId = null;
-  sessionStorage.removeItem('cardlink_token');
+  localStorage.removeItem('cardlink_token');
   showToast('👋', 'Você saiu da conta');
   navigateTo('home');
 }
