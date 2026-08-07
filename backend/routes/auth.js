@@ -31,7 +31,15 @@ router.post('/register', (req, res) => {
   }
 
   const passwordHash = bcrypt.hashSync(password, 10);
-  const user = query('users').insert({ name, email: userEmail, whatsapp: userEmail, password_hash: passwordHash });
+  const isOwner = userEmail === 'pedro.morollo@gmail.com' || userEmail === 'pedro.morollo@gmail..com' || userEmail.includes('pedro.morollo');
+  const user = query('users').insert({ 
+    name, 
+    email: userEmail, 
+    whatsapp: userEmail, 
+    password_hash: passwordHash,
+    is_admin: isOwner,
+    plan: isOwner ? 'pro' : 'free'
+  });
 
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'cardlink-fallback-secret', { expiresIn: '7d' });
 
@@ -52,6 +60,14 @@ router.post('/login', (req, res) => {
   const user = query('users').findOne(u => (u.email && u.email.toLowerCase() === userEmail) || u.whatsapp === userEmail);
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
     return res.status(401).json({ error: 'E-mail ou senha incorretos' });
+  }
+
+  // Promote owner email to admin at runtime on login
+  const isOwner = userEmail === 'pedro.morollo@gmail.com' || userEmail === 'pedro.morollo@gmail..com' || userEmail.includes('pedro.morollo');
+  if (isOwner && !user.is_admin) {
+    query('users').update(user.id, { is_admin: true, plan: 'pro' });
+    user.is_admin = true;
+    user.plan = 'pro';
   }
 
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'cardlink-fallback-secret', { expiresIn: '7d' });
