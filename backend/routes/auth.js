@@ -15,8 +15,9 @@ router.post('/register', (req, res) => {
     return res.status(400).json({ error: 'Nome, E-mail e senha são obrigatórios' });
   }
 
-  // Basic email format check
-  if (!userEmail.includes('@') || userEmail.length < 5) {
+  // Regex email format check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(userEmail) || userEmail.includes('..')) {
     return res.status(400).json({ error: 'E-mail inválido' });
   }
 
@@ -77,7 +78,8 @@ router.put('/profile', authMiddleware, (req, res) => {
 
   const name = (req.body.name || '').trim().substring(0, 100);
   const email = (req.body.email || '').trim().toLowerCase().substring(0, 200);
-  if (!name || !email || !email.includes('@')) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!name || !email || !emailRegex.test(email) || email.includes('..')) {
     return res.status(400).json({ error: 'Informe um nome e um e-mail válido' });
   }
 

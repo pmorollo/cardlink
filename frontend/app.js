@@ -299,7 +299,8 @@ async function handleLogin() {
   const email = emailEl.value.trim().toLowerCase();
   const password = passwordEl.value;
 
-  if (!email || !email.includes('@')) { showToast('⚠️', 'Preencha um e-mail válido!'); return; }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email) || email.includes('..')) { showToast('⚠️', 'Preencha um e-mail válido!'); return; }
   if (!password) { showToast('⚠️', 'Preencha a sua senha!'); return; }
 
   try {
@@ -332,8 +333,9 @@ async function handleRegister() {
   const email = emailEl.value.trim().toLowerCase();
   const password = passwordEl.value;
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!name) { showToast('⚠️', 'Preencha o seu nome!'); return; }
-  if (!email || !email.includes('@')) { showToast('⚠️', 'Preencha um e-mail válido!'); return; }
+  if (!email || !emailRegex.test(email) || email.includes('..')) { showToast('⚠️', 'Preencha um e-mail válido!'); return; }
   if (!password || password.length < 8) { showToast('⚠️', 'Senha deve ter pelo menos 8 caracteres'); return; }
 
   try {
@@ -358,7 +360,8 @@ async function handleRegister() {
 
 async function handleForgotPassword() {
   const email = document.getElementById('forgot-email')?.value.trim().toLowerCase();
-  if (!email || !email.includes('@')) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email) || email.includes('..')) {
     showToast('⚠️', 'Informe um e-mail válido!');
     return;
   }
@@ -440,8 +443,13 @@ function loadAccountView() {
 async function saveAccountProfile() {
   const name = document.getElementById('account-name')?.value.trim();
   const email = document.getElementById('account-email')?.value.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!name || !email) {
     showToast('⚠️', 'Informe seu nome e e-mail');
+    return;
+  }
+  if (!emailRegex.test(email) || email.includes('..')) {
+    showToast('⚠️', 'Informe um e-mail válido');
     return;
   }
   try {
