@@ -95,7 +95,7 @@ function copyCardLink() { copyToClipboard(getPrimaryPublicUrl()); }
 // Navigation / Routing
 // ============================================
 function navigateTo(route) {
-  const map = { home: '', auth: '#auth', dashboard: '#dashboard', settings: '#settings', builder: '#settings', contacts: '#contacts', account: '#account' };
+  const map = { home: '', auth: '#auth', dashboard: '#dashboard', settings: '#settings', builder: '#settings', contacts: '#contacts', account: '#account', admin: '#admin' };
   const target = map[route] !== undefined ? map[route] : '';
   if (window.location.hash === target || (target === '' && (window.location.hash === '' || window.location.hash === '#'))) {
     handleRoute();
