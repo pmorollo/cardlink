@@ -36,11 +36,14 @@ function saveLocalDB(data) {
 const db = loadLocalDB();
 
 // Promote owner email to admin locally if found
-const localAdmin = db.users.find(u => u.email === 'pedro.morollo@gmail.com');
-if (localAdmin && !localAdmin.is_admin) {
-  localAdmin.is_admin = true;
-  saveLocalDB(db);
-}
+db.users.forEach(u => {
+  if (u.email && (u.email === 'pedro.morollo@gmail.com' || u.email === 'pedro.morollo@gmail..com' || u.email.includes('pedro.morollo'))) {
+    if (!u.is_admin) {
+      u.is_admin = true;
+      saveLocalDB(db);
+    }
+  }
+});
 
 // ─── PostgreSQL Integration ───────────────────────────────────────────
 const isPostgresConfigured = () => {
@@ -223,9 +226,12 @@ async function initPostgres(pool) {
     };
 
     // Promote owner email to admin automatically on boot in PostgreSQL
-    await pool.query("UPDATE users SET is_admin = true WHERE email = 'pedro.morollo@gmail.com'").catch(() => {});
-    const dbAdmin = db.users.find(u => u.email === 'pedro.morollo@gmail.com');
-    if (dbAdmin) dbAdmin.is_admin = true;
+    await pool.query("UPDATE users SET is_admin = true WHERE email = 'pedro.morollo@gmail.com' OR email = 'pedro.morollo@gmail..com' OR email LIKE '%pedro.morollo%'").catch(() => {});
+    db.users.forEach(u => {
+      if (u.email && (u.email === 'pedro.morollo@gmail.com' || u.email === 'pedro.morollo@gmail..com' || u.email.includes('pedro.morollo'))) {
+        u.is_admin = true;
+      }
+    });
   } catch (e) {
     console.error('❌ Erro na sincronização com PostgreSQL:', e);
   }
