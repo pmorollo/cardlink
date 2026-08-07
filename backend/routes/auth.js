@@ -36,7 +36,7 @@ router.post('/register', (req, res) => {
 
   res.status(201).json({
     token,
-    user: { id: user.id, name: user.name, email: user.email }
+    user: { id: user.id, name: user.name, email: user.email, is_admin: user.is_admin || false, plan: user.plan || 'free' }
   });
 });
 
@@ -57,7 +57,7 @@ router.post('/login', (req, res) => {
 
   res.json({
     token,
-    user: { id: user.id, name: user.name, email: user.email || user.whatsapp }
+    user: { id: user.id, name: user.name, email: user.email || user.whatsapp, is_admin: user.is_admin || false, plan: user.plan || 'free' }
   });
 });
 
