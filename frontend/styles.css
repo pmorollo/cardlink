@@ -9,43 +9,43 @@
    CSS Variables (Design Tokens)
    ============================================ */
 :root {
-  /* Colors — Dark Mode */
-  --bg-primary: #06060e;
-  --bg-secondary: #0c0c1a;
-  --bg-surface: #111127;
-  --bg-surface-hover: #1a1a3e;
-  --bg-card: rgba(255, 255, 255, 0.04);
-  --bg-glass: rgba(255, 255, 255, 0.06);
-  --bg-glass-hover: rgba(255, 255, 255, 0.1);
+  /* Colors — Light Mode (SaaS/Stripe/Linear style) */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.7);
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --bg-glass-hover: rgba(255, 255, 255, 0.9);
 
   /* Gradient Colors */
-  --purple: #8b5cf6;
-  --blue: #3b82f6;
-  --cyan: #06b6d4;
-  --pink: #ec4899;
-  --indigo: #6366f1;
+  --purple: #7c3aed;
+  --blue: #2563eb;
+  --cyan: #0891b2;
+  --pink: #db2777;
+  --indigo: #4f46e5;
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, var(--purple), var(--blue), var(--cyan));
   --gradient-accent: linear-gradient(135deg, var(--pink), var(--purple));
-  --gradient-subtle: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+  --gradient-subtle: linear-gradient(135deg, rgba(124, 58, 237, 0.06), rgba(37, 99, 235, 0.06));
 
   /* Text */
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-gradient: linear-gradient(135deg, #c084fc, #60a5fa, #22d3ee);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-gradient: linear-gradient(135deg, #7c3aed, #2563eb, #0891b2);
 
   /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-glow: rgba(139, 92, 246, 0.3);
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-glow: rgba(124, 58, 237, 0.25);
 
   /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 30px rgba(139, 92, 246, 0.15);
-  --shadow-glow-strong: 0 0 60px rgba(139, 92, 246, 0.25);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 12px 30px rgba(15, 23, 42, 0.08);
+  --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.08);
+  --shadow-glow-strong: 0 0 40px rgba(124, 58, 237, 0.12);
 
   /* Typography */
   --font-display: 'Outfit', sans-serif;
@@ -712,7 +712,7 @@ img {
    ============================================ */
 .builder-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 380px;
   gap: var(--space-xl);
   min-height: 100vh;
   padding: calc(80px + var(--space-xl)) 0 var(--space-xl);
@@ -724,6 +724,10 @@ img {
   max-height: calc(100vh - 100px);
   scrollbar-width: thin;
   scrollbar-color: var(--border-subtle) transparent;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
 }
 
 .builder-form-panel::-webkit-scrollbar {
@@ -744,9 +748,17 @@ img {
   top: 100px;
   height: calc(100vh - 120px);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: var(--space-lg);
+}
+
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 .builder-title {
@@ -1365,18 +1377,61 @@ textarea.form-input {
    Preview Scaling
    ============================================ */
 .preview-container {
-  transform: scale(0.85);
+  position: relative;
+  width: 310px;
+  height: 590px;
+  border: 10px solid #1e293b; /* Slate-800 phone shell */
+  border-radius: 36px;
+  background: #ffffff;
+  box-shadow: var(--shadow-lg), 0 20px 40px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.95);
   transform-origin: top center;
+}
+
+.preview-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 16px;
+  background: #1e293b;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  z-index: 10;
 }
 
 .preview-label {
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
-  margin-bottom: var(--space-md);
-  font-weight: 500;
+  margin-bottom: var(--space-sm);
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
+  order: -1; /* Keep label above phone frame in flex layout */
+}
+
+#preview-card {
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none; /* Hide scrollbar */
+  padding: 16px 0 0 0;
+}
+
+#preview-card::-webkit-scrollbar {
+  display: none;
+}
+
+#preview-card .card-container {
+  min-height: 100%;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
 }
 
 /* ============================================
@@ -2302,7 +2357,7 @@ textarea.form-input {
   padding: 8px 13px;
   border: 1px solid var(--border-subtle);
   border-radius: 11px;
-  background: rgba(255,255,255,0.035);
+  background: var(--bg-secondary);
   color: var(--text-secondary);
   font: inherit;
   font-size: 0.78rem;

@@ -4,14 +4,25 @@ const path = require('path');
 const DB_PATH = path.join(__dirname, 'data.json');
 
 function loadLocalDB() {
+  let data = { users: [], cards: [], contacts: [], support_tickets: [], _counters: { users: 0, cards: 0, contacts: 0, support_tickets: 0 } };
   try {
     if (fs.existsSync(DB_PATH)) {
-      return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+      const parsed = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+      data = { ...data, ...parsed };
     }
   } catch (e) {
     console.error('Erro ao carregar DB local:', e.message);
   }
-  return { users: [], cards: [], contacts: [], _counters: { users: 0, cards: 0, contacts: 0 } };
+  if (!data.users) data.users = [];
+  if (!data.cards) data.cards = [];
+  if (!data.contacts) data.contacts = [];
+  if (!data.support_tickets) data.support_tickets = [];
+  if (!data._counters) data._counters = {};
+  if (!data._counters.users) data._counters.users = 0;
+  if (!data._counters.cards) data._counters.cards = 0;
+  if (!data._counters.contacts) data._counters.contacts = 0;
+  if (!data._counters.support_tickets) data._counters.support_tickets = 0;
+  return data;
 }
 
 function saveLocalDB(data) {
@@ -58,6 +69,8 @@ async function initPostgres(pool) {
         email VARCHAR(255) UNIQUE,
         whatsapp VARCHAR(255),
         password_hash VARCHAR(255) NOT NULL,
+        is_admin BOOLEAN DEFAULT FALSE,
+        plan VARCHAR(50) DEFAULT 'free',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -101,7 +114,22 @@ async function initPostgres(pool) {
         message TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      CREATE TABLE IF NOT EXISTS support_tickets (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        subject VARCHAR(255),
+        message TEXT NOT NULL,
+        status VARCHAR(50) DEFAULT 'open',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
+
+    // Ensure columns is_admin and plan exist (for existing databases)
+    await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS plan VARCHAR(50) DEFAULT 'free';
+    `).catch(() => {});
 
     console.log('✅ Tabelas PostgreSQL verificadas/criadas com sucesso');
 
@@ -109,14 +137,15 @@ async function initPostgres(pool) {
     const resUsers = await pool.query('SELECT * FROM users ORDER BY id ASC');
     const resCards = await pool.query('SELECT * FROM cards ORDER BY id ASC');
     const resContacts = await pool.query('SELECT * FROM contacts ORDER BY id ASC');
+    const resSupportTickets = await pool.query('SELECT * FROM support_tickets ORDER BY id ASC');
 
     if (resUsers.rows.length === 0 && db.users && db.users.length > 0) {
       console.log('🔄 Migrando dados locais (data.json) para o PostgreSQL...');
       // Migrate users
       for (const u of db.users) {
         await pool.query(
-          'INSERT INTO users (id, name, email, whatsapp, password_hash, created_at) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id) DO NOTHING',
-          [u.id, u.name, u.email || null, u.whatsapp || null, u.password_hash, u.created_at || new Date()]
+          'INSERT INTO users (id, name, email, whatsapp, password_hash, is_admin, plan, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (id) DO NOTHING',
+          [u.id, u.name, u.email || null, u.whatsapp || null, u.password_hash, u.is_admin || false, u.plan || 'free', u.created_at || new Date()]
         );
       }
       // Migrate cards
@@ -145,11 +174,21 @@ async function initPostgres(pool) {
           [ct.id, ct.card_id, ct.name, ct.email || null, ct.phone || null, ct.message || null, ct.created_at || new Date()]
         );
       }
+      // Migrate support tickets
+      if (db.support_tickets) {
+        for (const t of db.support_tickets) {
+          await pool.query(
+            'INSERT INTO support_tickets (id, user_id, subject, message, status, created_at) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id) DO NOTHING',
+            [t.id, t.user_id, t.subject || null, t.message, t.status || 'open', t.created_at || new Date()]
+          );
+        }
+      }
 
       // Sync sequences
       await pool.query("SELECT setval('users_id_seq', (SELECT MAX(id) FROM users))");
       await pool.query("SELECT setval('cards_id_seq', (SELECT MAX(id) FROM cards))");
       await pool.query("SELECT setval('contacts_id_seq', (SELECT MAX(id) FROM contacts))");
+      await pool.query("SELECT setval('support_tickets_id_seq', (SELECT MAX(id) FROM support_tickets))").catch(() => {});
       console.log('✅ Migração para PostgreSQL concluída com sucesso!');
     }
 
@@ -157,6 +196,7 @@ async function initPostgres(pool) {
     const freshUsers = await pool.query('SELECT * FROM users ORDER BY id ASC');
     const freshCards = await pool.query('SELECT * FROM cards ORDER BY id ASC');
     const freshContacts = await pool.query('SELECT * FROM contacts ORDER BY id ASC');
+    const freshSupport = await pool.query('SELECT * FROM support_tickets ORDER BY id ASC');
 
     db.users = freshUsers.rows;
     db.cards = freshCards.rows.map(c => ({
@@ -166,11 +206,13 @@ async function initPostgres(pool) {
       testimonials: typeof c.testimonials === 'string' ? JSON.parse(c.testimonials) : (c.testimonials || []),
     }));
     db.contacts = freshContacts.rows;
+    db.support_tickets = freshSupport.rows;
 
     db._counters = {
       users: Math.max(0, ...db.users.map(u => u.id || 0)),
       cards: Math.max(0, ...db.cards.map(c => c.id || 0)),
       contacts: Math.max(0, ...db.contacts.map(ct => ct.id || 0)),
+      support_tickets: Math.max(0, ...db.support_tickets.map(t => t.id || 0)),
     };
   } catch (e) {
     console.error('❌ Erro na sincronização com PostgreSQL:', e);
@@ -187,8 +229,8 @@ function syncPgInsert(collection, row) {
   if (!pgPool) return;
   if (collection === 'users') {
     pgPool.query(
-      'INSERT INTO users (id, name, email, whatsapp, password_hash, created_at) VALUES ($1, $2, $3, $4, $5, $6)',
-      [row.id, row.name, row.email || null, row.whatsapp || null, row.password_hash, row.created_at]
+      'INSERT INTO users (id, name, email, whatsapp, password_hash, is_admin, plan, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+      [row.id, row.name, row.email || null, row.whatsapp || null, row.password_hash, row.is_admin || false, row.plan || 'free', row.created_at]
     ).catch(e => console.error('PG Insert User Error:', e));
   } else if (collection === 'cards') {
     pgPool.query(
@@ -211,6 +253,11 @@ function syncPgInsert(collection, row) {
       'INSERT INTO contacts (id, card_id, name, email, phone, message, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)',
       [row.id, row.card_id, row.name, row.email || null, row.phone || null, row.message || null, row.created_at]
     ).catch(e => console.error('PG Insert Contact Error:', e));
+  } else if (collection === 'support_tickets') {
+    pgPool.query(
+      'INSERT INTO support_tickets (id, user_id, subject, message, status, created_at) VALUES ($1, $2, $3, $4, $5, $6)',
+      [row.id, row.user_id, row.subject || null, row.message, row.status || 'open', row.created_at]
+    ).catch(e => console.error('PG Insert Ticket Error:', e));
   }
 }
 
@@ -234,9 +281,14 @@ function syncPgUpdate(collection, id, row) {
     ).catch(e => console.error('PG Update Card Error:', e));
   } else if (collection === 'users') {
     pgPool.query(
-      'UPDATE users SET name=$1, email=$2, whatsapp=$3, password_hash=$4 WHERE id=$5',
-      [row.name, row.email || null, row.whatsapp || null, row.password_hash, id]
+      'UPDATE users SET name=$1, email=$2, whatsapp=$3, password_hash=$4, is_admin=$5, plan=$6 WHERE id=$7',
+      [row.name, row.email || null, row.whatsapp || null, row.password_hash, row.is_admin || false, row.plan || 'free', id]
     ).catch(e => console.error('PG Update User Error:', e));
+  } else if (collection === 'support_tickets') {
+    pgPool.query(
+      'UPDATE support_tickets SET subject=$1, message=$2, status=$3 WHERE id=$4',
+      [row.subject || null, row.message, row.status || 'open', id]
+    ).catch(e => console.error('PG Update Ticket Error:', e));
   }
 }
 

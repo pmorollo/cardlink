@@ -537,8 +537,8 @@
 
         <!-- Preview Panel -->
         <div class="builder-preview-panel">
+          <div class="preview-label">Visualização da página</div>
           <div class="preview-container">
-            <div class="preview-label">Visualização da página</div>
             <div id="preview-card" data-theme="midnight">
             </div>
           </div>
@@ -642,6 +642,112 @@
       </div>
     </div>
   </section>
+
+  <!-- ============================================
+       VIEW 8: PAINEL DO PROPRIETÁRIO (ADMIN)
+       ============================================ -->
+  <section class="view" id="admin-view">
+    <div class="container">
+      <div class="dashboard-header" style="margin-bottom:var(--space-xl);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-md);">
+        <div>
+          <h1 class="builder-title">Painel do <span class="text-gradient">Proprietário</span></h1>
+          <p class="builder-subtitle">Gerenciamento de usuários, métricas globais e chamados de suporte.</p>
+        </div>
+        <button class="btn btn-secondary" onclick="navigateTo('dashboard')">← Voltar ao painel</button>
+      </div>
+
+      <!-- Métricas Globais -->
+      <div class="stats-grid" style="margin-bottom:var(--space-xl);">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="admin-metric-users">-</div>
+          <div class="stat-label">Total de Usuários</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🌐</div>
+          <div class="stat-value" id="admin-metric-cards">-</div>
+          <div class="stat-label">Páginas Criadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👁️</div>
+          <div class="stat-value" id="admin-metric-views">-</div>
+          <div class="stat-label">Visualizações Globais</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📩</div>
+          <div class="stat-value" id="admin-metric-contacts">-</div>
+          <div class="stat-label">Contatos Gerados</div>
+        </div>
+      </div>
+
+      <!-- Seções com Abas Internas no Admin -->
+      <nav class="settings-nav" aria-label="Gerenciamento administrativo" style="margin-bottom:var(--space-md);border-bottom:1px solid var(--border-subtle);background:none;">
+        <button class="settings-nav-item active" type="button" id="admin-tab-users" onclick="switchAdminSubSection('users')">Gerenciar Usuários</button>
+        <button class="settings-nav-item" type="button" id="admin-tab-support" onclick="switchAdminSubSection('support')">Chamados de Suporte</button>
+      </nav>
+
+      <!-- Sub-view 1: Gerenciar Usuários -->
+      <div class="admin-section" id="admin-section-users">
+        <div class="dash-card-full" style="padding:var(--space-lg);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md);flex-wrap:wrap;gap:var(--space-sm);">
+            <h2>Lista de Usuários</h2>
+            <input type="text" id="admin-user-search" class="form-input" placeholder="🔍 Buscar por nome ou e-mail..." oninput="filterAdminUsers()" style="max-width:300px;">
+          </div>
+          
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;text-align:left;" class="admin-table">
+              <thead>
+                <tr style="border-bottom:2px solid var(--border-subtle);color:var(--text-muted);font-size:0.85rem;">
+                  <th style="padding:12px 8px;">Usuário</th>
+                  <th style="padding:12px 8px;">Status Página</th>
+                  <th style="padding:12px 8px;">Plano</th>
+                  <th style="padding:12px 8px;text-align:right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-table-body">
+                <tr><td colspan="4" style="text-align:center;padding:var(--space-lg);color:var(--text-secondary);">Carregando usuários...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-view 2: Chamados de Suporte -->
+      <div class="admin-section" id="admin-section-support" style="display:none;">
+        <div class="dash-card-full" style="padding:var(--space-lg);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);">
+          <h2>Chamados de Ajuda</h2>
+          <p class="builder-subtitle" style="margin-bottom:var(--space-md);">Dúvidas enviadas pelos assinantes do CardLink.</p>
+          
+          <div style="display:flex;flex-direction:column;gap:var(--space-md);" id="admin-support-list">
+            <p style="color:var(--text-secondary);text-align:center;padding:var(--space-lg);">Carregando chamados...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Modal de Ajuda & Suporte -->
+  <div class="modal-overlay" id="support-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;">
+    <div class="builder-form-panel" style="max-width:500px;width:90%;max-height:90vh;margin:10vh auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-lg);">
+      <h2 class="builder-title" style="margin-bottom:8px;">Falar com o <span class="text-gradient">Suporte</span></h2>
+      <p class="builder-subtitle" style="margin-bottom:16px;">Sua mensagem será enviada diretamente para o proprietário do CardLink.</p>
+      
+      <div class="form-group" style="margin-bottom:var(--space-md);">
+        <label class="form-label" for="support-subject">Assunto</label>
+        <input class="form-input" type="text" id="support-subject" placeholder="Ex: Problema com imagens, Dúvida sobre plano Pro...">
+      </div>
+      <div class="form-group" style="margin-bottom:var(--space-md);">
+        <label class="form-label" for="support-message">Mensagem *</label>
+        <textarea class="form-input" id="support-message" rows="5" placeholder="Descreva sua dúvida ou problema detalhadamente..." required></textarea>
+      </div>
+      
+      <div style="display:flex;gap:12px;margin-top:20px;">
+        <button class="btn btn-primary" onclick="submitSupportTicket()" style="flex:1;">Enviar chamado</button>
+        <button class="btn btn-secondary" onclick="closeSupportModal()" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Toast -->
   <div class="toast" id="toast">

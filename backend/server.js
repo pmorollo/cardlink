@@ -16,6 +16,7 @@ const cardRoutes = require('./routes/cards');
 const contactRoutes = require('./routes/contacts');
 const uploadRoutes = require('./routes/upload');
 const aiRoutes = require('./routes/ai');
+const { adminRouter, supportRouter } = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -67,6 +68,8 @@ app.use('/api/cards', apiLimiter, cardRoutes);
 app.use('/api', apiLimiter, contactRoutes);
 app.use('/api/upload', apiLimiter, uploadRoutes);
 app.use('/api/ai', apiLimiter, aiRoutes);
+app.use('/api/admin', apiLimiter, adminRouter);
+app.use('/api/support', apiLimiter, supportRouter);
 
 // Image proxy/streaming route
 app.get('/uploads/:filename', async (req, res, next) => {

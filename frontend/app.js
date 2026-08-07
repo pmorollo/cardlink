@@ -162,6 +162,14 @@ function handleRoute() {
     if (bgAnimated) bgAnimated.style.display = '';
     updateNavAuth();
     loadAccountView();
+  } else if (hash === '#admin') {
+    if (!authToken) { navigateTo('auth'); return; }
+    if (!currentUser || !currentUser.is_admin) { navigateTo('dashboard'); return; }
+    document.getElementById('admin-view').classList.add('active');
+    if (navbar) navbar.style.display = '';
+    if (bgAnimated) bgAnimated.style.display = '';
+    updateNavAuth();
+    loadAdminDashboard();
   } else {
     if (authToken) {
       document.getElementById('dashboard-view').classList.add('active');
@@ -226,6 +234,7 @@ function updateNavAuth() {
           <span class="user-menu-chevron">⌄</span>
         </button>
         <div class="user-menu-dropdown">
+          ${currentUser.is_admin ? `<button type="button" onclick="navigateTo('admin');closeUserMenu()" style="font-weight:bold;color:var(--purple);border-bottom:1.5px dashed var(--border-subtle);"><span style="display:flex;align-items:center;gap:6px;">👑 Painel Admin</span></button>` : ''}
           <button type="button" onclick="navigateTo('dashboard');closeUserMenu()"><span>Visão geral</span></button>
           <button type="button" onclick="openPageSettings();closeUserMenu()"><span>Configurações da página</span></button>
           ${currentUserCardId ? `<button type="button" onclick="viewContacts(${currentUserCardId}, 'Minha página');closeUserMenu()"><span>Contatos recebidos</span></button>` : ''}
@@ -600,6 +609,16 @@ async function loadDashboard() {
           </div>
         </div>
       ` : ''}
+
+      <div class="dash-card-full" style="margin-top:var(--space-xl);padding:var(--space-lg);background:var(--bg-surface);border:1px solid var(--border-subtle);">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h3 style="font-family:var(--font-display);font-weight:700;margin-bottom:4px;">💬 Central de Ajuda & Suporte</h3>
+            <p style="color:var(--text-secondary);font-size:0.85rem;">Teve algum problema ou tem alguma dúvida sobre seu site? Fale conosco.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openSupportModal()">Enviar dúvida</button>
+        </div>
+      </div>
     `;
 
     const miniPreview = document.getElementById('dash-mini-preview');
@@ -1459,6 +1478,185 @@ async function improveFieldWithAI(fieldId) {
     }
   } catch (err) {
     showToast('❌', 'Erro ao melhorar texto: ' + err.message);
+  }
+}
+
+// ─── ADMIN & SUPPORT FUNCTIONS ───────────────────────────────────────────
+
+let adminUsersList = [];
+
+async function loadAdminDashboard() {
+  try {
+    // 1. Fetch Stats
+    const stats = await api('/admin/stats');
+    document.getElementById('admin-metric-users').textContent = stats.totalUsers || 0;
+    document.getElementById('admin-metric-cards').textContent = stats.totalCards || 0;
+    document.getElementById('admin-metric-views').textContent = stats.totalViews || 0;
+    document.getElementById('admin-metric-contacts').textContent = stats.totalContacts || 0;
+
+    // 2. Fetch Users
+    adminUsersList = await api('/admin/users');
+    renderAdminUsers(adminUsersList);
+
+    // 3. Fetch Support Tickets
+    const tickets = await api('/admin/support');
+    renderAdminSupport(tickets);
+
+  } catch (err) {
+    showToast('❌', 'Erro ao carregar painel admin: ' + err.message);
+  }
+}
+
+function switchAdminSubSection(section) {
+  document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'none');
+  document.getElementById(`admin-section-${section}`).style.display = 'block';
+
+  document.querySelectorAll('#admin-tab-users, #admin-tab-support').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.getElementById(`admin-tab-${section}`).classList.add('active');
+}
+
+function renderAdminUsers(users) {
+  const tbody = document.getElementById('admin-users-table-body');
+  if (!tbody) return;
+
+  if (users.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:var(--space-lg);color:var(--text-secondary);">Nenhum usuário cadastrado</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = users.map(u => {
+    const isPro = u.plan === 'pro';
+    const date = new Date(u.created_at).toLocaleDateString('pt-BR');
+    const pageLink = u.card ? `/site/${u.card.slug}` : '';
+    
+    return `
+      <tr style="border-bottom:1px solid var(--border-subtle);font-size:0.9rem;">
+        <td style="padding:12px 8px;">
+          <strong style="color:var(--text-primary);display:block;">${escapeHtml(u.name)}</strong>
+          <span style="color:var(--text-muted);font-size:0.8rem;">${escapeHtml(u.email)} ${u.whatsapp ? '· ' + escapeHtml(u.whatsapp) : ''}</span>
+        </td>
+        <td style="padding:12px 8px;">
+          ${u.card ? `
+            <a href="${pageLink}" target="_blank" style="color:var(--purple);text-decoration:none;font-weight:500;">/${escapeHtml(u.card.slug)}</a>
+            <span style="color:var(--text-muted);font-size:0.8rem;display:block;">👁️ ${u.card.views_count} views</span>
+          ` : '<span style="color:var(--text-muted);">Sem página</span>'}
+        </td>
+        <td style="padding:12px 8px;">
+          <span class="badge ${isPro ? 'badge-pro' : 'badge-free'}" style="padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:bold;${isPro ? 'background:rgba(124,58,237,0.15);color:var(--purple);' : 'background:var(--bg-secondary);color:var(--text-secondary);'}">
+            ${isPro ? '⚡ PRO' : 'FREE'}
+          </span>
+        </td>
+        <td style="padding:12px 8px;text-align:right;white-space:nowrap;">
+          <button class="btn btn-sm ${isPro ? 'btn-outline' : 'btn-primary'}" onclick="toggleUserPlan(${u.id}, '${u.plan}')" style="padding:5px 10px;font-size:0.75rem;">
+            ${isPro ? 'Downgrade' : 'Upgrade PRO'}
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function toggleUserPlan(userId, currentPlan) {
+  const newPlan = currentPlan === 'pro' ? 'free' : 'pro';
+  if (!confirm(`Deseja alterar o plano deste usuário para ${newPlan.toUpperCase()}?`)) return;
+
+  try {
+    await api(`/admin/users/${userId}/plan`, {
+      method: 'POST',
+      body: JSON.stringify({ plan: newPlan })
+    });
+    showToast('✅', `Plano alterado para ${newPlan.toUpperCase()}`);
+    loadAdminDashboard();
+  } catch (err) {
+    showToast('❌', 'Erro ao alterar plano: ' + err.message);
+  }
+}
+
+function filterAdminUsers() {
+  const queryText = document.getElementById('admin-user-search')?.value.toLowerCase().trim() || '';
+  if (!queryText) {
+    renderAdminUsers(adminUsersList);
+    return;
+  }
+
+  const filtered = adminUsersList.filter(u => {
+    return u.name.toLowerCase().includes(queryText) || u.email.toLowerCase().includes(queryText);
+  });
+  renderAdminUsers(filtered);
+}
+
+function renderAdminSupport(tickets) {
+  const listEl = document.getElementById('admin-support-list');
+  if (!listEl) return;
+
+  if (tickets.length === 0) {
+    listEl.innerHTML = `<p style="color:var(--text-secondary);text-align:center;padding:var(--space-lg);">Nenhum chamado pendente</p>`;
+    return;
+  }
+
+  listEl.innerHTML = tickets.map(t => {
+    const date = new Date(t.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    const user = t.user || {};
+    const waLink = user.whatsapp ? `https://wa.me/${cleanWhatsapp(user.whatsapp)}` : '';
+    
+    return `
+      <div class="dash-card-full" style="padding:var(--space-md);background:var(--bg-primary);border-color:var(--border-subtle);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-sm);flex-wrap:wrap;gap:8px;">
+          <div>
+            <strong style="color:var(--text-primary);font-size:1rem;">📌 ${escapeHtml(t.subject)}</strong>
+            <span style="color:var(--text-muted);font-size:0.8rem;display:block;">Por: ${escapeHtml(user.name || 'Desconhecido')} (${escapeHtml(user.email || '-')}) · ${date}</span>
+          </div>
+          <span class="badge" style="padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:bold;background:rgba(234,179,8,0.15);color:rgb(202,138,4);">
+            ${t.status.toUpperCase()}
+          </span>
+        </div>
+        <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:var(--space-md);background:var(--bg-surface);padding:10px;border-radius:8px;border:1px solid var(--border-subtle);">${escapeHtml(t.message)}</p>
+        
+        <div style="display:flex;gap:var(--space-sm);">
+          ${waLink ? `<a href="${waLink}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">💬 Responder no WhatsApp</a>` : ''}
+          <a href="mailto:${escapeHtml(user.email)}" class="btn btn-outline btn-sm">📧 Enviar E-mail</a>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ─── CLIENT SUPPORT ACTIONS ──────────────────────────────────────────
+
+function openSupportModal() {
+  const modal = document.getElementById('support-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    setFieldValue('support-subject', '');
+    setFieldValue('support-message', '');
+  }
+}
+
+function closeSupportModal() {
+  const modal = document.getElementById('support-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function submitSupportTicket() {
+  const subject = document.getElementById('support-subject')?.value.trim();
+  const message = document.getElementById('support-message')?.value.trim();
+
+  if (!message) {
+    showToast('⚠️', 'Escreva uma mensagem detalhando seu problema!');
+    return;
+  }
+
+  try {
+    await api('/support', {
+      method: 'POST',
+      body: JSON.stringify({ subject, message })
+    });
+    showToast('✅', 'Chamado de suporte enviado com sucesso!');
+    closeSupportModal();
+  } catch (err) {
+    showToast('❌', 'Erro ao enviar chamado: ' + err.message);
   }
 }
 
