@@ -1197,33 +1197,105 @@ function renderCard(data, isPreview) {
       </div>`;
   }
 
-  return `
-    <div class="card-container" data-theme="${theme}">
-      <div class="card-cover">
-        <div class="card-cover-brand">
-          <div class="card-cover-logo">💳</div>
-          ${business ? `<div class="card-cover-subtitle">${escapeHtml(business)}</div>` : ''}
+  // Construção do novo layout premium baseado no mockup Barbearia Estilo & Cia
+  let messageHtml = '';
+  if (message) {
+    messageHtml = `
+      <div class="card-message" style="background:rgba(251,191,36,0.06);border:1.5px dashed rgba(251,191,36,0.2);border-radius:var(--radius-lg);padding:14px;margin: 15px 0 20px;display:flex;align-items:center;gap:12px;text-align:left;max-width:100%;">
+        <span style="font-size:1.8rem;line-height:1;">🎁</span>
+        <div>
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:#fbbf24;font-weight:bold;margin-bottom:2px;">Destaque / Promoção</div>
+          <div style="font-size:0.9rem;color:var(--text-primary);line-height:1.4;">${escapeHtml(message)}</div>
         </div>
       </div>
-      <div class="card-avatar-wrapper">
-        <div class="card-avatar-icon">✨</div>
-        <div class="card-avatar">${avatarContent}</div>
+    `;
+  }
+
+  let ctaButtonsHtml = '';
+  if (whatsapp) {
+    ctaButtonsHtml = `
+      <div style="display:flex;gap:12px;margin:15px 0;width:100%;">
+        <a href="https://wa.me/${cleanWhatsapp(whatsapp)}" target="_blank" rel="noopener" class="btn btn-primary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:0.95rem;font-weight:bold;text-decoration:none;">
+          <span>💬</span> WhatsApp
+        </a>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('contactFormSection')?.scrollIntoView({behavior:'smooth'})" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:0.95rem;font-weight:bold;background:none;border:1.5px solid var(--border-subtle);color:var(--text-primary);">
+          <span>📩</span> Cadastrar-se
+        </button>
       </div>
-      <div class="card-body">
-        <h1 class="card-name" style="${!business ? 'font-family: Georgia, Garamond, serif; font-style: italic; font-weight: 700; letter-spacing: -0.02em;' : ''}">${escapeHtml(mainTitle)}</h1>
-        ${subTitle ? `<div class="card-title" style="margin-top: 2px; margin-bottom: var(--space-md);">${escapeHtml(subTitle)}</div>` : ''}
-        ${description ? `<p class="card-description">${escapeHtml(description)}</p>`     : ''}
-        ${message     ? `<p class="card-message">${escapeHtml(message)}</p>`             : ''}
-        ${contactButtons  ? `<div class="card-contact-grid">${contactButtons}</div>`      : ''}
-        ${whatsappSection}
-        ${socialButtons   ? `<div class="card-social-grid">${socialButtons}</div>`        : ''}
-        ${addressHtml}
+    `;
+  }
+
+  let infoGridHtml = '';
+  if (phone || email || address || instagram) {
+    infoGridHtml = `
+      <div style="margin:24px 0 12px;text-align:left;width:100%;">
+        <h3 style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--text-primary);margin-bottom:12px;">Informações</h3>
+        <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:10px;">
+          ${phone ? `
+            <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:12px;display:flex;flex-direction:column;gap:4px;">
+              <span style="font-size:1.15rem;">📞</span>
+              <span style="font-size:0.75rem;font-weight:bold;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.02em;">Telefone</span>
+              <a href="tel:${escapeHtml(phone)}" style="font-size:0.85rem;color:var(--text-primary);text-decoration:none;font-weight:500;word-break:break-all;">${escapeHtml(phone)}</a>
+            </div>
+          ` : ''}
+          ${email ? `
+            <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:12px;display:flex;flex-direction:column;gap:4px;">
+              <span style="font-size:1.15rem;">📧</span>
+              <span style="font-size:0.75rem;font-weight:bold;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.02em;">E-mail</span>
+              <a href="mailto:${escapeHtml(email)}" style="font-size:0.85rem;color:var(--text-primary);text-decoration:none;font-weight:500;word-break:break-all;">${escapeHtml(email)}</a>
+            </div>
+          ` : ''}
+          ${instagram ? `
+            <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:12px;display:flex;flex-direction:column;gap:4px;">
+              <span style="font-size:1.15rem;">📷</span>
+              <span style="font-size:0.75rem;font-weight:bold;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.02em;">Instagram</span>
+              <a href="https://instagram.com/${instagram.startsWith('@') ? instagram.substring(1) : instagram}" target="_blank" rel="noopener" style="font-size:0.85rem;color:var(--text-primary);text-decoration:none;font-weight:500;word-break:break-all;">${escapeHtml(instagram)}</a>
+            </div>
+          ` : ''}
+          ${address ? `
+            <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:12px;display:flex;flex-direction:column;gap:4px;grid-column:span 2;">
+              <span style="font-size:1.15rem;">📍</span>
+              <span style="font-size:0.75rem;font-weight:bold;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.02em;">Endereço</span>
+              <a href="https://www.google.com/maps/search/${encodeURIComponent(address)}" target="_blank" rel="noopener" style="font-size:0.85rem;color:var(--text-primary);text-decoration:none;font-weight:500;line-height:1.4;">${escapeHtml(address)}</a>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="card-container" data-theme="${theme}">
+      <div class="card-cover" style="height:120px;background:linear-gradient(135deg, var(--primary-subtle), var(--primary));position:relative;overflow:hidden;">
+        <div class="card-cover-brand" style="position:absolute;top:15px;left:20px;font-size:0.8rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.08em;opacity:0.8;color:var(--text-primary);">
+          CardLink
+        </div>
+      </div>
+      
+      <!-- Profile Header (Avatar Left, Title Right) -->
+      <div style="display:flex;align-items:center;gap:16px;padding:0 20px;margin-top:-40px;position:relative;z-index:10;text-align:left;">
+        <div class="card-avatar" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--bg-surface);box-shadow:var(--shadow-md);overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg-card);font-size:1.8rem;font-weight:bold;flex-shrink:0;">
+          ${avatarContent}
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:center;padding-top:15px;">
+          <h1 class="card-name" style="margin:0;font-size:1.35rem;line-height:1.2;font-weight:800;color:var(--text-primary);${!business ? 'font-family: Georgia, Garamond, serif; font-style: italic; font-weight: 700; letter-spacing: -0.02em;' : ''}">${escapeHtml(mainTitle)}</h1>
+          ${subTitle ? `<div class="card-title" style="margin:3px 0 0;font-size:0.88rem;color:var(--text-secondary);font-weight:500;">${escapeHtml(subTitle)}</div>` : ''}
+        </div>
+      </div>
+
+      <div class="card-body" style="padding-top:15px;">
+        ${description ? `<p class="card-description" style="text-align:left;margin:10px 0 15px;font-size:0.9rem;line-height:1.6;color:var(--text-secondary);">${escapeHtml(description)}</p>` : ''}
+        ${messageHtml}
+        ${ctaButtonsHtml}
+        ${whatsappGroup ? `<a href="${escapeHtml(whatsappGroup)}" target="_blank" rel="noopener" class="btn btn-whatsapp-group" style="width:100%;margin-bottom:15px;display:flex;align-items:center;justify-content:center;gap:8px;">👥 Grupo do WhatsApp</a>` : ''}
+        ${socialButtons ? `<div class="card-social-grid" style="margin-bottom:20px;">${socialButtons}</div>` : ''}
+        ${infoGridHtml}
         ${address ? `<div class="card-map-card" style="margin-top:16px;"><div class="card-map-label">📍 Como chegar</div><a href="https://www.google.com/maps/search/${encodeURIComponent(address)}" target="_blank" rel="noopener" class="card-map-preview">Toque para abrir no Google Maps</a></div>` : ''}
         ${siteToggleButton}
         ${siteExpandedContent}
         ${contactForm}
       </div>
-      <div class="card-footer">Feito com 💜 por <a href="${window.location.origin}">CardLink</a></div>
+      <div class="card-footer" style="margin-top:20px;">Feito com 💜 por <a href="${window.location.origin}">CardLink</a></div>
     </div>`;
 }
 
