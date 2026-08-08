@@ -24,6 +24,12 @@ router.post('/public/:slug/contact', async (req, res) => {
     return res.status(404).json({ error: 'Cartão não encontrado' });
   }
 
+  // Honeypot anti-spam check
+  if (req.body.website && req.body.website.trim() !== '') {
+    // Return a silent 201 OK so the spambot thinks it succeeded
+    return res.status(201).json({ message: 'Contato enviado com sucesso!' });
+  }
+
   const name    = (req.body.name    || '').trim().substring(0, 100);
   const email   = (req.body.email   || '').trim().substring(0, 200);
   const phone   = (req.body.phone   || '').trim().substring(0, 30);

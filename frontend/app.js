@@ -1187,6 +1187,9 @@ function renderCard(data, isPreview) {
       <div style="margin: 24px 0 16px; border-top: 1px solid rgba(255,255,255,0.1);"></div>
       <div class="card-form" id="contactFormSection" style="text-align:left;">
         <h3 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:12px;text-align:center;color:var(--text-primary);">📩 Envie uma Mensagem</h3>
+        <!-- Honeypot (anti-spam) -->
+        <input type="text" id="contact-website" style="display:none !important;" tabindex="-1" autocomplete="off" placeholder="Website">
+        
         <input class="form-input" type="text" id="contact-name" placeholder="Seu nome *" style="margin-bottom:8px;width:100%;">
         <input class="form-input" type="email" id="contact-email" placeholder="Seu email" style="margin-bottom:8px;width:100%;">
         <input class="form-input" type="tel" id="contact-phone" placeholder="Seu WhatsApp / Telefone" style="margin-bottom:8px;width:100%;">
@@ -1315,11 +1318,26 @@ async function submitContactForm(slug) {
   const email   = document.getElementById('contact-email')?.value.trim();
   const phone   = document.getElementById('contact-phone')?.value.trim();
   const message = document.getElementById('contact-message')?.value.trim();
+  const website = document.getElementById('contact-website')?.value;
 
   if (!name) { showToast('⚠️', 'Preencha seu nome!'); return; }
 
+  // Honeypot anti-spam check
+  if (website && website.trim() !== '') {
+    // Silently block spambots and pretend success
+    const formSection = document.getElementById('contactFormSection');
+    if (formSection) formSection.innerHTML = `
+      <div class="form-success">
+        <div class="check-icon">✅</div>
+        <h4>Mensagem Enviada!</h4>
+        <p>Seus dados foram registrados com sucesso.</p>
+      </div>`;
+    showToast('✅', 'Mensagem enviada com sucesso!');
+    return;
+  }
+
   try {
-    await api('/public/' + slug + '/contact', { method: 'POST', body: JSON.stringify({ name, email, phone, message }) });
+    await api('/public/' + slug + '/contact', { method: 'POST', body: JSON.stringify({ name, email, phone, message, website }) });
     const formSection = document.getElementById('contactFormSection');
     if (formSection) formSection.innerHTML = `
       <div class="form-success">

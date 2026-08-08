@@ -46,7 +46,7 @@ router.post('/register', async (req, res) => {
   const user = await users.insert({ 
     name, 
     email: userEmail, 
-    whatsapp: userEmail, 
+    whatsapp: null, 
     password_hash: passwordHash,
     is_admin: isOwner,
     plan: isOwner ? 'pro' : 'free',
