@@ -1,26 +1,32 @@
 const express = require('express');
-const { query } = require('../db/database');
+const { users: userRepo, cards: cardRepo, contacts: contactRepo, supportTickets: ticketRepo } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
 
 const adminRouter = express.Router();
 const supportRouter = express.Router();
 
 // Admin validation middleware
-function adminMiddleware(req, res, next) {
-  const user = query('users').findById(req.userId);
-  if (!user || !user.is_admin) {
-    return res.status(403).json({ error: 'Acesso restrito ao proprietário da plataforma' });
+async function adminMiddleware(req, res, next) {
+  try {
+    const user = await userRepo.findById(req.userId);
+    if (!user || !user.is_admin) {
+      return res.status(403).json({ error: 'Acesso restrito ao proprietário da plataforma' });
+    }
+    next();
+  } catch (e) {
+    next(e);
   }
-  next();
 }
 
 // ─── ADMIN ROUTES ──────────────────────────────────────────────────────
 
 // 1. Stats route
-adminRouter.get('/stats', authMiddleware, adminMiddleware, (req, res) => {
-  const users = query('users').get();
-  const cards = query('cards').get();
-  const contacts = query('contacts').get();
+adminRouter.get('/stats', authMiddleware, adminMiddleware, async (req, res) => {
+  const [users, cards, contacts] = await Promise.all([
+    userRepo.all(),
+    cardRepo.all(),
+    contactRepo.all(),
+  ]);
 
   const totalUsers = users.length;
   const totalCards = cards.length;
@@ -36,9 +42,9 @@ adminRouter.get('/stats', authMiddleware, adminMiddleware, (req, res) => {
 });
 
 // 2. Users list route
-adminRouter.get('/users', authMiddleware, adminMiddleware, (req, res) => {
-  const users = query('users').get();
-  const cards = query('cards').get();
+adminRouter.get('/users', authMiddleware, adminMiddleware, async (req, res) => {
+  const users = await userRepo.all();
+  const cards = await cardRepo.all();
 
   const list = users.map(u => {
     const card = cards.find(c => c.user_id === u.id);
@@ -58,7 +64,7 @@ adminRouter.get('/users', authMiddleware, adminMiddleware, (req, res) => {
 });
 
 // 3. User plan toggle route (Upgrade/Downgrade)
-adminRouter.post('/users/:id/plan', authMiddleware, adminMiddleware, (req, res) => {
+adminRouter.post('/users/:id/plan', authMiddleware, adminMiddleware, async (req, res) => {
   const userId = parseInt(req.params.id, 10);
   const { plan } = req.body;
 
@@ -66,19 +72,19 @@ adminRouter.post('/users/:id/plan', authMiddleware, adminMiddleware, (req, res) 
     return res.status(400).json({ error: 'Plano inválido' });
   }
 
-  const user = query('users').findById(userId);
+  const user = await userRepo.findById(userId);
   if (!user) {
     return res.status(404).json({ error: 'Usuário não encontrado' });
   }
 
-  const updatedUser = query('users').update(userId, { plan });
+  const updatedUser = await userRepo.update(userId, { plan });
   res.json({ message: `Plano do usuário atualizado para ${plan}`, user: { id: updatedUser.id, plan: updatedUser.plan } });
 });
 
 // 4. Support Tickets list route for Admin
-adminRouter.get('/support', authMiddleware, adminMiddleware, (req, res) => {
-  const tickets = query('support_tickets').get();
-  const users = query('users').get();
+adminRouter.get('/support', authMiddleware, adminMiddleware, async (req, res) => {
+  const tickets = await ticketRepo.all();
+  const users = await userRepo.all();
 
   const list = tickets.map(t => {
     const user = users.find(u => u.id === t.user_id);
@@ -99,13 +105,13 @@ adminRouter.get('/support', authMiddleware, adminMiddleware, (req, res) => {
 // ─── SUPPORT ROUTES ────────────────────────────────────────────────────
 
 // Send Support ticket (Client Dashboard)
-supportRouter.post('/', authMiddleware, (req, res) => {
+supportRouter.post('/', authMiddleware, async (req, res) => {
   const { subject, message } = req.body;
   if (!message) {
     return res.status(400).json({ error: 'Mensagem é obrigatória' });
   }
 
-  const ticket = query('support_tickets').insert({
+  const ticket = await ticketRepo.insert({
     user_id: req.userId,
     subject: subject || 'Dúvida geral',
     message,

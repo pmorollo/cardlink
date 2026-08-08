@@ -1,10 +1,18 @@
-try { require('dotenv').config(); } catch(e) {}
+try { require('dotenv').config({ path: require('path').join(__dirname, '.env') }); } catch(e) {}
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
+
+if (!process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('❌ JWT_SECRET é obrigatório em produção. Configure a variável de ambiente.');
+    process.exit(1);
+  }
+  console.warn('⚠️ JWT_SECRET não configurado. Usando segredo temporário somente para desenvolvimento.');
+}
 
 const uploadsDir = path.join(__dirname, 'uploads');
 const dbDir = path.join(__dirname, 'db');
@@ -30,14 +38,20 @@ app.use(helmet({
 // ─── CORS ────────────────────────────────────────────────────────
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin) return cb(null, true);
+    const isSameOrigin = !origin;
     const corsEnv = process.env.CORS_ORIGIN;
-    if (!corsEnv || corsEnv === '*') return cb(null, true);
-    const allowed = corsEnv.split(',').map(o => o.trim());
-    if (allowed.includes(origin) || origin.endsWith('.railway.app') || origin.includes('localhost')) {
+    if (corsEnv === '*') {
       return cb(null, true);
     }
-    return cb(null, true);
+    if (isSameOrigin) {
+      return cb(null, true);
+    }
+    const allowed = (corsEnv || '').split(',').map(o => o.trim()).filter(Boolean);
+    const ok = allowed.includes(origin) || origin.endsWith('.railway.app') || origin.includes('localhost');
+    if (ok) {
+      return cb(null, true);
+    }
+    return cb(new Error('Origem não permitida pelo CORS'));
   },
   credentials: true
 }));
@@ -111,7 +125,6 @@ app.get('/uploads/:filename', async (req, res, next) => {
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
-app.use(express.static(path.join(__dirname, '..')));
 
 // Landing page route
 app.get('/site/:slug', (req, res) => {
@@ -130,6 +143,10 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: err.message || 'Erro no servidor' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
+module.exports = app;
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
+  });
+}

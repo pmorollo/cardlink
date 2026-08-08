@@ -2,7 +2,7 @@
    CardLink Landing Page — Premium Styles
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&family=Great+Vibes&display=swap');
 
 /* ============================================
    CSS Variables & Themes
@@ -289,6 +289,27 @@ img { max-width: 100%; display: block; }
   background-clip: text;
 }
 
+/* Nome em forma de assinatura (hero) */
+.lp-signature-name {
+  font-family: 'Great Vibes', 'Segoe Script', 'Brush Script MT', cursive;
+  font-weight: 400;
+  font-size: clamp(3rem, 7vw, 5.2rem);
+  line-height: 1.15;
+  display: block;
+  color: var(--text-primary);
+}
+
+/* Cargo logo abaixo do nome assinado */
+.lp-hero-title-role {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
 .lp-hero-subtitle {
   font-size: 1.15rem;
   color: var(--text-secondary);
@@ -511,6 +532,15 @@ img { max-width: 100%; display: block; }
   font-weight: 800;
   margin-bottom: 20px;
   line-height: 1.2;
+}
+
+/* Nome da seção "Sobre": menor e em itálico */
+.lp-about-name {
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+  font-weight: 500;
+  font-style: italic;
+  color: var(--text-secondary);
 }
 .lp-about-text p {
   color: var(--text-secondary);

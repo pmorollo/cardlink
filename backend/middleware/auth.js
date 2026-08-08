@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config');
 
 function authMiddleware(req, res, next) {
   const header = req.headers.authorization;
@@ -8,7 +9,7 @@ function authMiddleware(req, res, next) {
 
   const token = header.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'cardlink-fallback-secret');
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded.userId;
     next();
   } catch (err) {

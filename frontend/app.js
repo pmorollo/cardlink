@@ -369,16 +369,21 @@ async function handleForgotPassword() {
   showToast('⏳', 'Gerando código de recuperação...');
   try {
     const res = await api('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
+    if (!res) return;
     const step1 = document.getElementById('forgot-step-1');
     const step2 = document.getElementById('forgot-step-2');
     const banner = document.getElementById('forgot-code-banner');
 
+    // O código é devolvido somente em desenvolvimento; em produção ele é
+    // entregue por e-mail/SMS e aparece apenas no console do servidor.
     if (step1) step1.style.display = 'none';
     if (step2) step2.style.display = 'block';
     if (banner && res.code) {
       banner.innerHTML = `🔑 Código de Recuperação Gerado:<br><strong style="font-size:1.4rem;letter-spacing:4px;color:var(--accent);">${res.code}</strong>`;
+    } else if (banner) {
+      banner.innerHTML = `📩 ${res.message || 'Verifique seu e-mail / console do administrador para obter o código.'}`;
     }
-    showToast('✅', 'Código gerado! Digite o código e a nova senha.');
+    showToast('✅', res.message || 'Código gerado! Digite o código e a nova senha.');
   } catch (err) {
     showToast('❌', err.message);
   }

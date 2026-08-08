@@ -239,13 +239,16 @@ function renderHero(d) {
   const title = d.title || '';
   const initials = (name.split(' ').map(w => w[0]).join('').substring(0, 2) || 'P').toUpperCase();
 
-  // Badge
+  // Badge (mostra o negócio; o cargo fica logo abaixo do nome assinado)
   const badgeEl = document.getElementById('hero-badge-text');
-  if (badgeEl) badgeEl.textContent = title || business || 'Profissional';
+  if (badgeEl) badgeEl.textContent = business || title || 'Profissional';
 
-  // Title
+  // Title (nome em forma de assinatura + cargo abaixo)
   const titleEl = document.getElementById('hero-title');
-  if (titleEl) titleEl.innerHTML = `Olá, eu sou<br><span class="text-gradient">${esc(name)}</span>`;
+  if (titleEl) {
+    const role = title ? `<span class="lp-hero-title-role">${esc(title)}</span>` : '';
+    titleEl.innerHTML = `<span class="lp-signature-name">${esc(name)}</span>${role}`;
+  }
 
   // Subtitle
   const subEl = document.getElementById('hero-subtitle');
@@ -310,9 +313,9 @@ function renderAbout(d) {
   const business = d.business || '';
   const isPlaceholder = !d.description;
 
-  // Title
+  // Title (somente o nome, menor e em itálico)
   const aboutTitle = document.getElementById('about-title');
-  if (aboutTitle) aboutTitle.innerHTML = `Quem é <span class="text-gradient">${esc(name)}</span>?`;
+  if (aboutTitle) aboutTitle.innerHTML = `<span class="lp-about-name">${esc(name)}</span>`;
 
   // About image: use professional stock photo so self photo isn't duplicated from Hero
   const imgWrap = document.getElementById('about-image');

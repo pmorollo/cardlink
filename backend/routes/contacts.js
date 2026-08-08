@@ -1,24 +1,24 @@
 const express = require('express');
-const { query } = require('../db/database');
+const { cards: cardRepo, contacts: contactRepo } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
-router.get('/public/:slug', (req, res) => {
-  const card = query('cards').findOne(c => c.slug === req.params.slug);
+router.get('/public/:slug', async (req, res) => {
+  const card = await cardRepo.findBySlug(req.params.slug);
   if (!card) {
     return res.status(404).json({ error: 'Cartão não encontrado' });
   }
 
-  query('cards').update(card.id, { views_count: (card.views_count || 0) + 1 });
+  await cardRepo.update(card.id, { views_count: (card.views_count || 0) + 1 });
 
   // Only expose fields needed for public display — never expose user_id or internals
   const { user_id, views_count, created_at, updated_at, ...publicCard } = card;
   res.json(publicCard);
 });
 
-router.post('/public/:slug/contact', (req, res) => {
-  const card = query('cards').findOne(c => c.slug === req.params.slug);
+router.post('/public/:slug/contact', async (req, res) => {
+  const card = await cardRepo.findBySlug(req.params.slug);
   if (!card) {
     return res.status(404).json({ error: 'Cartão não encontrado' });
   }
@@ -37,7 +37,7 @@ router.post('/public/:slug/contact', (req, res) => {
     return res.status(400).json({ error: 'Conteúdo inválido' });
   }
 
-  query('contacts').insert({
+  await contactRepo.insert({
     card_id: card.id,
     name,
     email: email || null,
@@ -48,14 +48,14 @@ router.post('/public/:slug/contact', (req, res) => {
   res.status(201).json({ message: 'Contato enviado com sucesso!' });
 });
 
-router.get('/:cardId/contacts', authMiddleware, (req, res) => {
+router.get('/cards/:cardId/contacts', authMiddleware, async (req, res) => {
   const cardId = Number(req.params.cardId);
-  const card = query('cards').findOne(c => c.id === cardId && c.user_id === req.userId);
+  const card = await cardRepo.findByIdAndUser(cardId, req.userId);
   if (!card) {
     return res.status(404).json({ error: 'Cartão não encontrado' });
   }
 
-  const contacts = query('contacts').find(c => c.card_id === card.id);
+  const contacts = await contactRepo.findByCardId(card.id);
   contacts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   res.json(contacts);
 });

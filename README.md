@@ -39,12 +39,63 @@ Aplicação de cartão de visita digital com backend em Node/Express e frontend 
 - Copiar link para área de transferência com fallback.
 - Suporte a `navigator.share` em dispositivos compatíveis.
 
+## Testes
+
+```bash
+# Suite principal (armazenamento local JSON) — 7 testes + 1 skip do PG
+cd backend
+npm test
+
+# Teste de integração contra PostgreSQL real
+# (crie o banco antes: CREATE DATABASE cardlink_test;)
+DATABASE_URL=postgres://postgres@localhost:5433/cardlink_test node --test --test-concurrency=1 backend/test/pg.integration.test.js
+
+# Suite principal rodando contra PostgreSQL (dados compartilhados entre testes;
+# o banco deve estar limpo antes da execução)
+DATABASE_URL=postgres://postgres@localhost:5433/cardlink_test node --test --test-concurrency=1 backend/test/smoke.test.js
+```
+
+Cobertura da suite principal: SPA servida, não exposição de `backend/.env`, CORS bloqueando origens estranhas, escalada de admin por e-mail, e o fluxo completo de recuperação de senha (com bloqueio de reuso/invalidação do código).
+
+O teste de integração (`pg.integration.test.js`) valida contra o PostgreSQL real: registro de admin e usuário comum, criação/atualização/exclusão de cartão, slug único, página pública (sem expor `user_id`/`views_count`), envio de contato público com anti-spam, listagem de contatos, stats, controle de acesso de admin, troca de plano e chamados de suporte. As tabelas são truncadas a cada execução.
+
+## Arquitetura de banco
+
+- `backend/db/repository.js` — repositório tipado e assíncrono (`users`, `cards`, `contacts`, `supportTickets`). Quando `DATABASE_URL` é um PostgreSQL válido, todas as operações vão para o banco (esquema criado automaticamente na inicialização). Se o PostgreSQL estiver indisponível, cai automaticamente no armazenamento local (memória/JSON) sem quebrar a API.
+- `backend/db/database.js` — camada de compatibilidade que exporta `query()` legado e o objeto `db` (usado pelos testes).
+- `backend/db/data.json` — armazenamento local de desenvolvimento.
+- Os novos endpoints/rotas devem usar `repository.*` (async/await) em vez do `query()` legado.
+
 ## Deploy sugerido
 
 1. Use um serviço como Heroku, Render, Railway, Vercel (com backend separado) ou DigitalOcean App Platform.
 2. O backend já roda em Node com `npm start`.
 3. O `Procfile` está pronto para Heroku e o `Dockerfile` permite deploy containerizado.
-4. Garanta `CORS` habilitado para o domínio de produção e configure `JWT_SECRET` via variável de ambiente.
+
+### Checklist obrigatório de produção
+
+Gere variáveis de ambiente fortes e NUNCA as deixe em repositórios:
+
+```bash
+# Segredo do JWT — OBRIGATÓRIO (servidor não sobe em produção sem ele)
+JWT_SECRET=<gerar valor aleatório longo, ex: openssl rand -hex 64>
+NODE_ENV=production
+
+# E-mails autorizados como administradores (separados por vírgula)
+ADMIN_EMAILS=seu-email@dominio.com
+
+# CORS: liste os domínios do seu frontend (por padrão não aceita nada além de localhost)
+CORS_ORIGIN=https://seu-dominio.com
+
+# Banco de dados (opcional — sem ele o app usa backend/db/data.json local)
+DATABASE_URL=postgres://usuario:senha@host:5432/db
+```
+
+Pontos de atenção:
+
+- **Recuperação de senha:** atualmente o código é gerado e registrado no **console do servidor** (retornado na API somente em desenvolvimento). Para produção, configure um serviço de e-mail (SMTP) para entregar o código ao usuário e remova o `console.log`.
+- **Uploads:** em produção é recomendado configurar o Cloudflare R2 (`R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `CLOUDFLARE_ACCOUNT_ID`, `R2_BUCKET`) — caso contrário as imagens vão para `backend/uploads/` (volátil em deploy efêmero).
+- **HTTPS**: habilite no serviço de hosting.
 
 ## Docker
 
@@ -59,6 +110,6 @@ Aplicação de cartão de visita digital com backend em Node/Express e frontend 
 
 ## Observação
 
-- O app ainda usa `backend/db/data.json` como banco de dados local. Para produção, migrar para um banco real.
+- O app usa `backend/db/data.json` como banco local quando `DATABASE_URL` não é um PostgreSQL. Para produção com múltiplas instâncias, prefira PostgreSQL.
 - Os uploads de imagem são salvos em `backend/uploads`.
-- Recomenda-se adicionar recuperação de senha, backup de dados e HTTPS para produção.
+- Em aplicações multi-instância o armazenamento local (JSON/uploads) deve ser substituído por serviços compartilhados.
