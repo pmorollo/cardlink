@@ -1072,9 +1072,17 @@ function renderCard(data, isPreview) {
   const whatsappGroup = data.whatsapp_group || '';
   const theme       = data.theme || 'midnight';
 
-  const initials = (name.split(' ').map(w => w[0]).join('').substring(0, 2) || 'C').toUpperCase();
+  // Ajuste inteligente para diferenciação entre Cartão Comercial (Negócio) e Cartão Pessoal
+  const greeting = business ? 'Seja bem-vindo a' : 'Olá! Eu sou';
+  const mainTitle = business ? business : name;
+  const subTitle = business 
+    ? (name && name !== 'Seu Nome' ? (title ? `${name} — ${title}` : name) : title)
+    : title;
+
+  const initialsName = business || name;
+  const initials = (initialsName.split(' ').map(w => w[0]).join('').substring(0, 2) || 'C').toUpperCase();
   const avatarContent = photo
-    ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" onerror="this.parentElement.textContent='${initials}'">`
+    ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(mainTitle)}" onerror="this.parentElement.textContent='${initials}'">`
     : initials;
 
   let contactButtons = '';
@@ -1203,9 +1211,9 @@ function renderCard(data, isPreview) {
         <div class="card-avatar">${avatarContent}</div>
       </div>
       <div class="card-body">
-        <div class="card-greeting">Olá! Eu sou</div>
-        <h1 class="card-name">${escapeHtml(name)}</h1>
-        ${title       ? `<div class="card-title">${escapeHtml(title)}</div>`             : ''}
+        <div class="card-greeting">${escapeHtml(greeting)}</div>
+        <h1 class="card-name">${escapeHtml(mainTitle)}</h1>
+        ${subTitle ? `<div class="card-title">${escapeHtml(subTitle)}</div>` : ''}
         ${description ? `<p class="card-description">${escapeHtml(description)}</p>`     : ''}
         ${message     ? `<p class="card-message">${escapeHtml(message)}</p>`             : ''}
         ${contactButtons  ? `<div class="card-contact-grid">${contactButtons}</div>`      : ''}
