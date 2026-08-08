@@ -222,3 +222,34 @@ test('registro de usuario salva o codigo do vendedor indicador (referred_by)', a
   assert.ok(userRow);
   assert.equal(userRow.referred_by, referred_by);
 });
+
+test('envio de contato publico dispara email de notificacao para o dono do cartao', async () => {
+  const email = 'owner-notification@example.com';
+  // 1. Registra usuário dono
+  const rReg = await api('POST', '/api/auth/register', { email, name: 'Owner Test', password: 'Password123!' });
+  const token = rReg.data.token;
+
+  // 2. Cria cartão para esse usuário
+  const rCard = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ name: 'Meu Cartao Teste' })
+  });
+  const cardData = await rCard.json();
+  const slug = cardData.slug;
+
+  // 3. Envia contato público para o slug desse cartão
+  const rContact = await fetch(`http://127.0.0.1:${server.address().port}/api/public/${slug}/contact`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      name: 'Visitante Interessado', 
+      phone: '11999998888', 
+      message: 'Olá, gostaria de saber mais!' 
+    })
+  });
+  
+  assert.equal(rContact.status, 201);
+  const contactRes = await rContact.json();
+  assert.equal(contactRes.message, 'Contato enviado com sucesso!');
+});

@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const { users } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
 const { JWT_SECRET, isAdminEmail } = require('../config');
+const { sendEmail } = require('../utils/email');
 
 const router = express.Router();
 
@@ -159,8 +160,23 @@ router.post('/forgot-password', async (req, res) => {
     reset_expires: expiresAt
   });
 
-  // Em produção o código deve ser entregue por e-mail/SMS (SMTP). Por ora vai para o console do servidor.
-  console.log(`🔑 Código de recuperação para ${userEmail}: ${code} (válido até ${expiresAt})`);
+  // Envia e-mail de verdade (ou loga no console caso não configurado)
+  await sendEmail({
+    to: userEmail,
+    subject: 'Código de Recuperação - CardLink',
+    text: `Seu código de recuperação é: ${code}. Ele é válido por 15 minutos.`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 500px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #7c3aed; margin-bottom: 10px;">Recuperação de Senha</h2>
+        <p>Olá, <strong>${user.name}</strong>.</p>
+        <p>Você solicitou a recuperação de senha no CardLink. Use o código abaixo para redefinir sua senha:</p>
+        <div style="font-size: 24px; font-weight: bold; letter-spacing: 2px; color: #1e293b; background: #f1f5f9; padding: 12px; border-radius: 6px; text-align: center; margin: 20px 0;">
+          ${code}
+        </div>
+        <p style="font-size: 12px; color: #64748b;">Este código expira em 15 minutos. Se você não solicitou esta reconfiguração, ignore este e-mail.</p>
+      </div>
+    `
+  }).catch(err => console.error('Falha ao enviar e-mail de recuperação:', err.message));
 
   const payload = { message: genericMessage };
   if (!isProduction) {

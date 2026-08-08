@@ -1,6 +1,7 @@
 const express = require('express');
-const { cards: cardRepo, contacts: contactRepo } = require('../db/repository');
+const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
+const { sendEmail } = require('../utils/email');
 
 const router = express.Router();
 
@@ -44,6 +45,32 @@ router.post('/public/:slug/contact', async (req, res) => {
     phone: phone || null,
     message: message || null
   });
+
+  // Envia e-mail de notificação para o proprietário do cartão
+  const owner = await userRepo.findById(card.user_id);
+  if (owner && owner.email) {
+    sendEmail({
+      to: owner.email,
+      subject: '🎉 Novo contato recebido no CardLink!',
+      text: `Olá, ${owner.name}! Você recebeu uma nova mensagem de ${name} (${phone || 'Sem telefone'} / ${email || 'Sem e-mail'}):\n\n"${message || 'Sem mensagem'}"`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 500px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <h2 style="color: #7c3aed; margin-bottom: 10px;">🎉 Novo Contato Recebido!</h2>
+          <p>Olá, <strong>${owner.name}</strong>.</p>
+          <p>Um visitante enviou uma mensagem através da sua página digital do CardLink:</p>
+          
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 16px; margin: 15px 0;">
+            <div style="margin-bottom: 8px;"><strong>Nome:</strong> ${name}</div>
+            ${phone ? `<div style="margin-bottom: 8px;"><strong>Telefone:</strong> ${phone}</div>` : ''}
+            ${email ? `<div style="margin-bottom: 8px;"><strong>E-mail:</strong> ${email}</div>` : ''}
+            ${message ? `<div style="margin-top: 12px; border-top: 1px solid #e2e8f0; padding-top: 8px;"><strong>Mensagem:</strong><br>${message.replace(/\n/g, '<br>')}</div>` : ''}
+          </div>
+          
+          <p style="font-size: 0.85rem; color: #64748b;">Acesse seu painel do CardLink para ver a lista de contatos e retornar diretamente via WhatsApp.</p>
+        </div>
+      `
+    }).catch(err => console.error('Falha ao enviar e-mail de notificação de contato:', err.message));
+  }
 
   res.status(201).json({ message: 'Contato enviado com sucesso!' });
 });
