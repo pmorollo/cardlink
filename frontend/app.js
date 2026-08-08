@@ -427,14 +427,61 @@ function handleLogout() {
 }
 
 function showSettingsSection(section) {
-  activeSettingsSection = section || 'profile';
+  let targetSection = section || 'profile';
+  
+  // Feature gating logic
+  const proSections = ['services', 'gallery', 'testimonials', 'assistant'];
+  const isPro = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
+  
+  if (proSections.includes(targetSection) && !isPro) {
+    const lockTitles = {
+      services: 'Vitrine de Produtos & Serviços',
+      gallery: 'Galeria de Fotos & Portfólio',
+      testimonials: 'Carrossel de Avaliações',
+      assistant: 'Assistente de Conteúdo com IA'
+    };
+    
+    const lockDescs = {
+      services: 'Exiba seus produtos ou serviços com fotos, preços e descrições estruturadas. Seus clientes poderão fazer pedidos diretamente pelo WhatsApp!',
+      gallery: 'Crie uma vitrine visual do seu trabalho, portfólio de projetos, fotos de antes/depois ou do seu espaço físico.',
+      testimonials: 'Aumente sua credibilidade exibindo depoimentos e avaliações reais de clientes satisfeitos diretamente na sua página.',
+      assistant: 'Use inteligência artificial avançada para criar biografias, títulos e textos persuasivos otimizados para vendas com um único clique.'
+    };
+    
+    const titleEl = document.getElementById('pro-lock-title');
+    const descEl = document.getElementById('pro-lock-desc');
+    if (titleEl) titleEl.textContent = lockTitles[targetSection] || 'Recurso Premium PRO';
+    if (descEl) descEl.textContent = lockDescs[targetSection] || 'Faça o upgrade para o plano PRO para liberar este recurso.';
+    
+    targetSection = 'pro-lock';
+  }
+
+  activeSettingsSection = targetSection;
   document.querySelectorAll('[data-settings-section]').forEach(el => {
     el.classList.toggle('active', el.dataset.settingsSection === activeSettingsSection);
   });
   document.querySelectorAll('[data-settings-target]').forEach(button => {
-    button.classList.toggle('active', button.dataset.settingsTarget === activeSettingsSection);
+    button.classList.toggle('active', button.dataset.settingsTarget === section);
   });
   document.querySelector('.builder-form-panel')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openProPaymentModal() {
+  const modal = document.getElementById('pro-payment-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeProPaymentModal() {
+  const modal = document.getElementById('pro-payment-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function redirectToCheckout() {
+  const email = currentUser ? encodeURIComponent(currentUser.email) : '';
+  const userId = currentUser ? currentUser.id : '';
+  const checkoutBase = 'https://cakto.com.br/checkout/cardlink-pro';
+  const checkoutUrl = `${checkoutBase}?email=${email}&external_id=${userId}`;
+  window.open(checkoutUrl, '_blank');
 }
 
 function loadAccountView() {

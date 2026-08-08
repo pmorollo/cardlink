@@ -1,5 +1,6 @@
 const express = require('express');
 const authMiddleware = require('../middleware/auth');
+const { users } = require('../db/repository');
 
 const router = express.Router();
 
@@ -58,6 +59,11 @@ function generateFallbackAI({ profession, skill = 'vendedora' }) {
 }
 
 router.post('/generate', authMiddleware, async (req, res) => {
+  const user = await users.findById(req.userId);
+  if (!user || (user.plan !== 'pro' && !user.is_admin)) {
+    return res.status(403).json({ error: 'O Assistente de IA é um recurso do plano PRO.' });
+  }
+
   const { profession, skill = 'vendedora', mode = 'full', textToImprove } = req.body;
 
   if (!profession && !textToImprove) {

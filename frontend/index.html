@@ -524,6 +524,18 @@
             </div>
           </div>
 
+          <!-- PRO Lock Section -->
+          <div class="form-section settings-section" data-settings-section="pro-lock" style="text-align:center;padding:40px 20px;background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);margin-bottom:var(--space-xl);">
+            <div style="font-size:3rem;margin-bottom:15px;">🔒</div>
+            <h3 style="font-size:1.4rem;color:var(--text-primary);margin-bottom:10px;" id="pro-lock-title">Recurso Exclusivo PRO</h3>
+            <p style="color:var(--text-secondary);font-size:0.95rem;line-height:1.6;margin-bottom:25px;max-width:400px;margin-left:auto;margin-right:auto;" id="pro-lock-desc">
+              Esta é uma funcionalidade premium do CardLink. Assine o plano PRO por apenas R$ 19,90/mês para desbloquear!
+            </p>
+            <button class="btn btn-primary" type="button" onclick="openProPaymentModal()" style="padding:12px 24px;font-size:1rem;font-weight:bold;margin:0 auto;">
+              Assinar Plano PRO — R$ 19,90/mês
+            </button>
+          </div>
+
           <!-- Generate Buttons -->
           <div class="generate-section">
             <button class="btn btn-primary btn-lg" onclick="saveCard()" id="generate-btn">
@@ -745,6 +757,34 @@
       <div style="display:flex;gap:12px;margin-top:20px;">
         <button class="btn btn-primary" onclick="submitSupportTicket()" style="flex:1;">Enviar chamado</button>
         <button class="btn btn-secondary" onclick="closeSupportModal()" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Assinatura PRO -->
+  <div class="modal-overlay" id="pro-payment-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;">
+    <div class="builder-form-panel" style="max-width:440px;width:90%;max-height:90vh;margin:10vh auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-lg);text-align:center;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;text-align:left;">
+        <h2 class="builder-title" style="margin-bottom:0;font-size:1.25rem;"><span class="icon">👑</span> Plano <span class="text-gradient">PRO</span></h2>
+        <button type="button" onclick="closeProPaymentModal()" style="background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+      
+      <p style="color:var(--text-secondary);font-size:0.88rem;line-height:1.6;margin-bottom:20px;text-align:left;">
+        Desbloqueie todos os recursos avançados para destacar o seu negócio: vitrine de produtos e serviços com pedidos diretos por WhatsApp, portfólio de imagens, depoimentos de clientes e o Assistente de Conteúdo com Inteligência Artificial!
+      </p>
+      
+      <div style="background:rgba(139,92,246,0.06);border:1.5px dashed rgba(139,92,246,0.2);border-radius:var(--radius-lg);padding:16px;margin-bottom:24px;">
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--purple);font-weight:bold;margin-bottom:4px;">Valor da Assinatura</div>
+        <div style="font-size:2rem;font-weight:bold;color:var(--text-primary);">R$ 19,90 <span style="font-size:0.95rem;font-weight:normal;color:var(--text-secondary);">/ mês</span></div>
+      </div>
+      
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <button class="btn btn-primary" onclick="redirectToCheckout()" style="width:100%;padding:12px;font-size:0.95rem;font-weight:bold;text-align:center;">
+          Pagar via PIX ou Cartão (Cakto)
+        </button>
+        <button class="btn btn-secondary" onclick="closeProPaymentModal()" style="width:100%;">
+          Voltar depois
+        </button>
       </div>
     </div>
   </div>

@@ -1,6 +1,6 @@
 const express = require('express');
 const slugify = require('slugify');
-const { cards: cardRepo, contacts: contactRepo } = require('../db/repository');
+const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
@@ -80,6 +80,20 @@ router.post('/', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: 'Nome é obrigatório' });
   }
 
+  // Check if user is PRO/Admin to gate premium features
+  const user = await userRepo.findById(req.userId);
+  const isPro = user && (user.plan === 'pro' || user.is_admin);
+
+  let productsToSave = req.body.products;
+  let galleryToSave = req.body.gallery;
+  let testimonialsToSave = req.body.testimonials;
+
+  if (!isPro) {
+    productsToSave = [];
+    galleryToSave = [];
+    testimonialsToSave = [];
+  }
+
   const existing = await cardRepo.findOneByUserId(req.userId);
   if (existing) {
     let slug = existing.slug;
@@ -108,9 +122,9 @@ router.post('/', authMiddleware, async (req, res) => {
       twitter: req.body.twitter !== undefined ? sanitizeSocialUrl(req.body.twitter) : existing.twitter,
       theme: req.body.theme || existing.theme,
       site_button_text: req.body.site_button_text !== undefined ? String(req.body.site_button_text).substring(0, 200) : existing.site_button_text,
-      products: req.body.products !== undefined ? req.body.products : existing.products,
-      gallery: req.body.gallery !== undefined ? req.body.gallery : existing.gallery,
-      testimonials: req.body.testimonials !== undefined ? req.body.testimonials : existing.testimonials,
+      products: productsToSave !== undefined ? productsToSave : existing.products,
+      gallery: galleryToSave !== undefined ? galleryToSave : existing.gallery,
+      testimonials: testimonialsToSave !== undefined ? testimonialsToSave : existing.testimonials,
       updated_at: new Date().toISOString()
     });
 
@@ -141,9 +155,9 @@ router.post('/', authMiddleware, async (req, res) => {
     twitter: sanitizeSocialUrl(req.body.twitter),
     theme: req.body.theme || 'midnight',
     site_button_text: req.body.site_button_text ? String(req.body.site_button_text).substring(0, 200) : null,
-    products: req.body.products || [],
-    gallery: req.body.gallery || [],
-    testimonials: req.body.testimonials || [],
+    products: productsToSave || [],
+    gallery: galleryToSave || [],
+    testimonials: testimonialsToSave || [],
     views_count: 0
   });
 

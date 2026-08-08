@@ -149,3 +149,58 @@ test('webhook da Cakto ativa e cancela plano PRO', async () => {
   assert.equal(rHookCancel.data.success, true);
   assert.equal(rHookCancel.data.plan, 'free');
 });
+
+test('controle de recursos (gating) free vs pro no backend', async () => {
+  const email = 'gated-user@example.com';
+  
+  // 1. Cria usuário free
+  const rReg = await api('POST', '/api/auth/register', { email, name: 'Gated User', password: 'Password123!' });
+  const token = rReg.data.token;
+  
+  // 2. Tenta chamar API de IA como free (deve falhar com 403)
+  const resAI = await fetch(`http://127.0.0.1:${server.address().port}/api/ai/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ profession: 'Designer' })
+  });
+  assert.equal(resAI.status, 403);
+
+  // 3. Tenta salvar cartão com produtos como free (deve limpar produtos)
+  const resCard = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ 
+      name: 'Card de Gated', 
+      products: [{ name: 'Shampoo', price: '20,00' }] 
+    })
+  });
+  assert.equal(resCard.status, 201);
+  const cardData = await resCard.json();
+  // Produtos devem estar vazios para usuário free
+  assert.deepEqual(cardData.products, []);
+
+  // 4. Promove usuário a PRO
+  await api('POST', '/api/payments/cakto-webhook', { email, status: 'paid' });
+
+  // 5. Tenta chamar API de IA como PRO (deve passar com 200)
+  const resAIPro = await fetch(`http://127.0.0.1:${server.address().port}/api/ai/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ profession: 'Designer' })
+  });
+  assert.equal(resAIPro.status, 200);
+
+  // 6. Tenta salvar cartão com produtos como PRO (deve salvar os produtos)
+  const resCardPro = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ 
+      name: 'Card de Gated', 
+      products: [{ name: 'Shampoo', price: '20,00' }] 
+    })
+  });
+  assert.equal(resCardPro.status, 201);
+  const cardDataPro = await resCardPro.json();
+  assert.equal(cardDataPro.products.length, 1);
+  assert.equal(cardDataPro.products[0].name, 'Shampoo');
+});
