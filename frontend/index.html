@@ -175,8 +175,13 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <div class="container">
+      <div class="container" style="display:flex;flex-direction:column;align-items:center;gap:8px;">
         <p>Feito com 💜 por <a href="#">CardLink</a> — Seu cartão de visita digital</p>
+        <div style="display:flex;gap:15px;font-size:0.85rem;">
+          <a href="#/terms" style="color:var(--text-secondary);text-decoration:none;">Termos de Uso</a>
+          <span style="color:var(--border-subtle);">|</span>
+          <a href="#/privacy" style="color:var(--text-secondary);text-decoration:none;">Política de Privacidade</a>
+        </div>
       </div>
     </footer>
   </section>
@@ -225,6 +230,12 @@
           <div class="form-group">
             <label class="form-label" for="register-password">Senha</label>
             <input class="form-input" type="password" id="register-password" placeholder="Mínimo 8 caracteres">
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-start;gap:8px;margin-top:15px;text-align:left;">
+            <input type="checkbox" id="register-terms" style="margin-top:4px;cursor:pointer;">
+            <label for="register-terms" style="font-size:0.8rem;color:var(--text-secondary);cursor:pointer;line-height:1.4;">
+              Declaro que li e aceito os <a href="#/terms" style="color:var(--purple);text-decoration:underline;">Termos de Uso</a> e a <a href="#/privacy" style="color:var(--purple);text-decoration:underline;">Política de Privacidade</a>.
+            </label>
           </div>
           <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleRegister()">
             Criar Conta
@@ -788,6 +799,64 @@
       </div>
     </div>
   </div>
+
+  <!-- View: Termos de Uso -->
+  <section class="view" id="terms-view" style="display:none;background:var(--bg-surface);min-height:100vh;">
+    <div class="container" style="max-width:800px;padding:40px var(--space-md);color:var(--text-primary);">
+      <h1 class="text-gradient" style="font-size:2.5rem;margin-bottom:20px;text-align:center;">Termos de Uso</h1>
+      <p style="color:var(--text-secondary);margin-bottom:30px;font-size:0.9rem;text-align:center;">Última atualização: Agosto de 2026</p>
+      
+      <div class="legal-content" style="line-height:1.8;font-size:0.95rem;display:flex;flex-direction:column;gap:20px;text-align:left;">
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">1. Aceitação dos Termos</h3>
+        <p style="color:var(--text-secondary);">Ao se cadastrar e utilizar o CardLink, você concorda plenamente com estes Termos de Uso. Se você não concorda com qualquer parte destes termos, não deve utilizar a plataforma.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">2. Cadastro e Responsabilidade da Conta</h3>
+        <p style="color:var(--text-secondary);">Para criar cartões digitais, o usuário deve fornecer dados válidos (como nome e e-mail). A senha criada é pessoal e intransferível. O usuário é inteiramente responsável por todas as atividades e conteúdos publicados sob o seu login e link público.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">3. Uso Permitido e Conteúdo</h3>
+        <p style="color:var(--text-secondary);">É expressamente proibido utilizar o CardLink para publicar ou transmitir conteúdos ilegais, difamatórios, abusivos, ameaçadores, fraudulentos ou de cunho sexual explícito. O uso da plataforma para a prática de SPAM ou envio em massa de mensagens não autorizadas também resultará no banimento imediato da conta.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Planos e Assinatura PRO</h3>
+        <p style="color:var(--text-secondary);">O CardLink oferece recursos básicos gratuitos e recursos extras mediante assinatura do plano PRO. A cobrança é recorrente mensal e pode ser cancelada a qualquer momento diretamente pelo intermediador de pagamentos (Cakto). O não pagamento resultará no rebaixamento da conta para o plano grátis (free) e remoção de dados das seções premium.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">5. Alterações nos Termos</h3>
+        <p style="color:var(--text-secondary);">O CardLink reserva-se o direito de atualizar estes termos a qualquer momento. Modificações substanciais serão notificadas aos usuários ou publicadas com destaque em nosso website.</p>
+      </div>
+      
+      <div style="margin-top:40px;text-align:center;">
+        <button class="btn btn-secondary" onclick="window.history.back()" style="padding:10px 24px;">Voltar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- View: Política de Privacidade -->
+  <section class="view" id="privacy-view" style="display:none;background:var(--bg-surface);min-height:100vh;">
+    <div class="container" style="max-width:800px;padding:40px var(--space-md);color:var(--text-primary);">
+      <h1 class="text-gradient" style="font-size:2.5rem;margin-bottom:20px;text-align:center;">Política de Privacidade</h1>
+      <p style="color:var(--text-secondary);margin-bottom:30px;font-size:0.9rem;text-align:center;">Última atualização: Agosto de 2026</p>
+      
+      <div class="legal-content" style="line-height:1.8;font-size:0.95rem;display:flex;flex-direction:column;gap:20px;text-align:left;">
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">1. Informações que Coletamos</h3>
+        <p style="color:var(--text-secondary);">Coletamos os dados necessários para o fornecimento dos nossos serviços, incluindo seu nome, endereço de e-mail e senha criptografada. Também processamos e armazenamos quaisquer conteúdos que você insira ativamente no seu cartão digital (ex: links de redes sociais, fotos, produtos, avaliações).</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">2. Finalidade do Tratamento de Dados (LGPD)</h3>
+        <p style="color:var(--text-secondary);">Seus dados são tratados com a finalidade exclusiva de prestar o serviço contratado, especificamente: autenticação em sua conta, geração e exibição pública do seu cartão digital, entrega de leads/mensagens recebidas diretamente no seu e-mail cadastrado e gestão da sua assinatura PRO.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">3. Compartilhamento de Dados</h3>
+        <p style="color:var(--text-secondary);">O CardLink não vende ou aluga seus dados a terceiros. Compartilhamos seus dados apenas quando necessário para operar a plataforma, tais como processadores de pagamento seguros (Cakto) e serviços de entrega de e-mail transacional (SMTP).</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Armazenamento e Segurança</h3>
+        <p style="color:var(--text-secondary);">Adotamos medidas técnicas de segurança para proteger seus dados contra acessos não autorizados. Seus dados cadastrais e de cartões digitais são armazenados em servidores seguros em nuvem.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">5. Seus Direitos</h3>
+        <p style="color:var(--text-secondary);">Em conformidade com a LGPD (Lei Geral de Proteção de Dados), você tem direito de solicitar a confirmação do tratamento, acesso aos seus dados, retificação de dados incompletos ou a exclusão total da sua conta e de todos os dados a ela associados, o que pode ser feito enviando uma mensagem ao nosso suporte.</p>
+      </div>
+      
+      <div style="margin-top:40px;text-align:center;">
+        <button class="btn btn-secondary" onclick="window.history.back()" style="padding:10px 24px;">Voltar</button>
+      </div>
+    </div>
+  </section>
 
   <!-- Toast -->
   <div class="toast" id="toast">

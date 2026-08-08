@@ -170,6 +170,18 @@ function handleRoute() {
     if (bgAnimated) bgAnimated.style.display = '';
     updateNavAuth();
     loadAdminDashboard();
+  } else if (hash === '#/terms') {
+    document.getElementById('terms-view').classList.add('active');
+    if (navbar) navbar.style.display = '';
+    if (bgAnimated) bgAnimated.style.display = '';
+    updateNavAuth();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else if (hash === '#/privacy') {
+    document.getElementById('privacy-view').classList.add('active');
+    if (navbar) navbar.style.display = '';
+    if (bgAnimated) bgAnimated.style.display = '';
+    updateNavAuth();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   } else {
     if (authToken) {
       document.getElementById('dashboard-view').classList.add('active');
@@ -353,6 +365,12 @@ async function handleRegister() {
   if (!name) { showToast('⚠️', 'Preencha o seu nome!'); return; }
   if (!email || !emailRegex.test(email) || email.includes('..')) { showToast('⚠️', 'Preencha um e-mail válido!'); return; }
   if (!password || password.length < 8) { showToast('⚠️', 'Senha deve ter pelo menos 8 caracteres'); return; }
+
+  const termsCheckbox = document.getElementById('register-terms');
+  if (termsCheckbox && !termsCheckbox.checked) {
+    showToast('⚠️', 'Você precisa concordar com os Termos de Uso e a Política de Privacidade!');
+    return;
+  }
 
   try {
     const referred_by = sessionStorage.getItem('cardlink_ref') || null;
