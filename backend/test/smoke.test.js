@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -121,4 +122,30 @@ test('reset de senha com codigo errado eh rejeitado', async () => {
 
   const r = await api('POST', '/api/auth/reset-password', { email, code: '000000', newPassword: 'SenhaNova456!' });
   assert.equal(r.status, 400);
+});
+
+test('webhook da Cakto ativa e cancela plano PRO', async () => {
+  const email = 'webhook-user@example.com';
+  // 1. Registra usuário comum
+  const rReg = await api('POST', '/api/auth/register', { email, name: 'Test Webhook', password: 'Password123!' });
+  assert.equal(rReg.status, 201);
+  assert.equal(rReg.data.user.plan, 'free');
+
+  // 2. Simula webhook de pagamento aprovado da Cakto
+  const rHookPay = await api('POST', '/api/payments/cakto-webhook', {
+    email,
+    status: 'paid'
+  });
+  assert.equal(rHookPay.status, 200);
+  assert.equal(rHookPay.data.success, true);
+  assert.equal(rHookPay.data.plan, 'pro');
+
+  // 3. Simula webhook de cancelamento/estorno
+  const rHookCancel = await api('POST', '/api/payments/cakto-webhook', {
+    email,
+    status: 'refunded'
+  });
+  assert.equal(rHookCancel.status, 200);
+  assert.equal(rHookCancel.data.success, true);
+  assert.equal(rHookCancel.data.plan, 'free');
 });

@@ -25,6 +25,7 @@ const contactRoutes = require('./routes/contacts');
 const uploadRoutes = require('./routes/upload');
 const aiRoutes = require('./routes/ai');
 const { adminRouter, supportRouter } = require('./routes/admin');
+const paymentRoutes = require('./routes/payments');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -62,7 +63,7 @@ app.use(express.json({ limit: '1mb' }));
 // ─── Rate Limiting ────────────────────────────────────────────────
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: process.env.NODE_ENV === 'test' ? 1000 : 10,
   message: { error: 'Muitas tentativas. Tente novamente em 15 minutos.' },
   standardHeaders: true,
   legacyHeaders: false
@@ -70,7 +71,7 @@ const authLimiter = rateLimit({
 
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 200,
+  max: process.env.NODE_ENV === 'test' ? 10000 : 200,
   message: { error: 'Muitas requisições. Aguarde um momento.' },
   standardHeaders: true,
   legacyHeaders: false
@@ -84,6 +85,7 @@ app.use('/api/upload', apiLimiter, uploadRoutes);
 app.use('/api/ai', apiLimiter, aiRoutes);
 app.use('/api/admin', apiLimiter, adminRouter);
 app.use('/api/support', apiLimiter, supportRouter);
+app.use('/api/payments', paymentRoutes);
 
 // Image proxy/streaming route
 app.get('/uploads/:filename', async (req, res, next) => {
