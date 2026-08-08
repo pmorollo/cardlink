@@ -1073,7 +1073,6 @@ function renderCard(data, isPreview) {
   const theme       = data.theme || 'midnight';
 
   // Ajuste inteligente para diferenciação entre Cartão Comercial (Negócio) e Cartão Pessoal
-  const greeting = business ? 'Seja bem-vindo a' : 'Olá! Eu sou';
   const mainTitle = business ? business : name;
   const subTitle = business 
     ? (name && name !== 'Seu Nome' ? (title ? `${name} — ${title}` : name) : title)
@@ -1211,9 +1210,8 @@ function renderCard(data, isPreview) {
         <div class="card-avatar">${avatarContent}</div>
       </div>
       <div class="card-body">
-        <div class="card-greeting">${escapeHtml(greeting)}</div>
-        <h1 class="card-name">${escapeHtml(mainTitle)}</h1>
-        ${subTitle ? `<div class="card-title">${escapeHtml(subTitle)}</div>` : ''}
+        <h1 class="card-name" style="${!business ? 'font-family: Georgia, Garamond, serif; font-style: italic; font-weight: 700; letter-spacing: -0.02em;' : ''}">${escapeHtml(mainTitle)}</h1>
+        ${subTitle ? `<div class="card-title" style="margin-top: 2px; margin-bottom: var(--space-md);">${escapeHtml(subTitle)}</div>` : ''}
         ${description ? `<p class="card-description">${escapeHtml(description)}</p>`     : ''}
         ${message     ? `<p class="card-message">${escapeHtml(message)}</p>`             : ''}
         ${contactButtons  ? `<div class="card-contact-grid">${contactButtons}</div>`      : ''}
