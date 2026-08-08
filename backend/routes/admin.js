@@ -33,11 +33,27 @@ adminRouter.get('/stats', authMiddleware, adminMiddleware, async (req, res) => {
   const totalContacts = contacts.length;
   const totalViews = cards.reduce((sum, c) => sum + (c.views_count || 0), 0);
 
+  // Calculate referrals summary
+  const referralStats = {};
+  users.forEach(u => {
+    if (u.referred_by) {
+      const ref = u.referred_by;
+      if (!referralStats[ref]) {
+        referralStats[ref] = { total: 0, pro: 0 };
+      }
+      referralStats[ref].total++;
+      if (u.plan === 'pro') {
+        referralStats[ref].pro++;
+      }
+    }
+  });
+
   res.json({
     totalUsers,
     totalCards,
     totalContacts,
-    totalViews
+    totalViews,
+    referralStats
   });
 });
 
@@ -55,6 +71,7 @@ adminRouter.get('/users', authMiddleware, adminMiddleware, async (req, res) => {
       whatsapp: u.whatsapp,
       plan: u.plan || 'free',
       is_admin: u.is_admin || false,
+      referred_by: u.referred_by || null,
       created_at: u.created_at,
       card: card ? { slug: card.slug, views_count: card.views_count || 0 } : null
     };

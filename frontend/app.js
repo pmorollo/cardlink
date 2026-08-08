@@ -252,11 +252,27 @@ function updateNavAuth() {
   }
 }
 
+// Captura vendedor/afiliado indicador da URL e salva na sessão
+function captureReferral() {
+  const urlParams = new URLSearchParams(window.location.search);
+  let ref = urlParams.get('ref');
+  
+  if (!ref && window.location.hash.includes('?')) {
+    const hashParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    ref = hashParams.get('ref');
+  }
+  
+  if (ref) {
+    sessionStorage.setItem('cardlink_ref', ref.trim().substring(0, 100));
+  }
+}
+
 // ============================================
 // App Init
 // ============================================
 window.addEventListener('hashchange', handleRoute);
 window.addEventListener('DOMContentLoaded', async () => {
+  captureReferral();
   if (authToken) {
     try {
       currentUser = await api('/auth/me');
@@ -339,7 +355,11 @@ async function handleRegister() {
   if (!password || password.length < 8) { showToast('⚠️', 'Senha deve ter pelo menos 8 caracteres'); return; }
 
   try {
-    const data = await api('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password }) });
+    const referred_by = sessionStorage.getItem('cardlink_ref') || null;
+    const data = await api('/auth/register', { 
+      method: 'POST', 
+      body: JSON.stringify({ name, email, password, referred_by }) 
+    });
     authToken = data.token;
     currentUser = data.user;
     localStorage.setItem('cardlink_token', data.token);

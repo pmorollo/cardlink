@@ -146,6 +146,7 @@ async function initPostgres(pool) {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS plan VARCHAR(50) DEFAULT 'free';
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_code VARCHAR(6);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMP;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by VARCHAR(100);
   `).catch(() => {});
 
   await pool.query('UPDATE users SET is_admin = true WHERE lower(email) = ANY($1)', [ADMIN_EMAILS]).catch(() => {});
@@ -239,13 +240,13 @@ const users = {
     }
     return (db.users || []).find(u => u.email && u.email.toLowerCase() === identifier && u.id !== excludeId) || null;
   },
-  async insert({ name, email, whatsapp, password_hash, is_admin = false, plan = 'free' }) {
+  async insert({ name, email, whatsapp, password_hash, is_admin = false, plan = 'free', referred_by = null }) {
     const pool = await resolvePool();
     if (pool) {
       const r = await pool.query(
-        `INSERT INTO users (name, email, whatsapp, password_hash, is_admin, plan)
-         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-        [name, email, whatsapp || null, password_hash, !!is_admin, plan]
+        `INSERT INTO users (name, email, whatsapp, password_hash, is_admin, plan, referred_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        [name, email, whatsapp || null, password_hash, !!is_admin, plan, referred_by || null]
       );
       return castUserRow(r.rows[0]);
     }
@@ -256,6 +257,7 @@ const users = {
       password_hash,
       is_admin: !!is_admin,
       plan: plan || 'free',
+      referred_by: referred_by || null,
       id: nextId('users'),
       created_at: new Date().toISOString(),
     };
@@ -269,7 +271,7 @@ const users = {
       const fields = [];
       const values = [];
       let i = 1;
-      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_expires']) {
+      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_expires', 'referred_by']) {
         if (key in updates && updates[key] !== undefined) {
           fields.push(`${key} = $${i++}`);
           values.push(updates[key]);
