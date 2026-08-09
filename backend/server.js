@@ -195,10 +195,33 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: err.message || 'Erro no servidor' });
 });
 
+// Função para garantir que os e-mails em ADMIN_EMAILS tenham plano 'pro' e is_admin = true
+async function ensureAdmins() {
+  try {
+    const { ADMIN_EMAILS } = require('./config');
+    const { users } = require('./db/repository');
+    if (ADMIN_EMAILS && ADMIN_EMAILS.length > 0) {
+      for (const email of ADMIN_EMAILS) {
+        const user = await users.findByEmail(email);
+        if (user) {
+          if (user.plan !== 'pro' || !user.is_admin) {
+            console.log(`[Startup] Atualizando privilégios do admin: ${email}`);
+            await users.update(user.id, { plan: 'pro', is_admin: true });
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('[Startup] Erro ao garantir privilégios de administrador:', err);
+  }
+}
+
 module.exports = app;
 
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
+  ensureAdmins().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando em http://localhost:${PORT}`);
+    });
   });
 }
