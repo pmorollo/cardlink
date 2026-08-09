@@ -239,13 +239,7 @@ function renderNav(d) {
   const brandMark = document.getElementById('nav-brand-mark');
   if (brandMark) brandMark.textContent = (d.business || d.name || 'C').trim().charAt(0).toUpperCase();
 
-  const ctaBtn = document.getElementById('nav-contact-btn');
-  if (ctaBtn && d.whatsapp) {
-    ctaBtn.href = `https://wa.me/${cleanPhone(d.whatsapp)}`;
-    ctaBtn.target = '_blank';
-    ctaBtn.rel = 'noopener';
-    ctaBtn.innerHTML = `${WHATSAPP_ICON}<span>WhatsApp</span>`;
-  }
+
 }
 
 // ============================================
