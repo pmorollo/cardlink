@@ -8,7 +8,7 @@ const API = window.location.origin + '/api';
 const slug = window.location.pathname.split('/site/')[1]?.split('/')[0] || '';
 
 // Check if owner is viewing (has session token)
-const ownerToken = sessionStorage.getItem('cardlink_token') || null;
+const ownerToken = localStorage.getItem('cardlink_token') || null;
 
 let cardData = null;
 
@@ -198,6 +198,24 @@ async function init() {
   renderFab(cardData);
 
   document.title = `${cardData.name} — ${cardData.business || 'Site Profissional'}`;
+
+  // Check if logged in user owns this landing page
+  if (ownerToken) {
+    try {
+      const cardSummary = await fetch(`${API}/cards/stats/summary`, {
+        headers: { 'Authorization': `Bearer ${ownerToken}` }
+      }).then(r => r.ok ? r.json() : null);
+
+      if (cardSummary && cardSummary.card && cardSummary.card.slug === slug) {
+        const ownerBar = document.getElementById('card-owner-bar');
+        if (ownerBar) {
+          ownerBar.style.display = 'flex';
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to verify card ownership:', e);
+    }
+  }
 
   initScrollAnimations();
   // Atendimento público acontece diretamente pelo WhatsApp.

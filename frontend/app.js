@@ -627,6 +627,28 @@ async function loadDashboard() {
     const recentContacts = stats.recentContacts || [];
     const completion = getPageCompletion(card);
 
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    let pwaBannerHtml = '';
+    
+    if (isMobile && !isStandalone) {
+      pwaBannerHtml = `
+        <div id="pwa-install-banner" class="form-section" style="display:flex;background:linear-gradient(135deg, rgba(124,58,237,0.08), rgba(59,130,246,0.08));border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px;margin-bottom:var(--space-lg);text-align:left;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%;">
+          <div style="flex:1;min-width:250px;">
+            <div style="font-weight:700;color:var(--text-primary);font-size:0.95rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+              <span>📲</span> Fixar CardLink no seu Celular
+            </div>
+            <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.4;margin:0;">
+              Adicione o CardLink à sua tela de início para abrir seu painel instantaneamente como um aplicativo real.
+            </p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="window.triggerPwaInstall()" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;">
+            Instalar App
+          </button>
+        </div>
+      `;
+    }
+
     content.innerHTML = `
       <div class="dashboard-header">
         <div>
@@ -634,6 +656,8 @@ async function loadDashboard() {
           <p class="builder-subtitle">Olá, ${escapeHtml(userName)}. Aqui está o resumo da sua página profissional.</p>
         </div>
       </div>
+
+      ${pwaBannerHtml}
 
       <div class="page-status-card">
         <div>
@@ -1040,6 +1064,11 @@ async function loadPublicCard(slug) {
     const dashBtn = document.getElementById('dashboard-card-btn');
     if (dashBtn) {
       dashBtn.style.display = authToken && currentUserCardId === card.id ? '' : 'none';
+    }
+
+    const ownerBar = document.getElementById('card-owner-bar');
+    if (ownerBar) {
+      ownerBar.style.display = authToken && currentUserCardId === card.id ? 'flex' : 'none';
     }
 
     // O visitante é direcionado ao WhatsApp; não há chat de IA público.
