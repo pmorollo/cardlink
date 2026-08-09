@@ -186,8 +186,13 @@ function bootstrap() {
       pgReady = true;
       console.log('✅ Repositório PostgreSQL ativo');
     } catch (e) {
-      console.error('⚠️ PostgreSQL indisponível, usando armazenamento local:', e.message);
-      pgReady = false;
+      if (process.env.NODE_ENV === 'production') {
+        console.error('❌ ERRO CRÍTICO: PostgreSQL indisponível em produção! Encerrando processo.', e.stack || e);
+        process.exit(1);
+      } else {
+        console.error('⚠️ PostgreSQL indisponível, usando armazenamento local:', e.message);
+        pgReady = false;
+      }
     }
   })();
 }

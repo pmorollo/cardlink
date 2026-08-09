@@ -6,6 +6,17 @@ const router = express.Router();
 // Webhook da Cakto para ativação e cancelamento automático de planos
 router.post('/cakto-webhook', async (req, res) => {
   try {
+    const caktoSecret = process.env.CAKTO_SECRET;
+    if (caktoSecret) {
+      const clientToken = req.query.token || req.headers['x-cakto-token'] || req.headers['authorization'];
+      if (!clientToken || clientToken.replace('Bearer ', '').trim() !== caktoSecret.trim()) {
+        console.warn('⚠️ Tentativa de webhook não autorizada: Token inválido ou ausente.');
+        return res.status(401).json({ error: 'Token de autenticação inválido ou ausente.' });
+      }
+    } else {
+      console.warn('⚠️ AVISO: A variável de ambiente CAKTO_SECRET não está definida. O webhook da Cakto está vulnerável a requisições forjadas!');
+    }
+
     const payload = req.body;
     console.log('📬 Webhook recebido da Cakto:', JSON.stringify(payload, null, 2));
 

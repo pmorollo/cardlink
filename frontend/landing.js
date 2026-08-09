@@ -177,11 +177,30 @@ async function init() {
 
   try {
     cardData = await fetch(`${API}/public/${slug}`).then(r => {
-      if (!r.ok) throw new Error('not found');
+      if (r.status === 402) throw new Error('payment_required');
+      if (!r.ok) throw new Error('not_found');
       return r.json();
     });
-  } catch {
-    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;color:#a1a1aa;flex-direction:column;gap:16px;"><span style="font-size:3rem;">😕</span><p>Landing page não encontrada.</p></div>';
+  } catch (err) {
+    if (err.message === 'payment_required') {
+      document.body.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;color:#ffffff;background:#0f172a;flex-direction:column;gap:16px;padding:20px;text-align:center;">
+          <span style="font-size:4rem;margin-bottom:10px;">🔒</span>
+          <h1 style="font-size:1.6rem;font-weight:800;margin:0;background:linear-gradient(135deg, #a78bfa, #60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Página Temporariamente Offline</h1>
+          <p style="color:#94a3b8;font-size:0.95rem;max-width:400px;line-height:1.6;margin:0 0 10px;">
+            Este cartão de visitas digital foi configurado pelo proprietário, mas a assinatura está pendente de ativação.
+          </p>
+          <p style="color:#64748b;font-size:0.8rem;margin:0;">
+            Se você é o dono deste cartão, acesse o painel e realize a ativação para colocá-lo no ar!
+          </p>
+          <a href="/#auth" style="display:inline-block;margin-top:15px;padding:10px 20px;background:#7c3aed;color:#ffffff;text-decoration:none;border-radius:8px;font-size:0.85rem;font-weight:bold;box-shadow: 0 4px 12px rgba(124,58,237,0.2);">
+            Acessar Painel CardLink
+          </a>
+        </div>
+      `;
+    } else {
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;color:#a1a1aa;flex-direction:column;gap:16px;background:#0f172a;"><span style="font-size:3rem;">😕</span><p>Landing page não encontrada.</p></div>';
+    }
     return;
   }
 

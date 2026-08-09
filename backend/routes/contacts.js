@@ -31,6 +31,13 @@ router.post('/public/:slug/contact', async (req, res) => {
     return res.status(404).json({ error: 'Cartão não encontrado' });
   }
 
+  // Check if owner is active (PRO/Admin)
+  const owner = await userRepo.findById(card.user_id);
+  const isOwnerPro = owner && (owner.plan === 'pro' || owner.is_admin);
+  if (!isOwnerPro) {
+    return res.status(402).json({ error: 'subscription_required', message: 'Assinatura pendente para este cartão' });
+  }
+
   // Honeypot anti-spam check
   if (req.body.website && req.body.website.trim() !== '') {
     // Return a silent 201 OK so the spambot thinks it succeeded
@@ -59,8 +66,7 @@ router.post('/public/:slug/contact', async (req, res) => {
     message: message || null
   });
 
-  // Envia e-mail de notificação para o proprietário do cartão
-  const owner = await userRepo.findById(card.user_id);
+  // Envia e-mail de notificação para o proprietário do cartão (owner já carregado acima)
   if (owner && owner.email) {
     sendEmail({
       to: owner.email,

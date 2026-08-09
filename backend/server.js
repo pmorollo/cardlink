@@ -30,6 +30,7 @@ const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('./d
 const { sendEmail } = require('./utils/email');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // ─── Security Headers (Helmet) ───────────────────────────────────
@@ -87,12 +88,13 @@ app.use('/api/upload', apiLimiter, uploadRoutes);
 app.use('/api/ai', apiLimiter, aiRoutes);
 app.use('/api/admin', apiLimiter, adminRouter);
 app.use('/api/support', apiLimiter, supportRouter);
-app.use('/api/payments', paymentRoutes);
+app.use('/api/payments', apiLimiter, paymentRoutes);
 
 // Image proxy/streaming route
 app.get('/uploads/:filename', async (req, res, next) => {
   const filename = req.params.filename;
-  const localFilePath = path.join(__dirname, 'uploads', filename);
+  const safeFilename = path.basename(filename);
+  const localFilePath = path.join(__dirname, 'uploads', safeFilename);
 
   if (fs.existsSync(localFilePath)) {
     return res.sendFile(localFilePath);
@@ -138,6 +140,13 @@ app.get('/site/:slug/qr-whatsapp', async (req, res) => {
       return res.status(404).send('Cartão não encontrado');
     }
 
+    // Check if card owner is active (PRO/Admin)
+    const owner = await userRepo.findById(card.user_id);
+    const isOwnerPro = owner && (owner.plan === 'pro' || owner.is_admin);
+    if (!isOwnerPro) {
+      return res.redirect(`/site/${card.slug}`);
+    }
+
     // Increment view count
     await cardRepo.update(card.id, { views_count: (card.views_count || 0) + 1 });
 
@@ -150,8 +159,7 @@ app.get('/site/:slug/qr-whatsapp', async (req, res) => {
       message: 'Escaneou o seu QR Code físico/balcão para falar no WhatsApp.'
     });
 
-    // Get owner to send notification email
-    const owner = await userRepo.findById(card.user_id);
+    // Get owner to send notification email (already fetched above)
     if (owner && owner.email) {
       try {
         await sendEmail({
