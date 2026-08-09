@@ -18,7 +18,7 @@ function signToken(userId) {
 const isProduction = process.env.NODE_ENV === 'production';
 
 router.post('/register', async (req, res) => {
-  const { email, whatsapp, password, referred_by } = req.body;
+  const { email, whatsapp, password } = req.body;
   const name = (req.body.name || '').trim().substring(0, 100);
   const userEmail = (email || whatsapp || '').trim().toLowerCase().substring(0, 200);
 
@@ -50,7 +50,7 @@ router.post('/register', async (req, res) => {
     password_hash: passwordHash,
     is_admin: isOwner,
     plan: isOwner ? 'pro' : 'free',
-    referred_by: referred_by ? String(referred_by).substring(0, 100) : null
+    referred_by: null
   });
 
   const token = signToken(user.id);

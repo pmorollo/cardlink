@@ -202,23 +202,6 @@ test('controle de recursos (gating) free vs pro no backend', async () => {
   assert.equal(publicData.name, 'Card de Gated');
 });
 
-test('registro de usuario salva o codigo do vendedor indicador (referred_by)', async () => {
-  const email = 'referred-user@example.com';
-  const referred_by = 'pedro-seller';
-
-  const r = await api('POST', '/api/auth/register', { 
-    email, 
-    name: 'Referred User', 
-    password: 'Password123!',
-    referred_by 
-  });
-  
-  assert.equal(r.status, 201);
-  // Get user row directly from fallback db to verify referred_by
-  const userRow = db.users.find(u => u.email === email);
-  assert.ok(userRow);
-  assert.equal(userRow.referred_by, referred_by);
-});
 
 test('envio de contato publico dispara email de notificacao para o dono do cartao', async () => {
   const email = 'owner-notification@example.com';
