@@ -504,6 +504,35 @@ function redirectToCheckout() {
   window.open(checkoutUrl, '_blank');
 }
 
+let currentQrCodeSlug = '';
+
+function openQrCodeModal(slug) {
+  currentQrCodeSlug = slug;
+  const modal = document.getElementById('qr-code-modal');
+  const modalImg = document.getElementById('qr-code-modal-img');
+  const modalUrl = document.getElementById('qr-code-modal-url');
+
+  if (modal && modalImg && modalUrl) {
+    const url = window.location.origin + '/site/' + slug + '/qr-whatsapp';
+    modalImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=000000`;
+    modalUrl.textContent = url;
+    modal.style.display = 'flex';
+  }
+}
+
+function closeQrCodeModal() {
+  const modal = document.getElementById('qr-code-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function copyQrCodeLink() {
+  if (!currentQrCodeSlug) return;
+  const url = window.location.origin + '/site/' + currentQrCodeSlug + '/qr-whatsapp';
+  navigator.clipboard.writeText(url)
+    .then(() => showToast('📋', 'Link do QR Code copiado!'))
+    .catch(() => showToast('❌', 'Erro ao copiar link'));
+}
+
 function loadAccountView() {
   if (!currentUser) return;
   setFieldValue('account-name', currentUser.name || '');
@@ -661,10 +690,9 @@ async function loadDashboard() {
           <div class="stat-value">${stats.contacts}</div>
           <div class="stat-label">Mensagens Recebidas</div>
         </div>
-        <div class="stat-card" onclick="window.open('/site/${escapeHtml(card.slug)}', '_blank')" style="cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor=''">
-          <div class="stat-icon">🌐</div>
-          <div class="stat-value" style="font-size:1rem;">Ver</div>
-          <div class="stat-label">Página profissional</div>
+        <div class="stat-card" onclick="openQrCodeModal('${escapeHtml(card.slug)}')" style="cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor=''">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin + '/site/' + card.slug + '/qr-whatsapp')}&bgcolor=ffffff&color=000000" style="width:48px;height:48px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border-subtle);" alt="QR Code">
+          <div class="stat-label" style="font-size:0.75rem;font-weight:bold;color:var(--text-secondary);">QR Code de Balcão</div>
         </div>
       </div>
 

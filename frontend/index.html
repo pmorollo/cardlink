@@ -803,6 +803,33 @@
     </div>
   </div>
 
+  <!-- Modal do QR Code -->
+  <div class="modal-overlay" id="qr-code-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;">
+    <div class="builder-form-panel" style="max-width:400px;width:90%;max-height:90vh;margin:10vh auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-lg);text-align:center;display:flex;flex-direction:column;align-items:center;gap:15px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;">
+        <h2 class="builder-title" style="margin-bottom:0;font-size:1.2rem;"><span class="icon">📱</span> QR Code de Contato</h2>
+        <button type="button" onclick="closeQrCodeModal()" style="background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+      
+      <p style="color:var(--text-secondary);font-size:0.82rem;line-height:1.5;margin:0 0 10px;text-align:left;">
+        Apresente este QR Code no seu celular para o cliente escanear ou salve a imagem para imprimir e exibir no seu balcão! O cliente falará diretamente com você no WhatsApp e o escaneamento será contabilizado.
+      </p>
+
+      <div style="background:#ffffff;padding:16px;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);display:inline-flex;align-items:center;justify-content:center;margin:10px 0;">
+        <img id="qr-code-modal-img" style="width:200px;height:200px;display:block;" alt="QR Code de Balcão">
+      </div>
+
+      <div style="font-size:0.75rem;color:var(--purple);font-weight:bold;letter-spacing:0.02em;background:rgba(124,58,237,0.06);padding:6px 12px;border-radius:20px;width:100%;max-width:280px;text-align:center;word-break:break-all;" id="qr-code-modal-url">
+        -
+      </div>
+      
+      <div style="display:flex;gap:10px;width:100%;margin-top:10px;">
+        <button class="btn btn-primary" onclick="copyQrCodeLink()" style="flex:1;font-size:0.85rem;padding:10px 14px;">Copiar Link</button>
+        <button class="btn btn-secondary" onclick="closeQrCodeModal()" style="flex:1;font-size:0.85rem;padding:10px 14px;">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- View: Termos de Uso -->
   <section class="view" id="terms-view" style="background:var(--bg-surface);min-height:100vh;">
     <div class="container" style="max-width:800px;padding:40px var(--space-md);color:var(--text-primary);">
@@ -878,7 +905,7 @@
       }
     }
   </script>
-  <script src="app.js?v=27"></script>
+  <script src="app.js?v=28"></script>
   <script>
 
     let deferredPrompt = null;

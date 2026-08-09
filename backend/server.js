@@ -26,6 +26,8 @@ const uploadRoutes = require('./routes/upload');
 const aiRoutes = require('./routes/ai');
 const { adminRouter, supportRouter } = require('./routes/admin');
 const paymentRoutes = require('./routes/payments');
+const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('./db/repository');
+const { sendEmail } = require('./utils/email');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -127,6 +129,54 @@ app.get('/uploads/:filename', async (req, res, next) => {
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
+
+// QR Code WhatsApp redirect route
+app.get('/site/:slug/qr-whatsapp', async (req, res) => {
+  try {
+    const card = await cardRepo.findBySlug(req.params.slug);
+    if (!card) {
+      return res.status(404).send('Cartão não encontrado');
+    }
+
+    // Increment view count
+    await cardRepo.update(card.id, { views_count: (card.views_count || 0) + 1 });
+
+    // Insert an anonymous scan record in the contacts table
+    await contactRepo.insert({
+      card_id: card.id,
+      name: 'Visitante (QR Code)',
+      email: '',
+      phone: 'Via Balcão',
+      message: 'Escaneou o seu QR Code físico/balcão para falar no WhatsApp.'
+    });
+
+    // Get owner to send notification email
+    const owner = await userRepo.findById(card.user_id);
+    if (owner && owner.email) {
+      try {
+        await sendEmail({
+          to: owner.email,
+          subject: '🎉 Alguém escaneou seu QR Code do CardLink!',
+          text: `Olá, ${owner.name}! Um cliente acabou de escanear o QR Code de balcão do seu CardLink para falar com você no WhatsApp.`
+        });
+      } catch (emailErr) {
+        console.error('Erro ao enviar e-mail de notificação de QR:', emailErr);
+      }
+    }
+
+    // Clean up phone number for WhatsApp redirect
+    const cleanPhone = (card.whatsapp || card.phone || '').replace(/\D/g, '');
+    if (!cleanPhone) {
+      return res.redirect(`/site/${card.slug}`);
+    }
+
+    const text = encodeURIComponent('Olá! Escaneei o seu QR Code do CardLink e gostaria de tirar uma dúvida.');
+    res.redirect(`https://wa.me/${cleanPhone}?text=${text}`);
+  } catch (err) {
+    console.error('Error on QR redirect:', err);
+    res.redirect('/');
+  }
+});
 
 // Landing page route
 app.get('/site/:slug', (req, res) => {
