@@ -141,9 +141,6 @@ function handleRoute() {
     updateNavAuth();
   } else if (hash === '#settings' || hash === '#builder') {
     if (!authToken) { navigateTo('auth'); return; }
-    const isProUser = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
-    if (!isProUser) { navigateTo('dashboard'); return; }
-
     if (hash === '#builder') {
       window.location.hash = '#settings';
       return;
@@ -622,6 +619,25 @@ async function loadDashboard() {
     const cardLink = window.location.origin + '/site/' + card.slug;
     const recentContacts = stats.recentContacts || [];
     const completion = getPageCompletion(card);
+    const isProUser = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
+    let paywallBannerHtml = '';
+    if (!isProUser) {
+      paywallBannerHtml = `
+        <div class="form-section" style="display:flex;background:linear-gradient(135deg, rgba(239,68,68,0.06), rgba(220,38,38,0.1));border:1.5px solid rgba(239,68,68,0.25);border-radius:var(--radius-lg);padding:16px;margin-bottom:var(--space-lg);text-align:left;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%;">
+          <div style="flex:1;min-width:250px;">
+            <div style="font-weight:700;color:#ef4444;font-size:0.95rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+              <span>❌</span> Link Público Offline (Plano Gratuito)
+            </div>
+            <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.4;margin:0;">
+              Sua página foi configurada, mas o link público está offline. Assine o Plano PRO por apenas <strong>R$ 12,90/mês</strong> para colocá-lo no ar!
+            </p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="openProPaymentModal()" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;background:#ef4444;border:none;color:#ffffff;box-shadow: 0 4px 12px rgba(239,68,68,0.2);">
+            🚀 Ativar Página
+          </button>
+        </div>
+      `;
+    }
 
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
@@ -653,6 +669,7 @@ async function loadDashboard() {
         </div>
       </div>
 
+      ${paywallBannerHtml}
       ${pwaBannerHtml}
 
       <div class="page-status-card">
