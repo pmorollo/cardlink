@@ -1841,13 +1841,13 @@ function renderAdminUsers(users) {
           ` : '<span style="color:var(--text-muted);">Sem página</span>'}
         </td>
         <td style="padding:12px 8px;">
-          <span class="badge ${isPro ? 'badge-pro' : 'badge-free'}" style="padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:bold;${isPro ? 'background:rgba(124,58,237,0.15);color:var(--purple);' : 'background:var(--bg-secondary);color:var(--text-secondary);'}">
-            ${isPro ? '⚡ PRO' : 'FREE'}
+          <span class="badge" style="padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:bold;${isPro ? 'background:rgba(124,58,237,0.15);color:var(--purple);' : 'background:rgba(239,68,68,0.1);color:#ef4444;'}">
+            ${isPro ? '✅ Ativo' : '❌ Inativo'}
           </span>
         </td>
         <td style="padding:12px 8px;text-align:right;white-space:nowrap;">
           <button class="btn btn-sm ${isPro ? 'btn-outline' : 'btn-primary'}" onclick="toggleUserPlan(${u.id}, '${u.plan}')" style="padding:5px 10px;font-size:0.75rem;">
-            ${isPro ? 'Downgrade' : 'Upgrade PRO'}
+            ${isPro ? 'Desativar' : 'Ativar'}
           </button>
         </td>
       </tr>
@@ -1857,7 +1857,8 @@ function renderAdminUsers(users) {
 
 async function toggleUserPlan(userId, currentPlan) {
   const newPlan = currentPlan === 'pro' ? 'free' : 'pro';
-  if (!confirm(`Deseja alterar o plano deste usuário para ${newPlan.toUpperCase()}?`)) return;
+  const actionText = newPlan === 'pro' ? 'ATIVAR' : 'DESATIVAR';
+  if (!confirm(`Deseja realmente ${actionText} a assinatura deste usuário?`)) return;
 
   try {
     await api(`/admin/users/${userId}/plan`, {
