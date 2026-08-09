@@ -677,7 +677,7 @@ async function loadDashboard() {
         <div class="stat-card">
           <div class="stat-icon">📩</div>
           <div class="stat-value">${stats.contacts}</div>
-          <div class="stat-label">Contatos Recebidos</div>
+          <div class="stat-label">Mensagens Recebidas</div>
         </div>
         <div class="stat-card" onclick="window.open('/site/${escapeHtml(card.slug)}', '_blank')" style="cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor=''">
           <div class="stat-icon">🌐</div>
@@ -705,13 +705,13 @@ async function loadDashboard() {
 
         <div class="dash-card-actions-bar">
           <button class="btn btn-secondary btn-sm" onclick="shareCard('${escapeHtml(card.slug)}')">Compartilhar</button>
-          <button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">Contatos recebidos (${stats.contacts})</button>
+          <button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">Mensagens recebidas (${stats.contacts})</button>
         </div>
       </div>
 
       ${recentContacts.length > 0 ? `
         <div style="margin-top:var(--space-xl);">
-          <h3 style="font-family:var(--font-display);font-weight:700;margin-bottom:var(--space-md);">📩 Últimos Contatos</h3>
+          <h3 style="font-family:var(--font-display);font-weight:700;margin-bottom:var(--space-md);">📩 Últimas Mensagens</h3>
           <div class="contacts-list">
             ${recentContacts.map(c => {
               const date = new Date(c.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -726,6 +726,18 @@ async function loadDashboard() {
                     ${c.phone ? `<span>📞 ${escapeHtml(c.phone)}</span>` : ''}
                   </div>
                   ${c.message ? `<div class="contact-item-message">${escapeHtml(c.message)}</div>` : ''}
+                  <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-md);justify-content:flex-end;">
+                    ${c.phone ? `
+                      <a href="https://wa.me/${cleanWhatsapp(c.phone)}?text=${encodeURIComponent(`Olá, ${c.name}! Recebi sua mensagem pelo meu cartão digital CardLink. Como posso ajudar?`)}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;font-size:0.75rem;background:#25d366;color:#ffffff;border:none;">
+                        💬 Responder
+                      </a>
+                    ` : ''}
+                    ${c.email ? `
+                      <a href="mailto:${escapeHtml(c.email)}?subject=${encodeURIComponent('Retorno de Mensagem - CardLink')}&body=${encodeURIComponent(`Olá, ${c.name}!`)}" class="btn btn-outline btn-sm" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;font-size:0.75rem;">
+                        📧 E-mail
+                      </a>
+                    ` : ''}
+                  </div>
                 </div>`;
             }).join('')}
           </div>
@@ -1050,16 +1062,6 @@ async function loadPublicCard(slug) {
 
     const existingFab = document.querySelector('.fab-whatsapp');
     if (existingFab) existingFab.remove();
-    if (card.whatsapp) {
-      const fab = document.createElement('a');
-      fab.className = 'fab-whatsapp';
-      fab.href = `https://wa.me/${cleanWhatsapp(card.whatsapp)}`;
-      fab.target = '_blank';
-      fab.rel = 'noopener';
-      fab.innerHTML = '💬';
-      fab.title = 'Conversar no WhatsApp';
-      document.body.appendChild(fab);
-    }
 
     const dashBtn = document.getElementById('dashboard-card-btn');
     if (dashBtn) {
@@ -1393,10 +1395,10 @@ async function viewContacts(cardId, cardName) {
 
   try {
     const contacts = await api('/cards/' + cardId + '/contacts');
-    if (count) count.textContent = `${contacts.length} contato${contacts.length !== 1 ? 's' : ''} recebido${contacts.length !== 1 ? 's' : ''}`;
+    if (count) count.textContent = `${contacts.length} mensagem${contacts.length !== 1 ? 's' : ''} recebida${contacts.length !== 1 ? 's' : ''}`;
 
     if (contacts.length === 0) {
-      if (list) list.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:var(--space-3xl);">Nenhum contato recebido ainda.</p>';
+      if (list) list.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:var(--space-3xl);">Nenhuma mensagem recebida ainda.</p>';
       return;
     }
 
@@ -1413,6 +1415,18 @@ async function viewContacts(cardId, cardName) {
             ${c.phone ? `<span>📞 ${escapeHtml(c.phone)}</span>` : ''}
           </div>
           ${c.message ? `<div class="contact-item-message">${escapeHtml(c.message)}</div>` : ''}
+          <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-md);justify-content:flex-end;">
+            ${c.phone ? `
+              <a href="https://wa.me/${cleanWhatsapp(c.phone)}?text=${encodeURIComponent(`Olá, ${c.name}! Recebi sua mensagem pelo meu cartão digital CardLink. Como posso ajudar?`)}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;font-size:0.75rem;background:#25d366;color:#ffffff;border:none;">
+                💬 Responder via WhatsApp
+              </a>
+            ` : ''}
+            ${c.email ? `
+              <a href="mailto:${escapeHtml(c.email)}?subject=${encodeURIComponent('Retorno de Mensagem - CardLink')}&body=${encodeURIComponent(`Olá, ${c.name}!`)}" class="btn btn-outline btn-sm" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;font-size:0.75rem;">
+                📧 Responder por E-mail
+              </a>
+            ` : ''}
+          </div>
         </div>`;
     }).join('');
   } catch (err) {

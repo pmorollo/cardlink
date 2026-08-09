@@ -195,7 +195,7 @@ async function init() {
   renderSocial(cardData);
   renderContact(cardData);
   renderFooter(cardData);
-  renderFab(cardData);
+
 
   document.title = `${cardData.name} — ${cardData.business || 'Site Profissional'}`;
 
@@ -573,20 +573,7 @@ function renderFooter(d) {
   }
 }
 
-// ============================================
-// WhatsApp FAB
-// ============================================
-function renderFab(d) {
-  if (!d.whatsapp) return;
-  const fab = document.createElement('a');
-  fab.className = 'fab-whatsapp';
-  fab.href = `https://wa.me/${cleanPhone(d.whatsapp)}`;
-  fab.target = '_blank';
-  fab.rel = 'noopener';
-  fab.innerHTML = `${WHATSAPP_ICON}<span>WhatsApp</span>`;
-  fab.title = 'WhatsApp';
-  document.body.appendChild(fab);
-}
+
 
 // ============================================
 // Contact Form Submit
