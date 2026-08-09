@@ -239,7 +239,15 @@ function renderNav(d) {
   const brandMark = document.getElementById('nav-brand-mark');
   if (brandMark) brandMark.textContent = (d.business || d.name || 'C').trim().charAt(0).toUpperCase();
 
-
+  const userPhoto = document.getElementById('nav-user-photo');
+  if (userPhoto) {
+    if (d.photo_url) {
+      userPhoto.src = d.photo_url;
+      userPhoto.style.display = 'block';
+    } else {
+      userPhoto.style.display = 'none';
+    }
+  }
 }
 
 // ============================================
@@ -298,10 +306,12 @@ function renderHero(d) {
   // Avatar
   const avatarEl = document.getElementById('hero-avatar');
   if (avatarEl) {
-    if (d.photo_url) {
-      avatarEl.innerHTML = `<img src="${esc(d.photo_url)}" alt="${esc(name)}" onerror="this.parentElement.textContent='${initials}'">`;
+    const initialsName = business || name;
+    const initialsLogo = (initialsName.split(' ').map(w => w[0]).join('').substring(0, 2) || 'C').toUpperCase();
+    if (d.logo_url) {
+      avatarEl.innerHTML = `<img src="${esc(d.logo_url)}" alt="${esc(name)}" onerror="this.parentElement.textContent='${initialsLogo}'">`;
     } else {
-      avatarEl.textContent = initials;
+      avatarEl.textContent = initialsLogo;
     }
   }
 

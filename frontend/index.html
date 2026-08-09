@@ -351,16 +351,30 @@
                 <input class="form-input" type="text" id="field-title" placeholder="Ex: Designer" data-field="title">
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Foto de Perfil</label>
-              <div class="photo-upload-area" id="photo-upload-area" onclick="document.getElementById('field-photo-file').click()">
-                <img id="photo-preview-img" style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:8px;">
-                <div id="photo-placeholder" style="color:var(--text-muted);font-size:0.85rem;">
-                  📷 Clique para escolher uma foto
+            <div class="form-row">
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Foto do Usuário (Discreta, no topo)</label>
+                <div class="photo-upload-area" id="photo-upload-area" onclick="document.getElementById('field-photo-file').click()" style="padding:16px 12px;text-align:center;">
+                  <img id="photo-preview-img" style="display:none;width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px;margin-left:auto;margin-right:auto;">
+                  <div id="photo-placeholder" style="color:var(--text-muted);font-size:0.8rem;">
+                    👤 Enviar Foto Pessoal
+                  </div>
+                  <input type="file" id="field-photo-file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)">
                 </div>
-                <input type="file" id="field-photo-file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)">
+                <input type="hidden" id="field-photo" data-field="photo_url">
               </div>
-              <input type="hidden" id="field-photo" data-field="photo_url">
+
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Logo / Foto do Negócio (Central)</label>
+                <div class="photo-upload-area" id="logo-upload-area" onclick="document.getElementById('field-logo-file').click()" style="padding:16px 12px;text-align:center;">
+                  <img id="logo-preview-img" style="display:none;width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px;margin-left:auto;margin-right:auto;">
+                  <div id="logo-placeholder" style="color:var(--text-muted);font-size:0.8rem;">
+                    🏢 Enviar Logo do Negócio
+                  </div>
+                  <input type="file" id="field-logo-file" accept="image/*" style="display:none;" onchange="handleLogoUpload(this)">
+                </div>
+                <input type="hidden" id="field-logo" data-field="logo_url">
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label" for="field-description">Descrição</label>
@@ -864,7 +878,7 @@
       }
     }
   </script>
-  <script src="app.js?v=26"></script>
+  <script src="app.js?v=27"></script>
   <script>
 
     let deferredPrompt = null;

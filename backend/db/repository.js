@@ -98,6 +98,7 @@ async function initPostgres(pool) {
       business VARCHAR(255),
       title VARCHAR(255),
       photo_url TEXT,
+      logo_url TEXT,
       description TEXT,
       message TEXT,
       phone VARCHAR(100),
@@ -147,6 +148,7 @@ async function initPostgres(pool) {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_code VARCHAR(6);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMP;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by VARCHAR(100);
+    ALTER TABLE cards ADD COLUMN IF NOT EXISTS logo_url TEXT;
   `).catch(() => {});
 
   await pool.query('UPDATE users SET is_admin = true WHERE lower(email) = ANY($1)', [ADMIN_EMAILS]).catch(() => {});
@@ -357,18 +359,18 @@ const cards = {
     if (pool) {
       const r = await pool.query(
         `INSERT INTO cards (
-           user_id, slug, name, business, title, photo_url, description, message,
+           user_id, slug, name, business, title, photo_url, logo_url, description, message,
            phone, email, address, whatsapp, whatsapp_group, instagram, facebook,
            linkedin, tiktok, youtube, twitter, theme, site_button_text, products,
            gallery, testimonials, views_count
          ) VALUES (
-           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25
+           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26
          ) RETURNING *`,
         [
           data.user_id, data.slug, data.name, data.business || null, data.title || null, data.photo_url || null,
-          data.description || null, data.message || null, data.phone || null, data.email || null, data.address || null,
-          data.whatsapp || null, data.whatsapp_group || null, data.instagram || null, data.facebook || null,
-          data.linkedin || null, data.tiktok || null, data.youtube || null, data.twitter || null,
+          data.logo_url || null, data.description || null, data.message || null, data.phone || null, data.email || null,
+          data.address || null, data.whatsapp || null, data.whatsapp_group || null, data.instagram || null,
+          data.facebook || null, data.linkedin || null, data.tiktok || null, data.youtube || null, data.twitter || null,
           data.theme || 'midnight', data.site_button_text || null,
           JSON.stringify(data.products || []), JSON.stringify(data.gallery || []), JSON.stringify(data.testimonials || []),
           data.views_count || 0
@@ -395,7 +397,7 @@ const cards = {
       const fields = [];
       const values = [];
       let i = 1;
-      for (const k of ['slug', 'name', 'business', 'title', 'photo_url', 'description', 'message', 'phone', 'email',
+      for (const k of ['slug', 'name', 'business', 'title', 'photo_url', 'logo_url', 'description', 'message', 'phone', 'email',
         'address', 'whatsapp', 'whatsapp_group', 'instagram', 'facebook', 'linkedin', 'tiktok', 'youtube', 'twitter',
         'theme', 'site_button_text', 'products', 'gallery', 'testimonials', 'views_count']) {
         if (k in updates && updates[k] !== undefined) {

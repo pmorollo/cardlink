@@ -21,9 +21,10 @@
        ============================================ -->
   <nav class="lp-nav" id="lp-nav">
     <div class="container">
-      <div class="lp-nav-brand" onclick="scrollToTop()">
+      <div class="lp-nav-brand" onclick="scrollToTop()" style="display:inline-flex;align-items:center;gap:8px;">
         <div class="logo-icon" id="nav-brand-mark">C</div>
         <span id="nav-business-name">CardLink</span>
+        <img id="nav-user-photo" style="display:none;width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,0.7);box-shadow:var(--shadow-sm);margin-left:4px;" alt="Vendedor">
       </div>
       <ul class="lp-nav-links" id="lp-nav-links">
         <li><a href="#sobre">Sobre</a></li>
@@ -238,6 +239,6 @@
     <span id="toast-message"></span>
   </div>
 
-  <script src="/landing.js?v=7"></script>
+  <script src="/landing.js?v=8"></script>
 </body>
 </html>

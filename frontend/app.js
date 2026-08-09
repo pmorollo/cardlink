@@ -771,7 +771,7 @@ async function loadDashboard() {
 function createNewCard() {
   try {
     editingCardId = null;
-    ['field-name','field-business','field-title','field-photo','field-description',
+    ['field-name','field-business','field-title','field-photo','field-logo','field-description',
      'field-message','field-phone','field-email','field-address','field-whatsapp',
      'field-whatsapp-group','field-instagram','field-facebook','field-linkedin',
      'field-tiktok','field-youtube','field-twitter','field-site-button','field-gallery'
@@ -787,6 +787,11 @@ function createNewCard() {
     const photoPlaceholder = document.getElementById('photo-placeholder');
     if (photoImg) photoImg.style.display = 'none';
     if (photoPlaceholder) photoPlaceholder.style.display = '';
+
+    const logoImg = document.getElementById('logo-preview-img');
+    const logoPlaceholder = document.getElementById('logo-placeholder');
+    if (logoImg) logoImg.style.display = 'none';
+    if (logoPlaceholder) logoPlaceholder.style.display = '';
 
     selectTheme('midnight');
     updatePreview();
@@ -810,6 +815,7 @@ async function editCard(id) {
     setFieldValue('field-business', card.business || '');
     setFieldValue('field-title', card.title || '');
     setFieldValue('field-photo', card.photo_url || '');
+    setFieldValue('field-logo', card.logo_url || '');
     setFieldValue('field-description', card.description || '');
     setFieldValue('field-message', card.message || '');
     setFieldValue('field-phone', card.phone || '');
@@ -848,6 +854,19 @@ async function editCard(id) {
       } else {
         photoImg.style.display = 'none';
         photoPlaceholder.style.display = '';
+      }
+    }
+
+    const logoImg = document.getElementById('logo-preview-img');
+    const logoPlaceholder = document.getElementById('logo-placeholder');
+    if (logoImg && logoPlaceholder) {
+      if (card.logo_url) {
+        logoImg.src = card.logo_url;
+        logoImg.style.display = '';
+        logoPlaceholder.style.display = 'none';
+      } else {
+        logoImg.style.display = 'none';
+        logoPlaceholder.style.display = '';
       }
     }
 
@@ -1094,6 +1113,7 @@ function renderCard(data, isPreview) {
   const description = data.description || '';
   const message     = data.message || '';
   const photo       = data.photo_url || '';
+  const logo        = data.logo_url || '';
   const instagram   = data.instagram || '';
   const facebook    = data.facebook || '';
   const linkedin    = data.linkedin || '';
@@ -1111,8 +1131,8 @@ function renderCard(data, isPreview) {
 
   const initialsName = business || name;
   const initials = (initialsName.split(' ').map(w => w[0]).join('').substring(0, 2) || 'C').toUpperCase();
-  const avatarContent = photo
-    ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(mainTitle)}" onerror="this.parentElement.textContent='${initials}'">`
+  const avatarContent = logo
+    ? `<img src="${escapeHtml(logo)}" alt="${escapeHtml(mainTitle)}" onerror="this.parentElement.textContent='${initials}'">`
     : initials;
 
   let contactButtons = '';
@@ -1304,6 +1324,11 @@ function renderCard(data, isPreview) {
         <div class="card-cover-brand" style="position:absolute;top:15px;left:20px;font-size:0.8rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.08em;opacity:0.8;color:var(--text-primary);">
           CardLink
         </div>
+        ${photo ? `
+          <div class="card-cover-user" style="position:absolute;top:15px;right:20px;width:46px;height:46px;border-radius:50%;border:2px solid rgba(255,255,255,0.8);box-shadow:var(--shadow-sm);overflow:hidden;z-index:12;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;">
+            <img src="${escapeHtml(photo)}" style="width:100%;height:100%;object-fit:cover;" alt="Vendedor">
+          </div>
+        ` : ''}
       </div>
       
       <!-- Profile Header (Avatar Left, Title Right) -->
@@ -1505,6 +1530,31 @@ async function handlePhotoUpload(input) {
     showToast('❌', 'Erro: ' + err.message);
     if (photoImg) photoImg.style.display = 'none';
     if (photoPlaceholder) photoPlaceholder.style.display = '';
+  }
+}
+
+async function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const logoImg = document.getElementById('logo-preview-img');
+  const logoPlaceholder = document.getElementById('logo-placeholder');
+
+  // Show local preview immediately
+  const localUrl = URL.createObjectURL(file);
+  if (logoImg) { logoImg.src = localUrl; logoImg.style.display = ''; }
+  if (logoPlaceholder) logoPlaceholder.style.display = 'none';
+  showToast('⏳', 'Redimensionando e enviando...');
+
+  try {
+    const url = await uploadFile(file);
+    document.getElementById('field-logo').value = url;
+    showToast('✅', 'Logo enviado!');
+    updatePreview();
+  } catch (err) {
+    showToast('❌', 'Erro: ' + err.message);
+    if (logoImg) logoImg.style.display = 'none';
+    if (logoPlaceholder) logoPlaceholder.style.display = '';
   }
 }
 
