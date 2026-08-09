@@ -165,24 +165,29 @@ test('controle de recursos (gating) free vs pro no backend', async () => {
   });
   assert.equal(resAI.status, 403);
 
-  // 3. Tenta salvar cartão com produtos como free (deve limpar produtos)
+  // 3. Tenta salvar cartão com produtos como free (deve salvar os produtos na conta rascunho)
   const resCard = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify({ 
       name: 'Card de Gated', 
+      slug: 'card-de-gated',
       products: [{ name: 'Shampoo', price: '20,00' }] 
     })
   });
   assert.equal(resCard.status, 201);
   const cardData = await resCard.json();
-  // Produtos devem estar vazios para usuário free
-  assert.deepEqual(cardData.products, []);
+  assert.equal(cardData.products.length, 1);
+  assert.equal(cardData.products[0].name, 'Shampoo');
 
-  // 4. Promove usuário a PRO
+  // 4. Acesso ao link público como free deve retornar 402 Payment Required
+  const resPublicFree = await fetch(`http://127.0.0.1:${server.address().port}/api/public/card-de-gated`);
+  assert.equal(resPublicFree.status, 402);
+
+  // 5. Promove usuário a PRO
   await api('POST', '/api/payments/cakto-webhook', { email, status: 'paid' });
 
-  // 5. Tenta chamar API de IA como PRO (deve passar com 200)
+  // 6. Tenta chamar API de IA como PRO (deve passar com 200)
   const resAIPro = await fetch(`http://127.0.0.1:${server.address().port}/api/ai/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -190,19 +195,11 @@ test('controle de recursos (gating) free vs pro no backend', async () => {
   });
   assert.equal(resAIPro.status, 200);
 
-  // 6. Tenta salvar cartão com produtos como PRO (deve salvar os produtos)
-  const resCardPro = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-    body: JSON.stringify({ 
-      name: 'Card de Gated', 
-      products: [{ name: 'Shampoo', price: '20,00' }] 
-    })
-  });
-  assert.equal(resCardPro.status, 200);
-  const cardDataPro = await resCardPro.json();
-  assert.equal(cardDataPro.products.length, 1);
-  assert.equal(cardDataPro.products[0].name, 'Shampoo');
+  // 7. Acesso ao link público como PRO deve retornar 200
+  const resPublicPro = await fetch(`http://127.0.0.1:${server.address().port}/api/public/card-de-gated`);
+  assert.equal(resPublicPro.status, 200);
+  const publicData = await resPublicPro.json();
+  assert.equal(publicData.name, 'Card de Gated');
 });
 
 test('registro de usuario salva o codigo do vendedor indicador (referred_by)', async () => {

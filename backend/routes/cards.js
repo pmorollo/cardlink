@@ -88,11 +88,7 @@ router.post('/', authMiddleware, async (req, res) => {
   let galleryToSave = req.body.gallery;
   let testimonialsToSave = req.body.testimonials;
 
-  if (!isPro) {
-    productsToSave = [];
-    galleryToSave = [];
-    testimonialsToSave = [];
-  }
+
 
   const existing = await cardRepo.findOneByUserId(req.userId);
   if (existing) {

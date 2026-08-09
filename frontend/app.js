@@ -20,7 +20,11 @@ async function api(path, options = {}) {
   if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
   const res = await fetch(API + path, { ...options, headers: { ...headers, ...options.headers } });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Erro na requisição');
+  if (!res.ok) {
+    const err = new Error(data.error || 'Erro na requisição');
+    err.status = res.status;
+    throw err;
+  }
   return data;
 }
 
@@ -137,6 +141,9 @@ function handleRoute() {
     updateNavAuth();
   } else if (hash === '#settings' || hash === '#builder') {
     if (!authToken) { navigateTo('auth'); return; }
+    const isProUser = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
+    if (!isProUser) { navigateTo('dashboard'); return; }
+
     if (hash === '#builder') {
       window.location.hash = '#settings';
       return;
@@ -151,6 +158,9 @@ function handleRoute() {
     }
   } else if (hash === '#contacts') {
     if (!authToken) { navigateTo('auth'); return; }
+    const isProUser = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
+    if (!isProUser) { navigateTo('dashboard'); return; }
+
     document.getElementById('contacts-view').classList.add('active');
     if (navbar) navbar.style.display = '';
     if (bgAnimated) bgAnimated.style.display = '';
@@ -466,34 +476,6 @@ function handleLogout() {
 
 function showSettingsSection(section) {
   let targetSection = section || 'profile';
-  
-  // Feature gating logic
-  const proSections = ['services', 'gallery', 'testimonials', 'assistant'];
-  const isPro = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
-  
-  if (proSections.includes(targetSection) && !isPro) {
-    const lockTitles = {
-      services: 'Vitrine de Produtos & Serviços',
-      gallery: 'Galeria de Fotos & Portfólio',
-      testimonials: 'Carrossel de Avaliações',
-      assistant: 'Assistente de Conteúdo com IA'
-    };
-    
-    const lockDescs = {
-      services: 'Exiba seus produtos ou serviços com fotos, preços e descrições estruturadas. Seus clientes poderão fazer pedidos diretamente pelo WhatsApp!',
-      gallery: 'Crie uma vitrine visual do seu trabalho, portfólio de projetos, fotos de antes/depois ou do seu espaço físico.',
-      testimonials: 'Aumente sua credibilidade exibindo depoimentos e avaliações reais de clientes satisfeitos diretamente na sua página.',
-      assistant: 'Use inteligência artificial avançada para criar biografias, títulos e textos persuasivos otimizados para vendas com um único clique.'
-    };
-    
-    const titleEl = document.getElementById('pro-lock-title');
-    const descEl = document.getElementById('pro-lock-desc');
-    if (titleEl) titleEl.textContent = lockTitles[targetSection] || 'Recurso Premium PRO';
-    if (descEl) descEl.textContent = lockDescs[targetSection] || 'Faça o upgrade para o plano PRO para liberar este recurso.';
-    
-    targetSection = 'pro-lock';
-  }
-
   activeSettingsSection = targetSection;
   document.querySelectorAll('[data-settings-section]').forEach(el => {
     el.classList.toggle('active', el.dataset.settingsSection === activeSettingsSection);

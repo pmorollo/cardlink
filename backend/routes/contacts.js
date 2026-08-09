@@ -11,6 +11,13 @@ router.get('/public/:slug', async (req, res) => {
     return res.status(404).json({ error: 'Cartão não encontrado' });
   }
 
+  const owner = await userRepo.findById(card.user_id);
+  const isOwnerPro = owner && (owner.plan === 'pro' || owner.is_admin);
+
+  if (!isOwnerPro) {
+    return res.status(402).json({ error: 'subscription_required', message: 'Assinatura pendente para este cartão' });
+  }
+
   await cardRepo.update(card.id, { views_count: (card.views_count || 0) + 1 });
 
   // Only expose fields needed for public display — never expose user_id or internals
