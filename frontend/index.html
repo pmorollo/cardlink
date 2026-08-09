@@ -67,25 +67,39 @@
         </div>
 
         <!-- Floating Mockup & Video Container -->
-        <div class="hero-mockup" style="display:flex;gap:30px;flex-wrap:wrap;justify-content:center;align-items:center;margin-top:40px;width:100%;">
+        <div class="hero-mockup" style="display:flex;flex-direction:column;align-items:center;margin-top:50px;width:100%;">
           
-          <!-- Mockup Celular -->
-          <div style="position:relative;max-width:250px;width:100%;border-radius:24px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.45);border:5px solid #1e293b;background:#0f172a;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-            <img src="mockup.jpg" alt="Exemplo de Cartão Digital CardLink" style="width:100%;height:auto;display:block;">
+          <div style="width: 100%; text-align: center; margin-bottom: 25px;">
+            <span class="hero-badge" style="display:inline-flex;margin-bottom:8px;">🔍 Demonstração Visual</span>
+            <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Veja o CardLink na palma da mão e na tela</h3>
           </div>
 
-          <!-- Video Promocional MP4 -->
-          <div style="max-width:450px;width:100%;border-radius:var(--radius-xl);overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.45);border:1px solid var(--border-subtle);background:#000000;">
-            <video 
-              controls 
-              preload="metadata"
-              style="width:100%;display:block;outline:none;"
-            >
-              <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-              Seu navegador não suporta a reprodução de vídeos MP4.
-            </video>
-          </div>
+          <div style="display:flex;gap:35px;flex-wrap:wrap;justify-content:center;align-items:stretch;width:100%;">
+            
+            <!-- Coluna 1: Celular -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:12px;max-width:250px;width:100%;">
+              <div style="position:relative;width:100%;border-radius:24px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.30);border:6px solid #1e293b;background:#0f172a;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                <img src="mockup.jpg" alt="Exemplo de Cartão Digital CardLink" style="width:100%;height:auto;display:block;">
+              </div>
+              <span style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);letter-spacing:0.04em;text-transform:uppercase;">📱 Design Premium para Celular</span>
+            </div>
 
+            <!-- Coluna 2: Video -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:12px;max-width:450px;width:100%;">
+              <div style="position:relative;width:100%;border-radius:16px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.30);border:6px solid #1e293b;background:#000000;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                <video 
+                  controls 
+                  preload="metadata"
+                  style="width:100%;display:block;outline:none;"
+                >
+                  <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                  Seu navegador não suporta a reprodução de vídeos MP4.
+                </video>
+              </div>
+              <span style="font-size:0.8rem;font-weight:700;color:var(--purple);letter-spacing:0.04em;text-transform:uppercase;">▶️ Assista ao Vídeo Demonstrativo</span>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
