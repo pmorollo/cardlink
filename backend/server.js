@@ -86,6 +86,7 @@ const apiLimiter = rateLimit({
 });
 
 // ─── Routes ───────────────────────────────────────────────────────
+const { pgIsReady } = require('./db/repository');
 // [DIAG] endpoint temporário — só informa PRESENÇA de variáveis, sem expor valores
 app.get('/api/diag', (req, res) => {
   const env = process.env;
@@ -95,6 +96,7 @@ app.get('/api/diag', (req, res) => {
     cakto_secret_tamanho: env.CAKTO_SECRET ? String(env.CAKTO_SECRET).length : 0,
     cakto_secret_comeca_com_aspas: env.CAKTO_SECRET ? String(env.CAKTO_SECRET).startsWith('"') : null,
     database_url_presente: !!env.DATABASE_URL,
+    postgres_ativo: pgIsReady(),
     admin_emails: env.ADMIN_EMAILS || null,
     jwt_secret_presente: !!env.JWT_SECRET,
     smtp_host: env.SMTP_HOST || null,

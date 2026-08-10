@@ -528,6 +528,7 @@ module.exports = {
   supportTickets,
   db,
   isPgConfigured,
+  pgIsReady: () => pgReady,
   async close() {
     if (pgPool) {
       try { await pgPool.end(); } catch (e) { /* ja fechado */ }
