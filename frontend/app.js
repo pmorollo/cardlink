@@ -453,9 +453,13 @@ async function handleRegister() {
     authToken = data.token;
     currentUser = data.user;
     localStorage.setItem('cardlink_token', data.token);
-    showToast('✅', 'Conta criada com sucesso!');
+    showToast('✅', 'Conta criada com sucesso! Redirecionando para o pagamento...');
     currentUserCardId = null;
-    createNewCard();
+    const isPro = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
+    if (!isPro) {
+      redirectToCheckout();
+    }
+    navigateTo('dashboard');
   } catch (err) {
     if (err.message && err.message.includes('cadastrado')) {
       showToast('⚠️', 'E-mail já cadastrado! Redirecionando para login...');
