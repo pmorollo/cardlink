@@ -86,6 +86,22 @@ const apiLimiter = rateLimit({
 });
 
 // ─── Routes ───────────────────────────────────────────────────────
+// [DIAG] endpoint temporário — só informa PRESENÇA de variáveis, sem expor valores
+app.get('/api/diag', (req, res) => {
+  const env = process.env;
+  res.json({
+    node_env: env.NODE_ENV || null,
+    cakto_secret_presente: !!env.CAKTO_SECRET,
+    cakto_secret_tamanho: env.CAKTO_SECRET ? String(env.CAKTO_SECRET).length : 0,
+    cakto_secret_comeca_com_aspas: env.CAKTO_SECRET ? String(env.CAKTO_SECRET).startsWith('"') : null,
+    database_url_presente: !!env.DATABASE_URL,
+    admin_emails: env.ADMIN_EMAILS || null,
+    jwt_secret_presente: !!env.JWT_SECRET,
+    smtp_host: env.SMTP_HOST || null,
+    porta: env.PORT || null
+  });
+});
+
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/cards', apiLimiter, cardRoutes);
 app.use('/api', apiLimiter, contactRoutes);
