@@ -309,7 +309,23 @@ function toggleAuthForm(form) {
 
   if (loginForm) loginForm.style.display = form === 'login' ? '' : 'none';
   if (registerForm) registerForm.style.display = form === 'register' ? '' : 'none';
-  if (forgotForm) forgotForm.style.display = form === 'forgot' ? '' : 'none';
+  if (forgotForm) {
+    forgotForm.style.display = form === 'forgot' ? '' : 'none';
+    if (form === 'forgot') {
+      const step1 = document.getElementById('forgot-step-1');
+      const step2 = document.getElementById('forgot-step-2');
+      if (step1) step1.style.display = 'block';
+      if (step2) step2.style.display = 'none';
+      
+      // Clean inputs
+      const emailInput = document.getElementById('forgot-email');
+      const codeInput = document.getElementById('forgot-code');
+      const passInput = document.getElementById('forgot-new-password');
+      if (emailInput) emailInput.value = '';
+      if (codeInput) codeInput.value = '';
+      if (passInput) passInput.value = '';
+    }
+  }
 }
 
 async function handleLogin() {
