@@ -11,16 +11,21 @@ const isSmtpConfigured = () => {
 let transporter = null;
 
 if (isSmtpConfigured()) {
+  const host = String(process.env.SMTP_HOST || '').trim();
+  const portStr = String(process.env.SMTP_PORT || '587').trim();
+  const port = parseInt(portStr, 10);
+  const secure = portStr === '465';
+  const user = String(process.env.SMTP_USER || '').trim();
+  const pass = String(process.env.SMTP_PASS || '').trim();
+
   transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
+    host,
+    port,
+    secure,
+    auth: { user, pass },
+    tls: { rejectUnauthorized: false }
   });
-  console.log('✅ Nodemailer SMTP configurado com sucesso!');
+  console.log(`✅ Nodemailer SMTP configurado com sucesso! (Host: ${host}, Porto: ${port}, Secure: ${secure})`);
 } else {
   console.warn('⚠️ SMTP não configurado. E-mails serão impressos no console do servidor.');
 }
