@@ -562,10 +562,34 @@ function closeProPaymentModal() {
   if (modal) modal.style.display = 'none';
 }
 
-function redirectToCheckout() {
+let selectedRegisterPlan = 'monthly';
+
+function selectRegisterPlan(plan) {
+  selectedRegisterPlan = plan;
+  const monthlyEl = document.getElementById('plan-option-monthly');
+  const annualEl = document.getElementById('plan-option-annual');
+  if (monthlyEl && annualEl) {
+    if (plan === 'monthly') {
+      monthlyEl.style.border = '2px solid var(--accent)';
+      monthlyEl.style.background = 'rgba(139,92,246,0.12)';
+      annualEl.style.border = '1.5px solid var(--border-subtle)';
+      annualEl.style.background = 'var(--surface)';
+    } else {
+      annualEl.style.border = '2px solid var(--accent)';
+      annualEl.style.background = 'rgba(139,92,246,0.12)';
+      monthlyEl.style.border = '1.5px solid var(--border-subtle)';
+      monthlyEl.style.background = 'var(--surface)';
+    }
+  }
+}
+
+function redirectToCheckout(planOverride) {
+  const plan = planOverride || selectedRegisterPlan || 'monthly';
   const email = currentUser ? encodeURIComponent(currentUser.email) : '';
   const userId = currentUser ? currentUser.id : '';
-  const checkoutBase = 'https://cakto.com.br/checkout/cardlink-pro';
+  const checkoutBase = plan === 'annual' 
+    ? 'https://cakto.com.br/checkout/cardlink-pro-anual' 
+    : 'https://cakto.com.br/checkout/cardlink-pro';
   const checkoutUrl = `${checkoutBase}?email=${email}&external_id=${userId}`;
   window.open(checkoutUrl, '_blank');
 }

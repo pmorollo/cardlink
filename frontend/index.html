@@ -363,7 +363,7 @@
         <!-- Register Form -->
         <div id="register-form" style="display:none;">
           <h1 class="auth-title">Plano <span class="text-gradient">PRO</span></h1>
-          <p class="auth-subtitle">Cadastre seus dados. Você será direcionado para o checkout seguro da Cakto (R$ 12,90/mês).</p>
+          <p class="auth-subtitle">Cadastre seus dados e escolha seu plano para ir ao checkout da Cakto.</p>
           <div class="form-group">
             <label class="form-label" for="register-name">Nome</label>
             <input class="form-input" type="text" id="register-name" placeholder="Seu nome completo">
@@ -376,7 +376,26 @@
             <label class="form-label" for="register-password">Senha</label>
             <input class="form-input" type="password" id="register-password" placeholder="Mínimo 8 caracteres">
           </div>
-          <div class="form-group" style="display:flex;align-items:flex-start;gap:8px;margin-top:15px;text-align:left;">
+
+          <!-- Seletor de Plano Mensal vs Anual -->
+          <div style="margin:18px 0 10px;">
+            <label class="form-label" style="font-weight:700;margin-bottom:10px;display:block;text-align:left;">Escolha o plano:</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <!-- Opção Mensal -->
+              <div id="plan-option-monthly" onclick="selectRegisterPlan('monthly')" style="border:2px solid var(--accent);border-radius:12px;padding:12px;background:rgba(139,92,246,0.12);cursor:pointer;text-align:left;transition:all 0.2s;">
+                <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:2px;">Mensal</div>
+                <div style="font-size:1.05rem;font-weight:800;color:var(--text-primary);">R$ 12,90<span style="font-size:0.7rem;font-weight:400;">/mês</span></div>
+              </div>
+              <!-- Opção Anual -->
+              <div id="plan-option-annual" onclick="selectRegisterPlan('annual')" style="border:1.5px solid var(--border-subtle);border-radius:12px;padding:12px;background:var(--surface);cursor:pointer;text-align:left;position:relative;transition:all 0.2s;">
+                <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
+                <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:2px;">Anual</div>
+                <div style="font-size:1.05rem;font-weight:800;color:var(--text-primary);">R$ 99,00<span style="font-size:0.7rem;font-weight:400;">/ano</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="display:flex;align-items:flex-start;gap:8px;margin-top:12px;text-align:left;">
             <input type="checkbox" id="register-terms" style="margin-top:4px;cursor:pointer;">
             <label for="register-terms" style="font-size:0.8rem;color:var(--text-secondary);cursor:pointer;line-height:1.4;">
               Declaro que li e aceito os <a href="#/terms" style="color:var(--purple);text-decoration:underline;">Termos de Uso</a> e a <a href="#/privacy" style="color:var(--purple);text-decoration:underline;">Política de Privacidade</a>.
