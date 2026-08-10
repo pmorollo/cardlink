@@ -1,4 +1,5 @@
 process.env.NODE_ENV = 'test';
+process.env.CAKTO_SECRET = 'test-cakto-secret-123';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -124,26 +125,38 @@ test('reset de senha com codigo errado eh rejeitado', async () => {
   assert.equal(r.status, 400);
 });
 
+test('webhook da Cakto rejeita secret invalido', async () => {
+  const r = await api('POST', '/api/payments/cakto-webhook', {
+    secret: 'secret-errado',
+    event: 'purchase_approved',
+    data: { customerEmail: 'qualquer@example.com' }
+  });
+  assert.equal(r.status, 401);
+});
+
 test('webhook da Cakto ativa e cancela plano PRO', async () => {
   const email = 'webhook-user@example.com';
+  const secret = process.env.CAKTO_SECRET;
   // 1. Registra usuário comum
   const rReg = await api('POST', '/api/auth/register', { email, name: 'Test Webhook', password: 'Password123!' });
   assert.equal(rReg.status, 201);
   assert.equal(rReg.data.user.plan, 'free');
 
-  // 2. Simula webhook de pagamento aprovado da Cakto
+  // 2. Simula webhook de pagamento aprovado da Cakto (formato real: secret + event + data.customerEmail)
   const rHookPay = await api('POST', '/api/payments/cakto-webhook', {
-    email,
-    status: 'paid'
+    secret,
+    event: 'purchase_approved',
+    data: { customerEmail: email }
   });
   assert.equal(rHookPay.status, 200);
   assert.equal(rHookPay.data.success, true);
   assert.equal(rHookPay.data.plan, 'pro');
 
-  // 3. Simula webhook de cancelamento/estorno
+  // 3. Simula webhook de cancelamento de assinatura
   const rHookCancel = await api('POST', '/api/payments/cakto-webhook', {
-    email,
-    status: 'refunded'
+    secret,
+    event: 'subscription_canceled',
+    data: { customerEmail: email }
   });
   assert.equal(rHookCancel.status, 200);
   assert.equal(rHookCancel.data.success, true);
@@ -178,7 +191,11 @@ test('controle de recursos (gating) free vs pro no backend', async () => {
   assert.equal(resCardFree.status, 402);
 
   // 4. Promove usuário para PRO via webhook da Cakto
-  await api('POST', '/api/payments/cakto-webhook', { email, status: 'paid' });
+  await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
+    event: 'subscription_created',
+    data: { customerEmail: email }
+  });
 
   // 5. Salva cartão como PRO (deve ter sucesso 201)
   const resCardPro = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
@@ -218,7 +235,11 @@ test('envio de contato publico dispara email de notificacao para o dono do carta
   const token = rReg.data.token;
 
   // Promove o usuário a PRO para ativar o cartão público e poder receber contatos
-  await api('POST', '/api/payments/cakto-webhook', { email, status: 'paid' });
+  await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
+    event: 'purchase_approved',
+    data: { customerEmail: email }
+  });
 
   // 2. Cria cartão para esse usuário
   const rCard = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {

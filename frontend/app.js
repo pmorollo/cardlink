@@ -609,12 +609,15 @@ function selectRegisterPlan(plan) {
 function redirectToCheckout(planOverride) {
   const plan = planOverride || selectedRegisterPlan || 'monthly';
   const email = currentUser ? encodeURIComponent(currentUser.email) : '';
-  const userId = currentUser ? currentUser.id : '';
-  const checkoutBase = plan === 'annual' 
-    ? 'https://cakto.com.br/checkout/cardlink-pro-anual' 
-    : 'https://cakto.com.br/checkout/cardlink-pro';
-  const checkoutUrl = `${checkoutBase}?email=${email}&external_id=${userId}`;
-  window.open(checkoutUrl, '_blank');
+  const base = (plan === 'annual'
+    ? window.CARD_LINK && window.CARD_LINK.annualCheckoutUrl
+    : window.CARD_LINK && window.CARD_LINK.monthlyCheckoutUrl) || '';
+  if (!base || base.startsWith('PREENCHER')) {
+    showToast('⚠️', 'Checkout ainda não configurado. Tente novamente em instantes.');
+    return;
+  }
+  const sep = base.includes('?') ? '&' : '?';
+  window.open(`${base}${sep}email=${email}`, '_blank');
 }
 
 let currentQrCodeSlug = '';
