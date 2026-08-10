@@ -19,6 +19,11 @@ const dbDir = path.join(__dirname, 'db');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 
+console.log('[DIAG] CAKTO_SECRET presente:', !!process.env.CAKTO_SECRET, '| valor:', JSON.stringify(process.env.CAKTO_SECRET || null));
+console.log('[DIAG] NODE_ENV:', JSON.stringify(process.env.NODE_ENV));
+console.log('[DIAG] ADMIN_EMAILS:', JSON.stringify(process.env.ADMIN_EMAILS || null));
+console.log('[DIAG] JWT_SECRET presente:', !!process.env.JWT_SECRET);
+
 const authRoutes = require('./routes/auth');
 const cardRoutes = require('./routes/cards');
 const contactRoutes = require('./routes/contacts');
