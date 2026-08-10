@@ -209,6 +209,9 @@ test('envio de contato publico dispara email de notificacao para o dono do carta
   const rReg = await api('POST', '/api/auth/register', { email, name: 'Owner Test', password: 'Password123!' });
   const token = rReg.data.token;
 
+  // Promove o usuário a PRO para ativar o cartão público e poder receber contatos
+  await api('POST', '/api/payments/cakto-webhook', { email, status: 'paid' });
+
   // 2. Cria cartão para esse usuário
   const rCard = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
     method: 'POST',
