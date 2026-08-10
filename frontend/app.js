@@ -507,6 +507,16 @@ function closeQrCodeModal() {
   if (modal) modal.style.display = 'none';
 }
 
+function openUserManualModal() {
+  const modal = document.getElementById('user-manual-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeUserManualModal() {
+  const modal = document.getElementById('user-manual-modal');
+  if (modal) modal.style.display = 'none';
+}
+
 function copyQrCodeLink() {
   if (!currentQrCodeSlug) return;
   const url = window.location.origin + '/site/' + currentQrCodeSlug + '/qr-whatsapp';

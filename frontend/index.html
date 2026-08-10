@@ -31,6 +31,7 @@
         <span>Card<span class="text-gradient">Link</span></span>
       </div>
       <div class="navbar-cta" id="nav-cta">
+        <a href="javascript:void(0)" onclick="openUserManualModal()" style="color:var(--text-secondary);text-decoration:none;margin-right:20px;font-size:0.9rem;font-weight:600;vertical-align:middle;display:inline-block;" class="hide-mobile">Como Funciona</a>
         <button class="btn btn-primary" onclick="navigateTo('auth')" id="nav-cta-btn">
           ✨ <span class="hide-mobile">Cartão</span><span class="show-mobile" style="display:none;">Cartão</span>
         </button>
@@ -324,6 +325,8 @@
           <a href="#/terms" style="color:var(--text-secondary);text-decoration:none;">Termos de Uso</a>
           <span style="color:var(--border-subtle);">|</span>
           <a href="#/privacy" style="color:var(--text-secondary);text-decoration:none;">Política de Privacidade</a>
+          <span style="color:var(--border-subtle);">|</span>
+          <a href="javascript:void(0)" onclick="openUserManualModal()" style="color:var(--text-secondary);text-decoration:none;">Manual do Usuário</a>
         </div>
       </div>
     </footer>
@@ -985,6 +988,66 @@
       <div style="display:flex;gap:10px;width:100%;margin-top:10px;">
         <button class="btn btn-primary" onclick="copyQrCodeLink()" style="flex:1;font-size:0.85rem;padding:10px 14px;">Copiar Link</button>
         <button class="btn btn-secondary" onclick="closeQrCodeModal()" style="flex:1;font-size:0.85rem;padding:10px 14px;">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal do Manual do Usuário -->
+  <div class="modal-overlay" id="user-manual-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;">
+    <div class="builder-form-panel" style="max-width:650px;width:90%;max-height:85vh;overflow-y:auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-xl);display:flex;flex-direction:column;gap:15px;text-align:left;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-subtle);padding-bottom:12px;margin-bottom:8px;">
+        <h2 class="builder-title" style="margin-bottom:0;font-size:1.35rem;display:flex;align-items:center;gap:8px;"><span class="icon">📖</span> Manual do Usuário CardLink</h2>
+        <button type="button" onclick="closeUserManualModal()" style="background:none;border:none;color:var(--text-secondary);font-size:1.6rem;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+      
+      <div style="font-size:0.9rem;line-height:1.6;color:var(--text-secondary);display:flex;flex-direction:column;gap:20px;">
+        
+        <div>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🛠️</span> Passo 1: Cadastro e Primeiro Acesso</h3>
+          <p style="margin:0;">Acesse o site oficial do <strong>CardLink</strong>, clique em "Entrar" e depois em "Criar Conta". Após preencher seus dados, você será direcionado para o seu Painel do Usuário (Dashboard).</p>
+        </div>
+
+        <div>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🎨</span> Passo 2: Personalizando seu Cartão (O Editor)</h3>
+          <p style="margin:0;margin-bottom:8px;">No menu do painel, clique em "Configurações" para abrir o editor do seu cartão:</p>
+          <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;">
+            <li><strong>Perfil:</strong> Preencha seu nome profissional, profissão/cargo, empresa e uma descrição (bio) de 2 a 3 frases.</li>
+            <li><strong>Imagens:</strong> Envie uma foto de perfil e a logo da sua empresa (arquivos JPG ou PNG quadrados facilitam o enquadramento).</li>
+            <li><strong>Contatos e Redes Sociais:</strong> Insira seu WhatsApp (somente números com DDD) e links das suas redes sociais.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🛍️</span> Passo 3: Vitrine, Galeria e Depoimentos</h3>
+          <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;">
+            <li><strong>Vitrine:</strong> Cadastre seus serviços e produtos com nome, preço e descrição. Seus clientes poderão ver os preços organizados e solicitar a contratação direto pelo WhatsApp.</li>
+            <li><strong>Galeria:</strong> Faça o upload de fotos reais do seu trabalho (portfólio) para gerar credibilidade imediata.</li>
+            <li><strong>Depoimentos:</strong> Insira avaliações e avalie com estrelas para comprovar a qualidade do seu atendimento.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🤖</span> Passo 4: Usando a Inteligência Artificial</h3>
+          <p style="margin:0;">Tem dificuldades para escrever os textos? No topo do editor, clique em "Gerar Conteúdo com IA", insira sua profissão, selecione o tom de voz e clique em "Gerar". A IA criará todos os textos e até sugerirá 3 produtos/serviços com preços na hora!</p>
+        </div>
+
+        <div>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>📱</span> Passo 5: QR Code de Balcão e Compartilhamento</h3>
+          <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;">
+            <li><strong>Link Único:</strong> Copie o seu link exclusivo (ex: <code>cardlink.app/site/seu-nome</code>) para divulgar nas redes sociais.</li>
+            <li><strong>QR Code:</strong> Abra a miniatura do seu QR Code no painel e salve ou imprima a imagem. Ideal para expor em displays no balcão da sua empresa e direcionar clientes direto para seu WhatsApp.</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(124,58,237,0.06);border:1px dashed rgba(124,58,237,0.25);border-radius:var(--radius-lg);padding:14px;">
+          <h3 style="color:var(--purple);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;margin-top:0;"><span>🚀</span> Passo 6: Ativação (Colocando no Ar)</h3>
+          <p style="margin:0;font-size:0.88rem;">Seu cartão inicia em modo rascunho para você testar tudo de graça. Para que seu link público e QR Code fiquem ativos na internet para seus clientes, clique em "Ativar Página" no painel e assine o plano único de <strong>R$ 12,90/mês</strong>. Sem multas ou taxas de cancelamento!</p>
+        </div>
+
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:10px;border-top:1px solid var(--border-subtle);padding-top:12px;">
+        <button class="btn btn-primary" onclick="closeUserManualModal()" style="padding:8px 20px;font-size:0.85rem;font-weight:bold;">Entendi, fechar</button>
       </div>
     </div>
   </div>
