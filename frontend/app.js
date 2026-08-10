@@ -568,18 +568,22 @@ function selectRegisterPlan(plan) {
   selectedRegisterPlan = plan;
   const monthlyEl = document.getElementById('plan-option-monthly');
   const annualEl = document.getElementById('plan-option-annual');
-  if (monthlyEl && annualEl) {
-    if (plan === 'monthly') {
-      monthlyEl.style.border = '2px solid var(--accent)';
-      monthlyEl.style.background = 'rgba(139,92,246,0.12)';
-      annualEl.style.border = '1.5px solid var(--border-subtle)';
-      annualEl.style.background = 'var(--surface)';
-    } else {
-      annualEl.style.border = '2px solid var(--accent)';
-      annualEl.style.background = 'rgba(139,92,246,0.12)';
-      monthlyEl.style.border = '1.5px solid var(--border-subtle)';
-      monthlyEl.style.background = 'var(--surface)';
-    }
+  const radioMonthly = document.getElementById('plan-radio-monthly');
+  const radioAnnual = document.getElementById('plan-radio-annual');
+  const btn = document.getElementById('register-submit-btn');
+
+  if (plan === 'monthly') {
+    if (monthlyEl) { monthlyEl.style.border = '2px solid var(--accent)'; monthlyEl.style.background = 'rgba(139,92,246,0.12)'; }
+    if (annualEl) { annualEl.style.border = '1.5px solid var(--border-subtle)'; annualEl.style.background = 'var(--surface)'; }
+    if (radioMonthly) { radioMonthly.textContent = '🔘'; radioMonthly.style.color = 'var(--accent)'; }
+    if (radioAnnual) { radioAnnual.textContent = '⚪'; radioAnnual.style.color = 'var(--text-tertiary)'; }
+    if (btn) btn.textContent = '💳 Pagar R$ 12,90/mês na Cakto';
+  } else {
+    if (annualEl) { annualEl.style.border = '2px solid var(--accent)'; annualEl.style.background = 'rgba(139,92,246,0.12)'; }
+    if (monthlyEl) { monthlyEl.style.border = '1.5px solid var(--border-subtle)'; monthlyEl.style.background = 'var(--surface)'; }
+    if (radioAnnual) { radioAnnual.textContent = '🔘'; radioAnnual.style.color = 'var(--accent)'; }
+    if (radioMonthly) { radioMonthly.textContent = '⚪'; radioMonthly.style.color = 'var(--text-tertiary)'; }
+    if (btn) btn.textContent = '💳 Pagar R$ 99,00/ano na Cakto';
   }
 }
 

@@ -379,18 +379,24 @@
 
           <!-- Seletor de Plano Mensal vs Anual -->
           <div style="margin:18px 0 10px;">
-            <label class="form-label" style="font-weight:700;margin-bottom:10px;display:block;text-align:left;">Escolha o plano:</label>
+            <label class="form-label" style="font-weight:700;margin-bottom:8px;display:block;text-align:left;">1. Escolha o seu plano:</label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
               <!-- Opção Mensal -->
-              <div id="plan-option-monthly" onclick="selectRegisterPlan('monthly')" style="border:2px solid var(--accent);border-radius:12px;padding:12px;background:rgba(139,92,246,0.12);cursor:pointer;text-align:left;transition:all 0.2s;">
-                <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:2px;">Mensal</div>
-                <div style="font-size:1.05rem;font-weight:800;color:var(--text-primary);">R$ 12,90<span style="font-size:0.7rem;font-weight:400;">/mês</span></div>
+              <div id="plan-option-monthly" onclick="selectRegisterPlan('monthly')" style="border:2px solid var(--accent);border-radius:12px;padding:12px;background:rgba(139,92,246,0.12);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px;">
+                <span id="plan-radio-monthly" style="color:var(--accent);font-size:1.1rem;">🔘</span>
+                <div>
+                  <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Mensal</div>
+                  <div style="font-size:1.05rem;font-weight:800;color:var(--text-primary);">R$ 12,90<span style="font-size:0.7rem;font-weight:400;">/mês</span></div>
+                </div>
               </div>
               <!-- Opção Anual -->
-              <div id="plan-option-annual" onclick="selectRegisterPlan('annual')" style="border:1.5px solid var(--border-subtle);border-radius:12px;padding:12px;background:var(--surface);cursor:pointer;text-align:left;position:relative;transition:all 0.2s;">
+              <div id="plan-option-annual" onclick="selectRegisterPlan('annual')" style="border:1.5px solid var(--border-subtle);border-radius:12px;padding:12px;background:var(--surface);cursor:pointer;text-align:left;position:relative;transition:all 0.2s;display:flex;align-items:center;gap:10px;">
                 <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
-                <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:2px;">Anual</div>
-                <div style="font-size:1.05rem;font-weight:800;color:var(--text-primary);">R$ 99,00<span style="font-size:0.7rem;font-weight:400;">/ano</span></div>
+                <span id="plan-radio-annual" style="color:var(--text-tertiary);font-size:1.1rem;">⚪</span>
+                <div>
+                  <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Anual</div>
+                  <div style="font-size:1.05rem;font-weight:800;color:var(--text-primary);">R$ 99,00<span style="font-size:0.7rem;font-weight:400;">/ano</span></div>
+                </div>
               </div>
             </div>
           </div>
@@ -401,8 +407,8 @@
               Declaro que li e aceito os <a href="#/terms" style="color:var(--purple);text-decoration:underline;">Termos de Uso</a> e a <a href="#/privacy" style="color:var(--purple);text-decoration:underline;">Política de Privacidade</a>.
             </label>
           </div>
-          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);font-weight:bold;" onclick="handleRegister()">
-            💳 Ir para o Checkout (Cakto)
+          <button id="register-submit-btn" class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);font-weight:bold;" onclick="handleRegister()">
+            💳 Pagar R$ 12,90/mês na Cakto
           </button>
         </div>
 
