@@ -31,10 +31,9 @@
         <span>Card<span class="text-gradient">Link</span></span>
       </div>
       <div class="navbar-cta" id="nav-cta">
-        <a href="javascript:void(0)" onclick="openUserManualModal()" style="color:var(--text-secondary);text-decoration:none;margin-right:20px;font-size:0.9rem;font-weight:600;vertical-align:middle;display:inline-block;" class="hide-mobile">Como Funciona</a>
-        <button class="btn btn-primary" onclick="navigateTo('auth')" id="nav-cta-btn">
-          ✨ <span class="hide-mobile">Cartão</span><span class="show-mobile" style="display:none;">Cartão</span>
-        </button>
+        <a href="javascript:void(0)" onclick="openUserManualModal()" style="color:var(--text-secondary);text-decoration:none;margin-right:15px;font-size:0.9rem;font-weight:600;vertical-align:middle;display:inline-block;" class="hide-mobile">Como Funciona</a>
+        <button class="btn btn-secondary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('login');" style="margin-right:8px;">🔑 Entrar</button>
+        <button class="btn btn-primary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('register');">🚀 Começar Agora</button>
       </div>
     </div>
   </nav>
