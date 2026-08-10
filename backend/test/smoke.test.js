@@ -165,8 +165,8 @@ test('controle de recursos (gating) free vs pro no backend', async () => {
   });
   assert.equal(resAI.status, 403);
 
-  // 3. Tenta salvar cartão com produtos como free (deve salvar os produtos na conta rascunho)
-  const resCard = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
+  // 3. Tenta salvar cartão como free (deve falhar com 402 Payment Required pois não existe modo rascunho)
+  const resCardFree = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify({ 
@@ -175,17 +175,25 @@ test('controle de recursos (gating) free vs pro no backend', async () => {
       products: [{ name: 'Shampoo', price: '20,00' }] 
     })
   });
-  assert.equal(resCard.status, 201);
-  const cardData = await resCard.json();
+  assert.equal(resCardFree.status, 402);
+
+  // 4. Promove usuário para PRO via webhook da Cakto
+  await api('POST', '/api/payments/cakto-webhook', { email, status: 'paid' });
+
+  // 5. Salva cartão como PRO (deve ter sucesso 201)
+  const resCardPro = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ 
+      name: 'Card de Gated', 
+      slug: 'card-de-gated',
+      products: [{ name: 'Shampoo', price: '20,00' }] 
+    })
+  });
+  assert.equal(resCardPro.status, 201);
+  const cardData = await resCardPro.json();
   assert.equal(cardData.products.length, 1);
   assert.equal(cardData.products[0].name, 'Shampoo');
-
-  // 4. Acesso ao link público como free deve retornar 402 Payment Required
-  const resPublicFree = await fetch(`http://127.0.0.1:${server.address().port}/api/public/card-de-gated`);
-  assert.equal(resPublicFree.status, 402);
-
-  // 5. Promove usuário a PRO
-  await api('POST', '/api/payments/cakto-webhook', { email, status: 'paid' });
 
   // 6. Tenta chamar API de IA como PRO (deve passar com 200)
   const resAIPro = await fetch(`http://127.0.0.1:${server.address().port}/api/ai/generate`, {

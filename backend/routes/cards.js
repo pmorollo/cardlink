@@ -80,9 +80,13 @@ router.post('/', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: 'Nome é obrigatório' });
   }
 
-  // Check if user is PRO/Admin to gate premium features
+  // Check if user is PRO/Admin
   const user = await userRepo.findById(req.userId);
   const isPro = user && (user.plan === 'pro' || user.is_admin);
+
+  if (!isPro) {
+    return res.status(402).json({ error: 'subscription_required', message: 'Assinatura ativa do CardLink PRO necessária para salvar ou editar cartões' });
+  }
 
   let productsToSave = req.body.products;
   let galleryToSave = req.body.gallery;

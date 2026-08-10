@@ -122,7 +122,58 @@ function handleRoute() {
     document.getElementById('card-view').classList.add('active');
     if (navbar) navbar.style.display = 'none';
     if (bgAnimated) bgAnimated.style.display = 'none';
-  } else if (hash === '#auth') {
+  }
+
+  const isProUser = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
+
+  // Se o usuário está autenticado mas não é PRO nem Admin, bloqueia acesso a qualquer tela interna do painel
+  if (authToken && currentUser && !isProUser && hash !== '#/terms' && hash !== '#/privacy') {
+    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+    document.getElementById('dashboard-view').classList.add('active');
+    if (navbar) navbar.style.display = '';
+    if (bgAnimated) bgAnimated.style.display = '';
+    updateNavAuth();
+
+    document.getElementById('dashboard-content').innerHTML = `
+      <div style="max-width:550px;margin:40px auto;padding:32px 24px;background:var(--surface);border:1.5px solid var(--border-subtle);border-radius:var(--radius-xl);text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+        <div style="font-size:3.5rem;margin-bottom:16px;">✨</div>
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:12px;color:var(--text-primary);">
+          Ativação do <span class="text-gradient">CardLink PRO</span>
+        </h1>
+        <p style="color:var(--text-secondary);font-size:0.95rem;line-height:1.6;margin-bottom:24px;">
+          Olá, <strong>${escapeHtml(currentUser.name)}</strong>! O CardLink funciona exclusivamente com o plano PRO. Ative sua assinatura por apenas <strong>R$ 12,90/mês</strong> para acessar o painel de criação e publicar seu cartão de visita digital.
+        </p>
+
+        <div style="background:rgba(139,92,246,0.08);border:1px dashed var(--accent);border-radius:var(--radius-md);padding:16px;margin-bottom:24px;text-align:left;">
+          <div style="font-weight:700;color:var(--accent);margin-bottom:8px;font-size:0.9rem;">🚀 O que está incluído no seu CardLink PRO:</div>
+          <ul style="margin:0;padding-left:20px;font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">
+            <li>Editor de Cartão ilimitado com temas modernos</li>
+            <li>Geração de conteúdo com Inteligência Artificial</li>
+            <li>Galeria de fotos e vitrine de produtos</li>
+            <li>Captura de leads e contatos dos clientes</li>
+            <li>QR Code exclusivo para balcão e redes sociais</li>
+          </ul>
+        </div>
+
+        <a href="/checkout/cardlink-pro" class="btn btn-primary btn-lg" onclick="openProPaymentModal(); return false;" style="display:inline-block;width:100%;font-weight:bold;font-size:1rem;padding:14px;box-shadow:0 6px 20px rgba(124,58,237,0.3);margin-bottom:12px;text-decoration:none;">
+          💳 Assinar CardLink PRO por R$ 12,90/mês
+        </a>
+
+        <div style="display:flex;justify-content:center;gap:16px;margin-top:16px;font-size:0.85rem;">
+          <button type="button" onclick="checkSubscriptionStatus()" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-weight:600;">
+            🔄 Já pagou? Atualizar Status
+          </button>
+          <span style="color:var(--text-muted);">|</span>
+          <button type="button" onclick="handleLogout()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;text-decoration:underline;">
+            🚪 Sair da conta
+          </button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if (hash === '#auth') {
     if (!authToken) {
       document.getElementById('auth-view').classList.add('active');
     } else {
@@ -155,7 +206,6 @@ function handleRoute() {
     }
   } else if (hash === '#contacts') {
     if (!authToken) { navigateTo('auth'); return; }
-    const isProUser = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
     if (!isProUser) { navigateTo('dashboard'); return; }
 
     document.getElementById('contacts-view').classList.add('active');
@@ -205,7 +255,21 @@ function handleRoute() {
     updateNavAuth();
   }
 
-  window.scrollTo(0, 0);
+}
+
+async function checkSubscriptionStatus() {
+  showToast('⏳', 'Verificando assinatura...');
+  try {
+    currentUser = await api('/auth/me');
+    if (currentUser && (currentUser.plan === 'pro' || currentUser.is_admin)) {
+      showToast('🎉', 'Assinatura PRO confirmada! Redirecionando...');
+      handleRoute();
+    } else {
+      showToast('⚠️', 'Assinatura ainda pendente. Se você pagou agora, aguarde alguns instantes.');
+    }
+  } catch (err) {
+    showToast('❌', 'Erro ao verificar assinatura');
+  }
 }
 
 // ============================================
