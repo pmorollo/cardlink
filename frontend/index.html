@@ -33,7 +33,7 @@
       <div class="navbar-cta" id="nav-cta">
         <a href="javascript:void(0)" onclick="openUserManualModal()" style="color:var(--text-secondary);text-decoration:none;margin-right:15px;font-size:0.9rem;font-weight:600;vertical-align:middle;display:inline-block;" class="hide-mobile">Como Funciona</a>
         <button class="btn btn-secondary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('login');" style="margin-right:8px;">🔑 Entrar</button>
-        <button class="btn btn-primary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('register');">🚀 Começar Agora</button>
+        <button class="btn btn-primary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('register');">🚀 PLANO PRO</button>
       </div>
     </div>
   </nav>
@@ -59,7 +59,7 @@
         </p>
         <div class="hero-buttons">
           <button class="btn btn-primary btn-lg" onclick="handleHeroCta()">
-            🚀 Começar Agora — R$ 12,90/mês
+            🚀 PLANO PRO — R$ 12,90/mês
           </button>
           <button class="btn btn-secondary btn-lg" onclick="document.querySelector('.features').scrollIntoView({behavior:'smooth'})">
             Saiba Mais ↓
@@ -362,8 +362,8 @@
 
         <!-- Register Form -->
         <div id="register-form" style="display:none;">
-          <h1 class="auth-title">Criar <span class="text-gradient">Conta</span></h1>
-          <p class="auth-subtitle">Comece a criar seus cartões digitais</p>
+          <h1 class="auth-title">Plano <span class="text-gradient">PRO</span></h1>
+          <p class="auth-subtitle">Cadastre seus dados. Você será direcionado para o checkout seguro da Cakto (R$ 12,90/mês).</p>
           <div class="form-group">
             <label class="form-label" for="register-name">Nome</label>
             <input class="form-input" type="text" id="register-name" placeholder="Seu nome completo">
@@ -382,8 +382,8 @@
               Declaro que li e aceito os <a href="#/terms" style="color:var(--purple);text-decoration:underline;">Termos de Uso</a> e a <a href="#/privacy" style="color:var(--purple);text-decoration:underline;">Política de Privacidade</a>.
             </label>
           </div>
-          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleRegister()">
-            Criar Conta
+          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);font-weight:bold;" onclick="handleRegister()">
+            💳 Ir para o Checkout (Cakto)
           </button>
           <p class="auth-toggle">
             Já tem conta? <a href="#" onclick="toggleAuthForm('login');return false;">Entrar</a>

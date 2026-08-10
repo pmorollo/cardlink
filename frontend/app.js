@@ -330,7 +330,7 @@ function updateNavAuth() {
   } else {
     navCta.innerHTML = `
       <button class="btn btn-secondary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('login');">🔑 Entrar</button>
-      <button class="btn btn-primary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('register');">🚀 Começar Agora</button>
+      <button class="btn btn-primary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('register');">🚀 PLANO PRO</button>
     `;
   }
 }
