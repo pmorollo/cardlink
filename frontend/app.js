@@ -462,10 +462,28 @@ async function handleRegister() {
     navigateTo('dashboard');
   } catch (err) {
     if (err.message && err.message.includes('cadastrado')) {
-      showToast('⚠️', 'E-mail já cadastrado! Redirecionando para login...');
-      const loginEmail = document.getElementById('login-email');
-      if (loginEmail) loginEmail.value = email;
-      toggleAuthForm('login');
+      try {
+        const loginData = await api('/auth/login', { 
+          method: 'POST', 
+          body: JSON.stringify({ email, password }) 
+        });
+        authToken = loginData.token;
+        currentUser = loginData.user;
+        localStorage.setItem('cardlink_token', loginData.token);
+        showToast('✅', 'Bem-vindo de volta! Redirecionando para o pagamento...');
+        const isPro = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
+        if (!isPro) {
+          redirectToCheckout();
+        }
+        navigateTo('dashboard');
+      } catch (loginErr) {
+        showToast('⚠️', 'Este e-mail já é cadastrado! A senha digitada está incorreta. Informe sua senha correta ou clique em Esqueceu a senha.');
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        if (loginEmail) loginEmail.value = email;
+        if (loginPassword) loginPassword.value = '';
+        toggleAuthForm('login');
+      }
     } else {
       showToast('❌', err.message);
     }
