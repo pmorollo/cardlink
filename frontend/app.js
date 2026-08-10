@@ -371,21 +371,22 @@ function toggleAuthForm(form) {
   const registerForm = document.getElementById('register-form');
   const forgotForm = document.getElementById('forgot-form');
 
-  if (loginForm) loginForm.style.display = form === 'login' ? '' : 'none';
-  if (registerForm) registerForm.style.display = form === 'register' ? '' : 'none';
+  if (loginForm) loginForm.style.display = formType === 'login' ? '' : 'none';
+  if (registerForm) registerForm.style.display = formType === 'register' ? '' : 'none';
   if (forgotForm) {
-    forgotForm.style.display = form === 'forgot' ? '' : 'none';
-    if (form === 'forgot') {
+    forgotForm.style.display = formType === 'forgot' ? '' : 'none';
+    if (formType === 'forgot') {
       const step1 = document.getElementById('forgot-step-1');
       const step2 = document.getElementById('forgot-step-2');
       if (step1) step1.style.display = 'block';
       if (step2) step2.style.display = 'none';
       
-      // Clean inputs
+      // Pre-fill email from login or register if available
+      const existingEmail = (document.getElementById('login-email')?.value || document.getElementById('register-email')?.value || '').trim();
       const emailInput = document.getElementById('forgot-email');
       const codeInput = document.getElementById('forgot-code');
       const passInput = document.getElementById('forgot-new-password');
-      if (emailInput) emailInput.value = '';
+      if (emailInput) emailInput.value = existingEmail;
       if (codeInput) codeInput.value = '';
       if (passInput) passInput.value = '';
     }
