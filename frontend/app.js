@@ -377,11 +377,11 @@ function toggleAuthForm(form) {
   const registerForm = document.getElementById('register-form');
   const forgotForm = document.getElementById('forgot-form');
 
-  if (loginForm) loginForm.style.display = formType === 'login' ? '' : 'none';
-  if (registerForm) registerForm.style.display = formType === 'register' ? '' : 'none';
+  if (loginForm) loginForm.style.display = form === 'login' ? '' : 'none';
+  if (registerForm) registerForm.style.display = form === 'register' ? '' : 'none';
   if (forgotForm) {
-    forgotForm.style.display = formType === 'forgot' ? '' : 'none';
-    if (formType === 'forgot') {
+    forgotForm.style.display = form === 'forgot' ? '' : 'none';
+    if (form === 'forgot') {
       const step1 = document.getElementById('forgot-step-1');
       const step2 = document.getElementById('forgot-step-2');
       if (step1) step1.style.display = 'block';
