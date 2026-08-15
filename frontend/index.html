@@ -48,7 +48,7 @@
       <div class="hero-content container">
         <div class="hero-badge">
           <span class="dot"></span>
-          Plano Único R$ 12,90/mês
+          A partir de R$ 12,90/mês
         </div>
         <h1>
           Seu <span class="text-gradient">cartão de visita</span><br>digital em segundos
@@ -163,11 +163,18 @@
           <h3 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:8px;">Assinatura CardLink</h3>
           <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:20px;">Ideal para autônomos, profissionais e comércios locais.</p>
           
-          <div style="margin-bottom:24px;">
-            <span style="font-size:1.5rem;font-weight:normal;color:var(--text-secondary);vertical-align:super;">R$</span>
-            <span style="font-size:3.5rem;font-weight:800;color:var(--text-primary);line-height:1;">12,90</span>
-            <span style="font-size:1rem;color:var(--text-secondary);">/ mês</span>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
+            <div style="border:2px solid var(--accent);border-radius:12px;padding:14px 10px;background:rgba(139,92,246,0.12);cursor:pointer;transition:all 0.2s;" onclick="handlePricingCta('monthly')">
+              <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Mensal</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--text-primary);line-height:1.1;">R$ 12,90<span style="font-size:0.7rem;font-weight:400;">/mês</span></div>
+            </div>
+            <div style="border:1.5px solid var(--border-subtle);border-radius:12px;padding:14px 10px;background:var(--bg-surface);cursor:pointer;position:relative;transition:all 0.2s;" onclick="handlePricingCta('annual')">
+              <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
+              <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Anual</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--text-primary);line-height:1.1;">R$ 99,00<span style="font-size:0.7rem;font-weight:400;">/ano</span></div>
+            </div>
           </div>
+          <p style="color:var(--text-secondary);font-size:0.82rem;margin:-16px 0 24px;">Assine mensal por R$ 12,90/mês ou anual por R$ 99,00 (equivalente a R$ 8,25/mês, economize R$ 55,80 por ano).</p>
           
           <ul style="list-style:none;padding:0;margin:0 0 32px 0;text-align:left;display:flex;flex-direction:column;gap:12px;font-size:0.92rem;color:var(--text-secondary);">
             <li style="display:flex;align-items:center;gap:10px;">✅ <span>Página profissional 100% online</span></li>
@@ -291,7 +298,7 @@
               <span style="font-size:0.8rem;color:var(--purple);">▼</span>
             </summary>
             <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
-              A assinatura do CardLink é de R$ 12,90/mês, processada com segurança via Cakto. É possível assinar por PIX ou cartão, e você pode cancelar a qualquer momento sem taxas adicionais diretamente pelo sistema de pagamento.
+              A assinatura do CardLink é de R$ 12,90/mês no plano mensal ou R$ 99,00/ano no plano anual (equivalente a R$ 8,25/mês, com 36% OFF). É processada com segurança via Cakto, por PIX ou cartão, e você pode cancelar a qualquer momento sem taxas adicionais diretamente pelo sistema de pagamento.
             </div>
           </details>
 
@@ -304,7 +311,7 @@
       <div class="container">
         <div class="cta-box">
           <h2>Pronto para criar seu <span class="text-gradient">cartão digital</span>?</h2>
-          <p>Plano único por apenas R$ 12,90/mês. Comece agora!</p>
+          <p>Comece agora: R$ 12,90/mês ou R$ 99,00/ano (36% OFF). Cancele quando quiser!</p>
           <button class="btn btn-primary btn-lg" onclick="handleHeroCta()">
             🚀 PLANO PRO — R$ 12,90/mês
           </button>
@@ -966,14 +973,25 @@
         Ative seu cartão de visitas inteligente para colocá-lo online e liberar todos os recursos: vitrine de produtos e serviços, portfólio de imagens, depoimentos de clientes e inteligência artificial avançada!
       </p>
       
-      <div style="background:rgba(139,92,246,0.06);border:1.5px dashed rgba(139,92,246,0.2);border-radius:var(--radius-lg);padding:16px;margin-bottom:24px;">
-        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--purple);font-weight:bold;margin-bottom:4px;">Valor da Assinatura</div>
-        <div style="font-size:2rem;font-weight:bold;color:var(--text-primary);">R$ 12,90 <span style="font-size:0.95rem;font-weight:normal;color:var(--text-secondary);">/ mês</span></div>
+      <div style="background:rgba(139,92,246,0.06);border:1.5px dashed rgba(139,92,246,0.2);border-radius:var(--radius-lg);padding:16px;margin-bottom:16px;">
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--purple);font-weight:bold;margin-bottom:8px;">Valor da Assinatura</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;" id="pro-modal-plans">
+          <div id="pro-plan-m" onclick="selectProModalPlan('monthly')" style="border:2px solid var(--accent);border-radius:10px;padding:10px 8px;cursor:pointer;transition:all 0.2s;">
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-secondary);">Mensal</div>
+            <div style="font-size:1.25rem;font-weight:800;color:var(--text-primary);">R$ 12,90<span style="font-size:0.65rem;font-weight:400;">/mês</span></div>
+          </div>
+          <div id="pro-plan-a" onclick="selectProModalPlan('annual')" style="border:1.5px solid var(--border-subtle);border-radius:10px;padding:10px 8px;cursor:pointer;position:relative;transition:all 0.2s;">
+            <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.55rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-secondary);">Anual</div>
+            <div style="font-size:1.25rem;font-weight:800;color:var(--text-primary);">R$ 99,00<span style="font-size:0.65rem;font-weight:400;">/ano</span></div>
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;" id="pro-modal-note">Mensal: R$ 12,90/mês · Anual: R$ 99,00/ano (equivalente a R$ 8,25/mês, economize R$ 55,80/ano).</div>
       </div>
       
       <div style="display:flex;flex-direction:column;gap:12px;">
-        <button class="btn btn-primary" onclick="redirectToCheckout()" style="width:100%;padding:12px;font-size:0.95rem;font-weight:bold;text-align:center;">
-          Pagar via PIX ou Cartão (Cakto)
+        <button class="btn btn-primary" onclick="redirectToProCheckout()" style="width:100%;padding:12px;font-size:0.95rem;font-weight:bold;text-align:center;" id="pro-modal-checkout-btn">
+          💳 Pagar R$ 12,90/mês na Cakto
         </button>
         <button class="btn btn-secondary" onclick="closeProPaymentModal()" style="width:100%;">
           Voltar depois

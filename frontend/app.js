@@ -284,6 +284,12 @@ function handleHeroCta() {
   }
 }
 
+function handlePricingCta(plan) {
+  navigateTo('auth');
+  toggleAuthForm('register');
+  if (plan) selectRegisterPlan(plan);
+}
+
 function openPageSettings(section = 'profile') {
   activeSettingsSection = section;
   if (currentUserCardId) {
@@ -571,14 +577,37 @@ function showSettingsSection(section) {
   document.querySelector('.builder-form-panel')?.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function openProPaymentModal() {
-  const modal = document.getElementById('pro-payment-modal');
-  if (modal) modal.style.display = 'flex';
-}
-
 function closeProPaymentModal() {
   const modal = document.getElementById('pro-payment-modal');
   if (modal) modal.style.display = 'none';
+}
+
+let selectedProModalPlan = 'monthly';
+
+function selectProModalPlan(plan) {
+  selectedProModalPlan = plan;
+  const m = document.getElementById('pro-plan-m');
+  const a = document.getElementById('pro-plan-a');
+  const btn = document.getElementById('pro-modal-checkout-btn');
+  if (plan === 'annual') {
+    if (a) { a.style.border = '2px solid var(--accent)'; a.style.background = 'rgba(139,92,246,0.12)'; }
+    if (m) { m.style.border = '1.5px solid var(--border-subtle)'; m.style.background = ''; }
+    if (btn) btn.textContent = '💳 Pagar R$ 99,00/ano na Cakto';
+  } else {
+    if (m) { m.style.border = '2px solid var(--accent)'; m.style.background = 'rgba(139,92,246,0.12)'; }
+    if (a) { a.style.border = '1.5px solid var(--border-subtle)'; a.style.background = ''; }
+    if (btn) btn.textContent = '💳 Pagar R$ 12,90/mês na Cakto';
+  }
+}
+
+function redirectToProCheckout() {
+  redirectToCheckout(selectedProModalPlan || 'monthly');
+}
+
+function openProPaymentModal() {
+  selectProModalPlan('monthly');
+  const modal = document.getElementById('pro-payment-modal');
+  if (modal) modal.style.display = 'flex';
 }
 
 let selectedRegisterPlan = 'monthly';
