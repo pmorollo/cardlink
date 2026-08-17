@@ -1,5 +1,34 @@
 # CardLink — Programa de Testes Operacionais — Semana 1
 
+## Ponto de retomada — 17/08/2026
+
+### Concluído nesta sessão
+- Backup integral do projeto preservado.
+- Endereço oficial confirmado: `https://cardlink-production-abd2.up.railway.app/`.
+- Correções da Semana 1 organizadas na branch `agent/semana1-conta-teste`.
+- PR nº 2 aberto em modo rascunho, sem merge e sem deploy.
+- Arquivo obrigatório `backend/middleware/roles.js` recuperado e registrado localmente no commit `297650e`.
+- Etapa 2.1 concluída: servidor local iniciou, página inicial respondeu HTTP 200 e rota de API inexistente respondeu HTTP 404.
+- Servidor de teste encerrado; produção e Railway não foram alteradas.
+
+### Retomada de amanhã
+Continuar gradualmente, parando após cada etapa:
+
+1. **Etapa 2.2 — Login e isolamento entre usuários.**
+2. **Etapa 2.3 — Cartões, contatos, uploads, IA e mensagens.**
+3. **Etapa 2.4 — Criação local/controlada da conta interna PRO sem cobrança.**
+4. **Etapa 2.5 — Envio e validação do e-mail de ativação.**
+5. Atualizar o PR nº 2 somente após as verificações locais.
+6. Revisar novamente antes de qualquer merge ou deploy na Railway.
+
+### Dados já confirmados
+- E-mail da futura conta interna de teste: `pedro.morollo@yahoo.com`.
+- A conta deverá ser PRO, marcada como teste interno e excluída das métricas comerciais.
+- Não criar a conta em produção antes de concluir as etapas 2.2 a 2.5 e validar o deploy correto.
+
+### Observação técnica registrada
+- `multer@1.4.5-lts.2` apresentou aviso de segurança/depreciação. Avaliar atualização controlada para Multer 2 em etapa própria, sem misturar com os testes do Dia 1.
+
 ## Objetivo
 Validar o CardLink como usuário real durante sete dias, sem incluir novos usuários externos nesta primeira semana. Registrar qualquer comportamento confuso, erro, lentidão ou etapa desnecessária antes de ampliar os testes.
 
