@@ -520,6 +520,137 @@ img {
   50% { transform: rotateY(5deg) rotateX(-5deg) translateY(-20px); }
 }
 
+
+.showcase-grid {
+  display:flex;
+  gap:35px;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:stretch;
+  width:100%;
+}
+
+.showcase-media-col {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  width:100%;
+}
+
+.showcase-phone-col { max-width:250px; }
+.showcase-video-col { max-width:450px; }
+
+.phone-demo-shell {
+  position:relative;
+  width:100%;
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 20px 40px rgba(0,0,0,0.30);
+  border:6px solid #1e293b;
+  background:#0f172a;
+  transition:transform 0.3s ease;
+}
+
+.video-demo-shell {
+  position:relative;
+  width:100%;
+  border-radius:22px;
+  overflow:hidden;
+  padding:10px;
+  background:linear-gradient(135deg, rgba(124,58,237,0.18), rgba(37,99,235,0.18));
+  border:1px solid rgba(139,92,246,0.30);
+  box-shadow:0 24px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04) inset;
+  transition:transform 0.3s ease;
+}
+
+.video-demo-shell::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:22px;
+  padding:1px;
+  background:linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events:none;
+}
+
+.video-shell-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:42px;
+  padding:0 12px 10px;
+}
+
+.video-shell-dots {
+  display:flex;
+  gap:6px;
+  flex-shrink:0;
+}
+
+.video-shell-dots span {
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.22);
+}
+
+.video-shell-dots span:nth-child(1) { background:#fb7185; }
+.video-shell-dots span:nth-child(2) { background:#fbbf24; }
+.video-shell-dots span:nth-child(3) { background:#34d399; }
+
+.video-shell-title {
+  flex:1;
+  text-align:center;
+  font-size:0.82rem;
+  font-weight:700;
+  color:var(--text-secondary);
+  letter-spacing:0.02em;
+}
+
+.video-shell-badge {
+  flex-shrink:0;
+  border-radius:999px;
+  padding:5px 9px;
+  font-size:0.68rem;
+  font-weight:800;
+  letter-spacing:0.05em;
+  color:#ffffff;
+  background:linear-gradient(135deg, var(--purple), var(--blue));
+  box-shadow:0 8px 20px rgba(124,58,237,0.28);
+}
+
+.video-frame-wrap {
+  position:relative;
+  border-radius:16px;
+  overflow:hidden;
+  background:#020617;
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.demo-video {
+  width:100%;
+  display:block;
+  outline:none;
+  background:radial-gradient(circle at top, rgba(124,58,237,0.15), transparent 55%), #020617;
+}
+
+.showcase-caption {
+  font-size:0.8rem;
+  font-weight:700;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  text-align:center;
+}
+
+.showcase-caption-phone { color:var(--text-secondary); }
+.showcase-caption-video { color:var(--purple); }
+
 /* ============================================
    LANDING PAGE — Features
    ============================================ */
@@ -1594,6 +1725,24 @@ textarea.form-input {
     max-width: 300px;
   }
 
+  .showcase-grid {
+    gap: 24px;
+  }
+
+  .showcase-video-col,
+  .showcase-phone-col {
+    max-width: 100%;
+  }
+
+  .video-shell-header {
+    min-height: 38px;
+    padding: 0 10px 8px;
+  }
+
+  .video-shell-title {
+    font-size: 0.75rem;
+  }
+
   .theme-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -2420,4 +2569,77 @@ textarea.form-input {
   .page-status-card { grid-template-columns: 1fr; gap: var(--space-md); }
   .account-grid { grid-template-columns: 1fr; }
   .settings-nav { margin-left: -4px; margin-right: -4px; }
+}
+
+/* ============================================
+   Landing navigation hierarchy — 2026-08-15
+   ============================================ */
+.navbar-link {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.navbar-link:hover {
+  color: var(--text-primary);
+}
+
+.navbar-login {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.5rem 0.35rem;
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.navbar-login:hover {
+  color: var(--purple);
+  border-bottom-color: rgba(124, 58, 237, 0.45);
+}
+
+#demonstracao,
+#recursos,
+#como-funciona,
+#pricing {
+  scroll-margin-top: 92px;
+}
+
+@media (max-width: 768px) {
+  .navbar-cta {
+    gap: 0.55rem;
+  }
+
+  .navbar-login {
+    font-size: 0.82rem;
+    padding-inline: 0.15rem;
+  }
+
+  .navbar-subscribe {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+
+  .navbar-brand .logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .navbar-login {
+    font-size: 0.78rem;
+  }
+
+  .navbar-subscribe {
+    padding: 0.48rem 0.72rem;
+    font-size: 0.76rem;
+  }
 }

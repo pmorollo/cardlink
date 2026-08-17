@@ -1,11 +1,19 @@
 process.env.NODE_ENV = 'test';
 process.env.CAKTO_SECRET = 'test-cakto-secret-123';
+process.env.DATABASE_URL = '';
+process.env.SMTP_HOST = '';
+process.env.SMTP_USER = '';
+process.env.SMTP_PASS = '';
+process.env.NVIDIA_API_KEY = '';
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 const app = require('../server');
 const { db } = require('../db/database');
+const { users } = require('../db/repository');
 
 const DATA_FILE = path.join(__dirname, '..', 'db', 'data.json');
 let server;
@@ -17,18 +25,13 @@ function snapshotDb() {
   db.cards = [];
   db.contacts = [];
   db.support_tickets = [];
-  db._counters = { users: 0, cards: 0, contacts: 0, support_tickets: 0 };
-}
-
-function saveJsonState() {
-  return JSON.stringify({ users: db.users, cards: db.cards, contacts: db.contacts, support_tickets: db.support_tickets, _counters: db._counters });
+  db.admin_messages = [];
+  db._counters = { users: 0, cards: 0, contacts: 0, support_tickets: 0, admin_messages: 0 };
 }
 
 test.before(async () => {
   backup = fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf-8') : '';
-  await new Promise((resolve) => {
-    server = app.listen(0, resolve);
-  });
+  await new Promise(resolve => { server = app.listen(0, resolve); });
   base = `http://127.0.0.1:${server.address().port}`;
 });
 
@@ -36,29 +39,110 @@ test.beforeEach(snapshotDb);
 
 test.after(() => {
   server && server.close();
-  if (backup === '') {
-    fs.rmSync(DATA_FILE, { force: true });
-  } else {
-    fs.writeFileSync(DATA_FILE, backup, 'utf-8');
-  }
+  if (backup === '') fs.rmSync(DATA_FILE, { force: true });
+  else fs.writeFileSync(DATA_FILE, backup, 'utf-8');
 });
 
-async function api(method, urlPath, body) {
+async function api(method, urlPath, body, token) {
+  const headers = {};
+  if (body) headers['Content-Type'] = 'application/json';
+  if (token) headers.Authorization = `Bearer ${token}`;
   const res = await fetch(base + urlPath, {
     method,
-    headers: body ? { 'Content-Type': 'application/json' } : {},
+    headers,
     body: body ? JSON.stringify(body) : undefined
   });
   let data = null;
-  try { data = await res.json(); } catch (e) { /* resposta sem corpo JSON */ }
+  try { data = await res.json(); } catch (e) {}
   return { status: res.status, data, raw: res };
+}
+
+async function createActiveUser({
+  email = 'test@example.com',
+  name = 'Usuário Teste',
+  password = 'SenhaValida123!',
+  source = 'internal_test',
+  isTest = true,
+  plan = 'internal'
+} = {}) {
+  return users.insert({
+    name,
+    email,
+    whatsapp: null,
+    password_hash: await bcrypt.hash(password, 10),
+    is_admin: false,
+    plan: 'pro',
+    account_status: 'active',
+    subscription_status: 'active',
+    subscription_source: source,
+    subscription_plan: plan,
+    subscription_amount: isTest ? '0' : '12.90',
+    subscription_reference: null,
+    is_test_account: isTest,
+    referred_by: null,
+    email_verified_at: new Date().toISOString(),
+    subscription_updated_at: new Date().toISOString()
+  });
+}
+
+async function createAdmin({
+  email = 'admin@example.com',
+  name = 'Administrador',
+  password = 'SenhaAdmin123!'
+} = {}) {
+  return users.insert({
+    name,
+    email,
+    whatsapp: null,
+    password_hash: await bcrypt.hash(password, 10),
+    is_admin: true,
+    plan: 'none',
+    account_status: 'active',
+    subscription_status: 'none',
+    subscription_source: 'none',
+    subscription_plan: null,
+    subscription_amount: null,
+    subscription_reference: null,
+    is_test_account: false,
+    email_verified_at: new Date().toISOString(),
+    referred_by: null
+  });
+}
+
+async function login(email, password) {
+  return api('POST', '/api/auth/login', { email, password });
+}
+
+async function payAndActivate(email, name = 'Cliente Cakto', password = 'SenhaCliente123!') {
+  const hook = await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
+    event: 'purchase_approved',
+    data: {
+      customerEmail: email,
+      customerName: name,
+      metadata: { plan: 'monthly' },
+      amount: '12.90',
+      purchaseId: 'purchase-test-1'
+    }
+  });
+  assert.equal(hook.status, 200);
+  assert.equal(hook.data.success, true);
+  assert.equal(hook.data.account_status, 'pending_activation');
+  assert.ok(hook.data.activation_token);
+
+  const activation = await api('POST', '/api/auth/activate', {
+    email,
+    token: hook.data.activation_token,
+    password
+  });
+  assert.equal(activation.status, 200);
+  return { hook, activation, token: activation.data.token };
 }
 
 test('GET / serve o frontend (SPA)', async () => {
   const res = await fetch(base + '/');
   assert.equal(res.status, 200);
-  const html = await res.text();
-  assert.match(html, /<html/i);
+  assert.match(await res.text(), /<html/i);
 });
 
 test('/backend/.env NAO expoe segredos', async () => {
@@ -74,55 +158,163 @@ test('CORS rejeita origem nao permitida', async () => {
     headers: { Origin: 'https://evil.example.com' }
   });
   const acao = res.headers.get('access-control-allow-origin');
-  assert.ok(!acao || res.status >= 400, `esperava bloqueio, recebi status ${res.status} ACAO=${acao}`);
+  assert.ok(!acao || res.status >= 400);
 });
 
-test('registro com e-mail suspeito NAO vira admin', async () => {
+test('cadastro publico fica desativado: conta nasce da assinatura', async () => {
   const r = await api('POST', '/api/auth/register', {
-    name: 'Suspicious', email: 'pedro.morollo.attacker@example.com', password: 'SenhaValida123!'
+    name: 'Sem Assinatura',
+    email: 'naopago@example.com',
+    password: 'SenhaValida123!'
   });
-  assert.equal(r.status, 201);
-  assert.equal(r.data.user.is_admin, false);
-  assert.equal(r.data.user.plan, 'free');
+  assert.equal(r.status, 410);
+  assert.equal(r.data.error, 'public_registration_disabled');
+  assert.equal(db.users.length, 0);
 });
 
-test('registro com e-mail admin (ADMIN_EMAILS) vira admin', async () => {
-  const admins = (process.env.ADMIN_EMAILS || 'pedro.morollo@gmail.com').split(',').map(s => s.trim()).filter(Boolean);
-  const email = admins[0];
-  const r = await api('POST', '/api/auth/register', {
-    email, name: 'Admin', password: 'SenhaValida123!'
+test('/api/diag foi removido', async () => {
+  const r = await api('GET', '/api/diag');
+  assert.equal(r.status, 404);
+  assert.equal(r.data.error, 'Endpoint não encontrado');
+});
+
+test('subscription_created sozinho nao libera conta antes do pagamento aprovado', async () => {
+  const email = 'assinatura-sem-pagamento@example.com';
+  const hook = await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
+    event: 'subscription_created',
+    status: 'approved',
+    data: {
+      customerEmail: email,
+      customerName: 'Assinatura sem pagamento',
+      metadata: { plan: 'monthly' },
+      amount: '12.90'
+    }
   });
-  assert.equal(r.status, 201);
-  assert.equal(r.data.user.is_admin, true);
+
+  assert.equal(hook.status, 200);
+  assert.equal(hook.data.received, true);
+  assert.equal(hook.data.event, 'subscription_created');
+  assert.equal(await users.findByEmail(email), null);
 });
 
-test('fluxo completo de recuperacao de senha', async (t) => {
-  const email = 'reset-user@example.com';
-  const r1 = await api('POST', '/api/auth/register', { email, name: 'Reset', password: 'SenhaAntiga123!' });
-  assert.equal(r1.status, 201);
+test('conta administrativa e exclusiva da plataforma e nao usa recursos de cliente', async () => {
+  await createAdmin({ email: 'admin-exclusive@example.com' });
+  const rLogin = await login('admin-exclusive@example.com', 'SenhaAdmin123!');
+  assert.equal(rLogin.status, 200);
+  assert.equal(rLogin.data.user.is_admin, true);
+  assert.equal(rLogin.data.user.plan, 'none');
 
-  const r2 = await api('POST', '/api/auth/forgot-password', { email });
-  assert.equal(r2.status, 200);
-  assert.ok(r2.data.code, 'em dev o codigo deve vir na resposta');
+  const token = rLogin.data.token;
+  assert.equal((await api('GET', '/api/cards/stats/summary', null, token)).status, 403);
+  assert.equal((await api('POST', '/api/cards', { name: 'Cartão indevido' }, token)).status, 403);
+  assert.equal((await api('POST', '/api/ai/generate', { profession: 'Admin' }, token)).status, 403);
+  assert.equal((await api('POST', '/api/support', { message: 'Chamado indevido' }, token)).status, 403);
 
-  const r3 = await api('POST', '/api/auth/reset-password', { email, code: r2.data.code, newPassword: 'SenhaNova456!' });
-  assert.equal(r3.status, 200);
+  const hook = await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
+    event: 'purchase_approved',
+    data: { customerEmail: 'admin-exclusive@example.com' }
+  });
+  assert.equal(hook.status, 200);
+  assert.equal(hook.data.ignored, 'administrative_account');
 
-  const r4 = await api('POST', '/api/auth/login', { email, password: 'SenhaNova456!' });
-  assert.equal(r4.status, 200);
-  assert.ok(r4.data.token);
-
-  const r5 = await api('POST', '/api/auth/reset-password', { email, code: r2.data.code, newPassword: 'Xyz12345!' });
-  assert.equal(r5.status, 400, 'codigo reutilizado deve ser rejeitado');
+  const stats = await api('GET', '/api/admin/stats', null, token);
+  assert.equal(stats.status, 200);
+  assert.equal(stats.data.totalUsers, 0);
 });
 
-test('reset de senha com codigo errado eh rejeitado', async () => {
-  const email = 'eraser-user@example.com';
-  await api('POST', '/api/auth/register', { email, name: 'E', password: 'SenhaAntiga123!' });
-  await api('POST', '/api/auth/forgot-password', { email });
+test('pagamento Cakto cria conta pendente; ativacao define senha e libera acesso', async () => {
+  const email = 'cliente-cakto@example.com';
+  const hook = await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
+    event: 'purchase_approved',
+    data: {
+      customerEmail: email,
+      customerName: 'Cliente Cakto',
+      metadata: { plan: 'monthly' },
+      amount: '12.90'
+    }
+  });
 
-  const r = await api('POST', '/api/auth/reset-password', { email, code: '000000', newPassword: 'SenhaNova456!' });
-  assert.equal(r.status, 400);
+  assert.equal(hook.status, 200);
+  assert.equal(hook.data.account_status, 'pending_activation');
+  assert.equal(hook.data.activation_sent, true);
+  assert.ok(hook.data.activation_token);
+
+  const pending = await users.findByEmail(email);
+  assert.equal(pending.plan, 'pro');
+  assert.equal(pending.subscription_source, 'cakto');
+  assert.equal(pending.subscription_status, 'active');
+  assert.equal(pending.account_status, 'pending_activation');
+  assert.equal(pending.is_test_account, false);
+
+  const beforeActivation = await login(email, 'qualquerSenha123!');
+  assert.notEqual(beforeActivation.status, 200);
+
+  const activate = await api('POST', '/api/auth/activate', {
+    email,
+    token: hook.data.activation_token,
+    password: 'MinhaSenha123!'
+  });
+  assert.equal(activate.status, 200);
+  assert.ok(activate.data.token);
+  assert.equal(activate.data.user.account_status, 'active');
+  assert.ok(activate.data.user.email_verified_at);
+
+  const afterActivation = await login(email, 'MinhaSenha123!');
+  assert.equal(afterActivation.status, 200);
+  assert.equal(afterActivation.data.user.subscription_status, 'active');
+});
+
+
+test('nova compra reabre ativacao se cliente cancelou antes de definir senha', async () => {
+  const email = 'reativacao-pendente@example.com';
+
+  const first = await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
+    event: 'purchase_approved',
+    data: {
+      customerEmail: email,
+      customerName: 'Cliente Reativado',
+      metadata: { plan: 'monthly' },
+      amount: '12.90',
+      purchaseId: 'purchase-before-cancel'
+    }
+  });
+  assert.equal(first.status, 200);
+  assert.equal(first.data.account_status, 'pending_activation');
+
+  const canceled = await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
+    event: 'subscription_canceled',
+    data: { customerEmail: email }
+  });
+  assert.equal(canceled.status, 200);
+
+  const second = await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
+    event: 'purchase_approved',
+    data: {
+      customerEmail: email,
+      customerName: 'Cliente Reativado',
+      metadata: { plan: 'monthly' },
+      amount: '12.90',
+      purchaseId: 'purchase-after-cancel'
+    }
+  });
+
+  assert.equal(second.status, 200);
+  assert.equal(second.data.account_status, 'pending_activation');
+  assert.equal(second.data.activation_sent, true);
+  assert.ok(second.data.activation_token);
+
+  const activate = await api('POST', '/api/auth/activate', {
+    email,
+    token: second.data.activation_token,
+    password: 'NovaSenha123!'
+  });
+  assert.equal(activate.status, 200);
 });
 
 test('webhook da Cakto rejeita secret invalido', async () => {
@@ -134,134 +326,278 @@ test('webhook da Cakto rejeita secret invalido', async () => {
   assert.equal(r.status, 401);
 });
 
-test('webhook da Cakto ativa e cancela plano PRO', async () => {
-  const email = 'webhook-user@example.com';
-  const secret = process.env.CAKTO_SECRET;
-  // 1. Registra usuário comum
-  const rReg = await api('POST', '/api/auth/register', { email, name: 'Test Webhook', password: 'Password123!' });
-  assert.equal(rReg.status, 201);
-  assert.equal(rReg.data.user.plan, 'free');
+test('conta interna de teste tem recursos completos mas webhook Cakto nao a converte em venda', async () => {
+  await createActiveUser({ email: 'equipe@example.com', name: 'Equipe Teste' });
+  const rLogin = await login('equipe@example.com', 'SenhaValida123!');
+  assert.equal(rLogin.status, 200);
+  assert.equal(rLogin.data.user.is_test_account, true);
+  assert.equal(rLogin.data.user.subscription_source, 'internal_test');
 
-  // 2. Simula webhook de pagamento aprovado da Cakto (formato real: secret + event + data.customerEmail)
-  const rHookPay = await api('POST', '/api/payments/cakto-webhook', {
-    secret,
+  const token = rLogin.data.token;
+  const card = await api('POST', '/api/cards', {
+    name: 'Card Equipe',
+    services_mode: 'image',
+    services_title: 'Cardápio',
+    services_image_url: '/uploads/menu.webp'
+  }, token);
+  assert.equal(card.status, 201);
+
+  const ai = await api('POST', '/api/ai/generate', { profession: 'Barbearia' }, token);
+  assert.equal(ai.status, 200);
+
+  const hook = await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
     event: 'purchase_approved',
-    data: { customerEmail: email }
+    data: { customerEmail: 'equipe@example.com' }
   });
-  assert.equal(rHookPay.status, 200);
-  assert.equal(rHookPay.data.success, true);
-  assert.equal(rHookPay.data.plan, 'pro');
+  assert.equal(hook.status, 200);
+  assert.equal(hook.data.ignored, 'internal_test_account');
 
-  // 3. Simula webhook de cancelamento de assinatura
-  const rHookCancel = await api('POST', '/api/payments/cakto-webhook', {
-    secret,
+  const publicCard = await api('GET', `/api/public/${card.data.slug}`);
+  assert.equal(publicCard.status, 200);
+});
+
+test('cancelamento Cakto suspende cartao e corta APIs mesmo com token antigo', async () => {
+  const email = 'cancelado@example.com';
+  const { token } = await payAndActivate(email, 'Cliente Cancelado');
+
+  const card = await api('POST', '/api/cards', { name: 'Card Cancelado' }, token);
+  assert.equal(card.status, 201);
+
+  const cancel = await api('POST', '/api/payments/cakto-webhook', {
+    secret: process.env.CAKTO_SECRET,
     event: 'subscription_canceled',
     data: { customerEmail: email }
   });
-  assert.equal(rHookCancel.status, 200);
-  assert.equal(rHookCancel.data.success, true);
-  assert.equal(rHookCancel.data.plan, 'free');
+  assert.equal(cancel.status, 200);
+  assert.equal(cancel.data.plan, 'inactive');
+
+  const oldTokenAccess = await api('GET', '/api/cards/stats/summary', null, token);
+  assert.equal(oldTokenAccess.status, 402);
+
+  const publicAfterCancel = await api('GET', `/api/public/${card.data.slug}`);
+  assert.equal(publicAfterCancel.status, 402);
+
+  const relogin = await login(email, 'SenhaCliente123!');
+  assert.equal(relogin.status, 403);
 });
 
-test('controle de recursos (gating) free vs pro no backend', async () => {
-  const email = 'gated-user@example.com';
-  
-  // 1. Cria usuário free
-  const rReg = await api('POST', '/api/auth/register', { email, name: 'Gated User', password: 'Password123!' });
-  const token = rReg.data.token;
-  
-  // 2. Tenta chamar API de IA como free (deve falhar com 403)
-  const resAI = await fetch(`http://127.0.0.1:${server.address().port}/api/ai/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-    body: JSON.stringify({ profession: 'Designer' })
-  });
-  assert.equal(resAI.status, 403);
-
-  // 3. Tenta salvar cartão como free (deve falhar com 402 Payment Required pois não existe modo rascunho)
-  const resCardFree = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-    body: JSON.stringify({ 
-      name: 'Card de Gated', 
-      slug: 'card-de-gated',
-      products: [{ name: 'Shampoo', price: '20,00' }] 
-    })
-  });
-  assert.equal(resCardFree.status, 402);
-
-  // 4. Promove usuário para PRO via webhook da Cakto
-  await api('POST', '/api/payments/cakto-webhook', {
-    secret: process.env.CAKTO_SECRET,
-    event: 'subscription_created',
-    data: { customerEmail: email }
+test('conta ativa sem e-mail confirmado nao consegue fazer login', async () => {
+  const email = 'nao-verificado@example.com';
+  await users.insert({
+    name: 'Não Verificado',
+    email,
+    whatsapp: null,
+    password_hash: await bcrypt.hash('SenhaValida123!', 10),
+    is_admin: false,
+    plan: 'pro',
+    account_status: 'active',
+    subscription_status: 'active',
+    subscription_source: 'internal_test',
+    subscription_plan: 'internal',
+    subscription_amount: '0',
+    is_test_account: true,
+    email_verified_at: null,
+    referred_by: null
   });
 
-  // 5. Salva cartão como PRO (deve ter sucesso 201)
-  const resCardPro = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-    body: JSON.stringify({ 
-      name: 'Card de Gated', 
-      slug: 'card-de-gated',
-      products: [{ name: 'Shampoo', price: '20,00' }] 
-    })
-  });
-  assert.equal(resCardPro.status, 201);
-  const cardData = await resCardPro.json();
-  assert.equal(cardData.products.length, 1);
-  assert.equal(cardData.products[0].name, 'Shampoo');
-
-  // 6. Tenta chamar API de IA como PRO (deve passar com 200)
-  const resAIPro = await fetch(`http://127.0.0.1:${server.address().port}/api/ai/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-    body: JSON.stringify({ profession: 'Designer' })
-  });
-  assert.equal(resAIPro.status, 200);
-
-  // 7. Acesso ao link público como PRO deve retornar 200
-  const resPublicPro = await fetch(`http://127.0.0.1:${server.address().port}/api/public/card-de-gated`);
-  assert.equal(resPublicPro.status, 200);
-  const publicData = await resPublicPro.json();
-  assert.equal(publicData.name, 'Card de Gated');
+  const r = await login(email, 'SenhaValida123!');
+  assert.equal(r.status, 403);
+  assert.equal(r.data.error, 'email_verification_required');
 });
 
+test('troca de e-mail exige senha e confirmacao do novo endereco', async () => {
+  const oldEmail = 'email-atual@example.com';
+  const newEmail = 'email-novo@example.com';
+  await createActiveUser({ email: oldEmail, name: 'Troca Email', password: 'SenhaAtual123!' });
+  const rLogin = await login(oldEmail, 'SenhaAtual123!');
+  assert.equal(rLogin.status, 200);
+  const token = rLogin.data.token;
 
-test('envio de contato publico dispara email de notificacao para o dono do cartao', async () => {
+  const noPassword = await api('PUT', '/api/auth/profile', {
+    name: 'Troca Email', email: newEmail
+  }, token);
+  assert.equal(noPassword.status, 400);
+
+  const requestChange = await api('PUT', '/api/auth/profile', {
+    name: 'Troca Email', email: newEmail, currentPassword: 'SenhaAtual123!'
+  }, token);
+  assert.equal(requestChange.status, 200);
+  assert.equal(requestChange.data.email, oldEmail);
+  assert.equal(requestChange.data.pending_email, newEmail);
+  assert.ok(requestChange.data.verification_token);
+
+  const stillOld = await login(oldEmail, 'SenhaAtual123!');
+  assert.equal(stillOld.status, 200);
+  const beforeConfirmNew = await login(newEmail, 'SenhaAtual123!');
+  assert.equal(beforeConfirmNew.status, 401);
+
+  const confirm = await api('POST', '/api/auth/confirm-email-change', {
+    email: newEmail,
+    token: requestChange.data.verification_token
+  });
+  assert.equal(confirm.status, 200);
+  assert.equal(confirm.data.email, newEmail);
+
+  const oldAfter = await login(oldEmail, 'SenhaAtual123!');
+  assert.equal(oldAfter.status, 401);
+  const newAfter = await login(newEmail, 'SenhaAtual123!');
+  assert.equal(newAfter.status, 200);
+
+  const stored = await users.findByEmail(newEmail);
+  assert.ok(stored.email_verified_at);
+  assert.equal(stored.pending_email, null);
+  assert.equal(stored.email_verification_token_hash, null);
+});
+
+test('ativacao de conta interna de teste tambem confirma o e-mail', async () => {
+  const { createActivationToken } = require('../utils/accountActivation');
+  const activation = createActivationToken();
+  const email = 'interno-pendente@example.com';
+  await users.insert({
+    name: 'Teste Interno Pendente',
+    email,
+    whatsapp: null,
+    password_hash: await bcrypt.hash('SenhaTemporariaInutil123!', 10),
+    is_admin: false,
+    plan: 'pro',
+    account_status: 'pending_activation',
+    subscription_status: 'active',
+    subscription_source: 'internal_test',
+    subscription_plan: 'internal',
+    subscription_amount: '0',
+    is_test_account: true,
+    activation_token_hash: activation.tokenHash,
+    activation_expires: activation.expiresAt,
+    email_verified_at: null,
+    referred_by: null
+  });
+
+  const activate = await api('POST', '/api/auth/activate', {
+    email,
+    token: activation.token,
+    password: 'SenhaDefinida123!'
+  });
+  assert.equal(activate.status, 200);
+  assert.ok(activate.data.user.email_verified_at);
+  assert.equal((await login(email, 'SenhaDefinida123!')).status, 200);
+});
+
+test('recuperacao de senha funciona para assinante ativo', async () => {
+  const email = 'reset-user@example.com';
+  await createActiveUser({ email, name: 'Reset User', password: 'SenhaAntiga123!' });
+
+  const forgot = await api('POST', '/api/auth/forgot-password', { email });
+  assert.equal(forgot.status, 200);
+  assert.ok(forgot.data.code);
+
+  const reset = await api('POST', '/api/auth/reset-password', {
+    email,
+    code: forgot.data.code,
+    newPassword: 'SenhaNova456!'
+  });
+  assert.equal(reset.status, 200);
+
+  const rLogin = await login(email, 'SenhaNova456!');
+  assert.equal(rLogin.status, 200);
+
+  const reuse = await api('POST', '/api/auth/reset-password', {
+    email,
+    code: forgot.data.code,
+    newPassword: 'OutraSenha789!'
+  });
+  assert.equal(reuse.status, 400);
+});
+
+test('contato publico funciona para cartao ativo', async () => {
   const email = 'owner-notification@example.com';
-  // 1. Registra usuário dono
-  const rReg = await api('POST', '/api/auth/register', { email, name: 'Owner Test', password: 'Password123!' });
-  const token = rReg.data.token;
+  await createActiveUser({ email, name: 'Owner Test' });
+  const rLogin = await login(email, 'SenhaValida123!');
+  const token = rLogin.data.token;
 
-  // Promove o usuário a PRO para ativar o cartão público e poder receber contatos
-  await api('POST', '/api/payments/cakto-webhook', {
-    secret: process.env.CAKTO_SECRET,
-    event: 'purchase_approved',
-    data: { customerEmail: email }
-  });
+  const rCard = await api('POST', '/api/cards', { name: 'Meu Cartao Teste' }, token);
+  assert.equal(rCard.status, 201);
 
-  // 2. Cria cartão para esse usuário
-  const rCard = await fetch(`http://127.0.0.1:${server.address().port}/api/cards`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-    body: JSON.stringify({ name: 'Meu Cartao Teste' })
+  const rContact = await api('POST', `/api/public/${rCard.data.slug}/contact`, {
+    name: 'Visitante Interessado',
+    phone: '11999998888',
+    message: 'Olá, gostaria de saber mais!'
   });
-  const cardData = await rCard.json();
-  const slug = cardData.slug;
-
-  // 3. Envia contato público para o slug desse cartão
-  const rContact = await fetch(`http://127.0.0.1:${server.address().port}/api/public/${slug}/contact`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      name: 'Visitante Interessado', 
-      phone: '11999998888', 
-      message: 'Olá, gostaria de saber mais!' 
-    })
-  });
-  
   assert.equal(rContact.status, 201);
-  const contactRes = await rContact.json();
-  assert.equal(contactRes.message, 'Contato enviado com sucesso!');
+  assert.equal(rContact.data.message, 'Contato enviado com sucesso!');
+});
+
+test('metricas comerciais nao contam contas internas de teste', async () => {
+  await createAdmin();
+  await createActiveUser({ email: 'teste1@example.com', name: 'Teste Interno' });
+  await payAndActivate('cliente-real@example.com', 'Cliente Real');
+
+  const adminLogin = await login('admin@example.com', 'SenhaAdmin123!');
+  assert.equal(adminLogin.status, 200);
+  const stats = await api('GET', '/api/admin/stats', null, adminLogin.data.token);
+  assert.equal(stats.status, 200);
+  assert.equal(stats.data.totalUsers, 1);
+  assert.equal(stats.data.activeSubscriptions, 1);
+  assert.equal(stats.data.internalTests, 1);
+
+  const list = await api('GET', '/api/admin/users', null, adminLogin.data.token);
+  assert.equal(list.status, 200);
+  assert.equal(list.data.length, 2);
+  const testUser = list.data.find(u => u.is_test_account);
+  const realUser = list.data.find(u => u.subscription_source === 'cakto');
+  assert.ok(testUser);
+  assert.ok(realUser);
+});
+
+
+test('administrador envia mensagem interna e somente o destinatario consegue ler', async () => {
+  await createAdmin();
+  const user = await createActiveUser({ email: 'mensagem-user@example.com', name: 'Usuário Mensagem' });
+  const other = await createActiveUser({ email: 'mensagem-outro@example.com', name: 'Outro Usuário' });
+
+  const adminLogin = await login('admin@example.com', 'SenhaAdmin123!');
+  const userLogin = await login('mensagem-user@example.com', 'SenhaValida123!');
+  const otherLogin = await login('mensagem-outro@example.com', 'SenhaValida123!');
+
+  const sent = await api('POST', `/api/admin/users/${user.id}/message`, {
+    subject: 'Teste da semana',
+    message: 'Esta é uma mensagem enviada pelo administrador para validar o painel.'
+  }, adminLogin.data.token);
+  assert.equal(sent.status, 200);
+  assert.equal(sent.data.adminMessage.user_id, user.id);
+
+  const inbox = await api('GET', '/api/messages', null, userLogin.data.token);
+  assert.equal(inbox.status, 200);
+  assert.equal(inbox.data.length, 1);
+  assert.equal(inbox.data[0].read_at, null);
+
+  const otherInbox = await api('GET', '/api/messages', null, otherLogin.data.token);
+  assert.equal(otherInbox.status, 200);
+  assert.equal(otherInbox.data.length, 0);
+
+  const forbiddenRead = await api('POST', `/api/messages/${inbox.data[0].id}/read`, {}, otherLogin.data.token);
+  assert.equal(forbiddenRead.status, 404);
+
+  const read = await api('POST', `/api/messages/${inbox.data[0].id}/read`, {}, userLogin.data.token);
+  assert.equal(read.status, 200);
+  assert.ok(read.data.adminMessage.read_at);
+});
+
+test('QR de WhatsApp conta scan separado de contato e usa mensagem curta', async () => {
+  await createActiveUser({ email: 'qr-owner@example.com', name: 'QR Owner' });
+  const rLogin = await login('qr-owner@example.com', 'SenhaValida123!');
+  const token = rLogin.data.token;
+  const rCard = await api('POST', '/api/cards', { name: 'Cartão QR', whatsapp: '+5511999999999' }, token);
+  assert.equal(rCard.status, 201);
+
+  const qrRes = await fetch(base + `/site/${rCard.data.slug}/qr-whatsapp`, { redirect: 'manual' });
+  assert.equal(qrRes.status, 302);
+  const location = qrRes.headers.get('location') || '';
+  assert.match(location, /^https:\/\/wa\.me\/5511999999999\?text=/);
+  assert.ok(decodeURIComponent(location).includes('Olá! Vim pelo seu CardLink. ✅'));
+
+  const summary = await api('GET', '/api/cards/stats/summary', null, token);
+  assert.equal(summary.status, 200);
+  assert.equal(summary.data.stats.qrScans, 1);
+  assert.equal(summary.data.stats.contacts, 0);
 });

@@ -1,12 +1,11 @@
 const fs = require('fs');
 const path = require('path');
-const { isAdminEmail, ADMIN_EMAILS } = require('../config');
 
 const DB_PATH = path.join(__dirname, 'data.json');
 
 // ─── Local store (memória/JSON) ──────────────────────────────────────────
 function loadLocalDB() {
-  let data = { users: [], cards: [], contacts: [], support_tickets: [], _counters: { users: 0, cards: 0, contacts: 0, support_tickets: 0 } };
+  let data = { users: [], cards: [], contacts: [], support_tickets: [], admin_messages: [], _counters: { users: 0, cards: 0, contacts: 0, support_tickets: 0, admin_messages: 0 } };
   try {
     if (fs.existsSync(DB_PATH)) {
       const parsed = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
@@ -19,11 +18,13 @@ function loadLocalDB() {
   if (!data.cards) data.cards = [];
   if (!data.contacts) data.contacts = [];
   if (!data.support_tickets) data.support_tickets = [];
+  if (!data.admin_messages) data.admin_messages = [];
   if (!data._counters) data._counters = {};
   if (!data._counters.users) data._counters.users = 0;
   if (!data._counters.cards) data._counters.cards = 0;
   if (!data._counters.contacts) data._counters.contacts = 0;
   if (!data._counters.support_tickets) data._counters.support_tickets = 0;
+  if (!data._counters.admin_messages) data._counters.admin_messages = 0;
   return data;
 }
 
@@ -37,15 +38,7 @@ function saveLocalDB(data) {
 
 const db = loadLocalDB();
 
-// Promove e-mails de ADMIN_EMAILS para admin no armazenamento local
-db.users.forEach(u => {
-  if (isAdminEmail(u.email)) {
-    if (!u.is_admin) {
-      u.is_admin = true;
-      saveLocalDB(db);
-    }
-  }
-});
+// Privilégios administrativos são persistidos no banco e nunca inferidos pelo e-mail.
 
 function nextId(collection) {
   db._counters[collection] = (db._counters[collection] || 0) + 1;
@@ -53,16 +46,43 @@ function nextId(collection) {
 }
 
 function normalizeCard(row) {
+  const products = typeof row.products === 'string' ? JSON.parse(row.products) : (row.products || []);
   return {
     ...row,
-    products: typeof row.products === 'string' ? JSON.parse(row.products) : (row.products || []),
+    products,
+    services_mode: row.services_mode || (products.length ? 'list' : 'image'),
+    services_title: row.services_title || '',
+    services_image_url: row.services_image_url || '',
     gallery: typeof row.gallery === 'string' ? JSON.parse(row.gallery) : (row.gallery || []),
     testimonials: typeof row.testimonials === 'string' ? JSON.parse(row.testimonials) : (row.testimonials || []),
   };
 }
 
 function castUserRow(row) {
-  return { ...row, is_admin: !!row.is_admin, plan: row.plan || 'free' };
+  if (!row) return null;
+  const isAdmin = !!row.is_admin;
+  const legacyPlan = row.plan || (isAdmin ? 'none' : 'inactive');
+  const plan = isAdmin ? 'none' : (legacyPlan === 'free' ? 'inactive' : legacyPlan);
+  const legacyActive = !isAdmin && legacyPlan === 'pro';
+  return {
+    ...row,
+    is_admin: isAdmin,
+    plan,
+    account_status: row.account_status || (isAdmin ? 'active' : (legacyActive ? 'active' : 'inactive')),
+    subscription_status: row.subscription_status || (isAdmin ? 'none' : (legacyActive ? 'active' : 'inactive')),
+    subscription_source: row.subscription_source || (isAdmin ? 'none' : (legacyActive ? 'legacy' : 'none')),
+    subscription_plan: row.subscription_plan || null,
+    subscription_amount: row.subscription_amount || null,
+    subscription_reference: row.subscription_reference || null,
+    is_test_account: !!row.is_test_account,
+    activation_token_hash: row.activation_token_hash || null,
+    activation_expires: row.activation_expires || null,
+    email_verified_at: row.email_verified_at || null,
+    pending_email: row.pending_email || null,
+    email_verification_token_hash: row.email_verification_token_hash || null,
+    email_verification_expires: row.email_verification_expires || null,
+    subscription_updated_at: row.subscription_updated_at || null,
+  };
 }
 
 // ─── PostgreSQL (quando DATABASE_URL aponta para um servidor real) ────────
@@ -84,7 +104,21 @@ async function initPostgres(pool) {
       whatsapp VARCHAR(255),
       password_hash VARCHAR(255) NOT NULL,
       is_admin BOOLEAN DEFAULT FALSE,
-      plan VARCHAR(50) DEFAULT 'free',
+      plan VARCHAR(50) DEFAULT 'inactive',
+      account_status VARCHAR(50) DEFAULT 'inactive',
+      subscription_status VARCHAR(50) DEFAULT 'inactive',
+      subscription_source VARCHAR(50) DEFAULT 'none',
+      subscription_plan VARCHAR(50),
+      subscription_amount VARCHAR(50),
+      subscription_reference VARCHAR(255),
+      is_test_account BOOLEAN DEFAULT FALSE,
+      activation_token_hash VARCHAR(128),
+      activation_expires TIMESTAMP,
+      email_verified_at TIMESTAMP,
+      pending_email VARCHAR(255),
+      email_verification_token_hash VARCHAR(128),
+      email_verification_expires TIMESTAMP,
+      subscription_updated_at TIMESTAMP,
       reset_code VARCHAR(6),
       reset_expires TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -114,10 +148,14 @@ async function initPostgres(pool) {
       twitter VARCHAR(255),
       theme VARCHAR(50) DEFAULT 'midnight',
       site_button_text VARCHAR(255),
+      services_mode VARCHAR(20) DEFAULT 'image',
+      services_title VARCHAR(255),
+      services_image_url TEXT,
       products JSONB DEFAULT '[]'::jsonb,
       gallery JSONB DEFAULT '[]'::jsonb,
       testimonials JSONB DEFAULT '[]'::jsonb,
       views_count INTEGER DEFAULT 0,
+      qr_scans_count INTEGER DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -140,18 +178,44 @@ async function initPostgres(pool) {
       status VARCHAR(50) DEFAULT 'open',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS admin_messages (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      subject VARCHAR(255),
+      message TEXT NOT NULL,
+      read_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   await pool.query(`
     ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS plan VARCHAR(50) DEFAULT 'free';
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS plan VARCHAR(50) DEFAULT 'inactive';
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS account_status VARCHAR(50) DEFAULT 'inactive';
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(50) DEFAULT 'inactive';
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_source VARCHAR(50) DEFAULT 'none';
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_plan VARCHAR(50);
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_amount VARCHAR(50);
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_reference VARCHAR(255);
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS is_test_account BOOLEAN DEFAULT FALSE;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS activation_token_hash VARCHAR(128);
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS activation_expires TIMESTAMP;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS pending_email VARCHAR(255);
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_token_hash VARCHAR(128);
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expires TIMESTAMP;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_updated_at TIMESTAMP;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_code VARCHAR(6);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMP;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by VARCHAR(100);
     ALTER TABLE cards ADD COLUMN IF NOT EXISTS logo_url TEXT;
+    ALTER TABLE cards ADD COLUMN IF NOT EXISTS services_mode VARCHAR(20) DEFAULT 'image';
+    ALTER TABLE cards ADD COLUMN IF NOT EXISTS services_title VARCHAR(255);
+    ALTER TABLE cards ADD COLUMN IF NOT EXISTS services_image_url TEXT;
+    ALTER TABLE cards ADD COLUMN IF NOT EXISTS qr_scans_count INTEGER DEFAULT 0;
   `).catch(() => {});
 
-  await pool.query('UPDATE users SET is_admin = true WHERE lower(email) = ANY($1)', [ADMIN_EMAILS]).catch(() => {});
   console.log('✅ PostgreSQL inicializado (repositório)');
 }
 
@@ -214,7 +278,7 @@ const users = {
       const r = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
       return r.rows[0] ? castUserRow(r.rows[0]) : null;
     }
-    return (db.users || []).find(u => u.id === id) || null;
+    return castUserRow((db.users || []).find(u => u.id === id) || null);
   },
   async findByLogin(login) {
     const identifier = String(login || '').trim().toLowerCase();
@@ -224,9 +288,9 @@ const users = {
       const r = await pool.query('SELECT * FROM users WHERE lower(email) = $1 OR whatsapp = $1 LIMIT 1', [identifier]);
       return r.rows[0] ? castUserRow(r.rows[0]) : null;
     }
-    return (db.users || []).find(u =>
+    return castUserRow((db.users || []).find(u =>
       (u.email && u.email.toLowerCase() === identifier) || u.whatsapp === identifier
-    ) || null;
+    ) || null);
   },
   async findByEmail(email) {
     const identifier = String(email || '').trim().toLowerCase();
@@ -236,24 +300,47 @@ const users = {
       const r = await pool.query('SELECT * FROM users WHERE lower(email) = $1 LIMIT 1', [identifier]);
       return r.rows[0] ? castUserRow(r.rows[0]) : null;
     }
-    return (db.users || []).find(u => u.email && u.email.toLowerCase() === identifier) || null;
+    return castUserRow((db.users || []).find(u => u.email && u.email.toLowerCase() === identifier) || null);
   },
   async findEmailExcluding(email, excludeId) {
     const identifier = String(email || '').trim().toLowerCase();
     const pool = await resolvePool();
     if (pool) {
-      const r = await pool.query('SELECT * FROM users WHERE lower(email) = $1 AND id <> $2 LIMIT 1', [identifier, excludeId]);
+      const r = await pool.query('SELECT * FROM users WHERE (lower(email) = $1 OR lower(pending_email) = $1) AND id <> $2 LIMIT 1', [identifier, excludeId]);
       return r.rows[0] ? castUserRow(r.rows[0]) : null;
     }
-    return (db.users || []).find(u => u.email && u.email.toLowerCase() === identifier && u.id !== excludeId) || null;
+    return castUserRow((db.users || []).find(u => u.id !== excludeId && ((u.email && u.email.toLowerCase() === identifier) || (u.pending_email && u.pending_email.toLowerCase() === identifier))) || null);
   },
-  async insert({ name, email, whatsapp, password_hash, is_admin = false, plan = 'free', referred_by = null }) {
+  async findByPendingEmail(email) {
+    const identifier = String(email || '').trim().toLowerCase();
+    if (!identifier) return null;
+    const pool = await resolvePool();
+    if (pool) {
+      const r = await pool.query('SELECT * FROM users WHERE lower(pending_email) = $1 LIMIT 1', [identifier]);
+      return r.rows[0] ? castUserRow(r.rows[0]) : null;
+    }
+    return castUserRow((db.users || []).find(u => u.pending_email && u.pending_email.toLowerCase() === identifier) || null);
+  },
+  async insert({
+    name, email, whatsapp, password_hash, is_admin = false, plan = 'inactive', referred_by = null,
+    account_status = 'inactive', subscription_status = 'inactive', subscription_source = 'none',
+    subscription_plan = null, subscription_amount = null, subscription_reference = null, is_test_account = false, activation_token_hash = null,
+    activation_expires = null, email_verified_at = null, pending_email = null, email_verification_token_hash = null,
+    email_verification_expires = null, subscription_updated_at = null
+  }) {
     const pool = await resolvePool();
     if (pool) {
       const r = await pool.query(
-        `INSERT INTO users (name, email, whatsapp, password_hash, is_admin, plan, referred_by)
-         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-        [name, email, whatsapp || null, password_hash, !!is_admin, plan, referred_by || null]
+        `INSERT INTO users (
+           name, email, whatsapp, password_hash, is_admin, plan, referred_by, account_status,
+           subscription_status, subscription_source, subscription_plan, subscription_amount, subscription_reference, is_test_account,
+           activation_token_hash, activation_expires, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at
+         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21) RETURNING *`,
+        [
+          name, email, whatsapp || null, password_hash, !!is_admin, plan, referred_by || null, account_status,
+          subscription_status, subscription_source, subscription_plan, subscription_amount, subscription_reference, !!is_test_account,
+          activation_token_hash, activation_expires, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at
+        ]
       );
       return castUserRow(r.rows[0]);
     }
@@ -263,14 +350,28 @@ const users = {
       whatsapp: whatsapp || null,
       password_hash,
       is_admin: !!is_admin,
-      plan: plan || 'free',
+      plan: plan || (is_admin ? 'none' : 'inactive'),
       referred_by: referred_by || null,
+      account_status,
+      subscription_status,
+      subscription_source,
+      subscription_plan,
+      subscription_amount,
+      subscription_reference,
+      is_test_account: !!is_test_account,
+      activation_token_hash,
+      activation_expires,
+      email_verified_at,
+      pending_email,
+      email_verification_token_hash,
+      email_verification_expires,
+      subscription_updated_at,
       id: nextId('users'),
       created_at: new Date().toISOString(),
     };
     db.users.push(user);
     saveLocalDB(db);
-    return user;
+    return castUserRow(user);
   },
   async update(id, updates) {
     const pool = await resolvePool();
@@ -278,7 +379,7 @@ const users = {
       const fields = [];
       const values = [];
       let i = 1;
-      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_expires', 'referred_by']) {
+      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_expires', 'referred_by', 'account_status', 'subscription_status', 'subscription_source', 'subscription_plan', 'subscription_amount', 'subscription_reference', 'is_test_account', 'activation_token_hash', 'activation_expires', 'email_verified_at', 'pending_email', 'email_verification_token_hash', 'email_verification_expires', 'subscription_updated_at']) {
         if (key in updates && updates[key] !== undefined) {
           fields.push(`${key} = $${i++}`);
           values.push(updates[key]);
@@ -295,7 +396,7 @@ const users = {
     if (idx === -1) return null;
     Object.assign(db.users[idx], updates);
     saveLocalDB(db);
-    return db.users[idx];
+    return castUserRow(db.users[idx]);
   },
 };
 
@@ -366,10 +467,10 @@ const cards = {
         `INSERT INTO cards (
            user_id, slug, name, business, title, photo_url, logo_url, description, message,
            phone, email, address, whatsapp, whatsapp_group, instagram, facebook,
-           linkedin, tiktok, youtube, twitter, theme, site_button_text, products,
-           gallery, testimonials, views_count
+           linkedin, tiktok, youtube, twitter, theme, site_button_text, services_mode,
+           services_title, services_image_url, products, gallery, testimonials, views_count, qr_scans_count
          ) VALUES (
-           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26
+           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30
          ) RETURNING *`,
         [
           data.user_id, data.slug, data.name, data.business || null, data.title || null, data.photo_url || null,
@@ -377,8 +478,9 @@ const cards = {
           data.address || null, data.whatsapp || null, data.whatsapp_group || null, data.instagram || null,
           data.facebook || null, data.linkedin || null, data.tiktok || null, data.youtube || null, data.twitter || null,
           data.theme || 'midnight', data.site_button_text || null,
+          data.services_mode || 'image', data.services_title || null, data.services_image_url || null,
           JSON.stringify(data.products || []), JSON.stringify(data.gallery || []), JSON.stringify(data.testimonials || []),
-          data.views_count || 0
+          data.views_count || 0, data.qr_scans_count || 0
         ]
       );
       return normalizeCard(r.rows[0]);
@@ -388,6 +490,9 @@ const cards = {
       id: nextId('cards'),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      services_mode: data.services_mode || 'image',
+      services_title: data.services_title || '',
+      services_image_url: data.services_image_url || '',
       products: data.products || [],
       gallery: data.gallery || [],
       testimonials: data.testimonials || [],
@@ -404,7 +509,8 @@ const cards = {
       let i = 1;
       for (const k of ['slug', 'name', 'business', 'title', 'photo_url', 'logo_url', 'description', 'message', 'phone', 'email',
         'address', 'whatsapp', 'whatsapp_group', 'instagram', 'facebook', 'linkedin', 'tiktok', 'youtube', 'twitter',
-        'theme', 'site_button_text', 'products', 'gallery', 'testimonials', 'views_count']) {
+        'theme', 'site_button_text', 'services_mode', 'services_title', 'services_image_url',
+        'products', 'gallery', 'testimonials', 'views_count', 'qr_scans_count']) {
         if (k in updates && updates[k] !== undefined) {
           const val = ['products', 'gallery', 'testimonials'].includes(k) ? JSON.stringify(updates[k] || []) : updates[k];
           fields.push(`${k} = $${i++}`);
@@ -521,11 +627,64 @@ const supportTickets = {
   },
 };
 
+
+// ─── Repositório: admin_messages ───────────────────────────────────────────
+const adminMessages = {
+  async findByUserId(userId) {
+    const pool = await resolvePool();
+    if (pool) {
+      const r = await pool.query('SELECT * FROM admin_messages WHERE user_id = $1 ORDER BY created_at DESC, id DESC', [userId]);
+      return r.rows;
+    }
+    return (db.admin_messages || [])
+      .filter(m => m.user_id === userId)
+      .slice()
+      .sort((a, b) => (b.id || 0) - (a.id || 0));
+  },
+  async insert({ user_id, subject, message }) {
+    const pool = await resolvePool();
+    if (pool) {
+      const r = await pool.query(
+        'INSERT INTO admin_messages (user_id, subject, message) VALUES ($1, $2, $3) RETURNING *',
+        [user_id, subject || 'Mensagem do CardLink', message]
+      );
+      return r.rows[0];
+    }
+    const row = {
+      id: nextId('admin_messages'),
+      user_id,
+      subject: subject || 'Mensagem do CardLink',
+      message,
+      read_at: null,
+      created_at: new Date().toISOString(),
+    };
+    db.admin_messages.push(row);
+    saveLocalDB(db);
+    return row;
+  },
+  async markRead(id, userId) {
+    const pool = await resolvePool();
+    if (pool) {
+      const r = await pool.query(
+        'UPDATE admin_messages SET read_at = COALESCE(read_at, CURRENT_TIMESTAMP) WHERE id = $1 AND user_id = $2 RETURNING *',
+        [id, userId]
+      );
+      return r.rows[0] || null;
+    }
+    const row = (db.admin_messages || []).find(m => m.id === id && m.user_id === userId);
+    if (!row) return null;
+    if (!row.read_at) row.read_at = new Date().toISOString();
+    saveLocalDB(db);
+    return row;
+  },
+};
+
 module.exports = {
   users,
   cards,
   contacts,
   supportTickets,
+  adminMessages,
   db,
   isPgConfigured,
   pgIsReady: () => pgReady,

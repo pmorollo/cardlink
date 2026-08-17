@@ -5,7 +5,9 @@
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "test": "node --test \"backend/test/**/*.test.js\""
+    "test": "node --test \"backend/test/**/*.test.js\"",
+    "admin:set": "node backend/scripts/set-admin.js",
+    "test-user:create": "node backend/scripts/create-test-user.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1101.0",
