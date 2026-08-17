@@ -67,6 +67,7 @@ if (!hasPg) {
       subscription_amount: isAdmin ? null : (isTest ? '0' : '12.90'),
       is_test_account: isTest,
       referred_by: null,
+      email_verified_at: new Date().toISOString(),
       subscription_updated_at: new Date().toISOString()
     });
   }
