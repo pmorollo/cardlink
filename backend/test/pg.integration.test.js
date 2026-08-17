@@ -76,6 +76,8 @@ if (!hasPg) {
   }
 
   test.before(async () => {
+    // Aguarda o bootstrap criar as tabelas antes da limpeza do banco de teste.
+    await repo.users.all();
     await resetTables();
     await new Promise(resolve => { server = app.listen(0, resolve); });
     base = `http://127.0.0.1:${server.address().port}`;
