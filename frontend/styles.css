@@ -265,10 +265,11 @@ img {
 }
 
 .text-gradient {
-  background: var(--text-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--purple, #7c3aed);
+  background: none !important;
+  -webkit-text-fill-color: var(--purple, #7c3aed) !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
 }
 
 .sr-only {
@@ -1878,10 +1879,7 @@ textarea.form-input {
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 2rem;
-  background: var(--text-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--purple, #7c3aed);
 }
 
 .stat-label {
@@ -2420,4 +2418,23 @@ textarea.form-input {
   .page-status-card { grid-template-columns: 1fr; gap: var(--space-md); }
   .account-grid { grid-template-columns: 1fr; }
   .settings-nav { margin-left: -4px; margin-right: -4px; }
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+  .modal, .toast-container, #pro-payment-modal, .user-menu-dropdown {
+    display: none !important;
+  }
+  .text-gradient {
+    color: #7c3aed !important;
+    -webkit-text-fill-color: #7c3aed !important;
+    background: none !important;
+  }
+  .navbar {
+    position: relative !important;
+    box-shadow: none !important;
+  }
 }
