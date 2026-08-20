@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const RESEND_TIMEOUT_MS = 10_000;
 
 function getFromAddress() {
   const configured = String(process.env.EMAIL_FROM || process.env.SMTP_FROM || '').trim();
@@ -18,6 +19,7 @@ async function sendWithResend({ to, subject, html, text }) {
 
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
+    signal: AbortSignal.timeout(RESEND_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${String(process.env.RESEND_API_KEY).trim()}`,
       'Content-Type': 'application/json',

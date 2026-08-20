@@ -3,16 +3,23 @@ const assert = require('node:assert/strict');
 
 const ORIGINAL_ENV = { ...process.env };
 const ORIGINAL_FETCH = global.fetch;
+const ORIGINAL_ABORT_TIMEOUT = AbortSignal.timeout;
 
 test.afterEach(() => {
   process.env = { ...ORIGINAL_ENV };
   global.fetch = ORIGINAL_FETCH;
+  AbortSignal.timeout = ORIGINAL_ABORT_TIMEOUT;
 });
 
 test('envia pelo Resend via HTTPS quando RESEND_API_KEY está configurada', async () => {
   process.env.RESEND_API_KEY = 're_test';
   process.env.EMAIL_FROM = 'CardLink <cardlink@example.com>';
   let request;
+  let configuredTimeout;
+  AbortSignal.timeout = (milliseconds) => {
+    configuredTimeout = milliseconds;
+    return new AbortController().signal;
+  };
   global.fetch = async (url, options) => {
     request = { url, options };
     return { ok: true, status: 200, json: async () => ({ id: 'email_123' }) };
@@ -29,6 +36,8 @@ test('envia pelo Resend via HTTPS quando RESEND_API_KEY está configurada', asyn
   assert.equal(result.provider, 'resend');
   assert.equal(result.messageId, 'email_123');
   assert.equal(request.url, 'https://api.resend.com/emails');
+  assert.equal(configuredTimeout, 10_000);
+  assert.ok(request.options.signal instanceof AbortSignal);
   assert.equal(request.options.headers.Authorization, 'Bearer re_test');
   assert.deepEqual(JSON.parse(request.options.body), {
     from: 'CardLink <cardlink@example.com>',
