@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const authMiddleware = require('../middleware/auth');
+const { requireCustomer } = require('../middleware/roles');
 
 const router = express.Router();
 
@@ -24,13 +25,33 @@ if (isR2Configured()) {
   }
 }
 
+const ALLOWED_IMAGE_TYPES = {
+  'image/jpeg': new Set(['.jpg', '.jpeg']),
+  'image/png': new Set(['.png']),
+  'image/gif': new Set(['.gif']),
+  'image/webp': new Set(['.webp']),
+};
+
+function safeImageExtension(file) {
+  const mime = String(file?.mimetype || '').toLowerCase();
+  const originalExt = path.extname(file?.originalname || '').toLowerCase();
+  const allowedExts = ALLOWED_IMAGE_TYPES[mime];
+  if (!allowedExts || !allowedExts.has(originalExt)) return null;
+  if (mime === 'image/jpeg') return '.jpg';
+  if (mime === 'image/png') return '.png';
+  if (mime === 'image/gif') return '.gif';
+  if (mime === 'image/webp') return '.webp';
+  return null;
+}
+
 // Multer storage: memory if R2, disk if local
 const storage = isR2Configured() && S3Client
   ? multer.memoryStorage()
   : multer.diskStorage({
       destination: path.join(__dirname, '..', 'uploads'),
       filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname).toLowerCase() || '.webp';
+        const ext = safeImageExtension(file);
+        if (!ext) return cb(new Error('Tipo de imagem inválido'));
         const name = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
         cb(null, name);
       }
@@ -40,24 +61,21 @@ const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|gif|webp/;
-    const extOk = allowed.test(path.extname(file.originalname).toLowerCase() || '.webp');
-    const mimeOk = /image\/(jpeg|jpg|png|gif|webp)/.test(file.mimetype);
-    if (extOk || mimeOk) {
-      cb(null, true);
-    } else {
-      cb(new Error('Apenas imagens (JPG, PNG, GIF, WebP) são aceitas'));
+    if (safeImageExtension(file)) {
+      return cb(null, true);
     }
+    cb(new Error('Apenas imagens JPG, PNG, GIF ou WebP válidas são aceitas'));
   }
 });
 
-router.post('/', authMiddleware, upload.single('photo'), async (req, res) => {
+router.post('/', authMiddleware, requireCustomer, upload.single('photo'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'Nenhum arquivo enviado' });
   }
 
   try {
-    const ext = path.extname(req.file.originalname).toLowerCase() || '.webp';
+    const ext = safeImageExtension(req.file);
+    if (!ext) return res.status(400).json({ error: 'Tipo de imagem inválido' });
     const filename = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
 
     if (isR2Configured() && S3Client) {

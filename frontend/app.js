@@ -21,7 +21,7 @@ async function api(path, options = {}) {
   const res = await fetch(API + path, { ...options, headers: { ...headers, ...options.headers } });
   const data = await res.json();
   if (!res.ok) {
-    const err = new Error(data.error || 'Erro na requisição');
+    const err = new Error(data.message || data.error || 'Erro na requisição');
     err.status = res.status;
     throw err;
   }
@@ -124,10 +124,28 @@ function handleRoute() {
     if (bgAnimated) bgAnimated.style.display = 'none';
   }
 
-  const isProUser = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
+  const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' && currentUser.subscription_status === 'active' && currentUser.account_status === 'active';
 
-  // Se o usuário está autenticado mas não é PRO nem Admin, bloqueia acesso a qualquer tela interna do painel
-  if (authToken && currentUser && !isProUser && hash !== '#/terms' && hash !== '#/privacy') {
+  // Confirmação de novo e-mail pode ser aberta mesmo com outra sessão ativa.
+  if (hash.startsWith('#verify-email')) {
+    document.getElementById('auth-view').classList.add('active');
+    if (navbar) navbar.style.display = '';
+    if (bgAnimated) bgAnimated.style.display = '';
+    updateNavAuth();
+    toggleAuthForm('verify-email');
+    loadEmailVerificationFromHash();
+    return;
+  }
+
+  // A conta administrativa é exclusiva para operar a plataforma: não possui cartão nem assinatura.
+  const adminAllowedHashes = new Set(['#admin', '#account', '#/terms', '#/privacy']);
+  if (authToken && currentUser?.is_admin && !hash.startsWith('#card/') && !adminAllowedHashes.has(hash)) {
+    navigateTo('admin');
+    return;
+  }
+
+  // Usuários comuns sem PRO ficam limitados à tela de ativação e páginas legais.
+  if (authToken && currentUser && !currentUser.is_admin && !isProUser && hash !== '#/terms' && hash !== '#/privacy') {
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
     document.getElementById('dashboard-view').classList.add('active');
     if (navbar) navbar.style.display = '';
@@ -173,11 +191,19 @@ function handleRoute() {
     return;
   }
 
-  if (hash === '#auth') {
+  if (hash.startsWith('#activate')) {
+    if (authToken) { navigateTo(currentUser?.is_admin ? 'admin' : 'dashboard'); return; }
+    document.getElementById('auth-view').classList.add('active');
+    if (navbar) navbar.style.display = '';
+    if (bgAnimated) bgAnimated.style.display = '';
+    updateNavAuth();
+    toggleAuthForm('activate');
+    loadActivationFromHash();
+  } else if (hash === '#auth') {
     if (!authToken) {
       document.getElementById('auth-view').classList.add('active');
     } else {
-      navigateTo('dashboard');
+      navigateTo(currentUser?.is_admin ? 'admin' : 'dashboard');
       return;
     }
     if (navbar) navbar.style.display = '';
@@ -185,6 +211,7 @@ function handleRoute() {
     updateNavAuth();
   } else if (hash === '#dashboard') {
     if (!authToken) { navigateTo('auth'); return; }
+    if (currentUser?.is_admin) { navigateTo('admin'); return; }
     document.getElementById('dashboard-view').classList.add('active');
     if (navbar) navbar.style.display = '';
     if (bgAnimated) bgAnimated.style.display = '';
@@ -192,6 +219,7 @@ function handleRoute() {
     updateNavAuth();
   } else if (hash === '#settings' || hash === '#builder') {
     if (!authToken) { navigateTo('auth'); return; }
+    if (currentUser?.is_admin) { navigateTo('admin'); return; }
     if (hash === '#builder') {
       window.location.hash = '#settings';
       return;
@@ -206,6 +234,7 @@ function handleRoute() {
     }
   } else if (hash === '#contacts') {
     if (!authToken) { navigateTo('auth'); return; }
+    if (currentUser?.is_admin) { navigateTo('admin'); return; }
     if (!isProUser) { navigateTo('dashboard'); return; }
 
     document.getElementById('contacts-view').classList.add('active');
@@ -241,6 +270,7 @@ function handleRoute() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } else {
     if (authToken) {
+      if (currentUser?.is_admin) { navigateTo('admin'); return; }
       document.getElementById('dashboard-view').classList.add('active');
       if (navbar) navbar.style.display = '';
       if (bgAnimated) bgAnimated.style.display = '';
@@ -261,7 +291,12 @@ async function checkSubscriptionStatus() {
   showToast('⏳', 'Verificando assinatura...');
   try {
     currentUser = await api('/auth/me');
-    if (currentUser && (currentUser.plan === 'pro' || currentUser.is_admin)) {
+    if (currentUser?.is_admin) {
+      showToast('ℹ️', 'Conta administrativa: assinaturas são geridas no painel.');
+      navigateTo('admin');
+      return;
+    }
+    if (currentUser && !currentUser.is_admin && currentUser.plan === 'pro') {
       showToast('🎉', 'Assinatura PRO confirmada! Redirecionando...');
       handleRoute();
     } else {
@@ -276,21 +311,21 @@ async function checkSubscriptionStatus() {
 // Navbar CTA
 // ============================================
 function handleHeroCta() {
-  if (authToken) {
+  if (authToken && currentUser?.is_admin) {
+    navigateTo('admin');
+  } else if (authToken) {
     openPageSettings();
   } else {
-    navigateTo('auth');
-    toggleAuthForm('register');
+    openProPaymentModal();
   }
 }
 
 function handlePricingCta(plan) {
-  navigateTo('auth');
-  toggleAuthForm('register');
-  if (plan) selectRegisterPlan(plan);
+  redirectToCheckout(plan || 'monthly');
 }
 
 function openPageSettings(section = 'profile') {
+  if (currentUser?.is_admin) { navigateTo('admin'); return; }
   activeSettingsSection = section;
   if (currentUserCardId) {
     navigateTo('settings');
@@ -323,11 +358,15 @@ function updateNavAuth() {
           <span class="user-menu-chevron">⌄</span>
         </button>
         <div class="user-menu-dropdown">
-          ${currentUser.is_admin ? `<button type="button" onclick="navigateTo('admin');closeUserMenu()" style="font-weight:bold;color:var(--purple);border-bottom:1.5px dashed var(--border-subtle);"><span style="display:flex;align-items:center;gap:6px;">👑 Painel Admin</span></button>` : ''}
-          <button type="button" onclick="navigateTo('dashboard');closeUserMenu()"><span>Visão geral</span></button>
-          <button type="button" onclick="openPageSettings();closeUserMenu()"><span>Configurações da página</span></button>
-          ${currentUserCardId ? `<button type="button" onclick="viewContacts(${currentUserCardId}, 'Minha página');closeUserMenu()"><span>Contatos recebidos</span></button>` : ''}
-          <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Minha conta</span></button>
+          ${currentUser.is_admin ? `
+            <button type="button" onclick="navigateTo('admin');closeUserMenu()" style="font-weight:bold;color:var(--purple);"><span>👑 Painel Administrativo</span></button>
+            <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Segurança da conta</span></button>
+          ` : `
+            <button type="button" onclick="navigateTo('dashboard');closeUserMenu()"><span>Visão geral</span></button>
+            <button type="button" onclick="openPageSettings();closeUserMenu()"><span>Configurações da página</span></button>
+            ${currentUserCardId ? `<button type="button" onclick="viewContacts(${currentUserCardId}, 'Minha página');closeUserMenu()"><span>Contatos recebidos</span></button>` : ''}
+            <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Minha conta</span></button>
+          `}
           <div class="user-menu-divider"></div>
           <button type="button" class="danger" onclick="handleLogout()"><span>Sair</span></button>
         </div>
@@ -335,8 +374,10 @@ function updateNavAuth() {
     `;
   } else {
     navCta.innerHTML = `
-      <button class="btn btn-secondary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('login');">🔑 Entrar</button>
-      <button class="btn btn-primary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('register');">🚀 PLANO PRO</button>
+      <a href="#como-funciona" class="navbar-link hide-mobile">Como funciona</a>
+      <a href="#demonstracao" class="navbar-link hide-mobile">Demonstração</a>
+      <button class="navbar-login" onclick="navigateTo('auth'); toggleAuthForm('login');">Entrar na conta</button>
+      <button class="btn btn-primary btn-sm navbar-subscribe" onclick="openProPaymentModal()">Assinar CardLink</button>
     `;
   }
 }
@@ -351,9 +392,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (authToken) {
     try {
       currentUser = await api('/auth/me');
-      const summary = await api('/cards/stats/summary');
-      if (summary && summary.hasCard && summary.card) {
-        currentUserCardId = summary.card.id;
+      if (!currentUser?.is_admin) {
+        const summary = await api('/cards/stats/summary');
+        if (summary && summary.hasCard && summary.card) {
+          currentUserCardId = summary.card.id;
+        }
+      } else {
+        currentUserCardId = null;
       }
     } catch (e) {
       authToken = null;
@@ -374,11 +419,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 // ============================================
 function toggleAuthForm(form) {
   const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
+  const activationForm = document.getElementById('activation-form');
   const forgotForm = document.getElementById('forgot-form');
+  const verifyEmailForm = document.getElementById('verify-email-form');
 
   if (loginForm) loginForm.style.display = form === 'login' ? '' : 'none';
-  if (registerForm) registerForm.style.display = form === 'register' ? '' : 'none';
+  if (activationForm) activationForm.style.display = form === 'activate' ? '' : 'none';
+  if (verifyEmailForm) verifyEmailForm.style.display = form === 'verify-email' ? '' : 'none';
   if (forgotForm) {
     forgotForm.style.display = form === 'forgot' ? '' : 'none';
     if (form === 'forgot') {
@@ -387,8 +434,8 @@ function toggleAuthForm(form) {
       if (step1) step1.style.display = 'block';
       if (step2) step2.style.display = 'none';
       
-      // Pre-fill email from login or register if available
-      const existingEmail = (document.getElementById('login-email')?.value || document.getElementById('register-email')?.value || '').trim();
+      // Preenche o e-mail já digitado no login, quando houver
+      const existingEmail = (document.getElementById('login-email')?.value || '').trim();
       const emailInput = document.getElementById('forgot-email');
       const codeInput = document.getElementById('forgot-code');
       const passInput = document.getElementById('forgot-new-password');
@@ -418,6 +465,12 @@ async function handleLogin() {
     localStorage.setItem('cardlink_token', data.token);
     showToast('✅', 'Login realizado!');
 
+    if (currentUser.is_admin) {
+      currentUserCardId = null;
+      navigateTo('admin');
+      return;
+    }
+
     const summary = await api('/cards/stats/summary').catch(() => ({ hasCard: false }));
     if (summary && summary.hasCard && summary.card) {
       currentUserCardId = summary.card.id;
@@ -431,69 +484,72 @@ async function handleLogin() {
   }
 }
 
-async function handleRegister() {
-  const nameEl = document.getElementById('register-name');
-  const emailEl = document.getElementById('register-email');
-  const passwordEl = document.getElementById('register-password');
-  if (!nameEl || !emailEl || !passwordEl) { showToast('❌', 'Formulário não encontrado'); return; }
+function loadActivationFromHash() {
+  const raw = window.location.hash.startsWith('#activate?') ? window.location.hash.substring('#activate?'.length) : '';
+  const params = new URLSearchParams(raw);
+  setFieldValue('activation-email', params.get('email') || '');
+  setFieldValue('activation-token', params.get('token') || '');
+}
 
-  const name = nameEl.value.trim();
-  const email = emailEl.value.trim().toLowerCase();
-  const password = passwordEl.value;
+async function handleActivateAccount() {
+  const email = document.getElementById('activation-email')?.value.trim().toLowerCase();
+  const token = document.getElementById('activation-token')?.value.trim();
+  const password = document.getElementById('activation-password')?.value || '';
+  const confirmPassword = document.getElementById('activation-password-confirm')?.value || '';
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!name) { showToast('⚠️', 'Preencha o seu nome!'); return; }
-  if (!email || !emailRegex.test(email) || email.includes('..')) { showToast('⚠️', 'Preencha um e-mail válido!'); return; }
-  if (!password || password.length < 8) { showToast('⚠️', 'Senha deve ter pelo menos 8 caracteres'); return; }
-
-  const termsCheckbox = document.getElementById('register-terms');
-  if (termsCheckbox && !termsCheckbox.checked) {
-    showToast('⚠️', 'Você precisa concordar com os Termos de Uso e a Política de Privacidade!');
-    return;
-  }
+  if (!email || !token) { showToast('❌', 'Link de ativação inválido.'); return; }
+  if (password.length < 8) { showToast('⚠️', 'A senha deve ter pelo menos 8 caracteres.'); return; }
+  if (password !== confirmPassword) { showToast('⚠️', 'As senhas não coincidem.'); return; }
 
   try {
-    const data = await api('/auth/register', { 
-      method: 'POST', 
-      body: JSON.stringify({ name, email, password }) 
-    });
+    const data = await api('/auth/activate', { method: 'POST', body: JSON.stringify({ email, token, password }) });
     authToken = data.token;
     currentUser = data.user;
-    localStorage.setItem('cardlink_token', data.token);
-    showToast('✅', 'Conta criada com sucesso! Redirecionando para o pagamento...');
     currentUserCardId = null;
-    const isPro = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
-    if (!isPro) {
-      redirectToCheckout();
-    }
+    localStorage.setItem('cardlink_token', data.token);
+    showToast('✅', 'Conta ativada. Bem-vindo ao CardLink!');
     navigateTo('dashboard');
   } catch (err) {
-    if (err.message && err.message.includes('cadastrado')) {
+    showToast('❌', err.message);
+  }
+}
+
+function loadEmailVerificationFromHash() {
+  const raw = window.location.hash.startsWith('#verify-email?') ? window.location.hash.substring('#verify-email?'.length) : '';
+  const params = new URLSearchParams(raw);
+  setFieldValue('verify-email-address', params.get('email') || '');
+  setFieldValue('verify-email-token', params.get('token') || '');
+}
+
+async function handleConfirmEmailChange() {
+  const email = document.getElementById('verify-email-address')?.value.trim().toLowerCase();
+  const token = document.getElementById('verify-email-token')?.value.trim();
+  if (!email || !token) { showToast('❌', 'Link de confirmação inválido.'); return; }
+
+  try {
+    const result = await api('/auth/confirm-email-change', {
+      method: 'POST',
+      body: JSON.stringify({ email, token })
+    });
+    showToast('✅', result.message || 'E-mail confirmado com sucesso!');
+
+    if (authToken) {
       try {
-        const loginData = await api('/auth/login', { 
-          method: 'POST', 
-          body: JSON.stringify({ email, password }) 
-        });
-        authToken = loginData.token;
-        currentUser = loginData.user;
-        localStorage.setItem('cardlink_token', loginData.token);
-        showToast('✅', 'Bem-vindo de volta! Redirecionando para o pagamento...');
-        const isPro = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
-        if (!isPro) {
-          redirectToCheckout();
-        }
-        navigateTo('dashboard');
-      } catch (loginErr) {
-        showToast('⚠️', 'Este e-mail já é cadastrado! A senha digitada está incorreta. Informe sua senha correta ou clique em Esqueceu a senha.');
-        const loginEmail = document.getElementById('login-email');
-        const loginPassword = document.getElementById('login-password');
-        if (loginEmail) loginEmail.value = email;
-        if (loginPassword) loginPassword.value = '';
-        toggleAuthForm('login');
+        currentUser = await api('/auth/me');
+        updateNavAuth();
+        navigateTo('account');
+        return;
+      } catch (e) {
+        // Se a sessão não puder ser recarregada, segue para o login abaixo.
       }
-    } else {
-      showToast('❌', err.message);
     }
+
+    const loginEmail = document.getElementById('login-email');
+    if (loginEmail) loginEmail.value = result.email || email;
+    window.location.hash = '#auth';
+    toggleAuthForm('login');
+  } catch (err) {
+    showToast('❌', err.message);
   }
 }
 
@@ -610,33 +666,8 @@ function openProPaymentModal() {
   if (modal) modal.style.display = 'flex';
 }
 
-let selectedRegisterPlan = 'monthly';
-
-function selectRegisterPlan(plan) {
-  selectedRegisterPlan = plan;
-  const monthlyEl = document.getElementById('plan-option-monthly');
-  const annualEl = document.getElementById('plan-option-annual');
-  const radioMonthly = document.getElementById('plan-radio-monthly');
-  const radioAnnual = document.getElementById('plan-radio-annual');
-  const btn = document.getElementById('register-submit-btn');
-
-  if (plan === 'monthly') {
-    if (monthlyEl) { monthlyEl.style.border = '2px solid var(--accent)'; monthlyEl.style.background = 'rgba(139,92,246,0.12)'; }
-    if (annualEl) { annualEl.style.border = '1.5px solid var(--border-subtle)'; annualEl.style.background = 'var(--surface)'; }
-    if (radioMonthly) { radioMonthly.textContent = '🔘'; radioMonthly.style.color = 'var(--accent)'; }
-    if (radioAnnual) { radioAnnual.textContent = '⚪'; radioAnnual.style.color = 'var(--text-tertiary)'; }
-    if (btn) btn.textContent = '💳 Pagar R$ 12,90/mês na Cakto';
-  } else {
-    if (annualEl) { annualEl.style.border = '2px solid var(--accent)'; annualEl.style.background = 'rgba(139,92,246,0.12)'; }
-    if (monthlyEl) { monthlyEl.style.border = '1.5px solid var(--border-subtle)'; monthlyEl.style.background = 'var(--surface)'; }
-    if (radioAnnual) { radioAnnual.textContent = '🔘'; radioAnnual.style.color = 'var(--accent)'; }
-    if (radioMonthly) { radioMonthly.textContent = '⚪'; radioMonthly.style.color = 'var(--text-tertiary)'; }
-    if (btn) btn.textContent = '💳 Pagar R$ 99,00/ano na Cakto';
-  }
-}
-
 function redirectToCheckout(planOverride) {
-  const plan = planOverride || selectedRegisterPlan || 'monthly';
+  const plan = planOverride || 'monthly';
   const email = currentUser ? encodeURIComponent(currentUser.email) : '';
   const base = (plan === 'annual'
     ? window.CARD_LINK && window.CARD_LINK.annualCheckoutUrl
@@ -692,13 +723,25 @@ function loadAccountView() {
   if (!currentUser) return;
   setFieldValue('account-name', currentUser.name || '');
   setFieldValue('account-email', currentUser.email || '');
+  setFieldValue('account-email-password', '');
   setFieldValue('account-current-password', '');
   setFieldValue('account-new-password', '');
+  const status = document.getElementById('account-email-status');
+  if (status) {
+    if (currentUser.pending_email) {
+      status.textContent = `Aguardando confirmação de ${currentUser.pending_email}. O e-mail atual continua válido.`;
+    } else if (currentUser.email_verified_at || currentUser.is_admin) {
+      status.textContent = '✓ E-mail confirmado';
+    } else {
+      status.textContent = 'E-mail ainda não confirmado';
+    }
+  }
 }
 
 async function saveAccountProfile() {
   const name = document.getElementById('account-name')?.value.trim();
-  const email = document.getElementById('account-email')?.value.trim();
+  const email = document.getElementById('account-email')?.value.trim().toLowerCase();
+  const currentPassword = document.getElementById('account-email-password')?.value || '';
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!name || !email) {
     showToast('⚠️', 'Informe seu nome e e-mail');
@@ -708,13 +751,22 @@ async function saveAccountProfile() {
     showToast('⚠️', 'Informe um e-mail válido');
     return;
   }
+  const changingEmail = email !== String(currentUser?.email || '').toLowerCase();
+  if (changingEmail && !currentPassword) {
+    showToast('⚠️', 'Confirme sua senha atual para trocar o e-mail');
+    return;
+  }
   try {
-    currentUser = await api('/auth/profile', {
+    const profile = await api('/auth/profile', {
       method: 'PUT',
-      body: JSON.stringify({ name, email })
+      body: JSON.stringify({ name, email, currentPassword })
     });
+    currentUser = { ...currentUser, ...profile };
+    setFieldValue('account-email', currentUser.email || '');
+    setFieldValue('account-email-password', '');
+    loadAccountView();
     updateNavAuth();
-    showToast('✅', 'Dados da conta atualizados');
+    showToast('✅', profile.message || 'Dados da conta atualizados');
   } catch (err) {
     showToast('❌', err.message);
   }
@@ -754,6 +806,45 @@ function getPageCompletion(card) {
   return Math.round((completed / checks.length) * 100);
 }
 
+function renderAdminMessagesHtml(messages) {
+  if (!Array.isArray(messages) || messages.length === 0) return '';
+  return `
+    <div class="dash-card-full" style="margin-bottom:var(--space-lg);padding:var(--space-lg);background:linear-gradient(135deg, rgba(124,58,237,0.06), rgba(37,99,235,0.05));border:1px solid rgba(124,58,237,0.18);">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+        <div>
+          <h3 style="font-family:var(--font-display);font-weight:700;margin:0;">📣 Mensagens do CardLink</h3>
+          <p style="color:var(--text-secondary);font-size:0.82rem;margin-top:4px;">Avisos enviados pela administração da plataforma.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${messages.slice(0, 5).map(m => {
+          const date = new Date(m.created_at).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+          const unread = !m.read_at;
+          return `
+            <div style="padding:12px 14px;border-radius:12px;background:var(--bg-surface);border:1px solid ${unread ? 'rgba(124,58,237,0.28)' : 'var(--border-subtle)'};">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:220px;">
+                  <strong style="display:block;color:var(--text-primary);font-size:0.92rem;">${unread ? '● ' : ''}${escapeHtml(m.subject || 'Mensagem do CardLink')}</strong>
+                  <span style="color:var(--text-muted);font-size:0.74rem;">${date}</span>
+                  <p style="color:var(--text-secondary);font-size:0.88rem;line-height:1.55;margin-top:7px;white-space:pre-wrap;">${escapeHtml(m.message || '')}</p>
+                </div>
+                ${unread ? `<button class="btn btn-outline btn-sm" onclick="markAdminMessageRead(${Number(m.id)})">Marcar como lida</button>` : '<span style="color:var(--text-muted);font-size:0.75rem;">✓ Lida</span>'}
+              </div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+async function markAdminMessageRead(id) {
+  try {
+    await api(`/messages/${id}/read`, { method: 'POST' });
+    await loadDashboard();
+  } catch (err) {
+    showToast('❌', 'Não foi possível marcar a mensagem: ' + err.message);
+  }
+}
+
 async function loadDashboard() {
   const content = document.getElementById('dashboard-content');
   if (!content) return;
@@ -764,7 +855,11 @@ async function loadDashboard() {
     }
 
     const userName = currentUser ? currentUser.name : 'Usuário';
-    const data = await api('/cards/stats/summary');
+    const [data, platformMessages] = await Promise.all([
+      api('/cards/stats/summary'),
+      api('/messages').catch(() => [])
+    ]);
+    const platformMessagesHtml = renderAdminMessagesHtml(platformMessages);
 
     if (!data.hasCard) {
       currentUserCardId = null;
@@ -778,7 +873,8 @@ async function loadDashboard() {
             Configure sua página profissional para compartilhar com clientes e contatos.
           </p>
           <button class="btn btn-primary btn-lg" onclick="createNewCard()">Configurar minha página</button>
-        </div>`;
+        </div>
+        ${platformMessagesHtml}`;
       updateNavAuth();
       return;
     }
@@ -792,21 +888,21 @@ async function loadDashboard() {
     const cardLink = window.location.origin + '/site/' + card.slug;
     const recentContacts = stats.recentContacts || [];
     const completion = getPageCompletion(card);
-    const isProUser = currentUser && (currentUser.plan === 'pro' || currentUser.is_admin);
+    const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' && currentUser.subscription_status === 'active' && currentUser.account_status === 'active';
     let paywallBannerHtml = '';
     if (!isProUser) {
       paywallBannerHtml = `
         <div class="form-section" style="display:flex;background:linear-gradient(135deg, rgba(239,68,68,0.06), rgba(220,38,38,0.1));border:1.5px solid rgba(239,68,68,0.25);border-radius:var(--radius-lg);padding:16px;margin-bottom:var(--space-lg);text-align:left;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%;">
           <div style="flex:1;min-width:250px;">
             <div style="font-weight:700;color:#ef4444;font-size:0.95rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
-              <span>❌</span> Link Público Offline (Plano Gratuito)
+              <span>❌</span> Assinatura inativa
             </div>
             <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.4;margin:0;">
-              Sua página foi configurada, mas o link público está offline. Assine o Plano PRO por apenas <strong>R$ 12,90/mês</strong> para colocá-lo no ar!
+              Seu acesso de cliente está inativo e o link público foi suspenso. Regularize ou reative a assinatura para voltar a utilizar o CardLink.
             </p>
           </div>
           <button type="button" class="btn btn-primary btn-sm" onclick="openProPaymentModal()" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;background:#ef4444;border:none;color:#ffffff;box-shadow: 0 4px 12px rgba(239,68,68,0.2);">
-            🚀 Ativar Página
+            💳 Reativar assinatura
           </button>
         </div>
       `;
@@ -842,6 +938,7 @@ async function loadDashboard() {
         </div>
       </div>
 
+      ${platformMessagesHtml}
       ${paywallBannerHtml}
       ${pwaBannerHtml}
 
@@ -867,7 +964,8 @@ async function loadDashboard() {
         </div>
         <div class="stat-card" onclick="openQrCodeModal('${escapeHtml(card.slug)}')" style="cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor=''">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin + '/site/' + card.slug + '/qr-whatsapp')}&bgcolor=ffffff&color=000000" style="width:48px;height:48px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border-subtle);" alt="QR Code">
-          <div class="stat-label" style="font-size:0.75rem;font-weight:bold;color:var(--text-secondary);">QR Code de Balcão</div>
+          <div class="stat-value" style="font-size:1.05rem;line-height:1;margin-bottom:3px;">${stats.qrScans || 0}</div>
+          <div class="stat-label" style="font-size:0.72rem;font-weight:bold;color:var(--text-secondary);">QR escaneados · abrir código</div>
         </div>
       </div>
 
@@ -959,8 +1057,12 @@ function createNewCard() {
     ['field-name','field-business','field-title','field-photo','field-logo','field-description',
      'field-message','field-phone','field-email','field-address','field-whatsapp',
      'field-whatsapp-group','field-instagram','field-facebook','field-linkedin',
-     'field-tiktok','field-youtube','field-twitter','field-site-button','field-gallery'
+     'field-tiktok','field-youtube','field-twitter','field-site-button','field-gallery',
+     'field-services-title','field-services-image'
     ].forEach(id => setFieldValue(id, ''));
+    setFieldValue('field-services-mode', 'image');
+    syncServicesImagePreview('');
+    toggleServicesMode();
 
     const prodContainer = document.getElementById('builder-products-container');
     if (prodContainer) prodContainer.innerHTML = '';
@@ -1015,6 +1117,12 @@ async function editCard(id) {
     setFieldValue('field-youtube', card.youtube || '');
     setFieldValue('field-twitter', card.twitter || '');
     setFieldValue('field-site-button', card.site_button_text || '');
+    const inferredServicesMode = card.services_mode || ((card.products || []).length ? 'list' : 'image');
+    setFieldValue('field-services-mode', inferredServicesMode);
+    setFieldValue('field-services-title', card.services_title || '');
+    setFieldValue('field-services-image', card.services_image_url || '');
+    syncServicesImagePreview(card.services_image_url || '');
+    toggleServicesMode();
     setFieldValue('field-gallery', (card.gallery || []).join('\n'));
     loadGalleryFromUrls(card.gallery || []);
 
@@ -1075,6 +1183,71 @@ async function deleteCard(id) {
   } catch (err) {
     showToast('❌', err.message);
   }
+}
+
+// ============================================
+// Flexible Services / Menu / Price List
+// ============================================
+function toggleServicesMode() {
+  const mode = document.getElementById('field-services-mode')?.value || 'image';
+  const imageBuilder = document.getElementById('services-image-builder');
+  const listBuilder = document.getElementById('services-list-builder');
+  if (imageBuilder) imageBuilder.style.display = mode === 'image' ? '' : 'none';
+  if (listBuilder) listBuilder.style.display = mode === 'list' ? '' : 'none';
+}
+
+function syncServicesImagePreview(url) {
+  const preview = document.getElementById('services-image-preview');
+  const placeholder = document.getElementById('services-image-placeholder');
+  const removeBtn = document.getElementById('services-image-remove');
+  if (!preview) return;
+  if (url) {
+    preview.src = url;
+    preview.style.display = '';
+    if (placeholder) placeholder.style.display = 'none';
+    if (removeBtn) removeBtn.style.display = '';
+  } else {
+    preview.removeAttribute('src');
+    preview.style.display = 'none';
+    if (placeholder) placeholder.style.display = '';
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+}
+
+async function handleServicesImageUpload(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+
+  const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+  if (!allowed.includes(file.type)) {
+    showToast('⚠️', 'Use uma imagem JPG, PNG ou WebP.');
+    input.value = '';
+    return;
+  }
+
+  const localUrl = URL.createObjectURL(file);
+  syncServicesImagePreview(localUrl);
+  showToast('⏳', 'Otimizando e enviando sua tabela...');
+
+  try {
+    const url = await uploadFile(file);
+    setFieldValue('field-services-image', url);
+    syncServicesImagePreview(url);
+    showToast('✅', 'Tabela/cardápio enviado!');
+    updatePreview();
+  } catch (err) {
+    syncServicesImagePreview(document.getElementById('field-services-image')?.value || '');
+    showToast('❌', 'Erro: ' + err.message);
+  } finally {
+    URL.revokeObjectURL(localUrl);
+    input.value = '';
+  }
+}
+
+function clearServicesImage() {
+  setFieldValue('field-services-image', '');
+  syncServicesImagePreview('');
+  updatePreview();
 }
 
 // ============================================
@@ -1351,10 +1524,13 @@ function renderCard(data, isPreview) {
 
   // Site / Landing Page section
   const siteBtnText    = data.site_button_text || 'Ver mais informações';
-  const hasProducts    = data.products    && data.products.length    > 0;
+  const servicesMode   = data.services_mode || ((data.products || []).length ? 'list' : 'image');
+  const servicesTitle  = data.services_title || (servicesMode === 'image' ? 'Tabela / Cardápio' : 'Produtos & Serviços');
+  const hasServicesImage = servicesMode === 'image' && !!data.services_image_url;
+  const hasProducts    = servicesMode === 'list' && data.products && data.products.length > 0;
   const hasGallery     = data.gallery     && data.gallery.length     > 0;
   const hasTestimonials= data.testimonials&& data.testimonials.length> 0;
-  const hasSiteContent = hasProducts || hasGallery || hasTestimonials;
+  const hasSiteContent = hasServicesImage || hasProducts || hasGallery || hasTestimonials;
 
   let siteToggleButton = '';
   let siteExpandedContent = '';
@@ -1365,9 +1541,18 @@ function renderCard(data, isPreview) {
         📋 ${escapeHtml(siteBtnText)} ↓
       </button>`;
 
+    let servicesImageHtml = '';
+    if (hasServicesImage) {
+      servicesImageHtml = `
+        <div class="site-block-title">📋 ${escapeHtml(servicesTitle)}</div>
+        <div style="width:100%;display:flex;justify-content:center;margin-bottom:20px;">
+          <img src="${escapeHtml(data.services_image_url)}" alt="${escapeHtml(servicesTitle)}" style="max-width:100%;height:auto;max-height:900px;object-fit:contain;border-radius:14px;border:1px solid var(--border-subtle);background:var(--bg-card);" onerror="this.style.display='none'">
+        </div>`;
+    }
+
     let productsHtml = '';
     if (hasProducts) {
-      productsHtml = `<div class="site-block-title">🛍️ Produtos & Serviços</div><div class="products-grid">`;
+      productsHtml = `<div class="site-block-title">🛍️ ${escapeHtml(servicesTitle)}</div><div class="products-grid">`;
       data.products.forEach(p => {
         const waMsg = encodeURIComponent(`Olá! Gostaria de encomendar: ${p.name}${p.price ? ' (R$ ' + p.price + ')' : ''}`);
         const waUrl = whatsapp ? `https://wa.me/${cleanWhatsapp(whatsapp)}?text=${waMsg}` : '#';
@@ -1412,7 +1597,7 @@ function renderCard(data, isPreview) {
 
     siteExpandedContent = `
       <div class="site-expanded-section" id="site-expanded-section" style="${isPreview ? '' : 'display:none;'}">
-        ${productsHtml}${galleryHtml}${testimonialsHtml}
+        ${servicesImageHtml}${productsHtml}${galleryHtml}${testimonialsHtml}
       </div>`;
   }
 
@@ -1965,6 +2150,9 @@ async function loadAdminDashboard() {
     document.getElementById('admin-metric-cards').textContent = stats.totalCards || 0;
     document.getElementById('admin-metric-views').textContent = stats.totalViews || 0;
     document.getElementById('admin-metric-contacts').textContent = stats.totalContacts || 0;
+    document.getElementById('admin-metric-qr-scans').textContent = stats.totalQrScans || 0;
+    document.getElementById('admin-metric-active-subscriptions').textContent = stats.activeSubscriptions || 0;
+    document.getElementById('admin-metric-internal-tests').textContent = stats.internalTests || 0;
 
     // 2. Fetch Users
     adminUsersList = await api('/admin/users');
@@ -1994,7 +2182,7 @@ function renderAdminUsers(users) {
   if (!tbody) return;
 
   if (users.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:var(--space-lg);color:var(--text-secondary);">Nenhum usuário cadastrado</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:var(--space-lg);color:var(--text-secondary);">Nenhum usuário cadastrado</td></tr>`;
     return;
   }
 
@@ -2017,34 +2205,18 @@ function renderAdminUsers(users) {
         </td>
         <td style="padding:12px 8px;">
           <span class="badge" style="padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:bold;${isPro ? 'background:rgba(124,58,237,0.15);color:var(--purple);' : 'background:rgba(239,68,68,0.1);color:#ef4444;'}">
-            ${isPro ? '✅ Ativo' : '❌ Inativo'}
+            ${u.account_status === 'pending_activation' ? '⏳ Aguardando ativação' : (isPro ? '✅ Ativo' : '❌ Inativo')}
           </span>
         </td>
         <td style="padding:12px 8px;text-align:right;white-space:nowrap;">
-          <button class="btn btn-sm ${isPro ? 'btn-outline' : 'btn-primary'}" onclick="toggleUserPlan(${u.id}, '${u.plan}')" style="padding:5px 10px;font-size:0.75rem;">
-            ${isPro ? 'Desativar' : 'Ativar'}
-          </button>
+          <span style="color:var(--text-secondary);font-size:0.8rem;">${u.is_test_account ? '🧪 Teste interno' : (u.subscription_source === 'cakto' ? '💳 Cakto' : escapeHtml(u.subscription_source || '—'))}</span>
+        </td>
+        <td style="padding:12px 8px;text-align:right;white-space:nowrap;">
+          <button class="btn btn-outline btn-sm" type="button" onclick="openAdminMessageModal(${u.id})">Mensagem</button>
         </td>
       </tr>
     `;
   }).join('');
-}
-
-async function toggleUserPlan(userId, currentPlan) {
-  const newPlan = currentPlan === 'pro' ? 'free' : 'pro';
-  const actionText = newPlan === 'pro' ? 'ATIVAR' : 'DESATIVAR';
-  if (!confirm(`Deseja realmente ${actionText} a assinatura deste usuário?`)) return;
-
-  try {
-    await api(`/admin/users/${userId}/plan`, {
-      method: 'POST',
-      body: JSON.stringify({ plan: newPlan })
-    });
-    showToast('✅', `Plano alterado para ${newPlan.toUpperCase()}`);
-    loadAdminDashboard();
-  } catch (err) {
-    showToast('❌', 'Erro ao alterar plano: ' + err.message);
-  }
 }
 
 function filterAdminUsers() {
@@ -2058,6 +2230,42 @@ function filterAdminUsers() {
     return u.name.toLowerCase().includes(queryText) || u.email.toLowerCase().includes(queryText);
   });
   renderAdminUsers(filtered);
+}
+
+function openAdminMessageModal(userId) {
+  const user = adminUsersList.find(u => Number(u.id) === Number(userId)) || {};
+  setFieldValue('admin-message-user-id', String(userId));
+  setFieldValue('admin-message-subject', 'Mensagem do CardLink');
+  setFieldValue('admin-message-body', '');
+  const recipient = document.getElementById('admin-message-recipient');
+  if (recipient) recipient.textContent = `${user.name || 'Usuário'}${user.email ? ' · ' + user.email : ''}`;
+  const modal = document.getElementById('admin-message-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeAdminMessageModal() {
+  const modal = document.getElementById('admin-message-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function sendAdminMessage() {
+  const userId = Number(document.getElementById('admin-message-user-id')?.value);
+  const subject = document.getElementById('admin-message-subject')?.value.trim() || 'Mensagem do CardLink';
+  const message = document.getElementById('admin-message-body')?.value.trim();
+  if (!userId || !message) {
+    showToast('⚠️', 'Escreva uma mensagem para o usuário');
+    return;
+  }
+  try {
+    await api(`/admin/users/${userId}/message`, {
+      method: 'POST',
+      body: JSON.stringify({ subject, message })
+    });
+    closeAdminMessageModal();
+    showToast('✅', 'Mensagem enviada ao usuário');
+  } catch (err) {
+    showToast('❌', 'Erro ao enviar mensagem: ' + err.message);
+  }
 }
 
 function renderAdminSupport(tickets) {

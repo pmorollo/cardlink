@@ -1,7 +1,9 @@
 const express = require('express');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
+const { requireCustomer } = require('../middleware/roles');
 const { sendEmail } = require('../utils/email');
+const { hasActiveCustomerAccess } = require('../utils/subscription');
 
 const router = express.Router();
 
@@ -12,7 +14,7 @@ router.get('/public/:slug', async (req, res) => {
   }
 
   const owner = await userRepo.findById(card.user_id);
-  const isOwnerPro = owner && (owner.plan === 'pro' || owner.is_admin);
+  const isOwnerPro = hasActiveCustomerAccess(owner);
 
   if (!isOwnerPro) {
     return res.status(402).json({ error: 'subscription_required', message: 'Assinatura pendente para este cartão' });
@@ -31,9 +33,9 @@ router.post('/public/:slug/contact', async (req, res) => {
     return res.status(404).json({ error: 'Cartão não encontrado' });
   }
 
-  // Check if owner is active (PRO/Admin)
+  // Apenas clientes PRO mantêm o cartão público ativo
   const owner = await userRepo.findById(card.user_id);
-  const isOwnerPro = owner && (owner.plan === 'pro' || owner.is_admin);
+  const isOwnerPro = hasActiveCustomerAccess(owner);
   if (!isOwnerPro) {
     return res.status(402).json({ error: 'subscription_required', message: 'Assinatura pendente para este cartão' });
   }
@@ -94,7 +96,7 @@ router.post('/public/:slug/contact', async (req, res) => {
   res.status(201).json({ message: 'Contato enviado com sucesso!' });
 });
 
-router.get('/cards/:cardId/contacts', authMiddleware, async (req, res) => {
+router.get('/cards/:cardId/contacts', authMiddleware, requireCustomer, async (req, res) => {
   const cardId = Number(req.params.cardId);
   const card = await cardRepo.findByIdAndUser(cardId, req.userId);
   if (!card) {

@@ -19,20 +19,17 @@ const dbDir = path.join(__dirname, 'db');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 
-console.log('[DIAG] CAKTO_SECRET presente:', !!process.env.CAKTO_SECRET, '| valor:', JSON.stringify(process.env.CAKTO_SECRET || null));
-console.log('[DIAG] NODE_ENV:', JSON.stringify(process.env.NODE_ENV));
-console.log('[DIAG] ADMIN_EMAILS:', JSON.stringify(process.env.ADMIN_EMAILS || null));
-console.log('[DIAG] JWT_SECRET presente:', !!process.env.JWT_SECRET);
 
 const authRoutes = require('./routes/auth');
 const cardRoutes = require('./routes/cards');
 const contactRoutes = require('./routes/contacts');
 const uploadRoutes = require('./routes/upload');
 const aiRoutes = require('./routes/ai');
-const { adminRouter, supportRouter } = require('./routes/admin');
+const { adminRouter, supportRouter, messageRouter } = require('./routes/admin');
 const paymentRoutes = require('./routes/payments');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('./db/repository');
 const { sendEmail } = require('./utils/email');
+const { hasActiveCustomerAccess } = require('./utils/subscription');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -86,24 +83,6 @@ const apiLimiter = rateLimit({
 });
 
 // ─── Routes ───────────────────────────────────────────────────────
-const { pgIsReady } = require('./db/repository');
-// [DIAG] endpoint temporário — só informa PRESENÇA de variáveis, sem expor valores
-app.get('/api/diag', (req, res) => {
-  const env = process.env;
-  res.json({
-    node_env: env.NODE_ENV || null,
-    cakto_secret_presente: !!env.CAKTO_SECRET,
-    cakto_secret_tamanho: env.CAKTO_SECRET ? String(env.CAKTO_SECRET).length : 0,
-    cakto_secret_comeca_com_aspas: env.CAKTO_SECRET ? String(env.CAKTO_SECRET).startsWith('"') : null,
-    database_url_presente: !!env.DATABASE_URL,
-    postgres_ativo: pgIsReady(),
-    admin_emails: env.ADMIN_EMAILS || null,
-    jwt_secret_presente: !!env.JWT_SECRET,
-    smtp_host: env.SMTP_HOST || null,
-    porta: env.PORT || null
-  });
-});
-
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/cards', apiLimiter, cardRoutes);
 app.use('/api', apiLimiter, contactRoutes);
@@ -111,7 +90,13 @@ app.use('/api/upload', apiLimiter, uploadRoutes);
 app.use('/api/ai', apiLimiter, aiRoutes);
 app.use('/api/admin', apiLimiter, adminRouter);
 app.use('/api/support', apiLimiter, supportRouter);
+app.use('/api/messages', apiLimiter, messageRouter);
 app.use('/api/payments', apiLimiter, paymentRoutes);
+
+// Rotas /api desconhecidas não devem cair no SPA nem expor diagnósticos.
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Endpoint não encontrado' });
+});
 
 // Image proxy/streaming route
 app.get('/uploads/:filename', async (req, res, next) => {
@@ -163,45 +148,23 @@ app.get('/site/:slug/qr-whatsapp', async (req, res) => {
       return res.status(404).send('Cartão não encontrado');
     }
 
-    // Check if card owner is active (PRO/Admin)
+    // Apenas cartões pertencentes a clientes PRO ficam ativos.
     const owner = await userRepo.findById(card.user_id);
-    const isOwnerPro = owner && (owner.plan === 'pro' || owner.is_admin);
+    const isOwnerPro = hasActiveCustomerAccess(owner);
     if (!isOwnerPro) {
       return res.redirect(`/site/${card.slug}`);
     }
 
     // Increment view count
-    await cardRepo.update(card.id, { views_count: (card.views_count || 0) + 1 });
+    await cardRepo.update(card.id, { qr_scans_count: (card.qr_scans_count || 0) + 1 });
 
-    // Insert an anonymous scan record in the contacts table
-    await contactRepo.insert({
-      card_id: card.id,
-      name: 'Visitante (QR Code)',
-      email: '',
-      phone: 'Via Balcão',
-      message: 'Escaneou o seu QR Code físico/balcão para falar no WhatsApp.'
-    });
-
-    // Get owner to send notification email (already fetched above)
-    if (owner && owner.email) {
-      try {
-        await sendEmail({
-          to: owner.email,
-          subject: '🎉 Alguém escaneou seu QR Code do CardLink!',
-          text: `Olá, ${owner.name}! Um cliente acabou de escanear o QR Code de balcão do seu CardLink para falar com você no WhatsApp.`
-        });
-      } catch (emailErr) {
-        console.error('Erro ao enviar e-mail de notificação de QR:', emailErr);
-      }
-    }
-
-    // Clean up phone number for WhatsApp redirect
+        // Clean up phone number for WhatsApp redirect
     const cleanPhone = (card.whatsapp || card.phone || '').replace(/\D/g, '');
     if (!cleanPhone) {
       return res.redirect(`/site/${card.slug}`);
     }
 
-    const text = encodeURIComponent('Olá! Escaneei o seu QR Code do CardLink e gostaria de tirar uma dúvida.');
+    const text = encodeURIComponent('Olá! Vim pelo seu CardLink. ✅');
     res.redirect(`https://wa.me/${cleanPhone}?text=${text}`);
   } catch (err) {
     console.error('Error on QR redirect:', err);
@@ -213,6 +176,9 @@ app.get('/site/:slug/qr-whatsapp', async (req, res) => {
 app.get('/site/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'frontend', 'landing.html'));
 });
+
+// Entrada administrativa canônica. O SPA autentica e direciona para o painel admin.
+app.get('/admin', (req, res) => res.redirect('/#admin'));
 
 // SPA catch-all
 app.get('*', (req, res) => {
@@ -226,33 +192,10 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: err.message || 'Erro no servidor' });
 });
 
-// Função para garantir que os e-mails em ADMIN_EMAILS tenham plano 'pro' e is_admin = true
-async function ensureAdmins() {
-  try {
-    const { ADMIN_EMAILS } = require('./config');
-    const { users } = require('./db/repository');
-    if (ADMIN_EMAILS && ADMIN_EMAILS.length > 0) {
-      for (const email of ADMIN_EMAILS) {
-        const user = await users.findByEmail(email);
-        if (user) {
-          if (user.plan !== 'pro' || !user.is_admin) {
-            console.log(`[Startup] Atualizando privilégios do admin: ${email}`);
-            await users.update(user.id, { plan: 'pro', is_admin: true });
-          }
-        }
-      }
-    }
-  } catch (err) {
-    console.error('[Startup] Erro ao garantir privilégios de administrador:', err);
-  }
-}
-
 module.exports = app;
 
 if (require.main === module) {
-  ensureAdmins().then(() => {
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando em http://localhost:${PORT}`);
-    });
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
   });
 }

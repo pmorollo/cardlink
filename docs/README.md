@@ -16,3 +16,18 @@
 ---
 
 Documento completo: ver `cardlink-apresentacao-marketing.md`.
+
+
+**Diretrizes atuais de produto e marketing:** ver `DIRETRIZES-PRODUTO-MARKETING.md`.
+
+
+## Fluxo de acesso atual
+
+- **Conta de cliente:** nasce após pagamento confirmado pela Cakto e precisa ser ativada por link enviado ao e-mail do comprador.
+- **Conta administrativa:** única, sem cartão e sem assinatura.
+- **Contas internas de teste:** criadas manualmente e excluídas das métricas comerciais.
+
+Comandos de manutenção local:
+
+- `npm run admin:set -- email@exemplo.com SenhaCom8+ "Administrador"`
+- `npm run test-user:create -- email@exemplo.com SenhaCom8+ "Nome do teste"`

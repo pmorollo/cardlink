@@ -410,14 +410,39 @@ function renderServices(d) {
   const grid = document.getElementById('services-grid');
   if (!grid) return;
 
-  const hasRealServices = d.products && d.products.length > 0;
+  const titleEl = document.getElementById('services-title');
+  const descEl = document.getElementById('services-desc');
+  const products = Array.isArray(d.products) ? d.products : [];
+  const mode = d.services_mode || (products.length ? 'list' : 'image');
+  const sectionTitle = d.services_title || (mode === 'image' ? 'Tabela / Cardápio' : 'Meus Serviços');
+  const hasImage = mode === 'image' && !!d.services_image_url;
+  const hasRealServices = mode === 'list' && products.length > 0;
+
+  if (titleEl) titleEl.textContent = sectionTitle;
+  if (descEl) {
+    descEl.textContent = hasImage
+      ? 'Consulte abaixo as opções, serviços e valores disponíveis.'
+      : 'Soluções pensadas para atender você com qualidade e atenção.';
+  }
+
+  if (hasImage) {
+    grid.style.display = 'block';
+    grid.innerHTML = `
+      <div class="animate-in" style="max-width:920px;margin:0 auto;text-align:center;">
+        <img src="${esc(d.services_image_url)}" alt="${esc(sectionTitle)}"
+          style="width:100%;height:auto;max-height:1200px;object-fit:contain;border-radius:18px;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-sm);"
+          onerror="this.closest('#servicos')?.remove()">
+      </div>`;
+    return;
+  }
+
   if (!hasRealServices && !ownerToken) {
     removePublicSection('servicos');
     return;
   }
-  const services = hasRealServices ? d.products : getSmartServices(d.title, d.business);
-  const isPlaceholder = !hasRealServices;
 
+  grid.style.display = '';
+  const services = hasRealServices ? products : getSmartServices(d.title, d.business);
   if (!hasRealServices) makePlaceholderHint('services-placeholder-hint', 'Adicionar seus serviços reais');
 
   grid.innerHTML = services.map((s, i) => {

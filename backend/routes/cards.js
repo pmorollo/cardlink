@@ -2,6 +2,7 @@ const express = require('express');
 const slugify = require('slugify');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
+const { requireCustomer } = require('../middleware/roles');
 
 const router = express.Router();
 
@@ -48,10 +49,19 @@ function sanitizeEmail(value) {
   return v.substring(0, 200);
 }
 
-router.get('/stats/summary', authMiddleware, async (req, res) => {
+function sanitizeServicesMode(value, fallback = 'image') {
+  return value === 'list' || value === 'image' ? value : fallback;
+}
+
+function sanitizeServicesTitle(value) {
+  if (value === undefined || value === null) return undefined;
+  return String(value).trim().substring(0, 120);
+}
+
+router.get('/stats/summary', authMiddleware, requireCustomer, async (req, res) => {
   const card = await cardRepo.findOneByUserId(req.userId);
   if (!card) {
-    return res.json({ hasCard: false, card: null, stats: { views: 0, contacts: 0 } });
+    return res.json({ hasCard: false, card: null, stats: { views: 0, contacts: 0, qrScans: 0 } });
   }
 
   const contactList = await contactRepo.findByCardId(card.id);
@@ -63,26 +73,27 @@ router.get('/stats/summary', authMiddleware, async (req, res) => {
     stats: {
       views: card.views_count || 0,
       contacts: contactList.length,
+      qrScans: card.qr_scans_count || 0,
       recentContacts: contactList.slice(0, 5)
     }
   });
 });
 
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, requireCustomer, async (req, res) => {
   const cardList = await cardRepo.findByUserId(req.userId);
   cardList.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   res.json(cardList);
 });
 
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, requireCustomer, async (req, res) => {
   const { name } = req.body;
   if (!name) {
     return res.status(400).json({ error: 'Nome é obrigatório' });
   }
 
-  // Check if user is PRO/Admin
-  const user = await userRepo.findById(req.userId);
-  const isPro = user && (user.plan === 'pro' || user.is_admin);
+  // Somente clientes PRO podem criar ou editar cartão.
+  const user = req.currentUser || await userRepo.findById(req.userId);
+  const isPro = user && user.plan === 'pro';
 
   if (!isPro) {
     return res.status(402).json({ error: 'subscription_required', message: 'Assinatura ativa do CardLink PRO necessária para salvar ou editar cartões' });
@@ -123,6 +134,9 @@ router.post('/', authMiddleware, async (req, res) => {
       twitter: req.body.twitter !== undefined ? sanitizeSocialUrl(req.body.twitter) : existing.twitter,
       theme: req.body.theme || existing.theme,
       site_button_text: req.body.site_button_text !== undefined ? String(req.body.site_button_text).substring(0, 200) : existing.site_button_text,
+      services_mode: req.body.services_mode !== undefined ? sanitizeServicesMode(req.body.services_mode, existing.services_mode || 'image') : existing.services_mode,
+      services_title: req.body.services_title !== undefined ? sanitizeServicesTitle(req.body.services_title) : existing.services_title,
+      services_image_url: req.body.services_image_url !== undefined ? sanitizeSocialUrl(req.body.services_image_url, 1000) : existing.services_image_url,
       products: productsToSave !== undefined ? productsToSave : existing.products,
       gallery: galleryToSave !== undefined ? galleryToSave : existing.gallery,
       testimonials: testimonialsToSave !== undefined ? testimonialsToSave : existing.testimonials,
@@ -157,16 +171,20 @@ router.post('/', authMiddleware, async (req, res) => {
     twitter: sanitizeSocialUrl(req.body.twitter),
     theme: req.body.theme || 'midnight',
     site_button_text: req.body.site_button_text ? String(req.body.site_button_text).substring(0, 200) : null,
+    services_mode: sanitizeServicesMode(req.body.services_mode, 'image'),
+    services_title: sanitizeServicesTitle(req.body.services_title) || '',
+    services_image_url: sanitizeSocialUrl(req.body.services_image_url, 1000) || '',
     products: productsToSave || [],
     gallery: galleryToSave || [],
     testimonials: testimonialsToSave || [],
-    views_count: 0
+    views_count: 0,
+    qr_scans_count: 0
   });
 
   res.status(201).json(card);
 });
 
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/:id', authMiddleware, requireCustomer, async (req, res) => {
   const id = Number(req.params.id);
   const card = await cardRepo.findByIdAndUser(id, req.userId);
   if (!card) {
@@ -175,7 +193,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
   res.json(card);
 });
 
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
   const id = Number(req.params.id);
   const card = await cardRepo.findByIdAndUser(id, req.userId);
   if (!card) {
@@ -209,6 +227,9 @@ router.put('/:id', authMiddleware, async (req, res) => {
     twitter: req.body.twitter !== undefined ? sanitizeSocialUrl(req.body.twitter) : card.twitter,
     theme: req.body.theme || card.theme,
     site_button_text: req.body.site_button_text !== undefined ? String(req.body.site_button_text).substring(0, 200) : card.site_button_text,
+    services_mode: req.body.services_mode !== undefined ? sanitizeServicesMode(req.body.services_mode, card.services_mode || 'image') : card.services_mode,
+    services_title: req.body.services_title !== undefined ? sanitizeServicesTitle(req.body.services_title) : card.services_title,
+    services_image_url: req.body.services_image_url !== undefined ? sanitizeSocialUrl(req.body.services_image_url, 1000) : card.services_image_url,
     products: req.body.products !== undefined ? req.body.products : card.products,
     gallery: req.body.gallery !== undefined ? req.body.gallery : card.gallery,
     testimonials: req.body.testimonials !== undefined ? req.body.testimonials : card.testimonials,
@@ -218,7 +239,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
   res.json(updated);
 });
 
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, requireCustomer, async (req, res) => {
   const id = Number(req.params.id);
   const card = await cardRepo.findByIdAndUser(id, req.userId);
   if (!card) {

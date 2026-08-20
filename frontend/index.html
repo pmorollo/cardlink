@@ -31,9 +31,10 @@
         <span>Card<span class="text-gradient">Link</span></span>
       </div>
       <div class="navbar-cta" id="nav-cta">
-        <a href="javascript:void(0)" onclick="openUserManualModal()" style="color:var(--text-secondary);text-decoration:none;margin-right:15px;font-size:0.9rem;font-weight:600;vertical-align:middle;display:inline-block;" class="hide-mobile">Como Funciona</a>
-        <button class="btn btn-secondary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('login');" style="margin-right:8px;">🔑 Entrar</button>
-        <button class="btn btn-primary btn-sm" onclick="navigateTo('auth'); toggleAuthForm('register');">🚀 PLANO PRO</button>
+        <a href="#como-funciona" class="navbar-link hide-mobile">Como funciona</a>
+        <a href="#demonstracao" class="navbar-link hide-mobile">Demonstração</a>
+        <button class="navbar-login" onclick="navigateTo('auth'); toggleAuthForm('login');">Entrar na conta</button>
+        <button class="btn btn-primary btn-sm navbar-subscribe" onclick="openProPaymentModal()">Assinar CardLink</button>
       </div>
     </div>
   </nav>
@@ -58,45 +59,56 @@
           Compartilhe com um link e conecte-se com seus clientes.
         </p>
         <div class="hero-buttons">
-          <button class="btn btn-primary btn-lg" onclick="handleHeroCta()">
-            🚀 PLANO PRO — R$ 12,90/mês
+          <button class="btn btn-primary btn-lg" onclick="document.getElementById('demonstracao').scrollIntoView({behavior:'smooth'})">
+            Ver demonstração
           </button>
-          <button class="btn btn-secondary btn-lg" onclick="document.querySelector('.features').scrollIntoView({behavior:'smooth'})">
-            Saiba Mais ↓
+          <button class="btn btn-secondary btn-lg" onclick="document.getElementById('recursos').scrollIntoView({behavior:'smooth'})">
+            Conhecer recursos
           </button>
         </div>
 
         <!-- Floating Mockup & Video Container -->
-        <div class="hero-mockup" style="display:flex;flex-direction:column;align-items:center;margin-top:50px;width:100%;">
+        <div class="hero-mockup" id="demonstracao" style="display:flex;flex-direction:column;align-items:center;margin-top:50px;width:100%;">
           
           <div style="width: 100%; text-align: center; margin-bottom: 25px;">
             <span class="hero-badge" style="display:inline-flex;margin-bottom:8px;">🔍 Demonstração Visual</span>
             <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Veja o CardLink na palma da mão e na tela</h3>
           </div>
 
-          <div style="display:flex;gap:35px;flex-wrap:wrap;justify-content:center;align-items:stretch;width:100%;">
+          <div class="showcase-grid">
             
             <!-- Coluna 1: Celular -->
-            <div style="display:flex;flex-direction:column;align-items:center;gap:12px;max-width:250px;width:100%;">
-              <div style="position:relative;width:100%;border-radius:24px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.30);border:6px solid #1e293b;background:#0f172a;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+            <div class="showcase-media-col showcase-phone-col">
+              <div class="phone-demo-shell" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                 <img src="mockup.jpg" alt="Exemplo de Cartão Digital CardLink" style="width:100%;height:auto;display:block;">
               </div>
-              <span style="font-size:0.8rem;font-weight:700;color:var(--text-secondary);letter-spacing:0.04em;text-transform:uppercase;">📱 Design Premium para Celular</span>
+              <span class="showcase-caption showcase-caption-phone">📱 Design Premium para Celular</span>
             </div>
 
             <!-- Coluna 2: Video -->
-            <div style="display:flex;flex-direction:column;align-items:center;gap:12px;max-width:450px;width:100%;">
-              <div style="position:relative;width:100%;border-radius:16px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.30);border:6px solid #1e293b;background:#000000;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                <video 
-                  controls 
-                  preload="metadata"
-                  style="width:100%;display:block;outline:none;"
-                >
-                  <source src="promo.mp4" type="video/mp4">
-                  Seu navegador não suporta a reprodução de vídeos MP4.
-                </video>
+            <div class="showcase-media-col showcase-video-col">
+              <div class="video-demo-shell" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                <div class="video-shell-header">
+                  <div class="video-shell-dots" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                  </div>
+                  <div class="video-shell-title">Apresentação CardLink</div>
+                  <div class="video-shell-badge">HD</div>
+                </div>
+                <div class="video-frame-wrap">
+                  <video
+                    class="demo-video"
+                    controls
+                    preload="metadata"
+                    poster="promo-poster.jpg"
+                    playsinline
+                  >
+                    <source src="promo.mp4" type="video/mp4">
+                    Seu navegador não suporta a reprodução de vídeos MP4.
+                  </video>
+                </div>
               </div>
-              <span style="font-size:0.8rem;font-weight:700;color:var(--purple);letter-spacing:0.04em;text-transform:uppercase;">▶️ Assista ao Vídeo Demonstrativo</span>
+              <span class="showcase-caption showcase-caption-video">▶️ Assista ao Vídeo Demonstrativo</span>
             </div>
 
           </div>
@@ -105,7 +117,7 @@
     </div>
 
     <!-- Features -->
-    <div class="features">
+    <div class="features" id="recursos">
       <div class="container">
         <div class="section-header">
           <h2>Tudo que você precisa <span class="text-gradient">num só link</span></h2>
@@ -146,50 +158,8 @@
       </div>
     </div>
 
-    <!-- Pricing Section -->
-    <div class="pricing-section" id="pricing" style="padding:var(--space-3xl) 0;background:var(--bg-card);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);">
-      <div class="container" style="max-width:800px;text-align:center;">
-        <div class="section-header" style="margin-bottom:var(--space-2xl);">
-          <div class="hero-badge" style="margin:0 auto var(--space-md);width:fit-content;display:inline-flex;">💵 Transparente & Acessível</div>
-          <h2>Plano <span class="text-gradient">Único & Completo</span></h2>
-          <p style="color:var(--text-secondary);">Sem pegadinhas ou limites ocultos. Crie seu cartão e use todos os recursos.</p>
-        </div>
-        
-        <div style="background:var(--bg-surface);border:1.5px solid rgba(139,92,246,0.3);border-radius:var(--radius-xl);padding:var(--space-xl);max-width:440px;margin:0 auto;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-          <div style="position:absolute;top:15px;right:-35px;background:var(--purple);color:#ffffff;font-size:0.68rem;font-weight:bold;padding:4px 35px;transform:rotate(45deg);letter-spacing:0.05em;text-transform:uppercase;">
-            Popular
-          </div>
-          
-          <h3 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:8px;">Assinatura CardLink</h3>
-          <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:20px;">Ideal para autônomos, profissionais e comércios locais.</p>
-          
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
-            <div style="border:2px solid var(--accent);border-radius:12px;padding:14px 10px;background:rgba(139,92,246,0.12);cursor:pointer;transition:all 0.2s;" onclick="handlePricingCta('monthly')">
-              <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Mensal</div>
-              <div style="font-size:1.2rem;font-weight:800;color:var(--text-primary);line-height:1.1;">R$ 12,90<span style="font-size:0.7rem;font-weight:400;">/mês</span></div>
-            </div>
-            <div style="border:1.5px solid var(--border-subtle);border-radius:12px;padding:14px 10px;background:var(--bg-surface);cursor:pointer;position:relative;transition:all 0.2s;" onclick="handlePricingCta('annual')">
-              <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
-              <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Anual</div>
-              <div style="font-size:1.2rem;font-weight:800;color:var(--text-primary);line-height:1.1;">R$ 99,00<span style="font-size:0.7rem;font-weight:400;">/ano</span></div>
-            </div>
-          </div>
-          <p style="color:var(--text-secondary);font-size:0.82rem;margin:-16px 0 24px;">Assine mensal por R$ 12,90/mês ou anual por R$ 99,00 (equivalente a R$ 8,25/mês, economize R$ 55,80 por ano).</p>
-          
-          <ul style="list-style:none;padding:0;margin:0 0 32px 0;text-align:left;display:flex;flex-direction:column;gap:12px;font-size:0.92rem;color:var(--text-secondary);">
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Página profissional 100% online</span></li>
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Vitrine de Produtos & Serviços</span></li>
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Depoimentos & Avaliações</span></li>
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Galeria de Fotos / Portfólio</span></li>
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Assistente de Conteúdo com IA</span></li>
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>QR Code de Balcão e Métricas</span></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
     <!-- How it Works -->
-    <div class="how-it-works">
+    <div class="how-it-works" id="como-funciona">
       <div class="container">
         <div class="section-header">
           <h2>Como <span class="text-gradient">funciona</span></h2>
@@ -198,18 +168,18 @@
         <div class="steps">
           <div class="step animate-in">
             <div class="step-number">1</div>
-            <h3>Crie sua conta</h3>
-            <p>Cadastre-se com seu nome, email e senha para começar.</p>
+            <h3>Assine o CardLink</h3>
+            <p>Escolha o plano mensal ou anual e conclua o pagamento com segurança pela Cakto.</p>
           </div>
           <div class="step animate-in">
             <div class="step-number">2</div>
-            <h3>Monte seu cartão</h3>
-            <p>Preencha seus dados, escolha um tema e veja o preview ao vivo.</p>
+            <h3>Ative e personalize</h3>
+            <p>Após a confirmação, defina sua senha e monte sua página com seus dados, imagens e conteúdos.</p>
           </div>
           <div class="step animate-in">
             <div class="step-number">3</div>
-            <h3>Compartilhe o link</h3>
-            <p>Copie o link gerado (ex: /c/seu-nome) e compartilhe em qualquer lugar.</p>
+            <h3>Compartilhe e use</h3>
+            <p>Distribua seu link e QR Code, receba contatos e volte ao painel sempre que quiser atualizar sua página.</p>
           </div>
         </div>
       </div>
@@ -306,14 +276,57 @@
       </div>
     </div>
 
+    <!-- Pricing Section -->
+    <div class="pricing-section" id="pricing" style="padding:var(--space-3xl) 0;background:var(--bg-card);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);">
+      <div class="container" style="max-width:800px;text-align:center;">
+        <div class="section-header" style="margin-bottom:var(--space-2xl);">
+          <div class="hero-badge" style="margin:0 auto var(--space-md);width:fit-content;display:inline-flex;">💵 Transparente & Acessível</div>
+          <h2>Plano <span class="text-gradient">Único & Completo</span></h2>
+          <p style="color:var(--text-secondary);">Sem pegadinhas ou limites ocultos. Crie seu cartão e use todos os recursos.</p>
+        </div>
+
+        <div style="background:var(--bg-surface);border:1.5px solid rgba(139,92,246,0.3);border-radius:var(--radius-xl);padding:var(--space-xl);max-width:440px;margin:0 auto;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+          <div style="position:absolute;top:15px;right:-35px;background:var(--purple);color:#ffffff;font-size:0.68rem;font-weight:bold;padding:4px 35px;transform:rotate(45deg);letter-spacing:0.05em;text-transform:uppercase;">
+            Popular
+          </div>
+
+          <h3 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:8px;">Assinatura CardLink</h3>
+          <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:20px;">Ideal para autônomos, profissionais e comércios locais.</p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
+            <div style="border:2px solid var(--accent);border-radius:12px;padding:14px 10px;background:rgba(139,92,246,0.12);transition:all 0.2s;">
+              <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Mensal</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--text-primary);line-height:1.1;">R$ 12,90<span style="font-size:0.7rem;font-weight:400;">/mês</span></div>
+            </div>
+            <div style="border:1.5px solid var(--border-subtle);border-radius:12px;padding:14px 10px;background:var(--bg-surface);position:relative;transition:all 0.2s;">
+              <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
+              <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Anual</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--text-primary);line-height:1.1;">R$ 99,00<span style="font-size:0.7rem;font-weight:400;">/ano</span></div>
+            </div>
+          </div>
+          <p style="color:var(--text-secondary);font-size:0.82rem;margin:-16px 0 24px;">Assine mensal por R$ 12,90/mês ou anual por R$ 99,00 (equivalente a R$ 8,25/mês, economize R$ 55,80 por ano).</p>
+
+          <ul style="list-style:none;padding:0;margin:0 0 32px 0;text-align:left;display:flex;flex-direction:column;gap:12px;font-size:0.92rem;color:var(--text-secondary);">
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Página profissional 100% online</span></li>
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Vitrine de Produtos & Serviços</span></li>
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Depoimentos & Avaliações</span></li>
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Galeria de Fotos / Portfólio</span></li>
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Assistente de Conteúdo com IA</span></li>
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>QR Code de Balcão e Métricas</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
     <!-- CTA -->
     <div class="cta-section">
       <div class="container">
         <div class="cta-box">
-          <h2>Pronto para criar seu <span class="text-gradient">cartão digital</span>?</h2>
-          <p>Comece agora: R$ 12,90/mês ou R$ 99,00/ano (36% OFF). Cancele quando quiser!</p>
-          <button class="btn btn-primary btn-lg" onclick="handleHeroCta()">
-            🚀 PLANO PRO — R$ 12,90/mês
+          <h2>Pronto para ter seu <span class="text-gradient">CardLink</span>?</h2>
+          <p>Escolha o plano mensal por R$ 12,90 ou anual por R$ 99,00. Após a confirmação do pagamento, você recebe o acesso para criar e publicar seu CardLink.</p>
+          <button class="btn btn-primary btn-lg" onclick="openProPaymentModal()">
+            Quero meu CardLink
           </button>
         </div>
       </div>
@@ -343,7 +356,7 @@
         <!-- Login Form -->
         <div id="login-form">
           <h1 class="auth-title">Entrar no <span class="text-gradient">CardLink</span></h1>
-          <p class="auth-subtitle">Acesse seus cartões de visita</p>
+          <p class="auth-subtitle">Acesse seu CardLink e gerencie sua página profissional</p>
           <div class="form-group">
             <label class="form-label" for="login-email">E-mail</label>
             <input class="form-input" type="email" id="login-email" placeholder="seu@email.com">
@@ -359,60 +372,47 @@
             Entrar
           </button>
           <p class="auth-toggle">
-            Não tem conta? <a href="#" onclick="toggleAuthForm('register');return false;">Criar conta</a>
+            Ainda não é assinante? <a href="#" onclick="openProPaymentModal();return false;">Escolher um plano</a>
           </p>
         </div>
 
-        <!-- Register Form -->
-        <div id="register-form" style="display:none;">
-          <h1 class="auth-title">Plano <span class="text-gradient">PRO</span></h1>
-          <p class="auth-subtitle">Cadastre seus dados e escolha seu plano para ir ao checkout da Cakto.</p>
+        <!-- Activation Form: exibido somente pelo link enviado após pagamento -->
+        <div id="activation-form" style="display:none;">
+          <h1 class="auth-title">Ativar <span class="text-gradient">CardLink</span></h1>
+          <p class="auth-subtitle">Pagamento confirmado. Defina sua senha para começar.</p>
           <div class="form-group">
-            <label class="form-label" for="register-name">Nome</label>
-            <input class="form-input" type="text" id="register-name" placeholder="Seu nome completo">
+            <label class="form-label" for="activation-email">E-mail da assinatura</label>
+            <input class="form-input" type="email" id="activation-email" readonly>
+          </div>
+          <input type="hidden" id="activation-token">
+          <div class="form-group">
+            <label class="form-label" for="activation-password">Crie sua senha</label>
+            <input class="form-input" type="password" id="activation-password" minlength="8" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
           </div>
           <div class="form-group">
-            <label class="form-label" for="register-email">E-mail</label>
-            <input class="form-input" type="email" id="register-email" placeholder="seu@email.com">
+            <label class="form-label" for="activation-password-confirm">Confirme a senha</label>
+            <input class="form-input" type="password" id="activation-password-confirm" minlength="8" placeholder="Repita sua senha" autocomplete="new-password">
           </div>
-          <div class="form-group">
-            <label class="form-label" for="register-password">Senha</label>
-            <input class="form-input" type="password" id="register-password" placeholder="Mínimo 8 caracteres">
-          </div>
-
-          <!-- Seletor de Plano Mensal vs Anual -->
-          <div style="margin:18px 0 10px;">
-            <label class="form-label" style="font-weight:700;margin-bottom:8px;display:block;text-align:left;">1. Escolha o seu plano:</label>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <!-- Opção Mensal -->
-              <div id="plan-option-monthly" onclick="selectRegisterPlan('monthly')" style="border:2px solid var(--accent);border-radius:12px;padding:12px;background:rgba(139,92,246,0.12);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px;">
-                <span id="plan-radio-monthly" style="color:var(--accent);font-size:1.1rem;">🔘</span>
-                <div>
-                  <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Mensal</div>
-                  <div style="font-size:1.05rem;font-weight:800;color:var(--text-primary);">R$ 12,90<span style="font-size:0.7rem;font-weight:400;">/mês</span></div>
-                </div>
-              </div>
-              <!-- Opção Anual -->
-              <div id="plan-option-annual" onclick="selectRegisterPlan('annual')" style="border:1.5px solid var(--border-subtle);border-radius:12px;padding:12px;background:var(--surface);cursor:pointer;text-align:left;position:relative;transition:all 0.2s;display:flex;align-items:center;gap:10px;">
-                <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
-                <span id="plan-radio-annual" style="color:var(--text-tertiary);font-size:1.1rem;">⚪</span>
-                <div>
-                  <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Anual</div>
-                  <div style="font-size:1.05rem;font-weight:800;color:var(--text-primary);">R$ 99,00<span style="font-size:0.7rem;font-weight:400;">/ano</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group" style="display:flex;align-items:flex-start;gap:8px;margin-top:12px;text-align:left;">
-            <input type="checkbox" id="register-terms" style="margin-top:4px;cursor:pointer;">
-            <label for="register-terms" style="font-size:0.8rem;color:var(--text-secondary);cursor:pointer;line-height:1.4;">
-              Declaro que li e aceito os <a href="#/terms" style="color:var(--purple);text-decoration:underline;">Termos de Uso</a> e a <a href="#/privacy" style="color:var(--purple);text-decoration:underline;">Política de Privacidade</a>.
-            </label>
-          </div>
-          <button id="register-submit-btn" class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);font-weight:bold;" onclick="handleRegister()">
-            💳 Pagar R$ 12,90/mês na Cakto
+          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleActivateAccount()">
+            Ativar e entrar no CardLink
           </button>
+        </div>
+
+        <!-- Email Change Verification Form -->
+        <div id="verify-email-form" style="display:none;">
+          <h1 class="auth-title">Confirmar <span class="text-gradient">E-mail</span></h1>
+          <p class="auth-subtitle">Confirme o novo endereço para concluir a alteração da conta.</p>
+          <div class="form-group">
+            <label class="form-label" for="verify-email-address">Novo e-mail</label>
+            <input class="form-input" type="email" id="verify-email-address" readonly>
+          </div>
+          <input type="hidden" id="verify-email-token">
+          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleConfirmEmailChange()">
+            Confirmar novo e-mail
+          </button>
+          <p class="auth-toggle">
+            O endereço atual permanece válido até esta confirmação.
+          </p>
         </div>
 
         <!-- Forgot Password Form -->
@@ -484,7 +484,7 @@
           <nav class="settings-nav" aria-label="Áreas de configuração">
             <button class="settings-nav-item active" type="button" data-settings-target="profile" onclick="showSettingsSection('profile')">Perfil</button>
             <button class="settings-nav-item" type="button" data-settings-target="contact" onclick="showSettingsSection('contact')">Contato</button>
-            <button class="settings-nav-item" type="button" data-settings-target="services" onclick="showSettingsSection('services')">Serviços</button>
+            <button class="settings-nav-item" type="button" data-settings-target="services" onclick="showSettingsSection('services')">Tabela / Cardápio</button>
             <button class="settings-nav-item" type="button" data-settings-target="gallery" onclick="showSettingsSection('gallery')">Imagens</button>
             <button class="settings-nav-item" type="button" data-settings-target="testimonials" onclick="showSettingsSection('testimonials')">Avaliações</button>
             <button class="settings-nav-item" type="button" data-settings-target="social" onclick="showSettingsSection('social')">Redes</button>
@@ -659,13 +659,52 @@
             </div>
           </div>
 
-          <!-- Products / Services -->
+          <!-- Flexible services / menu / price list -->
           <div class="form-section settings-section" data-settings-section="services">
-            <div class="form-section-title"><span class="icon">🛍️</span> Produtos & Serviços (Vitrine)</div>
-            <div id="builder-products-container"></div>
-            <button class="btn btn-secondary btn-sm" type="button" onclick="addProductRow()" style="margin-top:8px;">
-              + Adicionar Produto / Serviço
-            </button>
+            <div class="form-section-title"><span class="icon">📋</span> Tabela, Cardápio ou Serviços</div>
+            <p style="color:var(--text-secondary);font-size:0.86rem;line-height:1.55;margin:-4px 0 16px;">
+              Mostre seu conteúdo do seu jeito: envie uma arte pronta com preços/cardápio ou monte uma lista de itens no CardLink.
+            </p>
+
+            <div class="form-row">
+              <div class="form-group" style="flex:1;">
+                <label class="form-label" for="field-services-mode">Como deseja apresentar?</label>
+                <select class="form-input" id="field-services-mode" data-field="services_mode" onchange="toggleServicesMode(); updatePreview();">
+                  <option value="image">Enviar tabela, cardápio ou arte pronta</option>
+                  <option value="list">Criar lista de produtos / serviços</option>
+                </select>
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label class="form-label" for="field-services-title">Título da seção</label>
+                <input class="form-input" type="text" id="field-services-title" data-field="services_title" placeholder="Ex: Cardápio, Tabela de Preços, Nossos Serviços">
+              </div>
+            </div>
+
+            <div id="services-image-builder">
+              <div class="form-group">
+                <label class="form-label">Imagem da tabela / cardápio</label>
+                <div style="border:1.5px dashed var(--border-subtle);border-radius:var(--radius-lg);padding:16px;text-align:center;background:var(--bg-surface);">
+                  <img id="services-image-preview" alt="Prévia da tabela ou cardápio" style="display:none;max-width:100%;max-height:520px;object-fit:contain;border-radius:12px;margin:0 auto 12px;">
+                  <div id="services-image-placeholder" style="color:var(--text-secondary);font-size:0.86rem;line-height:1.5;margin-bottom:12px;">
+                    Envie a arte que você já usa no seu negócio — tabela de preços, cardápio, relação de serviços ou catálogo resumido.
+                  </div>
+                  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+                    <button class="btn btn-secondary btn-sm" type="button" onclick="document.getElementById('services-image-file').click()">📷 Escolher imagem</button>
+                    <button class="btn btn-outline btn-sm" type="button" id="services-image-remove" onclick="clearServicesImage()" style="display:none;">Remover</button>
+                  </div>
+                  <input type="file" id="services-image-file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="handleServicesImageUpload(this)">
+                  <input type="hidden" id="field-services-image" data-field="services_image_url">
+                  <small style="color:var(--text-muted);display:block;margin-top:10px;">JPG, PNG ou WebP. O CardLink otimiza a imagem antes do envio.</small>
+                </div>
+              </div>
+            </div>
+
+            <div id="services-list-builder" style="display:none;">
+              <div id="builder-products-container"></div>
+              <button class="btn btn-secondary btn-sm" type="button" onclick="addProductRow()" style="margin-top:8px;">
+                + Adicionar Produto / Serviço
+              </button>
+            </div>
           </div>
 
           <!-- Photo Gallery -->
@@ -787,7 +826,7 @@
       </div>
       <div style="text-align:center;padding:20px 16px 32px;">
         <a href="/" onclick="navigateTo('auth');return false;" style="color:var(--purple);font-size:0.85rem;text-decoration:none;font-weight:500;opacity:0.7;transition:opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
-          ✨ Crie seu próprio cartão digital — é grátis
+          ✨ Conheça o CardLink e crie sua presença profissional
         </a>
       </div>
     </div>
@@ -835,6 +874,11 @@
           <div class="form-group">
             <label class="form-label" for="account-email">E-mail de acesso</label>
             <input class="form-input" type="email" id="account-email" autocomplete="email">
+            <div id="account-email-status" style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="account-email-password">Senha atual <span style="font-weight:400;color:var(--text-muted);">(somente para trocar o e-mail)</span></label>
+            <input class="form-input" type="password" id="account-email-password" autocomplete="current-password" placeholder="Confirme sua senha para alterar o e-mail">
           </div>
           <button class="btn btn-primary" type="button" onclick="saveAccountProfile()">Salvar dados da conta</button>
         </div>
@@ -865,7 +909,7 @@
           <h1 class="builder-title">Painel do <span class="text-gradient">Proprietário</span></h1>
           <p class="builder-subtitle">Gerenciamento de usuários, métricas globais e chamados de suporte.</p>
         </div>
-        <button class="btn btn-secondary" onclick="navigateTo('dashboard')">← Voltar ao painel</button>
+        <button class="btn btn-secondary" onclick="handleLogout()">Sair do administrador</button>
       </div>
 
       <!-- Métricas Globais -->
@@ -873,7 +917,7 @@
         <div class="stat-card">
           <div class="stat-icon">👥</div>
           <div class="stat-value" id="admin-metric-users">-</div>
-          <div class="stat-label">Total de Usuários</div>
+          <div class="stat-label">Clientes comerciais</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon">🌐</div>
@@ -889,6 +933,21 @@
           <div class="stat-icon">📩</div>
           <div class="stat-value" id="admin-metric-contacts">-</div>
           <div class="stat-label">Contatos Gerados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔳</div>
+          <div class="stat-value" id="admin-metric-qr-scans">-</div>
+          <div class="stat-label">QR escaneados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💳</div>
+          <div class="stat-value" id="admin-metric-active-subscriptions">-</div>
+          <div class="stat-label">Assinaturas ativas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🧪</div>
+          <div class="stat-value" id="admin-metric-internal-tests">-</div>
+          <div class="stat-label">Testes internos</div>
         </div>
       </div>
 
@@ -912,12 +971,13 @@
                 <tr style="border-bottom:2px solid var(--border-subtle);color:var(--text-muted);font-size:0.85rem;">
                   <th style="padding:12px 8px;">Usuário</th>
                   <th style="padding:12px 8px;">Status Página</th>
-                  <th style="padding:12px 8px;">Plano</th>
+                  <th style="padding:12px 8px;">Assinatura</th>
+                  <th style="padding:12px 8px;text-align:right;">Origem</th>
                   <th style="padding:12px 8px;text-align:right;">Ações</th>
                 </tr>
               </thead>
               <tbody id="admin-users-table-body">
-                <tr><td colspan="4" style="text-align:center;padding:var(--space-lg);color:var(--text-secondary);">Carregando usuários...</td></tr>
+                <tr><td colspan="5" style="text-align:center;padding:var(--space-lg);color:var(--text-secondary);">Carregando usuários...</td></tr>
               </tbody>
             </table>
           </div>
@@ -938,6 +998,32 @@
 
     </div>
   </section>
+
+  <!-- Modal de Mensagem Administrativa -->
+  <div class="modal-overlay" id="admin-message-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:110;align-items:center;justify-content:center;">
+    <div class="builder-form-panel" style="max-width:520px;width:92%;max-height:90vh;margin:auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-lg);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;">
+        <div>
+          <h2 class="builder-title" style="margin:0;font-size:1.25rem;">Mensagem ao usuário</h2>
+          <p id="admin-message-recipient" style="color:var(--text-secondary);font-size:0.82rem;margin-top:4px;"></p>
+        </div>
+        <button type="button" onclick="closeAdminMessageModal()" style="font-size:1.6rem;color:var(--text-secondary);">&times;</button>
+      </div>
+      <input type="hidden" id="admin-message-user-id">
+      <div class="form-group">
+        <label class="form-label" for="admin-message-subject">Assunto</label>
+        <input class="form-input" type="text" id="admin-message-subject" maxlength="120" value="Mensagem do CardLink">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="admin-message-body">Mensagem *</label>
+        <textarea class="form-input" id="admin-message-body" rows="5" maxlength="3000" placeholder="Escreva a mensagem que aparecerá no painel do usuário."></textarea>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:18px;">
+        <button class="btn btn-primary" type="button" onclick="sendAdminMessage()" style="flex:1;">Enviar mensagem</button>
+        <button class="btn btn-secondary" type="button" onclick="closeAdminMessageModal()" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal de Ajuda & Suporte -->
   <div class="modal-overlay" id="support-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;">
@@ -1038,8 +1124,8 @@
       <div style="font-size:0.9rem;line-height:1.6;color:var(--text-secondary);display:flex;flex-direction:column;gap:20px;">
         
         <div>
-          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🛠️</span> Passo 1: Cadastro e Primeiro Acesso</h3>
-          <p style="margin:0;">Acesse o site oficial do <strong>CardLink</strong>, clique em "Entrar" e depois em "Criar Conta". Após preencher seus dados, você será direcionado para o seu Painel do Usuário (Dashboard).</p>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🛠️</span> Passo 1: Assinatura e Primeiro Acesso</h3>
+          <p style="margin:0;">Assine o <strong>CardLink</strong> pelo botão de assinatura. Após a confirmação do pagamento pela Cakto, você receberá no e-mail informado um link seguro para confirmar o endereço, definir sua senha e ativar a conta. Depois disso, use <strong>Entrar na conta</strong> sempre que quiser voltar ao painel.</p>
         </div>
 
         <div>
@@ -1055,7 +1141,7 @@
         <div>
           <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🛍️</span> Passo 3: Vitrine, Galeria e Depoimentos</h3>
           <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;">
-            <li><strong>Vitrine:</strong> Cadastre seus serviços e produtos com nome, preço e descrição. Seus clientes poderão ver os preços organizados e solicitar a contratação direto pelo WhatsApp.</li>
+            <li><strong>Tabela, Cardápio ou Serviços:</strong> envie sua própria arte de preços/cardápio ou crie uma lista de produtos e serviços dentro do CardLink. Na lista estruturada, o cliente pode solicitar diretamente pelo WhatsApp.</li>
             <li><strong>Galeria:</strong> Faça o upload de fotos reais do seu trabalho (portfólio) para gerar credibilidade imediata.</li>
             <li><strong>Depoimentos:</strong> Insira avaliações e avalie com estrelas para comprovar a qualidade do seu atendimento.</li>
           </ul>
@@ -1095,16 +1181,16 @@
       
       <div class="legal-content" style="line-height:1.8;font-size:0.95rem;display:flex;flex-direction:column;gap:20px;text-align:left;">
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">1. Aceitação dos Termos</h3>
-        <p style="color:var(--text-secondary);">Ao se cadastrar e utilizar o CardLink, você concorda plenamente com estes Termos de Uso. Se você não concorda com qualquer parte destes termos, não deve utilizar a plataforma.</p>
+        <p style="color:var(--text-secondary);">Ao contratar, ativar e utilizar o CardLink, você concorda plenamente com estes Termos de Uso. Se você não concorda com qualquer parte destes termos, não deve utilizar a plataforma.</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">2. Cadastro e Responsabilidade da Conta</h3>
-        <p style="color:var(--text-secondary);">Para criar cartões digitais, o usuário deve fornecer dados válidos (como nome e e-mail). A senha criada é pessoal e intransferível. O usuário é inteiramente responsável por todas as atividades e conteúdos publicados sob o seu login e link público.</p>
+        <p style="color:var(--text-secondary);">Para utilizar o CardLink, o assinante deve fornecer dados válidos no pagamento e na ativação da conta. A senha criada é pessoal e intransferível. O usuário é inteiramente responsável por todas as atividades e conteúdos publicados sob o seu login e link público.</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">3. Uso Permitido e Conteúdo</h3>
         <p style="color:var(--text-secondary);">É expressamente proibido utilizar o CardLink para publicar ou transmitir conteúdos ilegais, difamatórios, abusivos, ameaçadores, fraudulentos ou de cunho sexual explícito. O uso da plataforma para a prática de SPAM ou envio em massa de mensagens não autorizadas também resultará no banimento imediato da conta.</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Planos e Assinatura PRO</h3>
-        <p style="color:var(--text-secondary);">O CardLink oferece recursos básicos gratuitos e recursos extras mediante assinatura do plano PRO. A cobrança é recorrente mensal e pode ser cancelada a qualquer momento diretamente pelo intermediador de pagamentos (Cakto). O não pagamento resultará no rebaixamento da conta para o plano grátis (free) e remoção de dados das seções premium.</p>
+        <p style="color:var(--text-secondary);">O CardLink é um serviço por assinatura, com opções mensal e anual apresentadas no checkout. O pagamento é processado pela Cakto e o acesso normal do cliente é liberado após a confirmação da assinatura e a ativação da conta. Em caso de cancelamento, estorno, chargeback ou assinatura inativa, o acesso aos recursos de cliente e a página pública podem ser suspensos. Os dados do cartão podem ser preservados por período razoável para eventual regularização ou reativação, conforme a política vigente.</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">5. Alterações nos Termos</h3>
         <p style="color:var(--text-secondary);">O CardLink reserva-se o direito de atualizar estes termos a qualquer momento. Modificações substanciais serão notificadas aos usuários ou publicadas com destaque em nosso website.</p>
@@ -1169,7 +1255,7 @@
       annualCheckoutUrl: 'https://pay.cakto.com.br/3fjp83k_1032077'
     };
   </script>
-  <script src="app.js?v=30"></script>
+  <script src="app.js?v=31"></script>
   <script>
 
     let deferredPrompt = null;

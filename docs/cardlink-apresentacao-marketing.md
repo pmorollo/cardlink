@@ -2,7 +2,7 @@
 
 > **Objetivo:** orientar o plano de divulgação da landing page e do aplicativo CardLink, convertendo visitantes em **assinaturas pagas** através da plataforma de pagamento da **Cakto**.
 >
-> **Produto:** cartão de visita digital que vira um mini-site de vendas profissional, compartilhável por um único link.
+> **Produto:** presença profissional modular em um único link — pode começar como cartão digital e evoluir para uma página comercial completa.
 
 ---
 
@@ -11,7 +11,7 @@
 O **CardLink** transforma o cartão de visita tradicional em uma página web profissional e completa. Com um único link, o profissional apresenta quem é, o que faz, seus produtos, avaliações e todas as redes sociais — sem precisar gastar milhares de reais com um site complexo.
 
 **Proposta de valor em uma frase:**
-> *"Sua presença profissional online em segundos, num único link."*
+> *"Um link. Seu negócio inteiro."*
 
 **Missão:** simplificar a forma como autônomos, prestadores de serviços e pequenos negócios se apresentam e vendem no mundo digital — fortalecendo a economia e o comércio local.
 
@@ -38,7 +38,7 @@ O **CardLink** transforma o cartão de visita tradicional em uma página web pro
 | **Todas as Redes** | Instagram, Facebook, LinkedIn, TikTok, YouTube e X em um só lugar |
 | **Mensagens & Leads** | Clientes enviam mensagens pelo cartão; você gerencia os contatos no painel |
 | **6 Temas Premium** | Midnight, Ocean, Sunset, Forest, Rose e Monochrome |
-| **Vitrine de Produtos & Serviços** | Exponha o que você vende, com preços, direto no cartão |
+| **Tabela, Cardápio ou Serviços** | Envie sua arte pronta de preços/cardápio ou crie uma lista estruturada de produtos e serviços |
 | **Depoimentos & Avaliações** | Prova social que gera confiança antes do contato |
 | **Galeria de Fotos / Portfólio** | Mostre seu trabalho em imagens |
 | **Assistente de Conteúdo com IA** | Gera textos, descrições e sugestões de serviços em segundos |
@@ -74,28 +74,34 @@ Pagamento processado pela **Cakto** (plataforma de pagamento):
 Visitante
    │
    ▼
-Landing page → CTA "🚀 PLANO PRO" / "✨ Começar Agora"
+Landing page + demonstrações reais
    │
    ▼
-Cadastro rápido (nome, e-mail, senha) — plano free
+Escolha da assinatura Mensal ou Anual
    │
    ▼
-Redirecionamento automático para o checkout da Cakto
+Checkout da Cakto
    │
    ▼
-Pagamento (Pix ou cartão) — assinatura ativada
+Pagamento aprovado
    │
    ▼
-Webhook ativa o PRO automaticamente
+Webhook Cakto → CardLink registra/libera a conta
    │
    ▼
-Painel completo liberado + link público + QR code
+Cliente ativa/acessa sua conta
+   │
+   ▼
+Painel completo + criação/publicação do CardLink + QR Code
 ```
 
+**Regra comercial:** não existe conta gratuita sem utilidade. A conta de cliente está vinculada a uma assinatura válida. O administrador é uma conta operacional separada, sem cartão e sem assinatura.
+
 **Pontos-chave para o marketing:**
-- O cadastro é rápido e o redirecionamento para pagamento é automático (menos atrito).
-- A assinatura é mensal (R$12,90) ou anual (R$99) — reforçar o anual como economia de 36%.
-- A ativação é **imediata** após o pagamento — sem espera.
+- A landing page e os CardLinks demonstrativos devem mostrar o valor antes da compra.
+- O pagamento precede o acesso normal do cliente ao produto.
+- A criação da conta deve ser automática após a confirmação do pagamento pela Cakto; o cliente conclui a ativação definindo sua senha pelo link enviado por e-mail.
+- O CardLink deve ser vendido como ferramenta de presença profissional e produtividade, não apenas como substituto do cartão de papel.
 
 ---
 

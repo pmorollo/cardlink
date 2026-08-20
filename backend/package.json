@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node --test \"test/**/*.test.js\""
+    "test": "node --test \"test/**/*.test.js\"",
+    "admin:set": "node scripts/set-admin.js",
+    "test-user:create": "node scripts/create-test-user.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1101.0",
