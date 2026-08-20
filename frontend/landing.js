@@ -149,6 +149,29 @@ function toast(icon, msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
 }
 
+function showHomeScreenGuide() {
+  if (new URLSearchParams(window.location.search).get('fixar') !== '1') return;
+
+  const guide = document.getElementById('home-screen-guide');
+  const text = document.getElementById('home-screen-guide-text');
+  if (!guide || !text) return;
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  text.textContent = isIOS
+    ? 'Este é o seu cartão. No Safari, toque em Compartilhar e depois em “Adicionar à Tela de Início”.'
+    : 'Este é o seu cartão. Abra o menu do navegador e escolha “Adicionar à tela inicial”.';
+  guide.style.display = 'flex';
+
+  const cleanUrl = new URL(window.location.href);
+  cleanUrl.searchParams.delete('fixar');
+  window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+}
+
+function dismissHomeScreenGuide() {
+  const guide = document.getElementById('home-screen-guide');
+  if (guide) guide.style.display = 'none';
+}
+
 function makePlaceholderHint(containerId, label = 'Personalizar') {
   if (!ownerToken) return;
   const el = document.getElementById(containerId);
@@ -214,6 +237,7 @@ async function init() {
   renderSocial(cardData);
   renderContact(cardData);
   renderFooter(cardData);
+  showHomeScreenGuide();
 
 
   document.title = `${cardData.name} — ${cardData.business || 'Site Profissional'}`;
