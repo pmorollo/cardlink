@@ -93,6 +93,12 @@ function shareCard(slug) {
   }
 }
 
+function openCardHomeScreenSetup(slug) {
+  const cardUrl = new URL(getPrimaryPublicUrl(slug));
+  cardUrl.searchParams.set('fixar', '1');
+  window.location.assign(cardUrl.toString());
+}
+
 function copyCardLink() { copyToClipboard(getPrimaryPublicUrl()); }
 
 // ============================================
@@ -917,14 +923,14 @@ async function loadDashboard() {
         <div id="pwa-install-banner" class="form-section" style="display:flex;background:linear-gradient(135deg, rgba(124,58,237,0.08), rgba(59,130,246,0.08));border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px;margin-bottom:var(--space-lg);text-align:left;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%;">
           <div style="flex:1;min-width:250px;">
             <div style="font-weight:700;color:var(--text-primary);font-size:0.95rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
-              <span>📲</span> Fixar CardLink no seu Celular
+              <span>📲</span> Fixar seu cartão na Tela de Início
             </div>
             <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.4;margin:0;">
-              Adicione o CardLink à sua tela de início para abrir seu painel instantaneamente como um aplicativo real.
+              Crie um atalho que abre diretamente o cartão público que você criou.
             </p>
           </div>
-          <button type="button" class="btn btn-primary btn-sm" onclick="window.triggerPwaInstall()" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;">
-            Instalar App
+          <button type="button" class="btn btn-primary btn-sm" onclick="openCardHomeScreenSetup('${escapeHtml(card.slug)}')" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;">
+            Fixar cartão
           </button>
         </div>
       `;
