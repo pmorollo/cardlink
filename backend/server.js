@@ -140,8 +140,9 @@ app.get('/uploads/:filename', async (req, res, next) => {
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
-// QR Code WhatsApp redirect route
-app.get('/site/:slug/qr-whatsapp', async (req, res) => {
+// QR Code de balcão: contabiliza o scan e abre a página pública do CardLink.
+// A rota antiga é mantida para que QRs já impressos continuem funcionando.
+app.get(['/site/:slug/qr', '/site/:slug/qr-whatsapp'], async (req, res) => {
   try {
     const card = await cardRepo.findBySlug(req.params.slug);
     if (!card) {
@@ -155,17 +156,9 @@ app.get('/site/:slug/qr-whatsapp', async (req, res) => {
       return res.redirect(`/site/${card.slug}`);
     }
 
-    // Increment view count
+    // O scan é uma métrica própria; a página pública contabiliza a visualização separadamente.
     await cardRepo.update(card.id, { qr_scans_count: (card.qr_scans_count || 0) + 1 });
-
-        // Clean up phone number for WhatsApp redirect
-    const cleanPhone = (card.whatsapp || card.phone || '').replace(/\D/g, '');
-    if (!cleanPhone) {
-      return res.redirect(`/site/${card.slug}`);
-    }
-
-    const text = encodeURIComponent('Olá! Vim pelo seu CardLink. ✅');
-    res.redirect(`https://wa.me/${cleanPhone}?text=${text}`);
+    return res.redirect(`/site/${card.slug}`);
   } catch (err) {
     console.error('Error on QR redirect:', err);
     res.redirect('/');

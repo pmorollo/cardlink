@@ -19,7 +19,7 @@ O assinante pode reunir apresentação profissional, contatos, WhatsApp, redes s
 - Pode funcionar como cartão profissional simples ou evoluir para um mini site comercial completo.
 - WhatsApp integrado para reduzir o caminho entre interesse e contato.
 - QR Code de balcão e materiais físicos como ponte entre atendimento presencial e ambiente digital.
-- QR Code pode direcionar para ações produtivas, como contato e WhatsApp, e não apenas abrir uma página estática.
+- QR Code de balcão direciona para a página profissional completa, onde o visitante escolhe entre WhatsApp e os demais meios de contato.
 - Galeria/portfólio e depoimentos ajudam a demonstrar trabalho e gerar confiança.
 - Captura e gestão de contatos recebidos pelo CardLink.
 - Assistente de conteúdo com IA.
@@ -182,7 +182,7 @@ Após validar o QR atual, estudar ações configuráveis por segmento, como:
 - `Agendar` / `Ver valores`;
 - `Fazer pedido` / `Reservar mesa`.
 
-O QR atual deve permanecer simples na primeira fase: abrir o WhatsApp com **“Olá! Vim pelo seu CardLink. ✅”**. Métrica de leitura de QR continua separada de contato efetivamente identificado.
+O QR atual deve permanecer simples na primeira fase: abrir a página profissional completa do estabelecimento/profissional. A métrica de leitura continua separada de contato efetivamente identificado, e o WhatsApp permanece como ação disponível dentro do cartão.
 
 ### 9.5. Apresentação do vídeo na landing page
 

@@ -24,7 +24,7 @@ Este documento reúne melhorias aprovadas conceitualmente, mas que não devem de
 - Estudo futuro de assistente público baseado apenas em dados fornecidos pelo assinante.
 
 ### 3. QR Code 2.0
-- Manter na primeira fase a mensagem simples “Olá! Vim pelo seu CardLink. ✅”.
+- Manter na primeira fase o direcionamento para a página profissional completa; nela o visitante escolhe o WhatsApp ou outro meio de contato.
 - Estudar depois duas ações configuráveis por segmento.
 - Preservar métricas separadas de QR escaneado e contato identificado.
 
