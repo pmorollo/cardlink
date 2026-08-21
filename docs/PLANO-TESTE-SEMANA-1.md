@@ -110,7 +110,7 @@ Validar o CardLink como usuário real durante sete dias, sem incluir novos usuá
 7. Copiar o link público do CardLink e adicioná-lo ao campo de site/perfil do WhatsApp Business, se estiver usando Business.
 8. Confirmar que o QR direciona sempre para a página completa e que os meios de contato permanecem disponíveis nela.
 
-**Observar:** quantidade de toques, clareza entre os dois QRs e se o visitante entende imediatamente o que fazer.
+**Observar:** quantidade de toques, clareza do destino do QR e se o visitante entende imediatamente o que fazer.
 
 ## Dia 5 — Página pública, mensagens e suporte
 1. Abrir o CardLink em janela anônima ou outro navegador, simulando um visitante.
