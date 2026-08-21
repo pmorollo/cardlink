@@ -1,5 +1,34 @@
 # CardLink — Programa de Testes Operacionais — Semana 1
 
+## Ponto de situação — 21/08/2026
+
+### Concluído e validado em produção
+- Endereço oficial mantido em `https://cardlink-production-abd2.up.railway.app/`.
+- PR nº 4 integrado e publicado; o atalho de tela inicial agora aponta para o cartão público.
+- Conta interna de teste ativada, senha definida e primeiro acesso realizado.
+- Logout e novo login pela landing page confirmados; o antigo link de ativação salvo no Safari foi identificado e descartado.
+- Fluxo **Esqueceu a senha?** aprovado com recebimento do código, redefinição e novo acesso.
+- Primeiro cartão criado e página pública validada em `/site/pedro-morollo-junior`.
+- Foto do usuário e logotipo reenviados e carregando corretamente na página pública.
+- Criado o volume persistente `cardlink-volume` no serviço `cardlink`, montado em `/app/backend/uploads`.
+- Executado redeploy controlado após os uploads; foto e logotipo permaneceram disponíveis no novo container.
+- Persistência de uploads considerada aprovada para o ambiente atual de uma réplica.
+
+### Pendências imediatas do Dia 1
+1. Enviar uma mensagem Administrador → Usuário.
+2. Confirmar a mensagem na conta de teste e marcá-la como lida.
+
+### Decisão validada durante o teste do QR
+- O direcionamento original para WhatsApp funcionou conforme previsto.
+- Por decisão de produto, o QR de balcão passa a abrir a página pública completa do estabelecimento/profissional.
+- A contagem de escaneamentos permanece separada de visualizações e contatos.
+- O botão de WhatsApp continua disponível dentro do cartão público.
+
+### Melhoria futura de infraestrutura
+- O volume do CardLink ainda não possui backup automático.
+- A Railway informa que Backups/PITR exigem o plano Pro; não foi feito upgrade nem criada cobrança adicional.
+- Reavaliar backup automático antes da abertura comercial ou adotar cópia externa controlada.
+
 ## Ponto de retomada — 17/08/2026
 
 ### Concluído nesta sessão
@@ -74,14 +103,14 @@ Validar o CardLink como usuário real durante sete dias, sem incluir novos usuá
 ## Dia 4 — WhatsApp, QR Code e contatos
 1. Abrir o QR Code de balcão no painel.
 2. Escanear usando outro aparelho/câmera, se possível.
-3. Confirmar que o WhatsApp abre com: **“Olá! Vim pelo seu CardLink. ✅”**
-4. Enviar a mensagem.
+3. Confirmar que o cartão público do estabelecimento/profissional abre.
+4. Usar o botão de WhatsApp disponível dentro do cartão.
 5. Confirmar que o painel registra **QR escaneado**, mas não cria um contato falso.
 6. Abrir a página pública e usar **Salvar contato**; confirmar a criação do contato no telefone.
 7. Copiar o link público do CardLink e adicioná-lo ao campo de site/perfil do WhatsApp Business, se estiver usando Business.
-8. Testar o QR da página completa e o QR direto para WhatsApp como dois usos diferentes.
+8. Confirmar que o QR direciona sempre para a página completa e que os meios de contato permanecem disponíveis nela.
 
-**Observar:** quantidade de toques, clareza entre os dois QRs e se o visitante entende imediatamente o que fazer.
+**Observar:** quantidade de toques, clareza do destino do QR e se o visitante entende imediatamente o que fazer.
 
 ## Dia 5 — Página pública, mensagens e suporte
 1. Abrir o CardLink em janela anônima ou outro navegador, simulando um visitante.

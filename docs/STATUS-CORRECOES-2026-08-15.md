@@ -131,7 +131,7 @@ O comando rejeita promoção de cliente comercial, conta de teste ou usuário qu
 ## Preparação para testes operacionais — Semana 1
 - Criada caixa de mensagens Administrador → Usuário no painel.
 - Mensagem administrativa fica armazenada por usuário, com controle de leitura e isolamento entre contas.
-- QR de WhatsApp usa mensagem curta: “Olá! Vim pelo seu CardLink. ✅”.
+- QR de balcão abre a página pública completa do estabelecimento/profissional; o WhatsApp permanece disponível dentro do cartão.
 - QR scan passou a ser métrica separada de contatos; leitura do QR não cria contato anônimo.
 - Criado `docs/PLANO-TESTE-SEMANA-1.md`.
 - Smoke tests locais: 20 aprovados, 0 falhas. PostgreSQL destrutivo continua condicionado a TEST_PG_URL específica.

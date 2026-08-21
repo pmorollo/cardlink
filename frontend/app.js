@@ -695,7 +695,7 @@ function openQrCodeModal(slug) {
   const modalUrl = document.getElementById('qr-code-modal-url');
 
   if (modal && modalImg && modalUrl) {
-    const url = window.location.origin + '/site/' + slug + '/qr-whatsapp';
+    const url = window.location.origin + '/site/' + slug + '/qr';
     modalImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=000000`;
     modalUrl.textContent = url;
     modal.style.display = 'flex';
@@ -719,7 +719,7 @@ function closeUserManualModal() {
 
 function copyQrCodeLink() {
   if (!currentQrCodeSlug) return;
-  const url = window.location.origin + '/site/' + currentQrCodeSlug + '/qr-whatsapp';
+  const url = window.location.origin + '/site/' + currentQrCodeSlug + '/qr';
   navigator.clipboard.writeText(url)
     .then(() => showToast('📋', 'Link do QR Code copiado!'))
     .catch(() => showToast('❌', 'Erro ao copiar link'));
@@ -969,7 +969,7 @@ async function loadDashboard() {
           <div class="stat-label">Mensagens Recebidas</div>
         </div>
         <div class="stat-card" onclick="openQrCodeModal('${escapeHtml(card.slug)}')" style="cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor=''">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin + '/site/' + card.slug + '/qr-whatsapp')}&bgcolor=ffffff&color=000000" style="width:48px;height:48px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border-subtle);" alt="QR Code">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin + '/site/' + card.slug + '/qr')}&bgcolor=ffffff&color=000000" style="width:48px;height:48px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border-subtle);" alt="QR Code">
           <div class="stat-value" style="font-size:1.05rem;line-height:1;margin-bottom:3px;">${stats.qrScans || 0}</div>
           <div class="stat-label" style="font-size:0.72rem;font-weight:bold;color:var(--text-secondary);">QR escaneados · abrir código</div>
         </div>

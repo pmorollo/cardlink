@@ -42,7 +42,7 @@ O **CardLink** transforma o cartão de visita tradicional em uma página web pro
 | **Depoimentos & Avaliações** | Prova social que gera confiança antes do contato |
 | **Galeria de Fotos / Portfólio** | Mostre seu trabalho em imagens |
 | **Assistente de Conteúdo com IA** | Gera textos, descrições e sugestões de serviços em segundos |
-| **QR Code de Balcão + Métricas** | Cliente escaneia no balcão, vai direto ao seu WhatsApp e você vê os escaneamentos |
+| **QR Code de Balcão + Métricas** | Cliente escaneia no balcão, abre sua página profissional completa e você vê os escaneamentos |
 | **Página 100% Online** | Alterações (foto, preço, telefone) atualizam na hora, para sempre |
 
 ---

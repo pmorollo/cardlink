@@ -583,21 +583,24 @@ test('administrador envia mensagem interna e somente o destinatario consegue ler
   assert.ok(read.data.adminMessage.read_at);
 });
 
-test('QR de WhatsApp conta scan separado de contato e usa mensagem curta', async () => {
+test('QR de balcão conta scan separado de contato e abre o cartão público', async () => {
   await createActiveUser({ email: 'qr-owner@example.com', name: 'QR Owner' });
   const rLogin = await login('qr-owner@example.com', 'SenhaValida123!');
   const token = rLogin.data.token;
   const rCard = await api('POST', '/api/cards', { name: 'Cartão QR', whatsapp: '+5511999999999' }, token);
   assert.equal(rCard.status, 201);
 
-  const qrRes = await fetch(base + `/site/${rCard.data.slug}/qr-whatsapp`, { redirect: 'manual' });
+  const qrRes = await fetch(base + `/site/${rCard.data.slug}/qr`, { redirect: 'manual' });
   assert.equal(qrRes.status, 302);
   const location = qrRes.headers.get('location') || '';
-  assert.match(location, /^https:\/\/wa\.me\/5511999999999\?text=/);
-  assert.ok(decodeURIComponent(location).includes('Olá! Vim pelo seu CardLink. ✅'));
+  assert.equal(location, `/site/${rCard.data.slug}`);
+
+  const legacyQrRes = await fetch(base + `/site/${rCard.data.slug}/qr-whatsapp`, { redirect: 'manual' });
+  assert.equal(legacyQrRes.status, 302);
+  assert.equal(legacyQrRes.headers.get('location'), `/site/${rCard.data.slug}`);
 
   const summary = await api('GET', '/api/cards/stats/summary', null, token);
   assert.equal(summary.status, 200);
-  assert.equal(summary.data.stats.qrScans, 1);
+  assert.equal(summary.data.stats.qrScans, 2);
   assert.equal(summary.data.stats.contacts, 0);
 });
