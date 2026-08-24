@@ -13,14 +13,19 @@
 - Criado o volume persistente `cardlink-volume` no serviço `cardlink`, montado em `/app/backend/uploads`.
 - Executado redeploy controlado após os uploads; foto e logotipo permaneceram disponíveis no novo container.
 - Persistência de uploads considerada aprovada para o ambiente atual de uma réplica.
+- Fluxo Visitante → Lojista validado: a mensagem enviada pela página pública apareceu no painel do CardLink e o aviso foi recebido no e-mail do proprietário.
+- A ação de resposta pelo painel abriu o e-mail para responder diretamente ao endereço informado pelo visitante.
+- QR Code de balcão testado com outro celular: abriu corretamente a página pública completa do cartão. Novo destino considerado aprovado.
+- Conta administrativa de produção regularizada em 22/08/2026: a conta antiga foi vinculada a `pedro.morollo@gmail.com` e marcada como administradora, permanecendo separada da conta lojista de teste.
+- Fluxo Administrador → Usuário validado em 22/08/2026: a mensagem enviada pelo administrador apareceu no painel de `pedro.morollo@yahoo.com`, foi aberta e marcada como lida, e o aviso também chegou ao e-mail Yahoo.
 
 ### Pendências imediatas do Dia 1
-1. Enviar uma mensagem Administrador → Usuário.
-2. Confirmar a mensagem na conta de teste e marcá-la como lida.
+1. Até o encerramento da rodada, testar Visitante → Lojista preenchendo somente WhatsApp como meio de retorno; confirmar registro no painel e abertura da resposta para o número correto.
 
 ### Decisão validada durante o teste do QR
 - O direcionamento original para WhatsApp funcionou conforme previsto.
 - Por decisão de produto, o QR de balcão passa a abrir a página pública completa do estabelecimento/profissional.
+- A alteração foi publicada e confirmada na prática com outro celular: o QR abriu corretamente a página pública completa.
 - A contagem de escaneamentos permanece separada de visualizações e contatos.
 - O botão de WhatsApp continua disponível dentro do cartão público.
 
@@ -28,6 +33,13 @@
 - O volume do CardLink ainda não possui backup automático.
 - A Railway informa que Backups/PITR exigem o plano Pro; não foi feito upgrade nem criada cobrança adicional.
 - Reavaliar backup automático antes da abertura comercial ou adotar cópia externa controlada.
+
+### Domínio comercial planejado — executar somente por fases
+- Domínio disponível do proprietário: `digitalnexoapp.com`, atualmente na HostGator.
+- Primeira etapa aprovada: redirecionamento 302 temporário para `abd2`, sem alterar Cakto, Resend ou configurações internas.
+- Etapa posterior: avaliar `cardlink.digitalnexoapp.com` como domínio direto na Railway somente após concluir os testes atuais.
+- O roteiro completo, critérios de parada, retorno e homologação estão registrados em `docs/MELHORIAS-PREVISTAS.md`.
+- Não iniciar a mudança de domínio junto com outra correção, commit ou deploy; tratar cada fase como etapa curta independente.
 
 ## Ponto de retomada — 17/08/2026
 
@@ -101,9 +113,9 @@ Validar o CardLink como usuário real durante sete dias, sem incluir novos usuá
 **Observar:** legibilidade da tabela, tamanho das imagens, velocidade, cortes e facilidade para substituir arquivos.
 
 ## Dia 4 — WhatsApp, QR Code e contatos
-1. Abrir o QR Code de balcão no painel.
-2. Escanear usando outro aparelho/câmera, se possível.
-3. Confirmar que o cartão público do estabelecimento/profissional abre.
+1. Abrir o QR Code de balcão no painel. **Validado.**
+2. Escanear usando outro aparelho/câmera, se possível. **Validado com outro celular.**
+3. Confirmar que o cartão público do estabelecimento/profissional abre. **Validado em 21/08/2026.**
 4. Usar o botão de WhatsApp disponível dentro do cartão.
 5. Confirmar que o painel registra **QR escaneado**, mas não cria um contato falso.
 6. Abrir a página pública e usar **Salvar contato**; confirmar a criação do contato no telefone.
@@ -114,13 +126,13 @@ Validar o CardLink como usuário real durante sete dias, sem incluir novos usuá
 
 ## Dia 5 — Página pública, mensagens e suporte
 1. Abrir o CardLink em janela anônima ou outro navegador, simulando um visitante.
-2. Enviar uma mensagem pelo formulário público.
-3. Confirmar que ela aparece em **Mensagens recebidas** no painel do usuário.
-4. Testar os atalhos de resposta por WhatsApp/e-mail quando houver dados do visitante.
+2. Enviar uma mensagem pelo formulário público. **Validado por e-mail em 21/08/2026.**
+3. Confirmar que ela aparece em **Mensagens recebidas** no painel do usuário. **Validado.**
+4. Testar os atalhos de resposta por WhatsApp/e-mail quando houver dados do visitante. **Resposta por e-mail validada. Resposta por WhatsApp ainda pendente.**
 5. Como usuário, abrir **Central de Ajuda & Suporte** e enviar um chamado.
 6. Como administrador, verificar se o chamado aparece no painel.
-7. Como administrador, enviar uma nova mensagem interna ao usuário.
-8. Como usuário, confirmar o recebimento no painel e no e-mail, se SMTP estiver ativo.
+7. Como administrador, enviar uma nova mensagem interna ao usuário. **Validado em 22/08/2026.**
+8. Como usuário, confirmar o recebimento no painel e no e-mail, se SMTP estiver ativo. **Validado; mensagem também marcada como lida.**
 
 **Observar:** diferença clara entre mensagem de visitante, suporte do usuário e mensagem administrativa.
 
@@ -161,6 +173,7 @@ Estas melhorias **não fazem parte do escopo obrigatório da Semana 1**, mas dev
 - **Onboarding pós-Cakto:** medir se o fluxo atual `pagamento → e-mail de ativação → senha → login` é claro e rápido. Anotar qualquer sensação de quebra de fluxo ou demora. A melhoria prevista é retornar automaticamente da Cakto ao CardLink, confirmar o pagamento exclusivamente pelo backend/webhook e permitir a criação de senha em uma sessão de retorno segura, mantendo e-mail de backup.
 - **IA 2.0:** anotar tarefas em que a IA realmente pouparia tempo, especialmente montagem/revisão do cartão, divulgação e respostas a contatos.
 - **QR 2.0:** observar se a mensagem simples é suficiente ou se opções configuráveis por negócio fariam diferença.
+- **Compartilhamento do cartão:** manter **Copiar link** e avaliar **Compartilhar link** como ação principal no celular, usando o menu nativo do aparelho e mantendo a cópia como alternativa.
 - **Vídeo da landing:** avaliar apresentação visual e necessidade de moldura/poster mais refinados na segunda rodada.
 
 ## Critério para avançar à Semana 2
