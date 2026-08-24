@@ -104,6 +104,11 @@ img { max-width: 100%; display: block; }
   transition: var(--transition);
 }
 
+/* Mantém a navegação abaixo da faixa exibida ao proprietário autenticado. */
+body.has-owner-bar .lp-nav {
+  top: var(--owner-bar-height, 48px);
+}
+
 .lp-nav .container {
   display: flex;
   align-items: center;
@@ -309,14 +314,6 @@ img { max-width: 100%; display: block; }
   color: var(--accent);
 }
 
-.lp-hero-subtitle {
-  font-size: 1.15rem;
-  color: var(--text-secondary);
-  margin-bottom: 36px;
-  line-height: 1.7;
-  max-width: 480px;
-}
-
 .lp-hero-actions {
   display: flex;
   gap: 14px;
@@ -409,7 +406,6 @@ img { max-width: 100%; display: block; }
     text-align: center;
   }
   .lp-hero-actions { justify-content: center; }
-  .lp-hero-subtitle { max-width: 100%; }
   .lp-hero-visual { order: -1; }
   .lp-hero-avatar-wrap { width: 200px; height: 200px; }
   .lp-hero-avatar { font-size: 3.5rem; }
@@ -1133,13 +1129,6 @@ body {
   line-height: 0.98;
   letter-spacing: -0.045em;
   margin-bottom: 28px;
-}
-
-.lp-hero-subtitle {
-  max-width: 590px;
-  font-size: clamp(1.02rem, 1.5vw, 1.18rem);
-  color: #c4c4cc;
-  margin-bottom: 32px;
 }
 
 .text-gradient {

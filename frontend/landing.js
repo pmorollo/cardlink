@@ -253,6 +253,15 @@ async function init() {
         const ownerBar = document.getElementById('card-owner-bar');
         if (ownerBar) {
           ownerBar.style.display = 'flex';
+          document.body.classList.add('has-owner-bar');
+
+          const syncOwnerBarOffset = () => {
+            document.documentElement.style.setProperty('--owner-bar-height', `${ownerBar.offsetHeight}px`);
+          };
+          syncOwnerBarOffset();
+          if ('ResizeObserver' in window) {
+            new ResizeObserver(syncOwnerBarOffset).observe(ownerBar);
+          }
         }
       }
     } catch (e) {
@@ -311,14 +320,6 @@ function renderHero(d) {
   if (titleEl) {
     const role = title ? `<span class="lp-hero-title-role">${esc(title)}</span>` : '';
     titleEl.innerHTML = `<span class="lp-signature-name">${esc(name)}</span>${role}`;
-  }
-
-  // Subtitle
-  const subEl = document.getElementById('hero-subtitle');
-  if (subEl) {
-    subEl.textContent = d.description
-      ? d.description.substring(0, 120)
-      : `${title ? title + ' — ' : ''}${business ? business + '. ' : ''}Conheça meu trabalho e entre em contato!`;
   }
 
   // CTA Button
