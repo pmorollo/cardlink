@@ -1,30 +1,44 @@
 # CardLink — Diretrizes Oficiais de Produto e Marketing
 
-**Atualizado em:** 16/08/2026
+**Atualizado em:** 25/08/2026
 
 Este documento registra decisões estruturais do CardLink que devem orientar desenvolvimento, vendas, comunicação e marketing.
 
 ## 1. O que o CardLink é
 
-O CardLink não deve ser posicionado apenas como um “cartão de visita digital”. Ele é uma **presença profissional modular em um único link**, capaz de começar como cartão de apresentação e evoluir para uma página comercial completa.
+O CardLink é um **site profissional simples, rápido e acessível para divulgar pequenos negócios e serviços**. Ele não deve ser apresentado comercialmente como cartão de visita digital, mini-site híbrido ou produto que começa como cartão e depois se transforma em site.
 
 Proposta central de posicionamento:
 
-> **Um link. Seu negócio inteiro.**
+> **CardLink — Seu negócio na internet em poucos minutos.**
 
-O assinante pode reunir apresentação profissional, contatos, WhatsApp, redes sociais, galeria/portfólio, depoimentos, conteúdo comercial, QR Code, captura de contatos e recursos de IA em uma única presença online.
+Definição comercial:
+
+> Crie um site profissional para apresentar seu negócio, divulgar serviços, mostrar fotos, receber contatos e compartilhar tudo por link ou QR Code.
+
+O produto atende à necessidade de colocar uma loja, negócio ou atividade profissional na web com rapidez, sem exigir conhecimento técnico nem a contratação inicial de um site convencional complexo. O link e o QR Code são meios de divulgação e acesso ao site; não constituem o produto principal.
+
+### 1.1. Limites do posicionamento
+
+- O foco é divulgar o negócio, o estabelecimento ou os serviços do assinante.
+- O CardLink não será promovido como cartão individual para funcionários de empresas.
+- A comunicação não deve misturar cartão pessoal, folder digital e site em uma mesma promessa.
+- Termos técnicos ou históricos como `card` podem permanecer no código sem orientar a comunicação comercial.
+- A marca **CardLink** permanece; muda a explicação do produto.
 
 ## 2. Diferenciais estratégicos
 
-- Pode funcionar como cartão profissional simples ou evoluir para um mini site comercial completo.
-- WhatsApp integrado para reduzir o caminho entre interesse e contato.
-- QR Code de balcão e materiais físicos como ponte entre atendimento presencial e ambiente digital.
-- QR Code de balcão direciona para a página profissional completa, onde o visitante escolhe entre WhatsApp e os demais meios de contato.
-- Galeria/portfólio e depoimentos ajudam a demonstrar trabalho e gerar confiança.
-- Captura e gestão de contatos recebidos pelo CardLink.
+- Site profissional publicado em poucos minutos, sem conhecimento técnico.
+- Página completa para apresentar o negócio, os serviços e as formas de contato.
+- WhatsApp integrado para reduzir o caminho entre interesse e atendimento.
+- Link compartilhável para redes sociais, mensagens, assinatura de e-mail e materiais promocionais.
+- QR Code de balcão e materiais físicos como porta de entrada para o site profissional.
+- Galeria/portfólio e depoimentos para demonstrar trabalho e gerar confiança.
+- Captura e gestão de contatos recebidos pelo site.
 - Assistente de conteúdo com IA.
 - Conteúdo comercial flexível: tabela de preços, cardápio, relação de serviços, catálogo resumido ou lista estruturada de produtos/serviços.
-- Um único endereço pode substituir a necessidade inicial de um site convencional para muitos profissionais e pequenos negócios.
+- Atualização pelo próprio assinante, sem depender de profissional técnico para cada alteração.
+- Alternativa inicial simples e acessível a um site convencional mais complexo.
 
 ## 3. Modelo de negócio
 
@@ -48,16 +62,16 @@ Fluxo comercial definido:
 ### Administrador
 
 - Conta administrativa única da plataforma.
-- Não possui cartão CardLink.
+- Não possui site CardLink.
 - Não possui assinatura.
 - Não entra nas métricas de assinantes.
 - Gerencia usuários, assinaturas, pagamentos, mensagens/suporte e indicadores do negócio.
-- Se o proprietário quiser um CardLink pessoal, deverá usar uma segunda conta comum de cliente.
+- Se o proprietário da plataforma quiser publicar um site para um negócio próprio, deverá usar uma segunda conta comum de cliente.
 
 ### Cliente assinante
 
 - Conta comum vinculada a uma assinatura válida.
-- Cria, edita, publica e compartilha seu CardLink.
+- Cria, edita, publica e compartilha seu site CardLink.
 - Não possui acesso administrativo.
 
 
@@ -72,7 +86,7 @@ Essas contas:
 - são marcadas como `internal_test`;
 - não são contabilizadas como vendas nem assinaturas comerciais;
 - não podem ser convertidas automaticamente em conta comercial por webhook;
-- servem para testar uso diário, isolamento entre usuários, cartão público, QR Code, WhatsApp, imagens, IA e suporte.
+- servem para testar uso diário, isolamento entre usuários, site público, QR Code, WhatsApp, imagens, IA e suporte.
 
 Antes da abertura comercial, uma conta separada deverá fazer uma **compra real pela Cakto** para homologar o fluxo completo de cobrança e ativação.
 
@@ -120,9 +134,16 @@ O assinante escolhe o formato mais apropriado ao seu negócio. Exemplos:
 
 ## 8. Consequência para vendas e marketing
 
-A comunicação deve vender **produtividade e presença comercial**, e não somente a substituição do cartão de papel.
+A comunicação deve vender um resultado objetivo: **colocar o negócio do cliente na internet em poucos minutos**.
 
-A landing page deve demonstrar diferentes usos reais e setores, mostrando que o mesmo CardLink pode ser simples ou completo conforme a necessidade do assinante.
+A landing page deve:
+
+- usar “site profissional” como categoria principal;
+- mostrar lojas, negócios locais, autônomos e prestadores de serviços;
+- demonstrar serviços, fotos, avaliações, contatos, WhatsApp, link e QR Code;
+- apresentar link e QR Code como meios de divulgação do site;
+- evitar “cartão digital”, “cartão de visita”, “mini-site que evolui” e outras definições híbridas;
+- destacar simplicidade, rapidez, autonomia e preço acessível.
 
 Estas diretrizes serão a base para o futuro **Plano de Vendas e Marketing do CardLink**.
 
@@ -167,8 +188,8 @@ Durante os testes, observar se a ativação atual exclusivamente por e-mail caus
 
 Manter a IA atual durante os testes e medir utilidade real antes de ampliar. Melhorias candidatas:
 
-- entrevista guiada para montar a apresentação profissional;
-- análise do CardLink pronto com sugestões de melhoria;
+- entrevista guiada para montar a apresentação do negócio;
+- análise do site pronto com sugestões de melhoria;
 - geração de textos de divulgação para WhatsApp e redes sociais;
 - sugestão de respostas a contatos recebidos;
 - interpretação assistida de tabela/cardápio, sem inventar preços;
@@ -182,7 +203,7 @@ Após validar o QR atual, estudar ações configuráveis por segmento, como:
 - `Agendar` / `Ver valores`;
 - `Fazer pedido` / `Reservar mesa`.
 
-O QR atual deve permanecer simples na primeira fase: abrir a página profissional completa do estabelecimento/profissional. A métrica de leitura continua separada de contato efetivamente identificado, e o WhatsApp permanece como ação disponível dentro do cartão.
+O QR atual deve permanecer simples na primeira fase: abrir a página profissional completa do estabelecimento/profissional. A métrica de leitura continua separada de contato efetivamente identificado, e o WhatsApp permanece como ação disponível dentro do site.
 
 ### 9.5. Apresentação do vídeo na landing page
 
