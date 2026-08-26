@@ -67,50 +67,47 @@
           </button>
         </div>
 
-        <!-- Floating Mockup & Video Container -->
+        <!-- Carrossel demonstrativo -->
         <div class="hero-mockup" id="demonstracao" style="display:flex;flex-direction:column;align-items:center;margin-top:50px;width:100%;">
           
           <div style="width: 100%; text-align: center; margin-bottom: 25px;">
             <span class="hero-badge" style="display:inline-flex;margin-bottom:8px;">🔍 Demonstração Visual</span>
-            <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Veja o CardLink na palma da mão e na tela</h3>
+            <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Veja como o CardLink coloca o seu negócio na internet</h3>
           </div>
 
-          <div class="showcase-grid">
-            
-            <!-- Coluna 1: Celular -->
-            <div class="showcase-media-col showcase-phone-col">
-              <div class="phone-demo-shell" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                <img src="mockup.jpg" alt="Exemplo de site profissional criado com CardLink" style="width:100%;height:auto;display:block;">
-              </div>
-              <span class="showcase-caption showcase-caption-phone">📱 Design Premium para Celular</span>
+          <div class="landing-carousel" id="landing-carousel" aria-roledescription="carrossel" aria-label="Demonstração do CardLink">
+            <div class="landing-carousel-track">
+              <article class="landing-carousel-slide is-active" aria-hidden="false">
+                <img src="assets/carousel/carrossel-01-atendimento.webp" alt="Cliente sendo atendido no balcão de um negócio" width="1440" height="960" fetchpriority="high">
+                <div class="landing-carousel-copy"><h4>Seu negócio na internet em poucos minutos</h4><p>Apresente sua empresa com uma presença profissional e acessível.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/carrossel-02-site.webp" alt="Site profissional completo exibido em um celular" width="1440" height="960" loading="lazy">
+                <div class="landing-carousel-copy"><h4>Um site completo em um único link</h4><p>Mostre apresentação, serviços, fotos, avaliações e contatos.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/carrossel-03-painel.webp" alt="Painel de configuração do site e prévia no celular" width="1440" height="960" loading="lazy">
+                <div class="landing-carousel-copy"><h4>Você mesmo atualiza quando quiser</h4><p>Edite as informações pelo painel e acompanhe o resultado.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/carrossel-04-divulgacao.webp" alt="Divulgação do site por link, QR Code e WhatsApp" width="1440" height="960" loading="lazy">
+                <div class="landing-carousel-copy"><h4>Divulgue e receba contatos</h4><p>Compartilhe por link ou QR Code e converse pelo WhatsApp.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/carrossel-05-negocios.webp" alt="Indústria, escritório e barbearia usando presença digital" width="1440" height="960" loading="lazy">
+                <div class="landing-carousel-copy"><h4>Feito para o seu negócio</h4><p>Uma solução profissional para diferentes atividades e segmentos.</p></div>
+              </article>
             </div>
-
-            <!-- Coluna 2: Video -->
-            <div class="showcase-media-col showcase-video-col">
-              <div class="video-demo-shell" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                <div class="video-shell-header">
-                  <div class="video-shell-dots" aria-hidden="true">
-                    <span></span><span></span><span></span>
-                  </div>
-                  <div class="video-shell-title">Apresentação CardLink</div>
-                  <div class="video-shell-badge">HD</div>
-                </div>
-                <div class="video-frame-wrap">
-                  <video
-                    class="demo-video"
-                    controls
-                    preload="metadata"
-                    poster="promo-poster.jpg"
-                    playsinline
-                  >
-                    <source src="promo.mp4" type="video/mp4">
-                    Seu navegador não suporta a reprodução de vídeos MP4.
-                  </video>
-                </div>
-              </div>
-              <span class="showcase-caption showcase-caption-video">▶️ Assista ao Vídeo Demonstrativo</span>
+            <button class="landing-carousel-arrow landing-carousel-prev" type="button" aria-label="Imagem anterior">‹</button>
+            <button class="landing-carousel-arrow landing-carousel-next" type="button" aria-label="Próxima imagem">›</button>
+            <div class="landing-carousel-dots" role="group" aria-label="Escolher imagem do carrossel">
+              <button class="is-active" type="button" aria-label="Mostrar imagem 1" aria-current="true"></button>
+              <button type="button" aria-label="Mostrar imagem 2"></button>
+              <button type="button" aria-label="Mostrar imagem 3"></button>
+              <button type="button" aria-label="Mostrar imagem 4"></button>
+              <button type="button" aria-label="Mostrar imagem 5"></button>
             </div>
-
+            <span class="sr-only" id="landing-carousel-status" aria-live="polite">Imagem 1 de 5</span>
           </div>
         </div>
       </div>
@@ -1256,6 +1253,7 @@
     };
   </script>
   <script src="app.js?v=32"></script>
+  <script src="landing-carousel.js?v=1"></script>
   <script>
 
     let deferredPrompt = null;
