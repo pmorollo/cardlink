@@ -1607,7 +1607,7 @@ function renderCard(data, isPreview) {
               <div class="testimonial-author">${escapeHtml(t.name.trim())}</div>
               <div class="testimonial-stars">${stars}</div>
             </div>
-            ${t.comment ? `<div class="testimonial-comment">"${escapeHtml(t.comment)}"</div>` : ''}
+            ${t.comment ? `<div class="testimonial-comment">"${escapeHtml(t.comment.trim())}"</div>` : ''}
           </div>`;
       });
       testimonialsHtml += '</div>';
