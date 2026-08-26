@@ -47,8 +47,8 @@ O **CardLink** coloca pequenos negócios e serviços na internet por meio de um 
 | **Depoimentos & Avaliações** | Prova social que gera confiança antes do contato |
 | **Galeria de Fotos / Portfólio** | Mostre seu trabalho em imagens |
 | **Assistente de Conteúdo com IA** | Gera textos, descrições e sugestões de serviços em segundos |
-| **QR Code de Balcão + Métricas** | Cliente escaneia no balcão e abre o site profissional completo e você vê os escaneamentos |
-| **Página 100% Online** | Alterações (foto, preço, telefone) atualizam na hora, para sempre |
+| **QR Code de Balcão + Métricas** | Cliente escaneia no balcão, abre o site profissional completo e os escaneamentos ficam registrados no painel |
+| **Página 100% Online** | Alterações de foto, preço e telefone aparecem imediatamente e permanecem disponíveis enquanto a assinatura estiver ativa |
 
 ---
 
