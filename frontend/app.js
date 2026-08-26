@@ -1534,8 +1534,20 @@ function renderCard(data, isPreview) {
   const servicesTitle  = data.services_title || (servicesMode === 'image' ? 'Destaque' : 'Produtos & Serviços');
   const hasServicesImage = servicesMode === 'image' && !!data.services_image_url;
   const hasProducts    = servicesMode === 'list' && data.products && data.products.length > 0;
-  const hasGallery     = data.gallery     && data.gallery.length     > 0;
-  const hasTestimonials= data.testimonials&& data.testimonials.length> 0;
+  const validGallery = Array.isArray(data.gallery)
+    ? data.gallery.filter(url => typeof url === 'string' && url.trim())
+    : [];
+  const validTestimonials = Array.isArray(data.testimonials)
+    ? data.testimonials.filter(t =>
+        t &&
+        typeof t.name === 'string' &&
+        t.name.trim() &&
+        typeof t.comment === 'string' &&
+        t.comment.trim()
+      )
+    : [];
+  const hasGallery = validGallery.length > 0;
+  const hasTestimonials = validTestimonials.length > 0;
   const hasSiteContent = hasServicesImage || hasProducts || hasGallery || hasTestimonials;
 
   let siteToggleButton = '';
@@ -1579,20 +1591,20 @@ function renderCard(data, isPreview) {
     let galleryHtml = '';
     if (hasGallery) {
       galleryHtml = `<div class="site-block-title">🖼️ Galeria de Fotos</div><div class="gallery-grid">`;
-      data.gallery.forEach(imgUrl => { galleryHtml += `<img src="${escapeHtml(imgUrl)}" class="gallery-img" alt="Foto" onerror="this.style.display='none'">`; });
+      validGallery.forEach(imgUrl => { galleryHtml += `<img src="${escapeHtml(imgUrl.trim())}" class="gallery-img" alt="Foto" onerror="this.style.display='none'">`; });
       galleryHtml += '</div>';
     }
 
     let testimonialsHtml = '';
     if (hasTestimonials) {
       testimonialsHtml = `<div class="site-block-title">⭐ Avaliações de Clientes</div><div class="testimonials-grid">`;
-      data.testimonials.forEach(t => {
+      validTestimonials.forEach(t => {
         const n = Math.min(5, Math.max(1, t.stars || 5));
         const stars = '★'.repeat(n) + '☆'.repeat(5 - n);
         testimonialsHtml += `
           <div class="testimonial-card">
             <div class="testimonial-header">
-              <div class="testimonial-author">${escapeHtml(t.name)}</div>
+              <div class="testimonial-author">${escapeHtml(t.name.trim())}</div>
               <div class="testimonial-stars">${stars}</div>
             </div>
             ${t.comment ? `<div class="testimonial-comment">"${escapeHtml(t.comment)}"</div>` : ''}
