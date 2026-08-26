@@ -194,7 +194,7 @@ function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 // ============================================
 async function init() {
   if (!slug) {
-    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;color:#a1a1aa;">Cartão não encontrado.</div>';
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;color:#a1a1aa;">Site não encontrado.</div>';
     return;
   }
 
