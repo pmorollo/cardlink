@@ -1,10 +1,31 @@
 # CardLink — Melhorias Previstas
 
-**Atualizado em:** 22/08/2026
+**Atualizado em:** 25/08/2026
 
 Este documento reúne melhorias aprovadas conceitualmente, mas que não devem desviar a Semana 1 do objetivo principal: testar o produto em uso real.
 
 ## Prioridade após/durante os testes
+
+### 0. Reposicionamento comercial: site profissional
+
+**Decisão de 25/08/2026:** o CardLink será apresentado como **site profissional para divulgar pequenos negócios e serviços**, e não como cartão digital, cartão de visita ou solução híbrida.
+
+Promessa central:
+
+> **Seu negócio na internet em poucos minutos.**
+
+Ajustes previstos, sempre em etapas curtas:
+
+1. Revisar toda a linguagem visível da landing page.
+2. Trocar definições comerciais de “cartão digital” por “site profissional”.
+3. Revisar rótulos do painel como “Meu cartão”, mantendo nomes técnicos internos quando a troca não trouxer benefício ao usuário.
+4. Atualizar demonstrações, manual, vídeo e materiais comerciais.
+5. Confirmar que link e QR Code aparecem como meios de divulgação do site.
+6. Testar a nova comunicação com exemplos de lojas, negócios locais, profissionais liberais e prestadores de serviços.
+7. Não alterar nesta etapa a operação já validada, a estrutura do banco, Cakto, Resend, Railway, URLs públicas ou QR Code.
+
+**Critério de conclusão:** um visitante deve compreender imediatamente que está contratando um site para divulgar seu negócio, sem interpretar o produto como cartão corporativo para funcionários.
+
 
 ### 1. Onboarding pós-pagamento Cakto
 - Não exigir cadastro prévio.
@@ -16,8 +37,8 @@ Este documento reúne melhorias aprovadas conceitualmente, mas que não devem de
 - Confirmar previamente na documentação oficial da Cakto quais identificadores de retorno/transação estão disponíveis para o vínculo seguro.
 
 ### 2. IA 2.0
-- Montagem guiada do CardLink.
-- Revisão do cartão pronto.
+- Montagem guiada do site do negócio.
+- Revisão do site pronto.
 - Textos para divulgação.
 - Sugestão de respostas.
 - Leitura assistida de tabela/cardápio sem inventar preços.
