@@ -1531,7 +1531,7 @@ function renderCard(data, isPreview) {
   // Site / Landing Page section
   const siteBtnText    = data.site_button_text || 'Ver mais informações';
   const servicesMode   = data.services_mode || ((data.products || []).length ? 'list' : 'image');
-  const servicesTitle  = data.services_title || (servicesMode === 'image' ? 'Tabela / Cardápio' : 'Produtos & Serviços');
+  const servicesTitle  = data.services_title || (servicesMode === 'image' ? 'Destaque' : 'Produtos & Serviços');
   const hasServicesImage = servicesMode === 'image' && !!data.services_image_url;
   const hasProducts    = servicesMode === 'list' && data.products && data.products.length > 0;
   const hasGallery     = data.gallery     && data.gallery.length     > 0;
