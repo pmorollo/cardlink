@@ -2,13 +2,13 @@
 
 > **Objetivo:** orientar o plano de divulgação da landing page e do aplicativo CardLink, convertendo visitantes em **assinaturas pagas** através da plataforma de pagamento da **Cakto**.
 >
-> **Produto:** site profissional simples, rápido e acessível para colocar pequenos negócios e serviços na internet em poucos minutos.
+> **Produto:** o site profissional para colocar o seu negócio na internet em poucos minutos.
 
 ---
 
 ## 1. Visão Geral do Produto
 
-O **CardLink** coloca pequenos negócios e serviços na internet por meio de um site profissional que o próprio cliente pode criar, publicar e atualizar. A página reúne apresentação do negócio, serviços ou produtos, fotos, avaliações, redes sociais e formas de contato — sem exigir conhecimento técnico ou um site convencional complexo.
+O **CardLink** coloca o seu negócio na internet por meio de um site profissional que você pode criar, publicar e atualizar. A página reúne apresentação do negócio, serviços ou produtos, fotos, avaliações, redes sociais e formas de contato — sem exigir conhecimento técnico ou um site convencional complexo.
 
 **Proposta de valor em uma frase:**
 > *"Seu negócio na internet em poucos minutos."*
@@ -49,6 +49,16 @@ O **CardLink** coloca pequenos negócios e serviços na internet por meio de um 
 | **Assistente de Conteúdo com IA** | Gera textos, descrições e sugestões de serviços em segundos |
 | **QR Code de Balcão + Métricas** | Cliente escaneia no balcão, abre o site profissional completo e os escaneamentos ficam registrados no painel |
 | **Página 100% Online** | Alterações de foto, preço e telefone aparecem imediatamente e permanecem disponíveis enquanto a assinatura estiver ativa |
+
+---
+
+## 3.1. Demonstração visual na landing page
+
+- Remover completamente o vídeo atual.
+- Usar um carrossel com 4 ou 5 mockups/imagens demonstrativas.
+- Mostrar diferentes aplicações do CardLink, com textos curtos e imagens autoexplicativas.
+- Aprovar as imagens antes da implementação.
+- Garantir navegação por setas, indicadores e toque, com bom desempenho no celular.
 
 ---
 
