@@ -405,14 +405,14 @@ function renderServices(d) {
   const descEl = document.getElementById('services-desc');
   const products = Array.isArray(d.products) ? d.products : [];
   const mode = d.services_mode || (products.length ? 'list' : 'image');
-  const sectionTitle = d.services_title || (mode === 'image' ? 'Tabela / Cardápio' : 'Meus Serviços');
+  const sectionTitle = d.services_title || (mode === 'image' ? 'Destaque' : 'Meus Serviços');
   const hasImage = mode === 'image' && !!d.services_image_url;
   const hasRealServices = mode === 'list' && products.length > 0;
 
   if (titleEl) titleEl.textContent = sectionTitle;
   if (descEl) {
     descEl.textContent = hasImage
-      ? 'Consulte abaixo as opções, serviços e valores disponíveis.'
+      ? 'Confira as informações em destaque.'
       : 'Soluções pensadas para atender você com qualidade e atenção.';
   }
 
