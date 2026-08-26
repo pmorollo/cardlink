@@ -21,7 +21,7 @@
 
 ### Decisão conceitual — 25/08/2026
 - A operação e os recursos já validados permanecem aprovados.
-- O CardLink passa a ser definido comercialmente como **site profissional para divulgar pequenos negócios e serviços**.
+- O CardLink passa a ser definido comercialmente como **o site profissional para colocar o seu negócio na internet em poucos minutos**.
 - A marca CardLink será mantida.
 - Link e QR Code serão tratados como meios de divulgação e acesso ao site.
 - “Cartão digital”, “cartão de visita” e a proposta híbrida cartão/mini-site deixam de orientar a comunicação comercial.
@@ -183,7 +183,7 @@ Estas melhorias **não fazem parte do escopo obrigatório da Semana 1**, mas dev
 - **IA 2.0:** anotar tarefas em que a IA realmente pouparia tempo, especialmente montagem/revisão do cartão, divulgação e respostas a contatos.
 - **QR 2.0:** observar se a mensagem simples é suficiente ou se opções configuráveis por negócio fariam diferença.
 - **Compartilhamento do site:** manter **Copiar link** e avaliar **Compartilhar link** como ação principal no celular, usando o menu nativo do aparelho e mantendo a cópia como alternativa.
-- **Vídeo da landing:** avaliar apresentação visual e necessidade de moldura/poster mais refinados na segunda rodada.
+- **Carrossel da landing:** remover o vídeo e substituí-lo por 4 ou 5 mockups/imagens demonstrativas, leves, autoexplicativas e aprovadas antes da implementação.
 
 ## Critério para avançar à Semana 2
 Avançar para o segundo usuário interno somente se:

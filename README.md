@@ -1,6 +1,6 @@
 # CardLink
 
-Aplicação SaaS para criação de sites profissionais rápidos para pequenos negócios e prestadores de serviços, com backend em Node/Express e frontend estático.
+Aplicação SaaS para criação de sites profissionais rápidos para negócios e profissionais, com backend em Node/Express e frontend estático.
 
 ## Como executar localmente
 

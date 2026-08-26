@@ -8,7 +8,7 @@ Este documento reúne melhorias aprovadas conceitualmente, mas que não devem de
 
 ### 0. Reposicionamento comercial: site profissional
 
-**Decisão de 25/08/2026:** o CardLink será apresentado como **site profissional para divulgar pequenos negócios e serviços**, e não como cartão digital, cartão de visita ou solução híbrida.
+**Decisão de 25/08/2026:** o CardLink será apresentado como **o site profissional para colocar o seu negócio na internet em poucos minutos**, e não como cartão digital, cartão de visita ou solução híbrida.
 
 Promessa central:
 
@@ -19,7 +19,7 @@ Ajustes previstos, sempre em etapas curtas:
 1. Revisar toda a linguagem visível da landing page.
 2. Trocar definições comerciais de “cartão digital” por “site profissional”.
 3. Revisar rótulos do painel como “Meu cartão”, mantendo nomes técnicos internos quando a troca não trouxer benefício ao usuário.
-4. Atualizar demonstrações, manual, vídeo e materiais comerciais.
+4. Atualizar demonstrações, manual, carrossel e materiais comerciais.
 5. Confirmar que link e QR Code aparecem como meios de divulgação do site.
 6. Testar a nova comunicação com exemplos de lojas, negócios locais, profissionais liberais e prestadores de serviços.
 7. Não alterar nesta etapa a operação já validada, a estrutura do banco, Cakto, Resend, Railway, URLs públicas ou QR Code.
@@ -79,9 +79,13 @@ Antes de implementar, mapear cada campo atual do painel para sua seção públic
 - Estudar depois duas ações configuráveis por segmento.
 - Preservar métricas separadas de QR escaneado e contato identificado.
 
-### 4. Vídeo da landing
-- Segunda melhoria visual com moldura/poster e acabamento mais criativo.
-- Sem prioridade sobre a validação funcional da Semana 1.
+### 4. Carrossel demonstrativo da landing
+- Remover completamente o vídeo atual.
+- Substituir por carrossel leve com 4 ou 5 mockups/imagens autoexplicativas.
+- Representar diferentes negócios e profissionais, mostrando aplicações reais do site.
+- Usar textos curtos, setas, indicadores, navegação por toque e avanço automático lento.
+- Priorizar carregamento rápido e experiência no celular.
+- Definir e aprovar as imagens antes da implementação.
 
 ### 5. Compartilhamento do link público
 - Manter **Copiar link**, que já foi validado e está funcionando corretamente.
