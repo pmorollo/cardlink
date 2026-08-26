@@ -57,6 +57,39 @@ Regra de visibilidade pública:
 Antes de implementar, mapear cada campo atual do painel para sua seção pública e apresentar a relação para aprovação. Depois da implementação, testar criação, alteração e remoção do conteúdo, confirmando o aparecimento e o desaparecimento automático de cada seção.
 
 
+#### 0.2. Mapeamento auditado do painel para o site público
+
+Mapeamento aprovado para uma implementação posterior, sem alterar os nomes técnicos do banco nesta etapa:
+
+| Área ou campo atual | Texto proposto no painel | Destino no site público |
+|---|---|---|
+| Perfil | **Apresentação do negócio** | Seção principal no topo |
+| Nome do usuário | **Nome do negócio ou profissional** | Nome principal em destaque |
+| Empresa / marca | **Marca ou estabelecimento complementar (opcional)** | Identificação complementar; deixar vazio quando repetir o nome principal |
+| Cargo / título | **Atividade ou especialidade** | Linha abaixo do nome principal |
+| Descrição | **Descrição do negócio** | Seção **Sobre o negócio** |
+| Contato | **Contato e WhatsApp** | Botões e informações de contato |
+| Tabela / Cardápio | **Serviços / Produtos** | Vitrine, tabela ou cardápio |
+| Imagens | **Galeria de fotos** | Galeria pública |
+| Avaliações | **Avaliações de clientes** | Depoimentos e avaliações |
+| Redes | **Redes sociais** | Links sociais |
+| Aparência | **Aparência do site** | Cores, tema e apresentação visual |
+
+Ajuda prevista no painel:
+
+- Nome principal: **“Este será o nome principal em destaque no topo do seu site.”**
+- Marca complementar: **“Use somente se for diferente do nome principal.”**
+- Descrição: **“Este texto aparecerá na seção ‘Sobre o negócio’ do seu site.”**
+- Seção opcional: **“Esta seção só aparecerá no seu site quando houver algum conteúdo cadastrado.”**
+
+Resultado da auditoria da visibilidade atual:
+
+- Serviços, galeria, avaliações e redes sociais já deixam de aparecer para visitantes quando estão vazios; esse comportamento deverá ser preservado e testado.
+- A seção **Sobre o negócio** ainda cria conteúdo genérico quando não há descrição cadastrada. Em etapa própria, o conteúdo automático deverá ser removido e a seção deverá ficar oculta quando estiver vazia.
+- Contatos opcionais deverão exibir somente os meios efetivamente preenchidos.
+- Nenhuma dessas mudanças de painel ou de visibilidade faz parte da revisão textual da landing page; serão implementadas e testadas separadamente.
+
+
 ### 1. Onboarding pós-pagamento Cakto
 - Não exigir cadastro prévio.
 - Após o checkout, redirecionar para uma página de retorno do CardLink.
