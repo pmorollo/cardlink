@@ -671,23 +671,23 @@
               <div class="form-group" style="flex:1;">
                 <label class="form-label" for="field-services-mode">Como deseja apresentar?</label>
                 <select class="form-input" id="field-services-mode" data-field="services_mode" onchange="toggleServicesMode(); updatePreview();">
-                  <option value="image">Enviar tabela, cardápio ou arte pronta</option>
+                  <option value="image">Enviar uma imagem pronta</option>
                   <option value="list">Criar lista de produtos / serviços</option>
                 </select>
               </div>
               <div class="form-group" style="flex:1;">
                 <label class="form-label" for="field-services-title">Título da seção</label>
-                <input class="form-input" type="text" id="field-services-title" data-field="services_title" placeholder="Ex: Cardápio, Tabela de Preços, Nossos Serviços">
+                <input class="form-input" type="text" id="field-services-title" data-field="services_title" placeholder="Ex: Destaque, Promoção, Cardápio ou Tabela de Preços">
               </div>
             </div>
 
             <div id="services-image-builder">
               <div class="form-group">
-                <label class="form-label">Imagem da tabela / cardápio</label>
+                <label class="form-label">Imagem em destaque</label>
                 <div style="border:1.5px dashed var(--border-subtle);border-radius:var(--radius-lg);padding:16px;text-align:center;background:var(--bg-surface);">
-                  <img id="services-image-preview" alt="Prévia da tabela ou cardápio" style="display:none;max-width:100%;max-height:520px;object-fit:contain;border-radius:12px;margin:0 auto 12px;">
+                  <img id="services-image-preview" alt="Prévia da imagem em destaque" style="display:none;max-width:100%;max-height:520px;object-fit:contain;border-radius:12px;margin:0 auto 12px;">
                   <div id="services-image-placeholder" style="color:var(--text-secondary);font-size:0.86rem;line-height:1.5;margin-bottom:12px;">
-                    Envie a arte que você já usa no seu negócio — tabela de preços, cardápio, relação de serviços ou catálogo resumido.
+                    Envie uma tabela, cardápio, promoção, banner, catálogo ou outra arte do seu negócio.
                   </div>
                   <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
                     <button class="btn btn-secondary btn-sm" type="button" onclick="document.getElementById('services-image-file').click()">📷 Escolher imagem</button>
@@ -1142,7 +1142,7 @@
         <div>
           <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🛍️</span> Passo 3: Vitrine, Galeria e Depoimentos</h3>
           <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;">
-            <li><strong>Tabela, Cardápio ou Serviços:</strong> envie sua própria arte de preços/cardápio ou crie uma lista de produtos e serviços dentro do CardLink. Na lista estruturada, o cliente pode solicitar diretamente pelo WhatsApp.</li>
+            <li><strong>Destaque ou Serviços:</strong> envie uma imagem pronta — como tabela, cardápio, promoção, banner ou catálogo — ou crie uma lista de produtos e serviços dentro do CardLink. Na lista estruturada, o cliente pode solicitar diretamente pelo WhatsApp.</li>
             <li><strong>Galeria:</strong> Faça o upload de fotos reais do seu trabalho (portfólio) para gerar credibilidade imediata.</li>
             <li><strong>Depoimentos:</strong> Insira avaliações e avalie com estrelas para comprovar a qualidade do seu atendimento.</li>
           </ul>
