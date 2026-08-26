@@ -19,6 +19,15 @@
 - Conta administrativa de produção regularizada em 22/08/2026: a conta antiga foi vinculada a `pedro.morollo@gmail.com` e marcada como administradora, permanecendo separada da conta lojista de teste.
 - Fluxo Administrador → Usuário validado em 22/08/2026: a mensagem enviada pelo administrador apareceu no painel de `pedro.morollo@yahoo.com`, foi aberta e marcada como lida, e o aviso também chegou ao e-mail Yahoo.
 
+### Decisão conceitual — 25/08/2026
+- A operação e os recursos já validados permanecem aprovados.
+- O CardLink passa a ser definido comercialmente como **site profissional para divulgar pequenos negócios e serviços**.
+- A marca CardLink será mantida.
+- Link e QR Code serão tratados como meios de divulgação e acesso ao site.
+- “Cartão digital”, “cartão de visita” e a proposta híbrida cartão/mini-site deixam de orientar a comunicação comercial.
+- A revisão de linguagem será executada em etapa própria, sem misturar com mudanças de infraestrutura ou funcionamento.
+- Os registros históricos abaixo conservam a terminologia usada durante os testes; isso não altera o novo posicionamento.
+
 ### Pendências imediatas do Dia 1
 1. Até o encerramento da rodada, testar Visitante → Lojista preenchendo somente WhatsApp como meio de retorno; confirmar registro no painel e abertura da resposta para o número correto.
 
@@ -173,7 +182,7 @@ Estas melhorias **não fazem parte do escopo obrigatório da Semana 1**, mas dev
 - **Onboarding pós-Cakto:** medir se o fluxo atual `pagamento → e-mail de ativação → senha → login` é claro e rápido. Anotar qualquer sensação de quebra de fluxo ou demora. A melhoria prevista é retornar automaticamente da Cakto ao CardLink, confirmar o pagamento exclusivamente pelo backend/webhook e permitir a criação de senha em uma sessão de retorno segura, mantendo e-mail de backup.
 - **IA 2.0:** anotar tarefas em que a IA realmente pouparia tempo, especialmente montagem/revisão do cartão, divulgação e respostas a contatos.
 - **QR 2.0:** observar se a mensagem simples é suficiente ou se opções configuráveis por negócio fariam diferença.
-- **Compartilhamento do cartão:** manter **Copiar link** e avaliar **Compartilhar link** como ação principal no celular, usando o menu nativo do aparelho e mantendo a cópia como alternativa.
+- **Compartilhamento do site:** manter **Copiar link** e avaliar **Compartilhar link** como ação principal no celular, usando o menu nativo do aparelho e mantendo a cópia como alternativa.
 - **Vídeo da landing:** avaliar apresentação visual e necessidade de moldura/poster mais refinados na segunda rodada.
 
 ## Critério para avançar à Semana 2

@@ -2,16 +2,19 @@
 
 > **Objetivo:** orientar o plano de divulgação da landing page e do aplicativo CardLink, convertendo visitantes em **assinaturas pagas** através da plataforma de pagamento da **Cakto**.
 >
-> **Produto:** presença profissional modular em um único link — pode começar como cartão digital e evoluir para uma página comercial completa.
+> **Produto:** site profissional simples, rápido e acessível para colocar pequenos negócios e serviços na internet em poucos minutos.
 
 ---
 
 ## 1. Visão Geral do Produto
 
-O **CardLink** transforma o cartão de visita tradicional em uma página web profissional e completa. Com um único link, o profissional apresenta quem é, o que faz, seus produtos, avaliações e todas as redes sociais — sem precisar gastar milhares de reais com um site complexo.
+O **CardLink** coloca pequenos negócios e serviços na internet por meio de um site profissional que o próprio cliente pode criar, publicar e atualizar. A página reúne apresentação do negócio, serviços ou produtos, fotos, avaliações, redes sociais e formas de contato — sem exigir conhecimento técnico ou um site convencional complexo.
 
 **Proposta de valor em uma frase:**
-> *"Um link. Seu negócio inteiro."*
+> *"Seu negócio na internet em poucos minutos."*
+
+**Definição comercial:**
+> *"Crie um site profissional para apresentar seu negócio, divulgar serviços, mostrar fotos, receber contatos e compartilhar tudo por link ou QR Code."*
 
 **Missão:** simplificar a forma como autônomos, prestadores de serviços e pequenos negócios se apresentam e vendem no mundo digital — fortalecendo a economia e o comércio local.
 
@@ -19,13 +22,15 @@ O **CardLink** transforma o cartão de visita tradicional em uma página web pro
 
 ## 2. Público-Alvo
 
-- Autônomos e profissionais liberais (advogados, designers, fotógrafos, cabeleireiras)
-- Prestadores de serviços (eletricistas, encanadores, corretores)
-- Comércios e negócios locais (lojas, restaurantes, consultórios)
-- Qualquer pessoa que hoje entrega cartão de papel ou depende só do WhatsApp
+- Pequenos negócios e estabelecimentos locais (lojas, restaurantes, salões, barbearias, oficinas e clínicas)
+- Autônomos e profissionais liberais que divulgam serviços (advogados, designers, fotógrafos, corretores e terapeutas)
+- Prestadores de serviços (eletricistas, encanadores, técnicos e consultores)
+- Negócios que hoje dependem apenas de WhatsApp ou redes sociais e ainda não possuem uma página própria
 
-**Dor:** não ter uma vitrine profissional acessível no celular do cliente, na hora da decisão de compra.
-**Solução:** um link + QR code que levam direto a um cartão digital completo, com botão de WhatsApp em 1 toque.
+**Dor:** não ter um site profissional, simples de manter e acessível no celular do cliente na hora da decisão de compra.
+**Solução:** um site pronto para divulgar o negócio, acessível por link ou QR Code, com serviços, fotos, avaliações, mensagens e WhatsApp.
+
+**Fora do foco inicial:** programas corporativos de cartões individuais para funcionários. Essa possibilidade não deve aparecer na comunicação principal.
 
 ---
 
@@ -36,14 +41,14 @@ O **CardLink** transforma o cartão de visita tradicional em uma página web pro
 | **Link Compartilhável** | Um único link para bio do Instagram, assinatura de e-mail, QR code e WhatsApp |
 | **WhatsApp Integrado** | Cliente fala com você em um toque (botão direto + link de grupo) |
 | **Todas as Redes** | Instagram, Facebook, LinkedIn, TikTok, YouTube e X em um só lugar |
-| **Mensagens & Leads** | Clientes enviam mensagens pelo cartão; você gerencia os contatos no painel |
+| **Mensagens & Leads** | Clientes enviam mensagens pelo site; você gerencia os contatos no painel |
 | **6 Temas Premium** | Midnight, Ocean, Sunset, Forest, Rose e Monochrome |
 | **Tabela, Cardápio ou Serviços** | Envie sua arte pronta de preços/cardápio ou crie uma lista estruturada de produtos e serviços |
 | **Depoimentos & Avaliações** | Prova social que gera confiança antes do contato |
 | **Galeria de Fotos / Portfólio** | Mostre seu trabalho em imagens |
 | **Assistente de Conteúdo com IA** | Gera textos, descrições e sugestões de serviços em segundos |
-| **QR Code de Balcão + Métricas** | Cliente escaneia no balcão, abre sua página profissional completa e você vê os escaneamentos |
-| **Página 100% Online** | Alterações (foto, preço, telefone) atualizam na hora, para sempre |
+| **QR Code de Balcão + Métricas** | Cliente escaneia no balcão, abre o site profissional completo e os escaneamentos ficam registrados no painel |
+| **Página 100% Online** | Alterações de foto, preço e telefone aparecem imediatamente e permanecem disponíveis enquanto a assinatura estiver ativa |
 
 ---
 
@@ -95,23 +100,26 @@ Cliente ativa/acessa sua conta
 Painel completo + criação/publicação do CardLink + QR Code
 ```
 
-**Regra comercial:** não existe conta gratuita sem utilidade. A conta de cliente está vinculada a uma assinatura válida. O administrador é uma conta operacional separada, sem cartão e sem assinatura.
+**Regra comercial:** não existe conta gratuita sem utilidade. A conta de cliente está vinculada a uma assinatura válida. O administrador é uma conta operacional separada, sem site publicado e sem assinatura.
 
 **Pontos-chave para o marketing:**
-- A landing page e os CardLinks demonstrativos devem mostrar o valor antes da compra.
+- A landing page e os sites demonstrativos devem mostrar o valor antes da compra.
 - O pagamento precede o acesso normal do cliente ao produto.
 - A criação da conta deve ser automática após a confirmação do pagamento pela Cakto; o cliente conclui a ativação definindo sua senha pelo link enviado por e-mail.
-- O CardLink deve ser vendido como ferramenta de presença profissional e produtividade, não apenas como substituto do cartão de papel.
+- O CardLink deve ser vendido diretamente como **site profissional para divulgar negócios e serviços**.
+- Link e QR Code são canais de compartilhamento do site, não a definição do produto.
+- Evitar as expressões “cartão digital”, “cartão de visita”, “mini-site que evolui” e “produto híbrido” na comunicação comercial.
+- Priorizar a promessa de rapidez: o negócio pode estar na web em poucos minutos.
 
 ---
 
 ## 6. Canais de Divulgação (sugestões)
 
 1. **QR code físico no balcão** (piloto Jundiaí/Várzea) — cliente escaneia e já fala no WhatsApp.
-2. **Redes sociais:** Instagram, TikTok e YouTube com demonstrações curtas ("criei meu cartão em 5 minutos").
+2. **Redes sociais:** Instagram, TikTok e YouTube com demonstrações curtas ("coloquei meu negócio na internet em poucos minutos").
 3. **WhatsApp Business / listas de transmissão** para parceiros locais.
 4. **Parcerias locais:** barbearias, salões, clínicas e comércios como vitrine de exemplo.
-5. **Prova social:** usar o próprio cartão do Pedro (PRO) como demonstração real.
+5. **Prova social:** usar um site demonstrativo de negócio como demonstração real.
 
 ---
 

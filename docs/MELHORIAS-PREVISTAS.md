@@ -1,10 +1,61 @@
 # CardLink — Melhorias Previstas
 
-**Atualizado em:** 22/08/2026
+**Atualizado em:** 26/08/2026
 
 Este documento reúne melhorias aprovadas conceitualmente, mas que não devem desviar a Semana 1 do objetivo principal: testar o produto em uso real.
 
 ## Prioridade após/durante os testes
+
+### 0. Reposicionamento comercial: site profissional
+
+**Decisão de 25/08/2026:** o CardLink será apresentado como **site profissional para divulgar pequenos negócios e serviços**, e não como cartão digital, cartão de visita ou solução híbrida.
+
+Promessa central:
+
+> **Seu negócio na internet em poucos minutos.**
+
+Ajustes previstos, sempre em etapas curtas:
+
+1. Revisar toda a linguagem visível da landing page.
+2. Trocar definições comerciais de “cartão digital” por “site profissional”.
+3. Revisar rótulos do painel como “Meu cartão”, mantendo nomes técnicos internos quando a troca não trouxer benefício ao usuário.
+4. Atualizar demonstrações, manual, vídeo e materiais comerciais.
+5. Confirmar que link e QR Code aparecem como meios de divulgação do site.
+6. Testar a nova comunicação com exemplos de lojas, negócios locais, profissionais liberais e prestadores de serviços.
+7. Não alterar nesta etapa a operação já validada, a estrutura do banco, Cakto, Resend, Railway, URLs públicas ou QR Code.
+
+**Critério de conclusão:** um visitante deve compreender imediatamente que está contratando um site para divulgar seu negócio, sem interpretar o produto como cartão corporativo para funcionários.
+
+
+#### 0.1. Clareza do menu de configuração e visibilidade das seções
+
+Ao mapear e revisar os textos do painel, cada campo deverá comunicar três informações:
+
+1. **O que deve ser preenchido.**
+2. **Onde o conteúdo aparecerá no site público.**
+3. **Em que condição a seção ficará visível.**
+
+Diretrizes aprovadas:
+
+- Substituir rótulos centrados na conta, como **“Nome do usuário”**, por rótulos centrados no resultado público.
+- Para o título principal, usar **“Nome do negócio ou profissional”**, preservando tanto estabelecimentos quanto profissionais que trabalham com o próprio nome.
+- Exibir abaixo desse campo a orientação: **“Este será o nome principal em destaque no topo do seu site.”**
+- Revisar os demais grupos para que seus nomes correspondam às seções públicas, como **Apresentação do negócio**, **Sobre o negócio**, **Serviços / Produtos**, **Tabela / Cardápio**, **Galeria de fotos**, **Avaliações de clientes**, **Contato e WhatsApp**, **Redes sociais** e **Aparência do site**.
+- Incluir ajuda curta nos campos relevantes, por exemplo: **“Este texto aparecerá na seção ‘Sobre o negócio’ do seu site.”**
+- Alterar inicialmente apenas rótulos e textos de orientação. Manter os nomes técnicos e campos do banco quando isso evitar migração e não prejudicar a experiência.
+
+Regra de visibilidade pública:
+
+- Uma seção opcional só deverá aparecer quando possuir conteúdo válido cadastrado.
+- Se **Serviços / Produtos** ou **Tabela / Cardápio** estiverem sem itens e sem imagem válida, a seção inteira não deverá aparecer.
+- Itens vazios ou incompletos não deverão gerar blocos públicos.
+- Ao salvar o primeiro conteúdo válido, a seção deverá aparecer automaticamente.
+- Ao remover todo o conteúdo, a seção deverá desaparecer novamente.
+- A mesma regra deverá ser verificada em galeria, avaliações, redes sociais, endereço e demais contatos opcionais.
+- O painel deverá informar: **“Esta seção só aparecerá no seu site quando houver algum conteúdo cadastrado. Você poderá alterar ou remover as informações quando quiser.”**
+
+Antes de implementar, mapear cada campo atual do painel para sua seção pública e apresentar a relação para aprovação. Depois da implementação, testar criação, alteração e remoção do conteúdo, confirmando o aparecimento e o desaparecimento automático de cada seção.
+
 
 ### 1. Onboarding pós-pagamento Cakto
 - Não exigir cadastro prévio.
@@ -16,8 +67,8 @@ Este documento reúne melhorias aprovadas conceitualmente, mas que não devem de
 - Confirmar previamente na documentação oficial da Cakto quais identificadores de retorno/transação estão disponíveis para o vínculo seguro.
 
 ### 2. IA 2.0
-- Montagem guiada do CardLink.
-- Revisão do cartão pronto.
+- Montagem guiada do site do negócio.
+- Revisão do site pronto.
 - Textos para divulgação.
 - Sugestão de respostas.
 - Leitura assistida de tabela/cardápio sem inventar preços.

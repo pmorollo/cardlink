@@ -1,15 +1,15 @@
 # CardLink — Resumo Rápido
 
-**Produto:** cartão de visita digital que vira um mini-site de vendas profissional, compartilhável por um único link.
+**Produto:** site profissional simples e acessível para colocar pequenos negócios e serviços na internet em poucos minutos.
 
-**Público:** autônomos, prestadores de serviços, profissionais liberais e comércios locais.
+**Público:** pequenos negócios, lojas, profissionais liberais, autônomos e prestadores de serviços que precisam divulgar sua atividade na web.
 
 **Oferta:**
 - Mensal: **R$ 12,90/mês**
 - Anual: **R$ 99,00/ano** (36% de economia)
 - Pagamento via **Cakto** (Pix: 0% + R$ 2,49 · Cartão: 4,99% + R$ 2,49)
 
-**Diferenciais:** link único, WhatsApp em 1 toque, todas as redes, vitrine de produtos, depoimentos, galeria, 6 temas premium, assistente de conteúdo com IA, QR code de balcão + métricas, ativação imediata após pagamento.
+**Diferenciais:** publicação rápida, edição pelo próprio cliente, serviços/produtos, WhatsApp em 1 toque, redes sociais, depoimentos, galeria, temas, assistente de conteúdo com IA, link compartilhável e QR Code + métricas.
 
 **Link oficial:** `https://cardlink-production-abd2.up.railway.app/`
 
@@ -24,7 +24,7 @@ Documento completo: ver `cardlink-apresentacao-marketing.md`.
 ## Fluxo de acesso atual
 
 - **Conta de cliente:** nasce após pagamento confirmado pela Cakto e precisa ser ativada por link enviado ao e-mail do comprador.
-- **Conta administrativa:** única, sem cartão e sem assinatura.
+- **Conta administrativa:** única, sem site publicado e sem assinatura.
 - **Contas internas de teste:** criadas manualmente e excluídas das métricas comerciais.
 
 Comandos de manutenção local:
