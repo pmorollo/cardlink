@@ -1233,13 +1233,13 @@ async function handleServicesImageUpload(input) {
 
   const localUrl = URL.createObjectURL(file);
   syncServicesImagePreview(localUrl);
-  showToast('⏳', 'Otimizando e enviando sua tabela...');
+  showToast('⏳', 'Otimizando e enviando sua imagem...');
 
   try {
     const url = await uploadFile(file);
     setFieldValue('field-services-image', url);
     syncServicesImagePreview(url);
-    showToast('✅', 'Tabela/cardápio enviado!');
+    showToast('✅', 'Imagem em destaque enviada!');
     updatePreview();
   } catch (err) {
     syncServicesImagePreview(document.getElementById('field-services-image')?.value || '');
