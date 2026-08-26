@@ -116,7 +116,7 @@ Painel completo + criação/publicação do CardLink + QR Code
 - A landing page e os sites demonstrativos devem mostrar o valor antes da compra.
 - O pagamento precede o acesso normal do cliente ao produto.
 - A criação da conta deve ser automática após a confirmação do pagamento pela Cakto; o cliente conclui a ativação definindo sua senha pelo link enviado por e-mail.
-- O CardLink deve ser vendido diretamente como **site profissional para divulgar negócios e serviços**.
+- O CardLink deve ser apresentado diretamente como **o site profissional para colocar o seu negócio na internet em poucos minutos**.
 - Link e QR Code são canais de compartilhamento do site, não a definição do produto.
 - Evitar as expressões “cartão digital”, “cartão de visita”, “mini-site que evolui” e “produto híbrido” na comunicação comercial.
 - Priorizar a promessa de rapidez: o negócio pode estar na web em poucos minutos.
