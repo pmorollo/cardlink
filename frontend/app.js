@@ -1017,7 +1017,7 @@ async function loadDashboard() {
                   ${c.message ? `<div class="contact-item-message">${escapeHtml(c.message)}</div>` : ''}
                   <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-md);justify-content:flex-end;">
                     ${c.phone ? `
-                      <a href="https://wa.me/${cleanWhatsapp(c.phone)}?text=${encodeURIComponent(`Olá, ${c.name}! Recebi sua mensagem pelo meu cartão digital CardLink. Como posso ajudar?`)}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;font-size:0.75rem;background:#25d366;color:#ffffff;border:none;">
+                      <a href="https://wa.me/${cleanWhatsapp(c.phone)}?text=${encodeURIComponent(`Olá, ${c.name}! Recebi sua mensagem pelo meu site CardLink. Como posso ajudar?`)}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;font-size:0.75rem;background:#25d366;color:#ffffff;border:none;">
                         💬 Responder
                       </a>
                     ` : ''}
@@ -1818,7 +1818,7 @@ async function viewContacts(cardId, cardName) {
           ${c.message ? `<div class="contact-item-message">${escapeHtml(c.message)}</div>` : ''}
           <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-md);justify-content:flex-end;">
             ${c.phone ? `
-              <a href="https://wa.me/${cleanWhatsapp(c.phone)}?text=${encodeURIComponent(`Olá, ${c.name}! Recebi sua mensagem pelo meu cartão digital CardLink. Como posso ajudar?`)}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;font-size:0.75rem;background:#25d366;color:#ffffff;border:none;">
+              <a href="https://wa.me/${cleanWhatsapp(c.phone)}?text=${encodeURIComponent(`Olá, ${c.name}! Recebi sua mensagem pelo meu site CardLink. Como posso ajudar?`)}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;font-size:0.75rem;background:#25d366;color:#ffffff;border:none;">
                 💬 Responder via WhatsApp
               </a>
             ` : ''}
