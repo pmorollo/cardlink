@@ -1,12 +1,12 @@
 # CardLink — Diretrizes Oficiais de Produto e Marketing
 
-**Atualizado em:** 25/08/2026
+**Atualizado em:** 26/08/2026
 
 Este documento registra decisões estruturais do CardLink que devem orientar desenvolvimento, vendas, comunicação e marketing.
 
 ## 1. O que o CardLink é
 
-O CardLink é um **site profissional simples, rápido e acessível para divulgar pequenos negócios e serviços**. Ele não deve ser apresentado comercialmente como cartão de visita digital, mini-site híbrido ou produto que começa como cartão e depois se transforma em site.
+O CardLink é o **site profissional para colocar o seu negócio na internet em poucos minutos**. Ele não deve ser apresentado comercialmente como cartão de visita digital, mini-site híbrido ou produto que começa como cartão e depois se transforma em site.
 
 Proposta central de posicionamento:
 
@@ -205,9 +205,22 @@ Após validar o QR atual, estudar ações configuráveis por segmento, como:
 
 O QR atual deve permanecer simples na primeira fase: abrir a página profissional completa do estabelecimento/profissional. A métrica de leitura continua separada de contato efetivamente identificado, e o WhatsApp permanece como ação disponível dentro do site.
 
-### 9.5. Apresentação do vídeo na landing page
+### 9.5. Carrossel demonstrativo na landing page
 
-Aprimoramento visual previsto para uma segunda rodada, sem prioridade sobre os testes funcionais. Avaliar moldura estilo navegador/notebook/monitor, poster de capa e tratamento visual que evite tela preta quando o vídeo estiver parado.
+Remover completamente o vídeo atual da landing page e substituí-lo por um carrossel leve com 4 ou 5 imagens demonstrativas.
+
+Diretrizes:
+
+- usar mockups ou telas que mostrem aplicações reais do CardLink;
+- representar diferentes tipos de negócio e também profissionais que divulgam seus próprios serviços;
+- demonstrar, ao longo das imagens, apresentação, serviços/produtos, galeria, avaliações, WhatsApp, link, QR Code e facilidade de edição;
+- usar textos curtos, pois as imagens devem ser autoexplicativas;
+- oferecer setas, indicadores e navegação por toque;
+- permitir avanço automático lento, com pausa durante a interação;
+- priorizar carregamento rápido, acessibilidade e funcionamento no celular;
+- aprovar as imagens antes da implementação.
+
+O carrossel deverá reforçar a definição **“CardLink — Seu negócio na internet em poucos minutos”** e não poderá voltar a apresentar o produto como cartão digital.
 
 ### 9.6. Critério para implementar melhorias previstas
 
