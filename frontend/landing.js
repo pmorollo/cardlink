@@ -15,21 +15,6 @@ let cardData = null;
 // ============================================
 // Placeholder Data Banks
 // ============================================
-const PLACEHOLDER_GALLERY = [
-  'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80',
-  'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
-  'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80',
-  'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80',
-  'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80',
-  'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80',
-];
-
-const PLACEHOLDER_TESTIMONIALS = [
-  { name: 'Mariana Souza', stars: 5, comment: 'Atendimento incrível! Superou todas as minhas expectativas. Profissional dedicado e muito competente. Recomendo sem hesitar.' },
-  { name: 'Carlos Oliveira', stars: 5, comment: 'Serviço de altíssima qualidade. Pontual, atencioso e entregou exatamente o que foi prometido. Com certeza voltarei!' },
-  { name: 'Ana Beatriz Lima', stars: 5, comment: 'Fiquei impressionada com o nível de profissionalismo. Resultado perfeito e atendimento humanizado. Nota 10!' },
-];
-
 // ============================================
 // Utils
 // ============================================
@@ -466,19 +451,19 @@ function renderGallery(d) {
   const grid = document.getElementById('gallery-grid');
   if (!grid) return;
 
-  const hasRealGallery = d.gallery && d.gallery.length > 0;
-  if (!hasRealGallery && !ownerToken) {
+  const photos = Array.isArray(d.gallery)
+    ? d.gallery.filter(url => typeof url === 'string' && url.trim())
+    : [];
+
+  if (photos.length === 0) {
     removePublicSection('galeria');
     return;
   }
-  const photos = hasRealGallery ? d.gallery : PLACEHOLDER_GALLERY;
-  const isPlaceholder = !hasRealGallery;
-
-  if (isPlaceholder) makePlaceholderHint('gallery-placeholder-hint', 'Adicionar suas fotos reais');
 
   grid.innerHTML = photos.slice(0, 6).map((url, i) => `
     <div class="lp-gallery-item animate-in">
-      <img src="${esc(url)}" alt="Foto ${i + 1}" loading="lazy" onerror="this.parentElement.style.display='none'">
+      <img src="${esc(url.trim())}" alt="Foto ${i + 1}" loading="lazy"
+        onerror="this.parentElement.remove(); if (!document.querySelector('#gallery-grid .lp-gallery-item')) removePublicSection('galeria')">
       <div class="lp-gallery-overlay" aria-hidden="true">+</div>
     </div>`).join('');
 }
@@ -490,28 +475,35 @@ function renderTestimonials(d) {
   const grid = document.getElementById('testimonials-grid');
   if (!grid) return;
 
-  const hasReal = d.testimonials && d.testimonials.length > 0;
-  if (!hasReal && !ownerToken) {
+  const list = Array.isArray(d.testimonials)
+    ? d.testimonials.filter(t =>
+        t &&
+        typeof t.name === 'string' &&
+        t.name.trim() &&
+        typeof t.comment === 'string' &&
+        t.comment.trim()
+      )
+    : [];
+
+  if (list.length === 0) {
     removePublicSection('depoimentos');
     return;
   }
-  const list = hasReal ? d.testimonials : PLACEHOLDER_TESTIMONIALS;
-  const isPlaceholder = !hasReal;
-
-  if (isPlaceholder) makePlaceholderHint('testimonials-placeholder-hint', 'Adicionar depoimentos reais');
 
   grid.innerHTML = list.map(t => {
     const n = Math.min(5, Math.max(1, t.stars || 5));
     const stars = '★'.repeat(n) + '☆'.repeat(5 - n);
-    const initials = (t.name || 'C').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const name = t.name.trim();
+    const comment = t.comment.trim();
+    const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
     return `
       <div class="lp-testimonial-card animate-in">
         <div class="lp-testimonial-quote">"</div>
-        <p class="lp-testimonial-text">${esc(t.comment || 'Excelente atendimento! Muito profissional e dedicado.')}</p>
+        <p class="lp-testimonial-text">${esc(comment)}</p>
         <div class="lp-testimonial-author">
           <div class="lp-testimonial-avatar">${initials}</div>
           <div>
-            <div class="lp-testimonial-name">${esc(t.name)}</div>
+            <div class="lp-testimonial-name">${esc(name)}</div>
             <div class="lp-testimonial-stars">${stars}</div>
           </div>
         </div>
