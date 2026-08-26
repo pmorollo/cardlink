@@ -1,6 +1,6 @@
 # CardLink — Resumo Rápido
 
-**Produto:** site profissional simples e acessível para colocar pequenos negócios e serviços na internet em poucos minutos.
+**Produto:** o site profissional para colocar o seu negócio na internet em poucos minutos.
 
 **Público:** pequenos negócios, lojas, profissionais liberais, autônomos e prestadores de serviços que precisam divulgar sua atividade na web.
 
