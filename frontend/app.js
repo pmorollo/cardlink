@@ -165,13 +165,13 @@ function handleRoute() {
           Ativação do <span class="text-gradient">CardLink PRO</span>
         </h1>
         <p style="color:var(--text-secondary);font-size:0.95rem;line-height:1.6;margin-bottom:24px;">
-          Olá, <strong>${escapeHtml(currentUser.name)}</strong>! O CardLink funciona exclusivamente com o plano PRO. Ative sua assinatura por apenas <strong>R$ 12,90/mês</strong> para acessar o painel de criação e publicar seu cartão de visita digital.
+          Olá, <strong>${escapeHtml(currentUser.name)}</strong>! O CardLink funciona exclusivamente com o plano PRO. Ative sua assinatura por apenas <strong>R$ 12,90/mês</strong> para acessar o painel de criação e publicar seu site profissional.
         </p>
 
         <div style="background:rgba(139,92,246,0.08);border:1px dashed var(--accent);border-radius:var(--radius-md);padding:16px;margin-bottom:24px;text-align:left;">
           <div style="font-weight:700;color:var(--accent);margin-bottom:8px;font-size:0.9rem;">🚀 O que está incluído no seu CardLink PRO:</div>
           <ul style="margin:0;padding-left:20px;font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">
-            <li>Editor de Cartão ilimitado com temas modernos</li>
+            <li>Editor do site com temas modernos</li>
             <li>Geração de conteúdo com Inteligência Artificial</li>
             <li>Galeria de fotos e vitrine de produtos</li>
             <li>Captura de leads e contatos dos clientes</li>
@@ -287,7 +287,7 @@ function handleRoute() {
     document.getElementById('landing-view').classList.add('active');
     if (navbar) navbar.style.display = '';
     if (bgAnimated) bgAnimated.style.display = '';
-    document.title = 'CardLink — Cartão de Visita Digital';
+    document.title = 'CardLink — Seu negócio na internet em poucos minutos';
     updateNavAuth();
   }
 
@@ -923,14 +923,14 @@ async function loadDashboard() {
         <div id="pwa-install-banner" class="form-section" style="display:flex;background:linear-gradient(135deg, rgba(124,58,237,0.08), rgba(59,130,246,0.08));border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px;margin-bottom:var(--space-lg);text-align:left;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%;">
           <div style="flex:1;min-width:250px;">
             <div style="font-weight:700;color:var(--text-primary);font-size:0.95rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
-              <span>📲</span> Fixar seu cartão na Tela de Início
+              <span>📲</span> Fixar seu site na Tela de Início
             </div>
             <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.4;margin:0;">
-              Crie um atalho que abre diretamente o cartão público que você criou.
+              Crie um atalho que abre diretamente o site público que você criou.
             </p>
           </div>
           <button type="button" class="btn btn-primary btn-sm" onclick="openCardHomeScreenSetup('${escapeHtml(card.slug)}')" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;">
-            Fixar cartão
+            Fixar site
           </button>
         </div>
       `;
@@ -1180,11 +1180,11 @@ async function editCard(id) {
 }
 
 async function deleteCard(id) {
-  if (!confirm('Tem certeza que deseja excluir este cartão?')) return;
+  if (!confirm('Tem certeza que deseja excluir este site?')) return;
   try {
     await api('/cards/' + id, { method: 'DELETE' });
     currentUserCardId = null;
-    showToast('✅', 'Cartão excluído!');
+    showToast('✅', 'Site excluído!');
     navigateTo('dashboard');
   } catch (err) {
     showToast('❌', err.message);
@@ -1430,7 +1430,7 @@ function updatePreview() {
 async function loadPublicCard(slug) {
   const rendered = document.getElementById('rendered-card');
   if (!rendered) return;
-  rendered.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:var(--space-3xl);">Carregando cartão...</p>';
+  rendered.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:var(--space-3xl);">Carregando site...</p>';
 
   try {
     const card = await api('/public/' + slug);
@@ -1459,7 +1459,7 @@ async function loadPublicCard(slug) {
     // O visitante é direcionado ao WhatsApp; não há chat de IA público.
   } catch (err) {
 
-    rendered.innerHTML = '<p style="text-align:center;color:#ef4444;padding:var(--space-3xl);">Cartão não encontrado</p>';
+    rendered.innerHTML = '<p style="text-align:center;color:#ef4444;padding:var(--space-3xl);">Site não encontrado</p>';
   }
 }
 

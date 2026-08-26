@@ -80,7 +80,7 @@ router.post('/generate', authMiddleware, requireCustomer, async (req, res) => {
     }
 
     try {
-      const prompt = `Você é um especialista em marketing e redação comercial. Reescreva o seguinte texto para torná-lo mais profissional, atraente e persuasivo para um cartão de visita/landing page (tom de voz: ${skill}). Responda APENAS com o texto final melhorado, sem explicações ou aspas:\n\n"${textToImprove}"`;
+      const prompt = `Você é um especialista em marketing e redação comercial. Reescreva o seguinte texto para torná-lo mais profissional, atraente e persuasivo para o site de um negócio (tom de voz: ${skill}). Responda APENAS com o texto final melhorado, sem explicações ou aspas:\n\n"${textToImprove}"`;
 
       const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
         method: 'POST',
@@ -105,7 +105,7 @@ router.post('/generate', authMiddleware, requireCustomer, async (req, res) => {
     }
   }
 
-  // Full Card & Landing Page generation mode
+  // Full professional website generation mode
   if (!apiKey) {
     console.log('ℹ️ NVIDIA_API_KEY não configurada. Usando gerador de modelo rápido.');
     return res.json(generateFallbackAI({ profession, skill }));
@@ -113,7 +113,7 @@ router.post('/generate', authMiddleware, requireCustomer, async (req, res) => {
 
   try {
     const prompt = `Você é um assistente de inteligência artificial do aplicativo CardLink.
-Gere o conteúdo completo de um cartão de visita digital e landing page para o profissional/negócio: "${profession}".
+Gere o conteúdo completo de um site profissional para o negócio ou profissional: "${profession}".
 O tom de voz deve ser: ${skill} (corporativa = sério/autoridade, criativa = inovador/autoral, acolhedora = humano/empático, vendedora = persuasivo/ofertas).
 
 Retorne ESTRITAMENTE um objeto JSON válido (sem código markdown, sem explicações fora do JSON) com a seguinte estrutura:

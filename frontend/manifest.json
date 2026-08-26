@@ -1,7 +1,7 @@
 {
-  "name": "CardLink — Cartão de Visita Digital",
+  "name": "CardLink — Site Profissional",
   "short_name": "CardLink",
-  "description": "Crie seu cartão de visita digital e compartilhe com um link.",
+  "description": "Coloque o seu negócio na internet com um site profissional.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
