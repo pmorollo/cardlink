@@ -982,7 +982,7 @@ async function loadDashboard() {
           </div>
           <div style="flex:1;">
             <div class="dash-card-name" style="font-size:1.2rem;">${escapeHtml(card.name)}</div>
-            <div class="dash-card-slug">${card.title ? escapeHtml(card.title) + ' · ' : ''}${card.business ? escapeHtml(card.business) : 'Cartão Digital'}</div>
+            <div class="dash-card-slug">${card.title ? escapeHtml(card.title) + ' · ' : ''}${card.business ? escapeHtml(card.business) : 'Site profissional'}</div>
           </div>
           <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
             <a class="btn btn-primary btn-sm" href="/site/${escapeHtml(card.slug)}" target="_blank" rel="noopener">Abrir página</a>
