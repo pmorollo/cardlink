@@ -30,41 +30,6 @@ const PLACEHOLDER_TESTIMONIALS = [
   { name: 'Ana Beatriz Lima', stars: 5, comment: 'Fiquei impressionada com o nível de profissionalismo. Resultado perfeito e atendimento humanizado. Nota 10!' },
 ];
 
-// Smart service suggestions by profession keywords
-const SERVICE_SUGGESTIONS = {
-  'cabeleire': [
-    { name: 'Corte de Cabelo', price: '60,00', description: 'Corte personalizado para o seu estilo', photo_url: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&q=80' },
-    { name: 'Coloração', price: '120,00', description: 'Transforme seu visual com coloração profissional', photo_url: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80' },
-    { name: 'Escova Progressiva', price: '180,00', description: 'Alise e hidrate seus fios com técnica premium', photo_url: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=400&q=80' },
-  ],
-  'designer': [
-    { name: 'Identidade Visual', price: '800,00', description: 'Logo, paleta de cores e manual da marca completo', photo_url: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&q=80' },
-    { name: 'Social Media', price: '400,00', description: 'Criação de posts e stories profissionais por mês', photo_url: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&q=80' },
-    { name: 'Website Design', price: '1.500,00', description: 'Layout moderno e responsivo para o seu negócio', photo_url: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=400&q=80' },
-  ],
-  'nutri': [
-    { name: 'Consulta Nutricional', price: '180,00', description: 'Avaliação completa e plano alimentar personalizado', photo_url: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&q=80' },
-    { name: 'Acompanhamento Mensal', price: '300,00', description: 'Retorno e ajustes do plano alimentar', photo_url: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80' },
-    { name: 'Dieta Esportiva', price: '220,00', description: 'Plano nutricional focado em performance', photo_url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80' },
-  ],
-  'advogad': [
-    { name: 'Consulta Jurídica', price: '250,00', description: 'Orientação legal personalizada para sua situação', photo_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&q=80' },
-    { name: 'Elaboração de Contratos', price: '500,00', description: 'Contratos seguros e personalizados', photo_url: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&q=80' },
-    { name: 'Assessoria Jurídica', price: '800,00', description: 'Acompanhamento jurídico mensal', photo_url: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=400&q=80' },
-  ],
-  'fotograf': [
-    { name: 'Ensaio Fotográfico', price: '350,00', description: 'Sessão de fotos profissional com edição inclusa', photo_url: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80' },
-    { name: 'Fotografia de Eventos', price: '800,00', description: 'Cobertura completa do seu evento especial', photo_url: 'https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=400&q=80' },
-    { name: 'Fotos para E-commerce', price: '500,00', description: 'Imagens profissionais dos seus produtos', photo_url: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&q=80' },
-  ],
-};
-
-const DEFAULT_SERVICES = [
-  { name: 'Consultoria', price: '200,00', description: 'Atendimento personalizado para suas necessidades', photo_url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=80' },
-  { name: 'Serviço Premium', price: '350,00', description: 'Solução completa com acompanhamento especializado', photo_url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80' },
-  { name: 'Pacote Completo', price: '600,00', description: 'Tudo que você precisa em um único pacote', photo_url: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=400&q=80' },
-];
-
 // ============================================
 // Utils
 // ============================================
@@ -177,14 +142,6 @@ function makePlaceholderHint(containerId, label = 'Personalizar') {
   const el = document.getElementById(containerId);
   if (!el) return;
   el.innerHTML = `<a class="placeholder-hint" href="${window.location.origin}/#builder" title="Editar no painel">✏️ ${label} no painel</a>`;
-}
-
-function getSmartServices(title, business) {
-  const text = ((title || '') + ' ' + (business || '')).toLowerCase();
-  for (const [key, services] of Object.entries(SERVICE_SUGGESTIONS)) {
-    if (text.includes(key)) return services;
-  }
-  return DEFAULT_SERVICES;
 }
 
 function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -470,14 +427,13 @@ function renderServices(d) {
     return;
   }
 
-  if (!hasRealServices && !ownerToken) {
+  if (!hasRealServices) {
     removePublicSection('servicos');
     return;
   }
 
   grid.style.display = '';
-  const services = hasRealServices ? products : getSmartServices(d.title, d.business);
-  if (!hasRealServices) makePlaceholderHint('services-placeholder-hint', 'Adicionar seus serviços reais');
+  const services = products;
 
   grid.innerHTML = services.map((s, i) => {
     const waMsg = encodeURIComponent(`Olá! Tenho interesse no serviço: ${s.name}${s.price ? ' (R$ ' + s.price + ')' : ''}`);
