@@ -377,35 +377,46 @@ function renderAbout(d) {
   const name = d.name || 'Profissional';
   const title = d.title || '';
   const business = d.business || '';
-  const isPlaceholder = !d.description;
+  const description = typeof d.description === 'string' ? d.description.trim() : '';
+  const isPlaceholder = !description;
+
+  if (isPlaceholder && !ownerToken) {
+    removePublicSection('sobre');
+    return;
+  }
 
   // Title (somente o nome, menor e em itálico)
   const aboutTitle = document.getElementById('about-title');
   if (aboutTitle) aboutTitle.innerHTML = `<span class="lp-about-name">${esc(name)}</span>`;
 
-  // About image: use professional stock photo so self photo isn't duplicated from Hero
+  // Use only an image supplied by the owner; never invent a stock image.
   const imgWrap = document.getElementById('about-image');
-  if (imgWrap) {
-    const aboutImg = (d.gallery && d.gallery.length > 0)
-      ? d.gallery[0]
-      : 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80';
+  const imageColumn = imgWrap?.closest('.lp-about-image-wrap');
+  const aboutGrid = imgWrap?.closest('.lp-about-grid');
+  const aboutImg = (d.gallery && d.gallery.length > 0)
+    ? d.gallery[0]
+    : (d.logo_url || d.photo_url || '');
+  if (imgWrap && aboutImg) {
     imgWrap.innerHTML = `<img src="${esc(aboutImg)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<div class=lp-about-image-placeholder><span style=font-size:5rem>👤</span></div>'">`;
+  } else if (imgWrap && ownerToken) {
+    imgWrap.innerHTML = '<div class="lp-about-image-placeholder"><span style="font-size:5rem">👤</span></div>';
+  } else if (imageColumn) {
+    imageColumn.style.display = 'none';
+    aboutGrid?.classList.add('lp-about-grid-single');
   }
 
   // Badge
   const badgeValue = document.getElementById('about-badge-value');
   const badgeLabel = document.getElementById('about-badge-label');
-  if (badgeValue) badgeValue.textContent = title ? title.split(' ')[0] : '⭐';
-  if (badgeLabel) badgeLabel.textContent = business || 'Profissional';
+  const badge = document.getElementById('about-badge');
+  if (badgeValue) badgeValue.textContent = title ? title.split(' ')[0] : '';
+  if (badgeLabel) badgeLabel.textContent = business || '';
+  if (badge && !title && !business) badge.style.display = 'none';
 
   // Description
   const descEl = document.getElementById('about-description');
   if (descEl) {
-    if (d.description) {
-      descEl.textContent = d.description;
-    } else {
-      descEl.innerHTML = `<em style="color:var(--text-muted);">Olá! Sou ${esc(name)}${title ? ', ' + esc(title) : ''}${business ? ' em ' + esc(business) : ''}. Trabalho com dedicação e qualidade para oferecer o melhor atendimento. Estou aqui para ajudar você a alcançar seus objetivos!</em>`;
-    }
+    descEl.textContent = description;
   }
 
   // Highlights
@@ -415,8 +426,6 @@ function renderAbout(d) {
     if (d.phone || d.whatsapp) items.push(['📞', 'Atendimento personalizado']);
     if (d.email) items.push(['📧', esc(d.email)]);
     if (d.address) items.push(['📍', esc(d.address)]);
-    items.push(['⭐', 'Qualidade e comprometimento']);
-    items.push(['🤝', 'Satisfação garantida']);
     highlightsEl.innerHTML = items.map(([icon, text]) => `
       <div class="lp-about-highlight">
         <div class="lp-about-highlight-icon">${icon}</div>
@@ -425,7 +434,7 @@ function renderAbout(d) {
   }
 
   // Placeholder hint for owner
-  if (isPlaceholder) makePlaceholderHint('about-placeholder-hint', 'Adicionar descrição');
+  if (isPlaceholder && ownerToken) makePlaceholderHint('about-placeholder-hint', 'Adicionar descrição');
 }
 
 // ============================================
