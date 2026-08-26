@@ -472,20 +472,20 @@
         <div class="builder-form-panel">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
             <div>
-              <h1 class="builder-title">Configurações da <span class="text-gradient">página</span></h1>
-              <p class="builder-subtitle">Organize as informações que seus clientes encontrarão.</p>
+              <h1 class="builder-title">Configurações do <span class="text-gradient">site</span></h1>
+              <p class="builder-subtitle">Organize as informações nas mesmas seções que seus clientes encontrarão.</p>
             </div>
             <button class="btn btn-secondary btn-sm" onclick="navigateTo('dashboard')">← Voltar</button>
           </div>
 
           <nav class="settings-nav" aria-label="Áreas de configuração">
-            <button class="settings-nav-item active" type="button" data-settings-target="profile" onclick="showSettingsSection('profile')">Perfil</button>
-            <button class="settings-nav-item" type="button" data-settings-target="contact" onclick="showSettingsSection('contact')">Contato</button>
-            <button class="settings-nav-item" type="button" data-settings-target="services" onclick="showSettingsSection('services')">Tabela / Cardápio</button>
-            <button class="settings-nav-item" type="button" data-settings-target="gallery" onclick="showSettingsSection('gallery')">Imagens</button>
-            <button class="settings-nav-item" type="button" data-settings-target="testimonials" onclick="showSettingsSection('testimonials')">Avaliações</button>
-            <button class="settings-nav-item" type="button" data-settings-target="social" onclick="showSettingsSection('social')">Redes</button>
-            <button class="settings-nav-item" type="button" data-settings-target="appearance" onclick="showSettingsSection('appearance')">Aparência</button>
+            <button class="settings-nav-item active" type="button" data-settings-target="profile" onclick="showSettingsSection('profile')">Apresentação do negócio</button>
+            <button class="settings-nav-item" type="button" data-settings-target="contact" onclick="showSettingsSection('contact')">Contato e WhatsApp</button>
+            <button class="settings-nav-item" type="button" data-settings-target="services" onclick="showSettingsSection('services')">Serviços / Produtos</button>
+            <button class="settings-nav-item" type="button" data-settings-target="gallery" onclick="showSettingsSection('gallery')">Galeria de fotos</button>
+            <button class="settings-nav-item" type="button" data-settings-target="testimonials" onclick="showSettingsSection('testimonials')">Avaliações de clientes</button>
+            <button class="settings-nav-item" type="button" data-settings-target="social" onclick="showSettingsSection('social')">Redes sociais</button>
+            <button class="settings-nav-item" type="button" data-settings-target="appearance" onclick="showSettingsSection('appearance')">Aparência do site</button>
             <button class="settings-nav-item" type="button" data-settings-target="assistant" onclick="showSettingsSection('assistant')">Assistente de conteúdo</button>
           </nav>
 
@@ -519,28 +519,31 @@
 
           <!-- Personal Info -->
           <div class="form-section settings-section active" data-settings-section="profile">
-            <div class="form-section-title"><span class="icon">👤</span> Informações Pessoais</div>
+            <div class="form-section-title"><span class="icon">🏢</span> Apresentação do negócio</div>
             <div class="form-group">
-              <label class="form-label" for="field-name">Nome *</label>
-              <input class="form-input" type="text" id="field-name" placeholder="Seu nome completo" data-field="name">
+              <label class="form-label" for="field-name">Nome do negócio ou profissional *</label>
+              <input class="form-input" type="text" id="field-name" placeholder="Ex: Studio Essenza ou Ana Martins" data-field="name">
+              <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Este será o nome principal em destaque no topo do seu site.</small>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label" for="field-business">Nome do Negócio</label>
-                <input class="form-input" type="text" id="field-business" placeholder="Sua empresa" data-field="business">
+                <label class="form-label" for="field-business">Marca ou estabelecimento complementar (opcional)</label>
+                <input class="form-input" type="text" id="field-business" placeholder="Use somente se for diferente do nome principal" data-field="business">
+                <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Deixe vazio quando repetir o nome principal.</small>
               </div>
               <div class="form-group">
-                <label class="form-label" for="field-title">Cargo / Função</label>
-                <input class="form-input" type="text" id="field-title" placeholder="Ex: Designer" data-field="title">
+                <label class="form-label" for="field-title">Atividade ou especialidade</label>
+                <input class="form-input" type="text" id="field-title" placeholder="Ex: Arquitetura, estética ou assistência técnica" data-field="title">
+                <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Aparecerá abaixo do nome principal no seu site.</small>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group" style="flex:1;">
-                <label class="form-label">Foto do Usuário (Discreta, no topo)</label>
+                <label class="form-label">Foto do profissional (opcional)</label>
                 <div class="photo-upload-area" id="photo-upload-area" onclick="document.getElementById('field-photo-file').click()" style="padding:16px 12px;text-align:center;">
                   <img id="photo-preview-img" style="display:none;width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px;margin-left:auto;margin-right:auto;">
                   <div id="photo-placeholder" style="color:var(--text-muted);font-size:0.8rem;">
-                    👤 Enviar Foto Pessoal
+                    👤 Enviar foto do profissional
                   </div>
                   <input type="file" id="field-photo-file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)">
                 </div>
@@ -548,11 +551,11 @@
               </div>
 
               <div class="form-group" style="flex:1;">
-                <label class="form-label">Logo / Foto do Negócio (Central)</label>
+                <label class="form-label">Logo ou imagem principal do negócio</label>
                 <div class="photo-upload-area" id="logo-upload-area" onclick="document.getElementById('field-logo-file').click()" style="padding:16px 12px;text-align:center;">
                   <img id="logo-preview-img" style="display:none;width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px;margin-left:auto;margin-right:auto;">
                   <div id="logo-placeholder" style="color:var(--text-muted);font-size:0.8rem;">
-                    🏢 Enviar Logo do Negócio
+                    🏢 Enviar logo ou imagem
                   </div>
                   <input type="file" id="field-logo-file" accept="image/*" style="display:none;" onchange="handleLogoUpload(this)">
                 </div>
@@ -560,15 +563,16 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label" for="field-description">Descrição</label>
-              <textarea class="form-input" id="field-description" placeholder="Uma breve descrição sobre você ou seu negócio..." data-field="description" rows="3"></textarea>
-              <button type="button" class="btn btn-outline btn-sm" onclick="improveFieldWithAI('field-description')" style="margin-top:6px;font-size:0.75rem;">✨ Melhorar Descrição com IA</button>
+              <label class="form-label" for="field-description">Descrição do negócio</label>
+              <textarea class="form-input" id="field-description" placeholder="Apresente seu negócio, seus diferenciais e o atendimento oferecido..." data-field="description" rows="3"></textarea>
+              <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Este texto aparecerá na seção “Sobre o negócio” do seu site.</small>
+              <button type="button" class="btn btn-outline btn-sm" onclick="improveFieldWithAI('field-description')" style="margin-top:6px;font-size:0.75rem;">✨ Melhorar descrição com IA</button>
             </div>
           </div>
 
           <!-- Contact -->
           <div class="form-section settings-section" data-settings-section="contact">
-            <div class="form-section-title"><span class="icon">📞</span> Contato</div>
+            <div class="form-section-title"><span class="icon">📞</span> Contato e localização</div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="field-phone">Telefone</label>
@@ -611,7 +615,7 @@
 
           <!-- Social Media -->
           <div class="form-section settings-section" data-settings-section="social">
-            <div class="form-section-title"><span class="icon">🌐</span> Redes Sociais</div>
+            <div class="form-section-title"><span class="icon">🌐</span> Redes sociais</div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="field-instagram">📷 Instagram</label>
@@ -646,19 +650,19 @@
 
           <!-- Landing Page / Site Config (Optional) -->
           <div class="form-section settings-section" data-settings-section="appearance">
-            <div class="form-section-title"><span class="icon">🌐</span> Botão do Site (Opcional)</div>
+            <div class="form-section-title"><span class="icon">🌐</span> Botão de destaque (opcional)</div>
             <div class="form-group">
-              <label class="form-label" for="field-site-button">Texto do Botão de Expansão no Cartão</label>
+              <label class="form-label" for="field-site-button">Texto do botão</label>
               <input class="form-input" type="text" id="field-site-button" placeholder="Vá para o site" data-field="site_button_text">
               <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">
-                Este botão só aparecerá no seu cartão se você cadastrar produtos, fotos ou depoimentos abaixo.
+                Este botão só aparecerá no seu site quando houver produtos, fotos ou avaliações cadastradas.
               </small>
             </div>
           </div>
 
           <!-- Flexible services / menu / price list -->
           <div class="form-section settings-section" data-settings-section="services">
-            <div class="form-section-title"><span class="icon">📋</span> Tabela, Cardápio ou Serviços</div>
+            <div class="form-section-title"><span class="icon">📋</span> Serviços / Produtos</div>
             <p style="color:var(--text-secondary);font-size:0.86rem;line-height:1.55;margin:-4px 0 16px;">
               Mostre seu conteúdo do seu jeito: envie uma arte pronta com preços/cardápio ou monte uma lista de itens no CardLink.
             </p>
@@ -706,7 +710,7 @@
 
           <!-- Photo Gallery -->
           <div class="form-section settings-section" data-settings-section="gallery">
-            <div class="form-section-title"><span class="icon">🖼️</span> Galeria de Fotos</div>
+            <div class="form-section-title"><span class="icon">🖼️</span> Galeria de fotos</div>
             <div id="gallery-upload-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;"></div>
             <button class="btn btn-secondary btn-sm" type="button" onclick="addGallerySlot()" style="width:100%;">
               📷 Adicionar Foto
@@ -717,7 +721,7 @@
 
           <!-- Testimonials -->
           <div class="form-section settings-section" data-settings-section="testimonials">
-            <div class="form-section-title"><span class="icon">⭐</span> Depoimentos de Clientes</div>
+            <div class="form-section-title"><span class="icon">⭐</span> Avaliações de clientes</div>
             <div id="builder-testimonials-container"></div>
             <button class="btn btn-secondary btn-sm" type="button" onclick="addTestimonialRow()" style="margin-top:8px;">
               + Adicionar Depoimento
@@ -726,7 +730,7 @@
 
           <!-- Theme -->
           <div class="form-section settings-section" data-settings-section="appearance">
-            <div class="form-section-title"><span class="icon">🎨</span> Tema do Cartão</div>
+            <div class="form-section-title"><span class="icon">🎨</span> Aparência do site</div>
             <div class="theme-grid" id="themeGrid">
               <div>
                 <div class="theme-swatch active" data-theme="midnight" onclick="selectTheme('midnight')"></div>
