@@ -479,6 +479,11 @@ body.has-owner-bar .lp-nav {
   align-items: center;
 }
 
+.lp-about-grid.lp-about-grid-single {
+  grid-template-columns: minmax(0, 760px);
+  justify-content: center;
+}
+
 .lp-about-image-wrap {
   position: relative;
 }
