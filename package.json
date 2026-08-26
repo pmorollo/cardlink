@@ -1,7 +1,7 @@
 {
   "name": "cardlink",
   "version": "1.0.0",
-  "description": "CardLink - Cartão de visita digital",
+  "description": "CardLink - Site profissional para o seu negócio",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
