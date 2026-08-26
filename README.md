@@ -1,6 +1,6 @@
 # CardLink
 
-Aplicação de cartão de visita digital com backend em Node/Express e frontend estático.
+Aplicação SaaS para criação de sites profissionais rápidos para pequenos negócios e prestadores de serviços, com backend em Node/Express e frontend estático.
 
 ## Como executar localmente
 
@@ -22,14 +22,14 @@ Aplicação de cartão de visita digital com backend em Node/Express e frontend 
 
 ## Como compartilhar o aplicativo
 
-- O link principal é a página profissional: `http://localhost:3000/site/<slug>`.
-- O cartão compacto continua disponível em `http://localhost:3000/#card/<slug>` para visualização complementar.
+- O produto público principal é o site profissional: `http://localhost:3000/site/<slug>`.
+- A rota compacta legada continua disponível em `http://localhost:3000/#card/<slug>` apenas como visualização complementar; ela não define o posicionamento comercial.
 - Para outras pessoas acessarem, é necessário hospedar o app em um servidor público ou usar um túnel como `ngrok`.
 
 ## Melhorias incluídas
 
 - `/` serve o frontend e `/api` serve a API backend.
-- Compartilhamento e QR code direcionam para a página profissional completa.
+- Compartilhamento e QR Code direcionam para o site profissional completo.
 - Ação principal pelo WhatsApp e opção secundária para salvar o contato no celular (`.vcf`).
 - O login abre uma visão geral; o menu da conta reúne Configurações, Contatos, Minha conta e Sair.
 - As configurações públicas são separadas dos dados de login e organizadas por Perfil, Contato, Serviços, Imagens, Avaliações, Redes e Aparência.
