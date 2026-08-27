@@ -8,6 +8,7 @@ const router = express.Router();
 const MAX_REQUEST_LENGTH = 2500;
 const MAX_RESPONSE_LENGTH = 2500;
 const AI_TIMEOUT_MS = Math.min(30000, Math.max(5000, Number(process.env.AI_TIMEOUT_MS) || 15000));
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const NVIDIA_MODEL = process.env.NVIDIA_MODEL || 'nvidia/nemotron-3-super-120b-a12b';
 
 const aiUserLimiter = rateLimit({
@@ -30,6 +31,41 @@ function logAiUsage(userId, source, startedAt) {
     source,
     duration_ms: Date.now() - startedAt
   }));
+}
+
+async function requestGemini(apiKey, systemPrompt, userRequest) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'x-goog-api-key': apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: userRequest }] }],
+          generationConfig: {
+            temperature: 0.5,
+            maxOutputTokens: 700
+          }
+        }),
+        signal: controller.signal
+      }
+    );
+    if (!response.ok) throw new Error(`Gemini respondeu com status ${response.status}`);
+    const data = await response.json();
+    const content = data.candidates?.[0]?.content?.parts
+      ?.map(part => typeof part.text === 'string' ? part.text : '')
+      .join('');
+    if (typeof content !== 'string' || !content.trim()) throw new Error('Gemini retornou conteúdo vazio');
+    return content.trim();
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function requestNvidia(apiKey, systemPrompt, userRequest) {
@@ -78,9 +114,10 @@ router.post('/generate', authMiddleware, requireCustomer, aiUserLimiter, async (
   }
 
   const request = cleanText(rawRequest, MAX_REQUEST_LENGTH);
-  const apiKey = process.env.NVIDIA_API_KEY;
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+  const nvidiaApiKey = process.env.NVIDIA_API_KEY;
   const startedAt = Date.now();
-  if (!apiKey) {
+  if (!geminiApiKey && !nvidiaApiKey) {
     logAiUsage(user.id, 'unavailable', startedAt);
     return res.status(503).json({
       code: 'ai_provider_not_configured',
@@ -95,22 +132,40 @@ Não invente preços, promoções, certificações, prêmios, garantias, resulta
 Se faltarem informações, produza uma alternativa neutra que o usuário possa adaptar, sem afirmar fatos não fornecidos.
 Entregue somente o texto solicitado, em português do Brasil, sem explicar seu raciocínio e sem usar blocos de código.`;
 
-  try {
-    const text = cleanText(await requestNvidia(apiKey, systemPrompt, request), MAX_RESPONSE_LENGTH);
-    if (!text) throw new Error('Resposta vazia após validação');
-    logAiUsage(user.id, 'nvidia', startedAt);
-    return res.json({ text, ai_meta: { source: 'nvidia', model: NVIDIA_MODEL } });
-  } catch (err) {
-    console.error('NVIDIA Text Assistant Error:', err.message);
-    const isTimeout = err?.name === 'AbortError';
-    logAiUsage(user.id, isTimeout ? 'timeout' : 'error', startedAt);
-    return res.status(503).json({
-      code: isTimeout ? 'ai_provider_timeout' : 'ai_provider_unavailable',
-      error: isTimeout
-        ? 'O provedor de IA demorou para responder. Tente novamente em instantes; sua solicitação foi preservada.'
-        : 'O provedor de IA está temporariamente indisponível. Tente novamente mais tarde; sua solicitação foi preservada.'
-    });
+  const failures = [];
+
+  if (geminiApiKey) {
+    try {
+      const text = cleanText(await requestGemini(geminiApiKey, systemPrompt, request), MAX_RESPONSE_LENGTH);
+      if (!text) throw new Error('Resposta vazia após validação');
+      logAiUsage(user.id, 'gemini', startedAt);
+      return res.json({ text, ai_meta: { source: 'gemini', model: GEMINI_MODEL } });
+    } catch (err) {
+      failures.push(err);
+      console.error('Gemini Text Assistant Error:', err.message);
+    }
   }
+
+  if (nvidiaApiKey) {
+    try {
+      const text = cleanText(await requestNvidia(nvidiaApiKey, systemPrompt, request), MAX_RESPONSE_LENGTH);
+      if (!text) throw new Error('Resposta vazia após validação');
+      logAiUsage(user.id, 'nvidia_fallback', startedAt);
+      return res.json({ text, ai_meta: { source: 'nvidia', model: NVIDIA_MODEL } });
+    } catch (err) {
+      failures.push(err);
+      console.error('NVIDIA Text Assistant Error:', err.message);
+    }
+  }
+
+  const isTimeout = failures.some(err => err?.name === 'AbortError');
+  logAiUsage(user.id, isTimeout ? 'timeout' : 'error', startedAt);
+  return res.status(503).json({
+    code: isTimeout ? 'ai_provider_timeout' : 'ai_provider_unavailable',
+    error: isTimeout
+      ? 'Os provedores de IA demoraram para responder. Tente novamente em instantes; sua solicitação foi preservada.'
+      : 'Os provedores de IA estão temporariamente indisponíveis. Tente novamente mais tarde; sua solicitação foi preservada.'
+  });
 });
 
 module.exports = router;
