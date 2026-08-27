@@ -448,6 +448,8 @@ test('assistente devolve somente texto separado quando o provedor responde', asy
     assert.equal(generated.data.ai_meta.source, 'nvidia');
     assert.equal(generated.data.text, 'Texto alternativo para a apresentação da barbearia.');
     assert.deepEqual(Object.keys(generated.data).sort(), ['ai_meta', 'text']);
+    assert.equal(providerPayload.model, 'nvidia/nemotron-3-super-120b-a12b');
+    assert.equal(generated.data.ai_meta.model, 'nvidia/nemotron-3-super-120b-a12b');
     assert.equal(providerPayload.messages.length, 2);
     assert.equal(providerPayload.messages[0].role, 'system');
     assert.equal(providerPayload.messages[1].role, 'user');
