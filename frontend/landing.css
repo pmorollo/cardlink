@@ -488,28 +488,6 @@ body.has-owner-bar .lp-nav {
   line-height: 1.8;
   margin-bottom: 16px;
 }
-.lp-about-highlights {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 32px;
-}
-.lp-about-highlight {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-}
-.lp-about-highlight-icon {
-  width: 36px; height: 36px;
-  border-radius: 10px;
-  background: rgba(139,92,246,0.12);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem;
-  flex-shrink: 0;
-}
-
 @media (max-width: 768px) {
   .lp-about-grid { grid-template-columns: 1fr; gap: 40px; }
   .lp-about-badge { right: 0; }
