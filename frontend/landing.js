@@ -316,6 +316,7 @@ function renderHero(d) {
 // ============================================
 function renderAbout(d) {
   const name = d.name || 'Profissional';
+  const business = typeof d.business === 'string' ? d.business.trim() : '';
   const description = typeof d.description === 'string' ? d.description.trim() : '';
   const isPlaceholder = !description;
 
@@ -327,6 +328,12 @@ function renderAbout(d) {
   // A seção apresenta o negócio sem repetir nome ou atividade do profissional.
   const aboutTitle = document.getElementById('about-title');
   if (aboutTitle) aboutTitle.textContent = 'Apresentação';
+
+  // O selo identifica apenas o negócio, sem repetir nome ou atividade.
+  const badge = document.getElementById('about-badge');
+  const badgeBusiness = document.getElementById('about-badge-business');
+  if (badgeBusiness) badgeBusiness.textContent = business;
+  if (badge) badge.style.display = business ? '' : 'none';
 
   // Use only an image supplied by the owner; never invent a stock image.
   const imgWrap = document.getElementById('about-image');
