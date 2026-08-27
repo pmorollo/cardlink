@@ -17,5 +17,7 @@ O Assistente de conteúdo é uma ferramenta textual exclusiva da área autentica
 - Timeout configurável por `AI_TIMEOUT_MS` (15 segundos por padrão).
 - Limite por usuário configurável por `AI_REQUESTS_PER_HOUR` (30 por hora por padrão).
 - Sem modelo básico alternativo: indisponibilidade externa retorna erro claro e preserva a solicitação no painel.
+- O painel diferencia configuração pendente, demora na resposta e indisponibilidade temporária sem revelar credenciais ou detalhes internos.
+- O botão **Colar texto** tenta ler a área de transferência; em celulares sem permissão, o painel orienta a colagem pelo toque prolongado.
 - Nenhum preço, promoção, certificação, resultado, depoimento ou fato específico deve ser inventado.
 - Registros operacionais contêm usuário, fonte e duração, nunca o texto digitado.

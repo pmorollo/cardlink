@@ -8,6 +8,7 @@ const router = express.Router();
 const MAX_REQUEST_LENGTH = 2500;
 const MAX_RESPONSE_LENGTH = 2500;
 const AI_TIMEOUT_MS = Math.min(30000, Math.max(5000, Number(process.env.AI_TIMEOUT_MS) || 15000));
+const NVIDIA_MODEL = process.env.NVIDIA_MODEL || 'nvidia/nemotron-3-super-120b-a12b';
 
 const aiUserLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -42,7 +43,7 @@ async function requestNvidia(apiKey, systemPrompt, userRequest) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'meta/llama-3.1-70b-instruct',
+        model: NVIDIA_MODEL,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userRequest }
@@ -81,7 +82,10 @@ router.post('/generate', authMiddleware, requireCustomer, aiUserLimiter, async (
   const startedAt = Date.now();
   if (!apiKey) {
     logAiUsage(user.id, 'unavailable', startedAt);
-    return res.status(503).json({ error: 'O Assistente está temporariamente indisponível. Sua solicitação foi preservada no campo.' });
+    return res.status(503).json({
+      code: 'ai_provider_not_configured',
+      error: 'O Assistente está aguardando a configuração do provedor de IA. Sua solicitação foi preservada no campo.'
+    });
   }
 
   const systemPrompt = `Você é o Assistente de conteúdo do CardLink, uma ferramenta de apoio à redação de sites profissionais.
@@ -95,11 +99,17 @@ Entregue somente o texto solicitado, em português do Brasil, sem explicar seu r
     const text = cleanText(await requestNvidia(apiKey, systemPrompt, request), MAX_RESPONSE_LENGTH);
     if (!text) throw new Error('Resposta vazia após validação');
     logAiUsage(user.id, 'nvidia', startedAt);
-    return res.json({ text, ai_meta: { source: 'nvidia', model: 'meta/llama-3.1-70b-instruct' } });
+    return res.json({ text, ai_meta: { source: 'nvidia', model: NVIDIA_MODEL } });
   } catch (err) {
     console.error('NVIDIA Text Assistant Error:', err.message);
-    logAiUsage(user.id, 'error', startedAt);
-    return res.status(503).json({ error: 'O Assistente está temporariamente indisponível. Sua solicitação foi preservada no campo.' });
+    const isTimeout = err?.name === 'AbortError';
+    logAiUsage(user.id, isTimeout ? 'timeout' : 'error', startedAt);
+    return res.status(503).json({
+      code: isTimeout ? 'ai_provider_timeout' : 'ai_provider_unavailable',
+      error: isTimeout
+        ? 'O provedor de IA demorou para responder. Tente novamente em instantes; sua solicitação foi preservada.'
+        : 'O provedor de IA está temporariamente indisponível. Tente novamente mais tarde; sua solicitação foi preservada.'
+    });
   }
 });
 

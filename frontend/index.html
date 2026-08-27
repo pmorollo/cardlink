@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="CardLink — Coloque o seu negócio na internet em poucos minutos. Crie um site profissional, compartilhe o link e receba contatos pelo WhatsApp.">
   <title>CardLink — Seu negócio na internet em poucos minutos</title>
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#8b5cf6">
@@ -506,7 +506,11 @@
             <div class="form-group">
               <label class="form-label" for="ai-request">O que você precisa?</label>
               <textarea class="form-input assistant-request" id="ai-request" maxlength="2500" rows="8" oninput="updateAssistantCounter()" placeholder="Explique o texto desejado. Se quiser melhorar algo existente, cole o texto aqui e diga como deseja que ele fique."></textarea>
-              <div class="assistant-counter"><span id="ai-request-count">0</span>/2500 caracteres</div>
+              <div class="assistant-request-toolbar">
+                <button class="btn btn-secondary btn-sm" type="button" onclick="pasteAssistantRequest()">Colar texto</button>
+                <div class="assistant-counter"><span id="ai-request-count">0</span>/2500 caracteres</div>
+              </div>
+              <small class="assistant-paste-help">No celular, você também pode tocar e segurar dentro do campo e escolher “Colar”.</small>
             </div>
             <button class="btn btn-primary" type="button" id="ai-generate-btn" onclick="generateAssistantText()">Gerar resposta</button>
             <div class="assistant-response-panel" id="ai-response-panel" hidden>
@@ -1151,7 +1155,7 @@
 
         <div>
           <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🤖</span> Passo 4: Usando a Inteligência Artificial</h3>
-          <p style="margin:0;">Tem dificuldades para escrever? Abra a aba “Assistente de conteúdo” e diga o que precisa. Você também pode colar um texto existente e pedir uma versão melhor. A resposta aparecerá separadamente: confira, clique em “Copiar texto” e cole manualmente no campo desejado. O Assistente nunca altera ou salva seu site.</p>
+          <p style="margin:0;">Tem dificuldades para escrever? Abra a aba “Assistente de conteúdo” e diga o que precisa. Você também pode usar “Colar texto” para inserir um conteúdo existente e pedir uma versão melhor. A resposta aparecerá separadamente: confira, clique em “Copiar texto” e cole manualmente no campo desejado. O Assistente nunca altera ou salva seu site.</p>
         </div>
 
         <div>
@@ -1260,7 +1264,7 @@
       annualCheckoutUrl: 'https://pay.cakto.com.br/3fjp83k_1032077'
     };
   </script>
-  <script src="app.js?v=32"></script>
+  <script src="app.js?v=33"></script>
   <script src="landing-carousel.js?v=1"></script>
   <script>
 

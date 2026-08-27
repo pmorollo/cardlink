@@ -23,6 +23,7 @@ async function api(path, options = {}) {
   if (!res.ok) {
     const err = new Error(data.message || data.error || 'Erro na requisição');
     err.status = res.status;
+    err.code = data.code || '';
     throw err;
   }
   return data;
@@ -2208,6 +2209,38 @@ function updateAssistantCounter() {
   const input = document.getElementById('ai-request');
   const counter = document.getElementById('ai-request-count');
   if (counter) counter.textContent = String(input?.value.length || 0);
+}
+
+async function pasteAssistantRequest() {
+  const input = document.getElementById('ai-request');
+  if (!input) return;
+  input.focus();
+
+  if (!navigator.clipboard?.readText) {
+    showToast('📋', 'Toque e segure no campo e escolha Colar.');
+    return;
+  }
+
+  try {
+    const clipboardText = await navigator.clipboard.readText();
+    if (!clipboardText) {
+      showToast('⚠️', 'Não há texto disponível para colar.');
+      return;
+    }
+
+    const start = Number.isInteger(input.selectionStart) ? input.selectionStart : input.value.length;
+    const end = Number.isInteger(input.selectionEnd) ? input.selectionEnd : start;
+    const available = input.maxLength - (input.value.length - (end - start));
+    const textToInsert = clipboardText.slice(0, Math.max(0, available));
+    input.setRangeText(textToInsert, start, end, 'end');
+    updateAssistantCounter();
+    showToast('✅', textToInsert.length < clipboardText.length
+      ? 'Texto colado até o limite de 2.500 caracteres.'
+      : 'Texto colado no Assistente.');
+  } catch {
+    input.focus();
+    showToast('📋', 'No celular, toque e segure no campo e escolha Colar.');
+  }
 }
 
 async function copyAssistantResponse() {
