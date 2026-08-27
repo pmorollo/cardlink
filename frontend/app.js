@@ -1612,9 +1612,15 @@ function renderCard(data, isPreview) {
 
     let galleryHtml = '';
     if (hasGallery) {
-      galleryHtml = `<div class="site-block-title">🖼️ Galeria de Fotos</div><div class="gallery-grid">`;
-      data.gallery.forEach(imgUrl => { galleryHtml += `<img src="${escapeHtml(imgUrl)}" class="gallery-img" alt="Foto" onerror="this.style.display='none'">`; });
-      galleryHtml += '</div>';
+      galleryHtml = `<div class="site-block-title">🖼️ Galeria de Fotos</div><div class="gallery-carousel-compact">
+        <div class="gallery-track-compact" onscroll="syncCompactGalleryCarousel(this)">`;
+      data.gallery.forEach((imgUrl, index) => {
+        galleryHtml += `<button type="button" class="gallery-slide-compact" data-image-src="${escapeHtml(imgUrl)}" onclick="openCompactGalleryImage(this.dataset.imageSrc, 'Foto ${index + 1}')" aria-label="Ampliar foto ${index + 1}"><img src="${escapeHtml(imgUrl)}" alt="Foto ${index + 1}" onerror="refreshCompactGalleryCarousel(this.closest('.gallery-carousel-compact'), this.closest('.gallery-slide-compact'))"></button>`;
+      });
+      galleryHtml += `</div>${data.gallery.length > 1 ? `
+        <button type="button" class="gallery-arrow-compact gallery-prev-compact" onclick="moveCompactGallery(this, -1)" aria-label="Foto anterior">‹</button>
+        <button type="button" class="gallery-arrow-compact gallery-next-compact" onclick="moveCompactGallery(this, 1)" aria-label="Próxima foto">›</button>
+        <div class="gallery-dots-compact">${data.gallery.map((_, index) => `<span class="gallery-dot-compact${index === 0 ? ' active' : ''}"></span>`).join('')}</div>` : ''}</div>`;
     }
 
     let testimonialsHtml = '';
@@ -1774,6 +1780,64 @@ function toggleSiteSection() {
   const hidden = section.style.display === 'none';
   section.style.display = hidden ? 'block' : 'none';
   if (hidden) section.scrollIntoView({ behavior: 'smooth' });
+}
+
+function moveCompactGallery(button, direction) {
+  const carousel = button.closest('.gallery-carousel-compact');
+  const track = carousel?.querySelector('.gallery-track-compact');
+  if (!track) return;
+  track.scrollBy({ left: direction * track.clientWidth, behavior: 'smooth' });
+}
+
+function syncCompactGalleryCarousel(track) {
+  window.clearTimeout(track._galleryTimer);
+  track._galleryTimer = window.setTimeout(() => {
+    const index = track.clientWidth ? Math.round(track.scrollLeft / track.clientWidth) : 0;
+    track.closest('.gallery-carousel-compact')?.querySelectorAll('.gallery-dot-compact').forEach((dot, i) => dot.classList.toggle('active', i === index));
+  }, 70);
+}
+
+function refreshCompactGalleryCarousel(carousel, failedSlide) {
+  failedSlide?.remove();
+  const slides = Array.from(carousel?.querySelectorAll('.gallery-slide-compact') || []);
+  if (!slides.length) {
+    carousel?.remove();
+    return;
+  }
+  const dots = carousel.querySelector('.gallery-dots-compact');
+  if (slides.length === 1) {
+    carousel.querySelectorAll('.gallery-arrow-compact, .gallery-dots-compact').forEach(el => el.remove());
+  } else if (dots) {
+    dots.innerHTML = slides.map((_, index) => `<span class="gallery-dot-compact${index === 0 ? ' active' : ''}"></span>`).join('');
+  }
+  const track = carousel.querySelector('.gallery-track-compact');
+  if (track) track.scrollLeft = 0;
+}
+
+function openCompactGalleryImage(url, alt) {
+  let lightbox = document.getElementById('compact-gallery-lightbox');
+  if (!lightbox) {
+    lightbox = document.createElement('div');
+    lightbox.id = 'compact-gallery-lightbox';
+    lightbox.className = 'compact-gallery-lightbox';
+    lightbox.innerHTML = '<button type="button" aria-label="Fechar imagem">×</button><img>';
+    lightbox.addEventListener('click', event => {
+      if (event.target === lightbox || event.target.closest('button')) closeCompactGalleryImage();
+    });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') closeCompactGalleryImage(); });
+    document.body.appendChild(lightbox);
+  }
+  const image = lightbox.querySelector('img');
+  image.src = url;
+  image.alt = alt || 'Foto ampliada';
+  lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  lightbox.querySelector('button').focus();
+}
+
+function closeCompactGalleryImage() {
+  document.getElementById('compact-gallery-lightbox')?.classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // ============================================
