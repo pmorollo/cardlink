@@ -418,6 +418,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('[data-field]').forEach(input => {
     input.addEventListener('input', updatePreview);
   });
+
+  initSettingsNav();
 });
 
 // ============================================
@@ -634,9 +636,37 @@ function showSettingsSection(section) {
     el.classList.toggle('active', el.dataset.settingsSection === activeSettingsSection);
   });
   document.querySelectorAll('[data-settings-target]').forEach(button => {
-    button.classList.toggle('active', button.dataset.settingsTarget === section);
+    button.classList.toggle('active', button.dataset.settingsTarget === targetSection);
   });
+  const activeButton = document.querySelector(`[data-settings-target="${targetSection}"]`);
+  activeButton?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  window.setTimeout(updateSettingsNavArrows, 260);
   document.querySelector('.builder-form-panel')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function scrollSettingsNav(direction) {
+  const nav = document.getElementById('settings-nav');
+  if (!nav) return;
+  nav.scrollBy({ left: direction * Math.max(220, nav.clientWidth * 0.7), behavior: 'smooth' });
+  window.setTimeout(updateSettingsNavArrows, 320);
+}
+
+function updateSettingsNavArrows() {
+  const nav = document.getElementById('settings-nav');
+  const previous = document.getElementById('settings-nav-prev');
+  const next = document.getElementById('settings-nav-next');
+  if (!nav || !previous || !next) return;
+  const maxScroll = Math.max(0, nav.scrollWidth - nav.clientWidth);
+  previous.disabled = nav.scrollLeft <= 2;
+  next.disabled = nav.scrollLeft >= maxScroll - 2;
+}
+
+function initSettingsNav() {
+  const nav = document.getElementById('settings-nav');
+  if (!nav) return;
+  nav.addEventListener('scroll', updateSettingsNavArrows, { passive: true });
+  window.addEventListener('resize', updateSettingsNavArrows);
+  window.requestAnimationFrame(updateSettingsNavArrows);
 }
 
 function closeProPaymentModal() {
