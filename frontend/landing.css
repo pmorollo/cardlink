@@ -454,6 +454,26 @@ body.has-owner-bar .lp-nav {
   color: var(--text-muted);
   font-size: 4rem;
 }
+.lp-about-badge {
+  position: absolute;
+  right: -20px;
+  bottom: 24px;
+  max-width: calc(100% - 24px);
+  padding: 14px 20px;
+  background: var(--bg-card-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(20px);
+}
+.lp-about-badge-business {
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: clamp(0.9rem, 1.7vw, 1.05rem);
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
 .lp-about-text h2 {
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 3vw, 2.5rem);
@@ -492,6 +512,7 @@ body.has-owner-bar .lp-nav {
 
 @media (max-width: 768px) {
   .lp-about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .lp-about-badge { right: 0; }
 }
 
 /* ============================================
