@@ -395,9 +395,11 @@ test('assistente devolve somente texto separado quando o provedor responde', asy
   const loginResult = await login('ia-provider@example.com', 'SenhaValida123!');
   const token = loginResult.data.token;
   const originalFetch = global.fetch;
+  let providerPayload = null;
   process.env.NVIDIA_API_KEY = 'test-provider-key';
   global.fetch = async (url, options) => {
     if (String(url).startsWith('https://integrate.api.nvidia.com/')) {
+      providerPayload = JSON.parse(options.body);
       return new Response(JSON.stringify({
         choices: [{ message: { content: 'Texto alternativo para a apresentação da barbearia.' } }]
       }), { status: 200, headers: { 'Content-Type': 'application/json' } });
@@ -413,6 +415,11 @@ test('assistente devolve somente texto separado quando o provedor responde', asy
     assert.equal(generated.data.ai_meta.source, 'nvidia');
     assert.equal(generated.data.text, 'Texto alternativo para a apresentação da barbearia.');
     assert.deepEqual(Object.keys(generated.data).sort(), ['ai_meta', 'text']);
+    assert.equal(providerPayload.messages.length, 2);
+    assert.equal(providerPayload.messages[0].role, 'system');
+    assert.equal(providerPayload.messages[1].role, 'user');
+    assert.equal(providerPayload.messages[1].content, 'Escreva uma apresentação curta para minha barbearia.');
+    assert.equal(providerPayload.messages[0].content.includes(providerPayload.messages[1].content), false);
   } finally {
     global.fetch = originalFetch;
     process.env.NVIDIA_API_KEY = '';
