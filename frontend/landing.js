@@ -11,6 +11,8 @@ const slug = window.location.pathname.split('/site/')[1]?.split('/')[0] || '';
 const ownerToken = localStorage.getItem('cardlink_token') || null;
 
 let cardData = null;
+let galleryAutoPlay = null;
+let galleryScrollTimer = null;
 
 // ============================================
 // Placeholder Data Banks
@@ -450,11 +452,127 @@ function renderGallery(d) {
 
   if (isPlaceholder) makePlaceholderHint('gallery-placeholder-hint', 'Adicionar suas fotos reais');
 
-  grid.innerHTML = photos.slice(0, 6).map((url, i) => `
-    <div class="lp-gallery-item animate-in">
-      <img src="${esc(url)}" alt="Foto ${i + 1}" loading="lazy" onerror="this.parentElement.style.display='none'">
-      <div class="lp-gallery-overlay" aria-hidden="true">+</div>
-    </div>`).join('');
+  const visiblePhotos = photos.slice(0, 6);
+  grid.innerHTML = `
+    <div class="lp-gallery-carousel animate-in" tabindex="0" aria-label="Galeria de fotos">
+      <div class="lp-gallery-track" id="gallery-track">
+        ${visiblePhotos.map((url, i) => `
+          <button class="lp-gallery-slide" type="button" data-image-src="${esc(url)}" onclick="openGalleryLightbox(this.dataset.imageSrc, 'Foto ${i + 1}')" aria-label="Ampliar foto ${i + 1}">
+            <img src="${esc(url)}" alt="Foto ${i + 1}" loading="lazy" onerror="this.closest('.lp-gallery-slide').remove(); refreshGalleryCarousel()">
+          </button>`).join('')}
+      </div>
+      ${visiblePhotos.length > 1 ? `
+        <button class="lp-gallery-arrow lp-gallery-prev" type="button" onclick="moveGallery(-1, true)" aria-label="Foto anterior">‹</button>
+        <button class="lp-gallery-arrow lp-gallery-next" type="button" onclick="moveGallery(1, true)" aria-label="Próxima foto">›</button>
+        <div class="lp-gallery-dots" id="gallery-dots">
+          ${visiblePhotos.map((_, i) => `<button type="button" class="lp-gallery-dot${i === 0 ? ' active' : ''}" onclick="goToGallerySlide(${i}, true)" aria-label="Ir para foto ${i + 1}"></button>`).join('')}
+        </div>` : ''}
+    </div>`;
+
+  const track = document.getElementById('gallery-track');
+  const carousel = grid.querySelector('.lp-gallery-carousel');
+  track?.addEventListener('scroll', () => {
+    window.clearTimeout(galleryScrollTimer);
+    galleryScrollTimer = window.setTimeout(syncGalleryDots, 80);
+  }, { passive: true });
+  track?.addEventListener('pointerdown', stopGalleryAutoPlay, { once: true });
+  carousel?.addEventListener('keydown', event => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      moveGallery(event.key === 'ArrowRight' ? 1 : -1, true);
+    }
+  });
+  startGalleryAutoPlay();
+}
+
+function gallerySlides() {
+  return Array.from(document.querySelectorAll('#gallery-track .lp-gallery-slide'));
+}
+
+function currentGalleryIndex() {
+  const track = document.getElementById('gallery-track');
+  if (!track || !track.clientWidth) return 0;
+  return Math.min(gallerySlides().length - 1, Math.max(0, Math.round(track.scrollLeft / track.clientWidth)));
+}
+
+function goToGallerySlide(index, interacted = false) {
+  const track = document.getElementById('gallery-track');
+  const slides = gallerySlides();
+  if (!track || slides.length < 2) return;
+  if (interacted) stopGalleryAutoPlay();
+  const target = (index + slides.length) % slides.length;
+  track.scrollTo({ left: target * track.clientWidth, behavior: 'smooth' });
+  updateGalleryDots(target);
+}
+
+function moveGallery(direction, interacted = false) {
+  goToGallerySlide(currentGalleryIndex() + direction, interacted);
+}
+
+function updateGalleryDots(index) {
+  document.querySelectorAll('#gallery-dots .lp-gallery-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === index);
+    dot.setAttribute('aria-current', i === index ? 'true' : 'false');
+  });
+}
+
+function syncGalleryDots() {
+  updateGalleryDots(currentGalleryIndex());
+}
+
+function startGalleryAutoPlay() {
+  stopGalleryAutoPlay();
+  if (gallerySlides().length < 2) return;
+  galleryAutoPlay = window.setInterval(() => moveGallery(1), 5000);
+}
+
+function stopGalleryAutoPlay() {
+  if (galleryAutoPlay) window.clearInterval(galleryAutoPlay);
+  galleryAutoPlay = null;
+}
+
+function refreshGalleryCarousel() {
+  const slides = gallerySlides();
+  if (!slides.length) {
+    removePublicSection('galeria');
+    stopGalleryAutoPlay();
+    return;
+  }
+  if (slides.length === 1) {
+    document.querySelectorAll('.lp-gallery-arrow, .lp-gallery-dots').forEach(el => el.remove());
+    stopGalleryAutoPlay();
+    return;
+  }
+  const dots = document.getElementById('gallery-dots');
+  if (dots) dots.innerHTML = slides.map((_, i) => `<button type="button" class="lp-gallery-dot${i === 0 ? ' active' : ''}" onclick="goToGallerySlide(${i}, true)" aria-label="Ir para foto ${i + 1}"></button>`).join('');
+  goToGallerySlide(0);
+  startGalleryAutoPlay();
+}
+
+function openGalleryLightbox(url, alt) {
+  let lightbox = document.getElementById('gallery-lightbox');
+  if (!lightbox) {
+    lightbox = document.createElement('div');
+    lightbox.id = 'gallery-lightbox';
+    lightbox.className = 'gallery-lightbox';
+    lightbox.innerHTML = '<button type="button" class="gallery-lightbox-close" aria-label="Fechar imagem">×</button><img>';
+    lightbox.addEventListener('click', event => {
+      if (event.target === lightbox || event.target.closest('.gallery-lightbox-close')) closeGalleryLightbox();
+    });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') closeGalleryLightbox(); });
+    document.body.appendChild(lightbox);
+  }
+  const image = lightbox.querySelector('img');
+  image.src = url;
+  image.alt = alt || 'Foto ampliada';
+  lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  lightbox.querySelector('.gallery-lightbox-close').focus();
+}
+
+function closeGalleryLightbox() {
+  document.getElementById('gallery-lightbox')?.classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // ============================================
