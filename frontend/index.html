@@ -493,35 +493,31 @@
             <button class="settings-nav-arrow" id="settings-nav-next" type="button" onclick="scrollSettingsNav(1)" aria-label="Ver mais opções">›</button>
           </div>
 
-          <!-- AI Assistant Banner -->
-          <div class="form-section settings-section" data-settings-section="assistant" style="background:linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.12));border:1.5px solid var(--accent);border-radius:var(--radius-lg);padding:20px;margin-bottom:var(--space-xl);">
-            <div class="form-section-title" style="color:var(--accent);font-size:1.1rem;margin-bottom:10px;">
-              <span class="icon">✦</span> Assistente de conteúdo
+          <!-- Assistente de conteúdo: resposta separada para cópia manual -->
+          <div class="form-section settings-section assistant-workspace" data-settings-section="assistant">
+            <div class="form-section-title"><span class="icon">✦</span> Assistente de conteúdo</div>
+            <p class="assistant-intro">Descreva o texto que você precisa ou cole um texto para receber uma versão alternativa. A resposta não altera nenhum campo do seu site.</p>
+            <div class="assistant-examples">
+              <strong>Exemplos:</strong>
+              <span>“Escreva uma apresentação curta para minha barbearia.”</span>
+              <span>“Melhore o texto abaixo e deixe mais profissional: …”</span>
+              <span>“Crie uma mensagem convidando o cliente a entrar em contato.”</span>
             </div>
-            <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:14px;line-height:1.5;">
-              Receba sugestões para sua apresentação e seus serviços. Nada será aplicado sem sua confirmação.
-            </p>
-            <div class="form-row">
-              <div class="form-group" style="flex:2;">
-                <label class="form-label" for="ai-profession">Sua Profissão ou Negócio</label>
-                <input class="form-input" type="text" id="ai-profession" maxlength="180" placeholder="Ex: Cabeleireira em SP, Advogado Trabalhista, Fotógrafo...">
-              </div>
-              <div class="form-group" style="flex:1;">
-                <label class="form-label" for="ai-skill">Tom de voz</label>
-                <select class="form-input" id="ai-skill" style="cursor:pointer;">
-                  <option value="vendedora">Comercial</option>
-                  <option value="corporativa">Corporativo</option>
-                  <option value="criativa">Criativo</option>
-                  <option value="acolhedora">Acolhedor</option>
-                </select>
+            <div class="form-group">
+              <label class="form-label" for="ai-request">O que você precisa?</label>
+              <textarea class="form-input assistant-request" id="ai-request" maxlength="2500" rows="8" oninput="updateAssistantCounter()" placeholder="Explique o texto desejado. Se quiser melhorar algo existente, cole o texto aqui e diga como deseja que ele fique."></textarea>
+              <div class="assistant-counter"><span id="ai-request-count">0</span>/2500 caracteres</div>
+            </div>
+            <button class="btn btn-primary" type="button" id="ai-generate-btn" onclick="generateAssistantText()">Gerar resposta</button>
+            <div class="assistant-response-panel" id="ai-response-panel" hidden>
+              <div class="assistant-response-header"><strong>Resposta do Assistente</strong><span>Confira antes de utilizar</span></div>
+              <textarea class="form-input assistant-response" id="ai-response" rows="10" readonly aria-label="Resposta do Assistente"></textarea>
+              <div class="assistant-response-actions">
+                <button class="btn btn-primary btn-sm" type="button" onclick="copyAssistantResponse()">Copiar texto</button>
+                <button class="btn btn-secondary btn-sm" type="button" onclick="clearAssistantResponse()">Limpar resposta</button>
               </div>
             </div>
-            <button class="btn btn-primary" type="button" id="ai-generate-btn" onclick="generateWithAI()" style="width:100%;margin-top:8px;">
-              Gerar sugestões de conteúdo
-            </button>
-            <small style="color:var(--text-muted);font-size:0.74rem;line-height:1.5;display:block;margin-top:9px;">
-              Revise todas as sugestões antes de aplicar. A IA não define preços e pode cometer erros. Não envie dados pessoais, sigilosos ou informações de clientes.
-            </small>
+            <small class="assistant-safety">A IA pode cometer erros. Não envie dados pessoais, sigilosos ou informações de clientes. O texto só será usado no site se você copiar, colar no campo desejado e salvar.</small>
           </div>
 
           <!-- Personal Info -->
@@ -573,8 +569,6 @@
               <label class="form-label" for="field-description">Descrição do negócio</label>
               <textarea class="form-input" id="field-description" maxlength="1800" placeholder="Apresente seu negócio, seus diferenciais e o atendimento oferecido..." data-field="description" rows="3"></textarea>
               <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Este texto aparecerá na seção “Sobre o negócio”. Se o campo ficar vazio, a seção não será exibida no site público.</small>
-              <button type="button" class="btn btn-outline btn-sm" onclick="improveFieldWithAI('field-description')" style="margin-top:6px;font-size:0.75rem;">✨ Melhorar somente esta descrição</button>
-              <div class="form-help" style="margin-top:6px;">Este botão altera somente a descrição. Para gerar a apresentação e os serviços completos, use a aba <strong>Assistente de conteúdo</strong>. Depois de aplicar, clique em <strong>Salvar alterações</strong>.</div>
             </div>
           </div>
 
@@ -598,8 +592,6 @@
             <div class="form-group">
               <label class="form-label" for="field-message">Mensagem</label>
               <textarea class="form-input" id="field-message" maxlength="1800" placeholder="Ex: Agende pelo WhatsApp ou visite-nos no fim de semana" data-field="message" rows="3"></textarea>
-              <button type="button" class="btn btn-outline btn-sm" onclick="improveFieldWithAI('field-message')" style="margin-top:6px;font-size:0.75rem;">✨ Melhorar somente esta mensagem</button>
-              <div class="form-help" style="margin-top:6px;">Este botão altera somente a mensagem. Para gerar todos os textos e serviços, use a aba <strong>Assistente de conteúdo</strong>.</div>
             </div>
           </div>
 
@@ -1159,7 +1151,7 @@
 
         <div>
           <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🤖</span> Passo 4: Usando a Inteligência Artificial</h3>
-          <p style="margin:0;">Tem dificuldades para escrever os textos? Abra a aba “Assistente de conteúdo”, informe sua profissão ou negócio e escolha o tom. O CardLink mostrará uma revisão completa antes de aplicar. Você poderá usar somente os textos, acrescentar serviços ou substituir a lista atual. Os preços devem ser preenchidos manualmente.</p>
+          <p style="margin:0;">Tem dificuldades para escrever? Abra a aba “Assistente de conteúdo” e diga o que precisa. Você também pode colar um texto existente e pedir uma versão melhor. A resposta aparecerá separadamente: confira, clique em “Copiar texto” e cole manualmente no campo desejado. O Assistente nunca altera ou salva seu site.</p>
         </div>
 
         <div>
@@ -1229,7 +1221,7 @@
         <p style="color:var(--text-secondary);">O CardLink não vende ou aluga seus dados a terceiros. Compartilhamos dados somente quando necessário para operar a plataforma, incluindo o processador de pagamentos Cakto, serviços de e-mail transacional e, quando você utiliza voluntariamente o Assistente de conteúdo, a NVIDIA, atual fornecedora do processamento de inteligência artificial, ou eventual fornecedora substituta informada nesta política. Não insira dados pessoais de clientes, informações sigilosas ou conteúdo confidencial no Assistente.</p>
 
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Assistente de Conteúdo</h3>
-        <p style="color:var(--text-secondary);">As sugestões da inteligência artificial podem conter erros ou informações inadequadas. Nada é publicado automaticamente: o usuário deve revisar, confirmar e salvar o conteúdo. O CardLink não gera preços comerciais automaticamente, e o assinante permanece responsável pela exatidão das informações que decidir publicar.</p>
+        <p style="color:var(--text-secondary);">As respostas da inteligência artificial podem conter erros ou informações inadequadas. O Assistente entrega apenas uma alternativa textual em uma área separada e não preenche, altera ou salva campos do site. O usuário decide se deseja copiar, colar, revisar e publicar o conteúdo, permanecendo responsável pela exatidão das informações utilizadas.</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">5. Armazenamento e Segurança</h3>
         <p style="color:var(--text-secondary);">Adotamos medidas técnicas de segurança para proteger seus dados contra acessos não autorizados. Seus dados cadastrais e de cartões digitais são armazenados em servidores seguros em nuvem.</p>

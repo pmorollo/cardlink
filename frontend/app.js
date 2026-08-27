@@ -2156,171 +2156,86 @@ function initIntersectionObserver() {
 }
 
 // ============================================
-// AI Generation (NVIDIA API & Skill Tones)
+// Assistente de conteúdo — resposta textual para cópia manual
 // ============================================
-async function generateWithAI() {
-  const profInput = document.getElementById('ai-profession');
-  const skillSelect = document.getElementById('ai-skill');
-  const btn = document.getElementById('ai-generate-btn');
+async function generateAssistantText() {
+  const requestInput = document.getElementById('ai-request');
+  const responseInput = document.getElementById('ai-response');
+  const responsePanel = document.getElementById('ai-response-panel');
+  const button = document.getElementById('ai-generate-btn');
+  const request = requestInput?.value.trim() || '';
 
-  const profession = profInput?.value.trim();
-  const skill = skillSelect?.value || 'vendedora';
-
-  if (!profession) {
-    showToast('⚠️', 'Digite sua profissão ou negócio!');
-    if (profInput) profInput.focus();
+  if (!request) {
+    showToast('⚠️', 'Descreva o texto que você precisa.');
+    requestInput?.focus();
     return;
   }
 
-  if (btn) { btn.disabled = true; btn.textContent = 'Preparando sugestões...'; }
-  showToast('⏳', 'Preparando sugestões de conteúdo...');
+  // Uma nova solicitação invalida a resposta anterior. Ocultá-la evita que um
+  // erro do provedor faça o usuário confundir o texto antigo com o novo.
+  if (responseInput) responseInput.value = '';
+  if (responsePanel) responsePanel.hidden = true;
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Gerando resposta...';
+  }
+  showToast('⏳', 'Preparando uma alternativa de texto...');
 
   try {
-    const res = await api('/ai/generate', {
+    const result = await api('/ai/generate', {
       method: 'POST',
-      body: JSON.stringify({ profession, skill, mode: 'full' })
+      body: JSON.stringify({ request })
     });
+    const text = typeof result.text === 'string' ? result.text.trim() : '';
+    if (!text) throw new Error('O Assistente não retornou um texto.');
 
-    const action = await reviewAiSuggestion(res);
-    if (!action) {
-      showToast('ℹ️', 'Sugestões descartadas. Nenhuma informação foi alterada.');
-      return;
-    }
-
-    if (res.title) setFieldValue('field-title', res.title);
-    if (res.description) setFieldValue('field-description', res.description);
-    if (res.message) setFieldValue('field-message', res.message);
-    if (res.site_button_text) setFieldValue('field-site-button', res.site_button_text);
-
-    // Serviços só são alterados quando o usuário escolhe explicitamente essa opção.
-    if (action !== 'text-only' && res.products && Array.isArray(res.products) && res.products.length > 0) {
-      const prodContainer = document.getElementById('builder-products-container');
-      if (prodContainer) {
-        if (action === 'replace') prodContainer.innerHTML = '';
-        res.products.forEach(p => addProductRow({ ...p, price: '' }));
-        setFieldValue('field-services-mode', 'list');
-        toggleServicesMode();
-      }
-    }
-
-    updatePreview();
-    const sourceNotice = res.ai_meta?.source === 'template' ? ' Modelo básico aplicado para revisão.' : '';
-    showToast('✨', `Sugestões aplicadas ao painel.${sourceNotice} Revise e clique em Salvar alterações.`);
+    if (responseInput) responseInput.value = text;
+    if (responsePanel) responsePanel.hidden = false;
+    responseInput?.focus();
+    showToast('✨', 'Resposta pronta. Confira e copie se quiser utilizar.');
   } catch (err) {
-    showToast('❌', 'Erro na IA: ' + err.message);
+    showToast('❌', err.message || 'Não foi possível gerar a resposta.');
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Gerar sugestões de conteúdo'; }
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Gerar resposta';
+    }
   }
 }
 
-function reviewAiSuggestion(suggestion) {
-  return new Promise(resolve => {
-    document.getElementById('ai-review-modal')?.remove();
-    const products = Array.isArray(suggestion.products) ? suggestion.products.filter(product => product?.name) : [];
-    const existingProducts = document.querySelectorAll('#builder-products-container .builder-item-row').length;
-    const modal = document.createElement('div');
-    modal.id = 'ai-review-modal';
-    modal.className = 'ai-review-overlay';
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
-    modal.setAttribute('aria-labelledby', 'ai-review-title');
-
-    const productList = products.length
-      ? products.map((product, index) => `
-          <div class="ai-review-service">
-            <strong>${index + 1}. ${escapeHtml(product.name)}</strong>
-            ${product.description ? `<p>${escapeHtml(product.description)}</p>` : ''}
-            <small>Preço não gerado — preencha manualmente se desejar.</small>
-          </div>`).join('')
-      : '<p class="ai-review-empty">Nenhum serviço foi sugerido.</p>';
-
-    const providerNotice = suggestion.ai_meta?.notice
-      ? `<div class="ai-review-notice">⚠️ ${escapeHtml(suggestion.ai_meta.notice)}</div>`
-      : '<div class="ai-review-source">Sugestão produzida pelo Assistente de conteúdo.</div>';
-
-    modal.innerHTML = `
-      <div class="ai-review-dialog">
-        <div class="ai-review-header">
-          <div><div class="ai-review-kicker">Revisão obrigatória</div><h2 id="ai-review-title">Confira tudo antes de aplicar</h2></div>
-          <button type="button" class="ai-review-close" data-ai-action="cancel" aria-label="Fechar">×</button>
-        </div>
-        ${providerNotice}
-        <div class="ai-review-content">
-          <section><h3>Atividade ou especialidade</h3><p>${escapeHtml(suggestion.title || 'Sem sugestão')}</p></section>
-          <section><h3>Descrição do negócio</h3><p>${escapeHtml(suggestion.description || 'Sem sugestão')}</p></section>
-          <section><h3>Mensagem de contato</h3><p>${escapeHtml(suggestion.message || 'Sem sugestão')}</p></section>
-          <section><h3>Texto do botão</h3><p>${escapeHtml(suggestion.site_button_text || 'Sem sugestão')}</p></section>
-          <section><h3>Serviços sugeridos</h3>${productList}</section>
-        </div>
-        <div class="ai-review-warning">Nada será publicado agora. Depois de aplicar, revise os campos e clique em <strong>Salvar alterações</strong>.</div>
-        ${existingProducts ? '<div class="ai-review-replace-warning">A opção “Substituir serviços atuais” remove também os preços, descrições e fotos já cadastrados nessa lista.</div>' : ''}
-        <div class="ai-review-actions">
-          <button type="button" class="btn btn-secondary" data-ai-action="cancel">Cancelar</button>
-          <button type="button" class="btn btn-outline" data-ai-action="text-only">Aplicar somente os textos</button>
-          ${products.length ? `<button type="button" class="btn btn-primary" data-ai-action="${existingProducts ? 'append' : 'replace'}">${existingProducts ? 'Acrescentar serviços' : 'Aplicar textos e serviços'}</button>` : ''}
-          ${products.length && existingProducts ? '<button type="button" class="btn btn-danger-soft" data-ai-action="replace">Substituir serviços atuais</button>' : ''}
-        </div>
-      </div>`;
-
-    const finish = action => {
-      modal.remove();
-      document.body.style.overflow = '';
-      resolve(action === 'cancel' ? null : action);
-    };
-    modal.addEventListener('click', event => {
-      const action = event.target.closest('[data-ai-action]')?.dataset.aiAction;
-      if (action) finish(action);
-      else if (event.target === modal) finish('cancel');
-    });
-    modal.addEventListener('keydown', event => {
-      if (event.key === 'Escape') finish('cancel');
-    });
-    document.body.appendChild(modal);
-    document.body.style.overflow = 'hidden';
-    modal.querySelector('.ai-review-close').focus();
-  });
+function updateAssistantCounter() {
+  const input = document.getElementById('ai-request');
+  const counter = document.getElementById('ai-request-count');
+  if (counter) counter.textContent = String(input?.value.length || 0);
 }
 
-async function improveFieldWithAI(fieldId) {
-  const input = document.getElementById(fieldId);
-  if (!input) return;
-  const currentText = input.value.trim();
-  const profession = document.getElementById('ai-profession')?.value.trim() || document.getElementById('field-title')?.value.trim() || 'Profissional';
-  const skill = document.getElementById('ai-skill')?.value || 'vendedora';
-
-  if (!currentText) {
-    showToast('⚠️', 'Digite algum texto no campo antes de melhorar!');
-    input.focus();
+async function copyAssistantResponse() {
+  const response = document.getElementById('ai-response');
+  const text = response?.value || '';
+  if (!text) {
+    showToast('⚠️', 'Ainda não existe uma resposta para copiar.');
     return;
   }
-
-  showToast('⏳', 'Melhorando texto com IA...');
-
   try {
-    const res = await api('/ai/generate', {
-      method: 'POST',
-      body: JSON.stringify({ profession, skill, mode: 'improve', textToImprove: currentText })
-    });
-
-    const improvedText = typeof res.improvedText === 'string' ? res.improvedText.trim() : '';
-    if (!improvedText) {
-      showToast('⚠️', 'A IA não retornou uma sugestão. Tente novamente.');
-      return;
-    }
-    if (improvedText === currentText) {
-      showToast('ℹ️', 'A IA não encontrou uma alteração relevante para este texto.');
-      return;
-    }
-    if (window.confirm(`Texto sugerido:\n\n${improvedText}\n\nDeseja substituir o texto atual?`)) {
-      input.value = improvedText;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.focus();
-      showToast('✨', 'Texto aplicado ao campo. Clique em Salvar alterações para publicar.');
-    }
-  } catch (err) {
-    showToast('❌', 'Erro ao melhorar texto: ' + err.message);
+    await navigator.clipboard.writeText(text);
+    showToast('✅', 'Texto copiado. Cole no campo desejado.');
+  } catch {
+    response.focus();
+    response.select();
+    const copied = document.execCommand('copy');
+    showToast(copied ? '✅' : '❌', copied ? 'Texto copiado. Cole no campo desejado.' : 'Não foi possível copiar o texto.');
   }
 }
+
+function clearAssistantResponse() {
+  const response = document.getElementById('ai-response');
+  const panel = document.getElementById('ai-response-panel');
+  if (response) response.value = '';
+  if (panel) panel.hidden = true;
+  document.getElementById('ai-request')?.focus();
+}
+
 
 // ─── ADMIN & SUPPORT FUNCTIONS ───────────────────────────────────────────
 

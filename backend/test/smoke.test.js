@@ -145,6 +145,17 @@ test('GET / serve o frontend (SPA)', async () => {
   assert.match(await res.text(), /<html/i);
 });
 
+test('frontend mantem a IA somente como assistente textual para copia manual', async () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', '..', 'frontend', 'index.html'), 'utf-8');
+  const js = fs.readFileSync(path.join(__dirname, '..', '..', 'frontend', 'app.js'), 'utf-8');
+  assert.equal(html.includes('id="ai-request"'), true);
+  assert.equal(html.includes('id="ai-response"'), true);
+  assert.equal(html.includes('Copiar texto'), true);
+  assert.equal(html.includes('id="ai-skill"'), false);
+  assert.equal(js.includes('improveFieldWithAI'), false);
+  assert.equal(js.includes('reviewAiSuggestion'), false);
+});
+
 test('/backend/.env NAO expoe segredos', async () => {
   const res = await fetch(base + '/backend/.env');
   const html = await res.text();
@@ -342,12 +353,9 @@ test('conta interna de teste tem recursos completos mas webhook Cakto nao a conv
   }, token);
   assert.equal(card.status, 201);
 
-  const ai = await api('POST', '/api/ai/generate', { profession: 'Barbearia' }, token);
-  assert.equal(ai.status, 200);
-  assert.equal(ai.data.ai_meta.source, 'template');
-  assert.ok(ai.data.ai_meta.notice);
-  assert.ok(ai.data.products.length > 0);
-  assert.equal(ai.data.products.every(product => product.price === ''), true);
+  const ai = await api('POST', '/api/ai/generate', { request: 'Crie uma apresentação para uma barbearia.' }, token);
+  assert.equal(ai.status, 503);
+  assert.match(ai.data.error, /preservada/i);
 
   const hook = await api('POST', '/api/payments/cakto-webhook', {
     secret: process.env.CAKTO_SECRET,
@@ -367,37 +375,33 @@ test('assistente valida entradas e preserva o texto quando a IA externa esta ind
   const token = loginResult.data.token;
 
   const tooLong = await api('POST', '/api/ai/generate', {
-    profession: 'A'.repeat(181), mode: 'full'
+    request: 'A'.repeat(2501)
   }, token);
   assert.equal(tooLong.status, 400);
 
-  const improve = await api('POST', '/api/ai/generate', {
-    profession: 'Barbearia', mode: 'improve', textToImprove: 'Meu texto original'
+  const empty = await api('POST', '/api/ai/generate', { request: '   ' }, token);
+  assert.equal(empty.status, 400);
+
+  const unavailable = await api('POST', '/api/ai/generate', {
+    request: 'Melhore este texto: Meu texto original.'
   }, token);
-  assert.equal(improve.status, 503);
-  assert.equal(Object.hasOwn(improve.data, 'improvedText'), false);
-  assert.match(improve.data.error, /preservado/i);
+  assert.equal(unavailable.status, 503);
+  assert.equal(Object.hasOwn(unavailable.data, 'text'), false);
+  assert.match(unavailable.data.error, /preservada/i);
 });
 
-test('assistente normaliza a resposta externa e nunca repassa precos gerados', async () => {
+test('assistente devolve somente texto separado quando o provedor responde', async () => {
   await createActiveUser({ email: 'ia-provider@example.com', name: 'Teste Provedor IA' });
   const loginResult = await login('ia-provider@example.com', 'SenhaValida123!');
   const token = loginResult.data.token;
   const originalFetch = global.fetch;
+  let providerPayload = null;
   process.env.NVIDIA_API_KEY = 'test-provider-key';
   global.fetch = async (url, options) => {
     if (String(url).startsWith('https://integrate.api.nvidia.com/')) {
+      providerPayload = JSON.parse(options.body);
       return new Response(JSON.stringify({
-        choices: [{ message: { content: JSON.stringify({
-          title: 'Barbearia contemporânea',
-          description: 'Atendimento profissional com opções para diferentes estilos.',
-          message: 'Entre em contato para conhecer os horários disponíveis.',
-          site_button_text: 'Conhecer serviços',
-          products: [
-            { name: 'Corte', price: '999,00', description: 'Corte conforme preferência do cliente.' },
-            { name: 'Barba', price: '888,00', description: 'Cuidados e acabamento para a barba.' }
-          ]
-        }) } }]
+        choices: [{ message: { content: 'Texto alternativo para a apresentação da barbearia.' } }]
       }), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
     return originalFetch(url, options);
@@ -405,12 +409,17 @@ test('assistente normaliza a resposta externa e nunca repassa precos gerados', a
 
   try {
     const generated = await api('POST', '/api/ai/generate', {
-      profession: 'Barbearia', skill: 'corporativa', mode: 'full'
+      request: 'Escreva uma apresentação curta para minha barbearia.'
     }, token);
     assert.equal(generated.status, 200);
     assert.equal(generated.data.ai_meta.source, 'nvidia');
-    assert.equal(generated.data.products.length, 2);
-    assert.equal(generated.data.products.every(product => product.price === ''), true);
+    assert.equal(generated.data.text, 'Texto alternativo para a apresentação da barbearia.');
+    assert.deepEqual(Object.keys(generated.data).sort(), ['ai_meta', 'text']);
+    assert.equal(providerPayload.messages.length, 2);
+    assert.equal(providerPayload.messages[0].role, 'system');
+    assert.equal(providerPayload.messages[1].role, 'user');
+    assert.equal(providerPayload.messages[1].content, 'Escreva uma apresentação curta para minha barbearia.');
+    assert.equal(providerPayload.messages[0].content.includes(providerPayload.messages[1].content), false);
   } finally {
     global.fetch = originalFetch;
     process.env.NVIDIA_API_KEY = '';
