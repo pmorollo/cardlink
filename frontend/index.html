@@ -144,7 +144,7 @@
           <div class="feature-card animate-in">
             <div class="feature-icon">🎨</div>
             <h3>6 Temas Premium</h3>
-            <p>Escolha entre temas elegantes: Midnight, Ocean, Sunset, Forest, Rose e Monochrome.</p>
+            <p>Escolha entre temas elegantes: Midnight, Mel Claro, Sunset, Executivo Premium, Rose e Monochrome.</p>
           </div>
           <div class="feature-card animate-in">
             <div class="feature-icon">⚡</div>
@@ -478,16 +478,20 @@
             <button class="btn btn-secondary btn-sm" onclick="navigateTo('dashboard')">← Voltar</button>
           </div>
 
-          <nav class="settings-nav" aria-label="Áreas de configuração">
-            <button class="settings-nav-item active" type="button" data-settings-target="profile" onclick="showSettingsSection('profile')">Apresentação do negócio</button>
-            <button class="settings-nav-item" type="button" data-settings-target="contact" onclick="showSettingsSection('contact')">Contato e WhatsApp</button>
-            <button class="settings-nav-item" type="button" data-settings-target="services" onclick="showSettingsSection('services')">Serviços / Produtos</button>
-            <button class="settings-nav-item" type="button" data-settings-target="gallery" onclick="showSettingsSection('gallery')">Galeria de fotos</button>
-            <button class="settings-nav-item" type="button" data-settings-target="testimonials" onclick="showSettingsSection('testimonials')">Avaliações de clientes</button>
-            <button class="settings-nav-item" type="button" data-settings-target="social" onclick="showSettingsSection('social')">Redes sociais</button>
-            <button class="settings-nav-item" type="button" data-settings-target="appearance" onclick="showSettingsSection('appearance')">Aparência do site</button>
-            <button class="settings-nav-item" type="button" data-settings-target="assistant" onclick="showSettingsSection('assistant')">Assistente de conteúdo</button>
-          </nav>
+          <div class="settings-nav-shell">
+            <button class="settings-nav-arrow" id="settings-nav-prev" type="button" onclick="scrollSettingsNav(-1)" aria-label="Ver opções anteriores">‹</button>
+            <nav class="settings-nav" id="settings-nav" aria-label="Áreas de configuração">
+              <button class="settings-nav-item active" type="button" data-settings-target="profile" onclick="showSettingsSection('profile')">Apresentação do negócio</button>
+              <button class="settings-nav-item" type="button" data-settings-target="contact" onclick="showSettingsSection('contact')">Contato e WhatsApp</button>
+              <button class="settings-nav-item" type="button" data-settings-target="services" onclick="showSettingsSection('services')">Serviços / Produtos</button>
+              <button class="settings-nav-item" type="button" data-settings-target="gallery" onclick="showSettingsSection('gallery')">Galeria de fotos</button>
+              <button class="settings-nav-item" type="button" data-settings-target="testimonials" onclick="showSettingsSection('testimonials')">Avaliações de clientes</button>
+              <button class="settings-nav-item" type="button" data-settings-target="social" onclick="showSettingsSection('social')">Redes sociais</button>
+              <button class="settings-nav-item" type="button" data-settings-target="appearance" onclick="showSettingsSection('appearance')">Aparência do site</button>
+              <button class="settings-nav-item" type="button" data-settings-target="assistant" onclick="showSettingsSection('assistant')">Assistente de conteúdo</button>
+            </nav>
+            <button class="settings-nav-arrow" id="settings-nav-next" type="button" onclick="scrollSettingsNav(1)" aria-label="Ver mais opções">›</button>
+          </div>
 
           <!-- AI Assistant Banner -->
           <div class="form-section settings-section" data-settings-section="assistant" style="background:linear-gradient(135deg, rgba(139,92,246,0.12), rgba(6,182,212,0.12));border:1.5px solid var(--accent);border-radius:var(--radius-lg);padding:20px;margin-bottom:var(--space-xl);">
@@ -739,7 +743,7 @@
               </div>
               <div>
                 <div class="theme-swatch" data-theme="ocean" onclick="selectTheme('ocean')"></div>
-                <div class="theme-label">Ocean</div>
+                <div class="theme-label">Mel Claro</div>
               </div>
               <div>
                 <div class="theme-swatch" data-theme="sunset" onclick="selectTheme('sunset')"></div>
@@ -747,7 +751,7 @@
               </div>
               <div>
                 <div class="theme-swatch" data-theme="forest" onclick="selectTheme('forest')"></div>
-                <div class="theme-label">Forest</div>
+                <div class="theme-label">Executivo Premium</div>
               </div>
               <div>
                 <div class="theme-swatch" data-theme="rose" onclick="selectTheme('rose')"></div>
