@@ -151,6 +151,7 @@ test('frontend mantem a IA somente como assistente textual para copia manual', a
   assert.equal(html.includes('id="ai-request"'), true);
   assert.equal(html.includes('id="ai-response"'), true);
   assert.equal(html.includes('Copiar texto'), true);
+  assert.equal(html.includes('Colar texto'), true);
   assert.equal(html.includes('id="ai-skill"'), false);
   assert.equal(js.includes('improveFieldWithAI'), false);
   assert.equal(js.includes('reviewAiSuggestion'), false);
@@ -387,7 +388,39 @@ test('assistente valida entradas e preserva o texto quando a IA externa esta ind
   }, token);
   assert.equal(unavailable.status, 503);
   assert.equal(Object.hasOwn(unavailable.data, 'text'), false);
+  assert.equal(unavailable.data.code, 'ai_provider_not_configured');
   assert.match(unavailable.data.error, /preservada/i);
+});
+
+test('assistente diferencia falha temporaria do provedor sem expor detalhes internos', async () => {
+  await createActiveUser({ email: 'ia-falha@example.com', name: 'Teste Falha IA' });
+  const loginResult = await login('ia-falha@example.com', 'SenhaValida123!');
+  const token = loginResult.data.token;
+  const originalFetch = global.fetch;
+  process.env.NVIDIA_API_KEY = 'test-provider-key';
+  global.fetch = async (url, options) => {
+    if (String(url).startsWith('https://integrate.api.nvidia.com/')) {
+      return new Response(JSON.stringify({ error: 'unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    return originalFetch(url, options);
+  };
+
+  try {
+    const unavailable = await api('POST', '/api/ai/generate', {
+      request: 'Crie uma apresentação curta.'
+    }, token);
+    assert.equal(unavailable.status, 503);
+    assert.equal(unavailable.data.code, 'ai_provider_unavailable');
+    assert.match(unavailable.data.error, /temporariamente indisponível/i);
+    assert.equal(JSON.stringify(unavailable.data).includes('401'), false);
+    assert.equal(JSON.stringify(unavailable.data).includes('test-provider-key'), false);
+  } finally {
+    global.fetch = originalFetch;
+    process.env.NVIDIA_API_KEY = '';
+  }
 });
 
 test('assistente devolve somente texto separado quando o provedor responde', async () => {
