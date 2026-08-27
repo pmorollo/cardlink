@@ -504,7 +504,7 @@
             <div class="form-row">
               <div class="form-group" style="flex:2;">
                 <label class="form-label" for="ai-profession">Sua Profissão ou Negócio</label>
-                <input class="form-input" type="text" id="ai-profession" placeholder="Ex: Cabeleireira em SP, Advogado Trabalhista, Fotógrafo...">
+                <input class="form-input" type="text" id="ai-profession" maxlength="180" placeholder="Ex: Cabeleireira em SP, Advogado Trabalhista, Fotógrafo...">
               </div>
               <div class="form-group" style="flex:1;">
                 <label class="form-label" for="ai-skill">Tom de voz</label>
@@ -519,6 +519,9 @@
             <button class="btn btn-primary" type="button" id="ai-generate-btn" onclick="generateWithAI()" style="width:100%;margin-top:8px;">
               Gerar sugestões de conteúdo
             </button>
+            <small style="color:var(--text-muted);font-size:0.74rem;line-height:1.5;display:block;margin-top:9px;">
+              Revise todas as sugestões antes de aplicar. A IA não define preços e pode cometer erros. Não envie dados pessoais, sigilosos ou informações de clientes.
+            </small>
           </div>
 
           <!-- Personal Info -->
@@ -568,10 +571,10 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="field-description">Descrição do negócio</label>
-              <textarea class="form-input" id="field-description" placeholder="Apresente seu negócio, seus diferenciais e o atendimento oferecido..." data-field="description" rows="3"></textarea>
+              <textarea class="form-input" id="field-description" maxlength="1800" placeholder="Apresente seu negócio, seus diferenciais e o atendimento oferecido..." data-field="description" rows="3"></textarea>
               <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Este texto aparecerá na seção “Sobre o negócio”. Se o campo ficar vazio, a seção não será exibida no site público.</small>
-              <button type="button" class="btn btn-outline btn-sm" onclick="improveFieldWithAI('field-description')" style="margin-top:6px;font-size:0.75rem;">✨ Melhorar descrição com IA</button>
-              <div class="form-help" style="margin-top:6px;">Após aplicar a sugestão, clique em <strong>Salvar alterações</strong> para publicar no site.</div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="improveFieldWithAI('field-description')" style="margin-top:6px;font-size:0.75rem;">✨ Melhorar somente esta descrição</button>
+              <div class="form-help" style="margin-top:6px;">Este botão altera somente a descrição. Para gerar a apresentação e os serviços completos, use a aba <strong>Assistente de conteúdo</strong>. Depois de aplicar, clique em <strong>Salvar alterações</strong>.</div>
             </div>
           </div>
 
@@ -594,8 +597,9 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="field-message">Mensagem</label>
-              <textarea class="form-input" id="field-message" placeholder="Ex: Agende pelo WhatsApp ou visite-nos no fim de semana" data-field="message" rows="3"></textarea>
-              <button type="button" class="btn btn-outline btn-sm" onclick="improveFieldWithAI('field-message')" style="margin-top:6px;font-size:0.75rem;">✨ Melhorar Mensagem com IA</button>
+              <textarea class="form-input" id="field-message" maxlength="1800" placeholder="Ex: Agende pelo WhatsApp ou visite-nos no fim de semana" data-field="message" rows="3"></textarea>
+              <button type="button" class="btn btn-outline btn-sm" onclick="improveFieldWithAI('field-message')" style="margin-top:6px;font-size:0.75rem;">✨ Melhorar somente esta mensagem</button>
+              <div class="form-help" style="margin-top:6px;">Este botão altera somente a mensagem. Para gerar todos os textos e serviços, use a aba <strong>Assistente de conteúdo</strong>.</div>
             </div>
           </div>
 
@@ -1155,7 +1159,7 @@
 
         <div>
           <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🤖</span> Passo 4: Usando a Inteligência Artificial</h3>
-          <p style="margin:0;">Tem dificuldades para escrever os textos? No topo do editor, clique em "Gerar Conteúdo com IA", insira sua profissão, selecione o tom de voz e clique em "Gerar". A IA criará todos os textos e até sugerirá 3 produtos/serviços com preços na hora!</p>
+          <p style="margin:0;">Tem dificuldades para escrever os textos? Abra a aba “Assistente de conteúdo”, informe sua profissão ou negócio e escolha o tom. O CardLink mostrará uma revisão completa antes de aplicar. Você poderá usar somente os textos, acrescentar serviços ou substituir a lista atual. Os preços devem ser preenchidos manualmente.</p>
         </div>
 
         <div>
@@ -1222,12 +1226,15 @@
         <p style="color:var(--text-secondary);">Seus dados são tratados com a finalidade exclusiva de prestar o serviço contratado, especificamente: autenticação em sua conta, geração e exibição pública do seu site profissional, entrega de leads/mensagens recebidas diretamente no seu e-mail cadastrado e gestão da sua assinatura PRO.</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">3. Compartilhamento de Dados</h3>
-        <p style="color:var(--text-secondary);">O CardLink não vende ou aluga seus dados a terceiros. Compartilhamos seus dados apenas quando necessário para operar a plataforma, tais como processadores de pagamento seguros (Cakto) e serviços de entrega de e-mail transacional (SMTP).</p>
+        <p style="color:var(--text-secondary);">O CardLink não vende ou aluga seus dados a terceiros. Compartilhamos dados somente quando necessário para operar a plataforma, incluindo o processador de pagamentos Cakto, serviços de e-mail transacional e, quando você utiliza voluntariamente o Assistente de conteúdo, a NVIDIA, atual fornecedora do processamento de inteligência artificial, ou eventual fornecedora substituta informada nesta política. Não insira dados pessoais de clientes, informações sigilosas ou conteúdo confidencial no Assistente.</p>
+
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Assistente de Conteúdo</h3>
+        <p style="color:var(--text-secondary);">As sugestões da inteligência artificial podem conter erros ou informações inadequadas. Nada é publicado automaticamente: o usuário deve revisar, confirmar e salvar o conteúdo. O CardLink não gera preços comerciais automaticamente, e o assinante permanece responsável pela exatidão das informações que decidir publicar.</p>
         
-        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Armazenamento e Segurança</h3>
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">5. Armazenamento e Segurança</h3>
         <p style="color:var(--text-secondary);">Adotamos medidas técnicas de segurança para proteger seus dados contra acessos não autorizados. Seus dados cadastrais e de cartões digitais são armazenados em servidores seguros em nuvem.</p>
         
-        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">5. Seus Direitos</h3>
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">6. Seus Direitos</h3>
         <p style="color:var(--text-secondary);">Em conformidade com a LGPD (Lei Geral de Proteção de Dados), você tem direito de solicitar a confirmação do tratamento, acesso aos seus dados, retificação de dados incompletos ou a exclusão total da sua conta e de todos os dados a ela associados, o que pode ser feito enviando uma mensagem ao nosso suporte.</p>
       </div>
       

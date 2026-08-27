@@ -2181,9 +2181,8 @@ async function generateWithAI() {
       body: JSON.stringify({ profession, skill, mode: 'full' })
     });
 
-    const summary = [res.title, res.description, ...(res.products || []).map(p => p.name)].filter(Boolean).join('\n\n');
-    const approved = window.confirm(`Sugestão do Assistente de conteúdo:\n\n${summary}\n\nDeseja aplicar estas sugestões à sua página?`);
-    if (!approved) {
+    const action = await reviewAiSuggestion(res);
+    if (!action) {
       showToast('ℹ️', 'Sugestões descartadas. Nenhuma informação foi alterada.');
       return;
     }
@@ -2193,22 +2192,93 @@ async function generateWithAI() {
     if (res.message) setFieldValue('field-message', res.message);
     if (res.site_button_text) setFieldValue('field-site-button', res.site_button_text);
 
-    // Products / Services
-    if (res.products && Array.isArray(res.products) && res.products.length > 0) {
+    // Serviços só são alterados quando o usuário escolhe explicitamente essa opção.
+    if (action !== 'text-only' && res.products && Array.isArray(res.products) && res.products.length > 0) {
       const prodContainer = document.getElementById('builder-products-container');
       if (prodContainer) {
-        prodContainer.innerHTML = '';
-        res.products.forEach(p => addProductRow(p));
+        if (action === 'replace') prodContainer.innerHTML = '';
+        res.products.forEach(p => addProductRow({ ...p, price: '' }));
+        setFieldValue('field-services-mode', 'list');
+        toggleServicesMode();
       }
     }
 
     updatePreview();
-    showToast('✨', 'Sugestões aplicadas. Revise antes de salvar.');
+    const sourceNotice = res.ai_meta?.source === 'template' ? ' Modelo básico aplicado para revisão.' : '';
+    showToast('✨', `Sugestões aplicadas ao painel.${sourceNotice} Revise e clique em Salvar alterações.`);
   } catch (err) {
     showToast('❌', 'Erro na IA: ' + err.message);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Gerar sugestões de conteúdo'; }
   }
+}
+
+function reviewAiSuggestion(suggestion) {
+  return new Promise(resolve => {
+    document.getElementById('ai-review-modal')?.remove();
+    const products = Array.isArray(suggestion.products) ? suggestion.products.filter(product => product?.name) : [];
+    const existingProducts = document.querySelectorAll('#builder-products-container .builder-item-row').length;
+    const modal = document.createElement('div');
+    modal.id = 'ai-review-modal';
+    modal.className = 'ai-review-overlay';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'ai-review-title');
+
+    const productList = products.length
+      ? products.map((product, index) => `
+          <div class="ai-review-service">
+            <strong>${index + 1}. ${escapeHtml(product.name)}</strong>
+            ${product.description ? `<p>${escapeHtml(product.description)}</p>` : ''}
+            <small>Preço não gerado — preencha manualmente se desejar.</small>
+          </div>`).join('')
+      : '<p class="ai-review-empty">Nenhum serviço foi sugerido.</p>';
+
+    const providerNotice = suggestion.ai_meta?.notice
+      ? `<div class="ai-review-notice">⚠️ ${escapeHtml(suggestion.ai_meta.notice)}</div>`
+      : '<div class="ai-review-source">Sugestão produzida pelo Assistente de conteúdo.</div>';
+
+    modal.innerHTML = `
+      <div class="ai-review-dialog">
+        <div class="ai-review-header">
+          <div><div class="ai-review-kicker">Revisão obrigatória</div><h2 id="ai-review-title">Confira tudo antes de aplicar</h2></div>
+          <button type="button" class="ai-review-close" data-ai-action="cancel" aria-label="Fechar">×</button>
+        </div>
+        ${providerNotice}
+        <div class="ai-review-content">
+          <section><h3>Atividade ou especialidade</h3><p>${escapeHtml(suggestion.title || 'Sem sugestão')}</p></section>
+          <section><h3>Descrição do negócio</h3><p>${escapeHtml(suggestion.description || 'Sem sugestão')}</p></section>
+          <section><h3>Mensagem de contato</h3><p>${escapeHtml(suggestion.message || 'Sem sugestão')}</p></section>
+          <section><h3>Texto do botão</h3><p>${escapeHtml(suggestion.site_button_text || 'Sem sugestão')}</p></section>
+          <section><h3>Serviços sugeridos</h3>${productList}</section>
+        </div>
+        <div class="ai-review-warning">Nada será publicado agora. Depois de aplicar, revise os campos e clique em <strong>Salvar alterações</strong>.</div>
+        ${existingProducts ? '<div class="ai-review-replace-warning">A opção “Substituir serviços atuais” remove também os preços, descrições e fotos já cadastrados nessa lista.</div>' : ''}
+        <div class="ai-review-actions">
+          <button type="button" class="btn btn-secondary" data-ai-action="cancel">Cancelar</button>
+          <button type="button" class="btn btn-outline" data-ai-action="text-only">Aplicar somente os textos</button>
+          ${products.length ? `<button type="button" class="btn btn-primary" data-ai-action="${existingProducts ? 'append' : 'replace'}">${existingProducts ? 'Acrescentar serviços' : 'Aplicar textos e serviços'}</button>` : ''}
+          ${products.length && existingProducts ? '<button type="button" class="btn btn-danger-soft" data-ai-action="replace">Substituir serviços atuais</button>' : ''}
+        </div>
+      </div>`;
+
+    const finish = action => {
+      modal.remove();
+      document.body.style.overflow = '';
+      resolve(action === 'cancel' ? null : action);
+    };
+    modal.addEventListener('click', event => {
+      const action = event.target.closest('[data-ai-action]')?.dataset.aiAction;
+      if (action) finish(action);
+      else if (event.target === modal) finish('cancel');
+    });
+    modal.addEventListener('keydown', event => {
+      if (event.key === 'Escape') finish('cancel');
+    });
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    modal.querySelector('.ai-review-close').focus();
+  });
 }
 
 async function improveFieldWithAI(fieldId) {

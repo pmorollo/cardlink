@@ -20,4 +20,7 @@ This skill defines the AI Content Generation architecture for CardLink using the
 - **Endpoint:** `POST /api/ai/generate`
 - **Environment Variable:** `NVIDIA_API_KEY` (configured on Railway / .env)
 - **Model Endpoint:** `https://integrate.api.nvidia.com/v1/chat/completions` (`meta/llama-3.1-70b-instruct`)
-- **Fallback:** Automatic built-in template generator when API key is unconfigured or offline.
+- **Fallback:** modelo básico identificado claramente ao usuário quando a API está indisponível.
+- **Safety:** preços nunca são gerados; respostas são validadas e limitadas antes de chegar ao painel.
+- **Review:** o usuário confere todos os campos e escolhe aplicar apenas textos, acrescentar serviços ou substituir serviços.
+- **Operational controls:** timeout configurável por `AI_TIMEOUT_MS` e limite por usuário configurável por `AI_REQUESTS_PER_HOUR`.

@@ -344,6 +344,10 @@ test('conta interna de teste tem recursos completos mas webhook Cakto nao a conv
 
   const ai = await api('POST', '/api/ai/generate', { profession: 'Barbearia' }, token);
   assert.equal(ai.status, 200);
+  assert.equal(ai.data.ai_meta.source, 'template');
+  assert.ok(ai.data.ai_meta.notice);
+  assert.ok(ai.data.products.length > 0);
+  assert.equal(ai.data.products.every(product => product.price === ''), true);
 
   const hook = await api('POST', '/api/payments/cakto-webhook', {
     secret: process.env.CAKTO_SECRET,
@@ -355,6 +359,62 @@ test('conta interna de teste tem recursos completos mas webhook Cakto nao a conv
 
   const publicCard = await api('GET', `/api/public/${card.data.slug}`);
   assert.equal(publicCard.status, 200);
+});
+
+test('assistente valida entradas e preserva o texto quando a IA externa esta indisponivel', async () => {
+  await createActiveUser({ email: 'ia-segura@example.com', name: 'Teste IA Segura' });
+  const loginResult = await login('ia-segura@example.com', 'SenhaValida123!');
+  const token = loginResult.data.token;
+
+  const tooLong = await api('POST', '/api/ai/generate', {
+    profession: 'A'.repeat(181), mode: 'full'
+  }, token);
+  assert.equal(tooLong.status, 400);
+
+  const improve = await api('POST', '/api/ai/generate', {
+    profession: 'Barbearia', mode: 'improve', textToImprove: 'Meu texto original'
+  }, token);
+  assert.equal(improve.status, 503);
+  assert.equal(Object.hasOwn(improve.data, 'improvedText'), false);
+  assert.match(improve.data.error, /preservado/i);
+});
+
+test('assistente normaliza a resposta externa e nunca repassa precos gerados', async () => {
+  await createActiveUser({ email: 'ia-provider@example.com', name: 'Teste Provedor IA' });
+  const loginResult = await login('ia-provider@example.com', 'SenhaValida123!');
+  const token = loginResult.data.token;
+  const originalFetch = global.fetch;
+  process.env.NVIDIA_API_KEY = 'test-provider-key';
+  global.fetch = async (url, options) => {
+    if (String(url).startsWith('https://integrate.api.nvidia.com/')) {
+      return new Response(JSON.stringify({
+        choices: [{ message: { content: JSON.stringify({
+          title: 'Barbearia contemporânea',
+          description: 'Atendimento profissional com opções para diferentes estilos.',
+          message: 'Entre em contato para conhecer os horários disponíveis.',
+          site_button_text: 'Conhecer serviços',
+          products: [
+            { name: 'Corte', price: '999,00', description: 'Corte conforme preferência do cliente.' },
+            { name: 'Barba', price: '888,00', description: 'Cuidados e acabamento para a barba.' }
+          ]
+        }) } }]
+      }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    return originalFetch(url, options);
+  };
+
+  try {
+    const generated = await api('POST', '/api/ai/generate', {
+      profession: 'Barbearia', skill: 'corporativa', mode: 'full'
+    }, token);
+    assert.equal(generated.status, 200);
+    assert.equal(generated.data.ai_meta.source, 'nvidia');
+    assert.equal(generated.data.products.length, 2);
+    assert.equal(generated.data.products.every(product => product.price === ''), true);
+  } finally {
+    global.fetch = originalFetch;
+    process.env.NVIDIA_API_KEY = '';
+  }
 });
 
 test('cancelamento Cakto suspende cartao e corta APIs mesmo com token antigo', async () => {
