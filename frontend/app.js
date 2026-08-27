@@ -2134,10 +2134,20 @@ async function improveFieldWithAI(fieldId) {
       body: JSON.stringify({ profession, skill, mode: 'improve', textToImprove: currentText })
     });
 
-    if (res.improvedText && window.confirm(`Texto sugerido:\n\n${res.improvedText}\n\nDeseja substituir o texto atual?`)) {
-      input.value = res.improvedText;
-      updatePreview();
-      showToast('✨', 'Texto melhorado com sucesso!');
+    const improvedText = typeof res.improvedText === 'string' ? res.improvedText.trim() : '';
+    if (!improvedText) {
+      showToast('⚠️', 'A IA não retornou uma sugestão. Tente novamente.');
+      return;
+    }
+    if (improvedText === currentText) {
+      showToast('ℹ️', 'A IA não encontrou uma alteração relevante para este texto.');
+      return;
+    }
+    if (window.confirm(`Texto sugerido:\n\n${improvedText}\n\nDeseja substituir o texto atual?`)) {
+      input.value = improvedText;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.focus();
+      showToast('✨', 'Texto aplicado ao campo. Clique em Salvar alterações para publicar.');
     }
   } catch (err) {
     showToast('❌', 'Erro ao melhorar texto: ' + err.message);

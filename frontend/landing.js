@@ -265,18 +265,11 @@ function renderNav(d) {
 function renderHero(d) {
   const name = d.name || 'Profissional';
   const business = d.business || '';
-  const title = d.title || '';
-  const initials = (name.split(' ').map(w => w[0]).join('').substring(0, 2) || 'P').toUpperCase();
 
-  // Badge (mostra o negócio; o cargo fica logo abaixo do nome assinado)
-  const badgeEl = document.getElementById('hero-badge-text');
-  if (badgeEl) badgeEl.textContent = business || title || 'Profissional';
-
-  // Title (nome em forma de assinatura + cargo abaixo)
+  // O início destaca o negócio; nome e atividade ficam na seção de contato.
   const titleEl = document.getElementById('hero-title');
   if (titleEl) {
-    const role = title ? `<span class="lp-hero-title-role">${esc(title)}</span>` : '';
-    titleEl.innerHTML = `<span class="lp-signature-name">${esc(name)}</span>${role}`;
+    titleEl.innerHTML = `<span class="lp-business-name">${esc(business || name)}</span>`;
   }
 
   // CTA Button
@@ -316,15 +309,6 @@ function renderHero(d) {
     }
   }
 
-  // Stats pills
-  const statsEl = document.getElementById('hero-stats');
-  if (statsEl) {
-    const pills = [];
-    if (d.phone || d.whatsapp) pills.push(`<strong>Atendimento direto</strong>`);
-    if (title) pills.push(`<strong>${esc(title)}</strong>`);
-    if (business) pills.push(`<strong>${esc(business)}</strong>`);
-    statsEl.innerHTML = pills.map(p => `<div class="lp-stat-pill">${p}</div>`).join('');
-  }
 }
 
 // ============================================
@@ -332,8 +316,7 @@ function renderHero(d) {
 // ============================================
 function renderAbout(d) {
   const name = d.name || 'Profissional';
-  const title = d.title || '';
-  const business = d.business || '';
+  const business = typeof d.business === 'string' ? d.business.trim() : '';
   const description = typeof d.description === 'string' ? d.description.trim() : '';
   const isPlaceholder = !description;
 
@@ -342,9 +325,15 @@ function renderAbout(d) {
     return;
   }
 
-  // Title (somente o nome, menor e em itálico)
+  // A seção apresenta o negócio sem repetir nome ou atividade do profissional.
   const aboutTitle = document.getElementById('about-title');
-  if (aboutTitle) aboutTitle.innerHTML = `<span class="lp-about-name">${esc(name)}</span>`;
+  if (aboutTitle) aboutTitle.textContent = 'Apresentação';
+
+  // O selo identifica apenas o negócio, sem repetir nome ou atividade.
+  const badge = document.getElementById('about-badge');
+  const badgeBusiness = document.getElementById('about-badge-business');
+  if (badgeBusiness) badgeBusiness.textContent = business;
+  if (badge) badge.style.display = business ? '' : 'none';
 
   // Use only an image supplied by the owner; never invent a stock image.
   const imgWrap = document.getElementById('about-image');
@@ -362,32 +351,10 @@ function renderAbout(d) {
     aboutGrid?.classList.add('lp-about-grid-single');
   }
 
-  // Badge
-  const badgeValue = document.getElementById('about-badge-value');
-  const badgeLabel = document.getElementById('about-badge-label');
-  const badge = document.getElementById('about-badge');
-  if (badgeValue) badgeValue.textContent = title ? title.split(' ')[0] : '';
-  if (badgeLabel) badgeLabel.textContent = business || '';
-  if (badge && !title && !business) badge.style.display = 'none';
-
   // Description
   const descEl = document.getElementById('about-description');
   if (descEl) {
     descEl.textContent = description;
-  }
-
-  // Highlights
-  const highlightsEl = document.getElementById('about-highlights');
-  if (highlightsEl) {
-    const items = [];
-    if (d.phone || d.whatsapp) items.push(['📞', 'Atendimento personalizado']);
-    if (d.email) items.push(['📧', esc(d.email)]);
-    if (d.address) items.push(['📍', esc(d.address)]);
-    highlightsEl.innerHTML = items.map(([icon, text]) => `
-      <div class="lp-about-highlight">
-        <div class="lp-about-highlight-icon">${icon}</div>
-        <span>${text}</span>
-      </div>`).join('');
   }
 
   // Placeholder hint for owner
@@ -570,6 +537,15 @@ function renderSocial(d) {
 function renderContact(d) {
   const links = document.getElementById('contact-links');
   if (!links) return;
+
+  const contactTitle = document.getElementById('contact-title');
+  if (contactTitle) {
+    const name = d.name || 'Profissional';
+    const role = typeof d.title === 'string' ? d.title.trim() : '';
+    contactTitle.innerHTML = `
+      <span class="lp-contact-name">${esc(name)}</span>
+      ${role ? `<span class="lp-contact-role">${esc(role)}</span>` : ''}`;
+  }
 
   const items = [];
   if (d.whatsapp) items.push({
