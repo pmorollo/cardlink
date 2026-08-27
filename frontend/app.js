@@ -2171,6 +2171,11 @@ async function generateAssistantText() {
     return;
   }
 
+  // Uma nova solicitação invalida a resposta anterior. Ocultá-la evita que um
+  // erro do provedor faça o usuário confundir o texto antigo com o novo.
+  if (responseInput) responseInput.value = '';
+  if (responsePanel) responsePanel.hidden = true;
+
   if (button) {
     button.disabled = true;
     button.textContent = 'Gerando resposta...';
