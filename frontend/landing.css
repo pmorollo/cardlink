@@ -42,20 +42,37 @@
 }
 
 [data-theme="ocean"] {
-  --hero-from: #0a192f;
-  --hero-via: #0d3b6e;
-  --hero-to: #0a2540;
-  --accent: #06b6d4;
-  --accent-2: #3b82f6;
-  --accent-glow: rgba(6,182,212,0.3);
+  --hero-from: #fff8df;
+  --hero-via: #f3c766;
+  --hero-to: #d5901c;
+  --accent: #9a5b00;
+  --accent-2: #d9981f;
+  --accent-glow: rgba(190,123,13,0.22);
+  --bg: #fffaf0;
+  --bg-card: #fff3d6;
+  --bg-card-2: #ffe6ad;
+  --border: rgba(92,60,18,0.16);
+  --text-primary: #382612;
+  --text-secondary: #6c4d27;
+  --text-muted: #8d7049;
+  --shadow-sm: 0 2px 10px rgba(92,60,18,0.09);
+  --shadow-md: 0 10px 34px rgba(92,60,18,0.13);
+  --shadow-lg: 0 26px 70px rgba(92,60,18,0.16);
 }
 [data-theme="forest"] {
-  --hero-from: #0a1628;
-  --hero-via: #1a3a2a;
-  --hero-to: #0d2818;
-  --accent: #10b981;
-  --accent-2: #34d399;
-  --accent-glow: rgba(16,185,129,0.3);
+  --hero-from: #07111e;
+  --hero-via: #13263d;
+  --hero-to: #1e3045;
+  --accent: #c6a15b;
+  --accent-2: #f0d394;
+  --accent-glow: rgba(198,161,91,0.22);
+  --bg: #09131f;
+  --bg-card: #101f30;
+  --bg-card-2: #17283a;
+  --border: rgba(221,194,140,0.17);
+  --text-primary: #f5f0e6;
+  --text-secondary: #c8c1b3;
+  --text-muted: #918b80;
 }
 [data-theme="sunset"] {
   --hero-from: #1a0a1e;
@@ -153,6 +170,87 @@ body.has-owner-bar .lp-nav {
 
 @media (max-width: 768px) {
   .lp-nav-links { display: none; }
+}
+
+/* ============================================
+   Temas de contraste ampliado
+   ============================================ */
+[data-theme="ocean"] {
+  color-scheme: light;
+}
+
+[data-theme="ocean"] .lp-nav {
+  background: rgba(255,250,240,0.88);
+  box-shadow: 0 8px 26px rgba(92,60,18,0.07);
+}
+
+[data-theme="ocean"] .lp-section-alt {
+  background: rgba(190,123,13,0.055);
+}
+
+[data-theme="ocean"] .lp-hero::before {
+  background:
+    linear-gradient(rgba(92,60,18,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(92,60,18,0.055) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+[data-theme="ocean"] .btn-outline {
+  background: rgba(255,255,255,0.32);
+  border-color: rgba(92,60,18,0.24);
+}
+
+[data-theme="ocean"] .lp-footer {
+  background: #fff0c8;
+}
+
+[data-theme="forest"] .lp-section-title,
+[data-theme="forest"] .lp-about-text h2,
+[data-theme="forest"] .lp-contact-info h2,
+[data-theme="forest"] .lp-contact-form h3 {
+  font-family: var(--font-display);
+}
+
+[data-theme="forest"] .lp-service-card,
+[data-theme="forest"] .lp-testimonial-card,
+[data-theme="forest"] .lp-contact-form,
+[data-theme="forest"] .lp-contact-link,
+[data-theme="forest"] .lp-gallery-item,
+[data-theme="forest"] .lp-about-image,
+[data-theme="forest"] .lp-about-badge,
+[data-theme="forest"] .btn {
+  border-radius: 7px;
+}
+
+[data-theme="forest"] .lp-section-tag {
+  color: var(--accent);
+  letter-spacing: 0.2em;
+}
+
+[data-theme="forest"] .lp-section-title::after,
+[data-theme="forest"] .lp-about-text h2::after,
+[data-theme="forest"] .lp-contact-info h2::after {
+  content: '';
+  display: block;
+  width: 52px;
+  height: 1px;
+  margin-top: 15px;
+  background: var(--accent);
+}
+
+[data-theme="forest"] .lp-section-header .lp-section-title::after {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+[data-theme="forest"] .lp-service-card,
+[data-theme="forest"] .lp-testimonial-card,
+[data-theme="forest"] .lp-contact-form {
+  border-top: 2px solid rgba(198,161,91,0.62);
+}
+
+[data-theme="forest"] .lp-nav {
+  background: rgba(7,17,30,0.9);
 }
 
 /* ============================================
@@ -271,7 +369,7 @@ body.has-owner-bar .lp-nav {
 
 /* Nome do negócio com presença empresarial no início */
 .lp-business-name {
-  font-family: var(--font-body);
+  font-family: Georgia, Cambria, 'Times New Roman', serif;
   font-weight: 800;
   font-size: clamp(3.35rem, 6.4vw, 5.6rem);
   line-height: 1.02;
