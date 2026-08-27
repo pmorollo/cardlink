@@ -369,7 +369,7 @@ body.has-owner-bar .lp-nav {
 
 /* Nome do negócio com presença empresarial no início */
 .lp-business-name {
-  font-family: Cambria, Georgia, 'Times New Roman', serif;
+  font-family: Georgia, Cambria, 'Times New Roman', serif;
   font-weight: 800;
   font-size: clamp(3.35rem, 6.4vw, 5.6rem);
   line-height: 1.02;
