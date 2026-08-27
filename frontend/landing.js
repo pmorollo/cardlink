@@ -357,20 +357,6 @@ function renderAbout(d) {
     descEl.textContent = description;
   }
 
-  // Highlights
-  const highlightsEl = document.getElementById('about-highlights');
-  if (highlightsEl) {
-    const items = [];
-    if (d.phone || d.whatsapp) items.push(['📞', 'Atendimento personalizado']);
-    if (d.email) items.push(['📧', esc(d.email)]);
-    if (d.address) items.push(['📍', esc(d.address)]);
-    highlightsEl.innerHTML = items.map(([icon, text]) => `
-      <div class="lp-about-highlight">
-        <div class="lp-about-highlight-icon">${icon}</div>
-        <span>${text}</span>
-      </div>`).join('');
-  }
-
   // Placeholder hint for owner
   if (isPlaceholder && ownerToken) makePlaceholderHint('about-placeholder-hint', 'Adicionar descrição');
 }
