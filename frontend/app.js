@@ -1508,12 +1508,12 @@ function renderCard(data, isPreview) {
   const message     = data.message || '';
   const photo       = data.photo_url || '';
   const logo        = data.logo_url || '';
-  const instagram   = data.instagram || '';
-  const facebook    = data.facebook || '';
-  const linkedin    = data.linkedin || '';
-  const tiktok      = data.tiktok || '';
-  const youtube     = data.youtube || '';
-  const twitter     = data.twitter || '';
+  const instagram   = typeof data.instagram === 'string' ? data.instagram.trim() : '';
+  const facebook    = typeof data.facebook === 'string' ? data.facebook.trim() : '';
+  const linkedin    = typeof data.linkedin === 'string' ? data.linkedin.trim() : '';
+  const tiktok      = typeof data.tiktok === 'string' ? data.tiktok.trim() : '';
+  const youtube     = typeof data.youtube === 'string' ? data.youtube.trim() : '';
+  const twitter     = typeof data.twitter === 'string' ? data.twitter.trim() : '';
   const whatsappGroup = data.whatsapp_group || '';
   const theme       = data.theme || 'midnight';
 
@@ -1560,10 +1560,14 @@ function renderCard(data, isPreview) {
 
   // Site / Landing Page section
   const siteBtnText    = data.site_button_text || 'Ver mais informações';
-  const servicesMode   = data.services_mode || ((data.products || []).length ? 'list' : 'image');
+  const validProducts  = Array.isArray(data.products)
+    ? data.products.filter(product => typeof product?.name === 'string' && product.name.trim())
+    : [];
+  const servicesMode   = data.services_mode || (validProducts.length ? 'list' : 'image');
   const servicesTitle  = data.services_title || (servicesMode === 'image' ? 'Destaque' : 'Produtos & Serviços');
-  const hasServicesImage = servicesMode === 'image' && !!data.services_image_url;
-  const hasProducts    = servicesMode === 'list' && data.products && data.products.length > 0;
+  const servicesImageUrl = typeof data.services_image_url === 'string' ? data.services_image_url.trim() : '';
+  const hasServicesImage = servicesMode === 'image' && !!servicesImageUrl;
+  const hasProducts    = servicesMode === 'list' && validProducts.length > 0;
   const hasGallery     = data.gallery     && data.gallery.length     > 0;
   const hasTestimonials= data.testimonials&& data.testimonials.length> 0;
   const hasSiteContent = hasServicesImage || hasProducts || hasGallery || hasTestimonials;
@@ -1582,14 +1586,14 @@ function renderCard(data, isPreview) {
       servicesImageHtml = `
         <div class="site-block-title">📋 ${escapeHtml(servicesTitle)}</div>
         <div style="width:100%;display:flex;justify-content:center;margin-bottom:20px;">
-          <img src="${escapeHtml(data.services_image_url)}" alt="${escapeHtml(servicesTitle)}" style="max-width:100%;height:auto;max-height:900px;object-fit:contain;border-radius:14px;border:1px solid var(--border-subtle);background:var(--bg-card);" onerror="this.style.display='none'">
+          <img src="${escapeHtml(servicesImageUrl)}" alt="${escapeHtml(servicesTitle)}" style="max-width:100%;height:auto;max-height:900px;object-fit:contain;border-radius:14px;border:1px solid var(--border-subtle);background:var(--bg-card);" onerror="this.style.display='none'">
         </div>`;
     }
 
     let productsHtml = '';
     if (hasProducts) {
       productsHtml = `<div class="site-block-title">🛍️ ${escapeHtml(servicesTitle)}</div><div class="products-grid">`;
-      data.products.forEach(p => {
+      validProducts.forEach(p => {
         const waMsg = encodeURIComponent(`Olá! Gostaria de encomendar: ${p.name}${p.price ? ' (R$ ' + p.price + ')' : ''}`);
         const waUrl = whatsapp ? `https://wa.me/${cleanWhatsapp(whatsapp)}?text=${waMsg}` : '#';
         productsHtml += `

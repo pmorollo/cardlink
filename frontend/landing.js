@@ -42,6 +42,10 @@ function esc(str) {
 
 function cleanPhone(num) { return (num || '').replace(/\D/g, ''); }
 
+function cleanText(value) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
 function removePublicSection(id) {
   document.getElementById(id)?.remove();
   document.querySelectorAll(`a[href="#${id}"]`).forEach(link => {
@@ -370,10 +374,13 @@ function renderServices(d) {
 
   const titleEl = document.getElementById('services-title');
   const descEl = document.getElementById('services-desc');
-  const products = Array.isArray(d.products) ? d.products : [];
+  const products = Array.isArray(d.products)
+    ? d.products.filter(product => cleanText(product?.name))
+    : [];
   const mode = d.services_mode || (products.length ? 'list' : 'image');
   const sectionTitle = d.services_title || (mode === 'image' ? 'Destaque' : 'Meus Serviços');
-  const hasImage = mode === 'image' && !!d.services_image_url;
+  const servicesImageUrl = cleanText(d.services_image_url);
+  const hasImage = mode === 'image' && !!servicesImageUrl;
   const hasRealServices = mode === 'list' && products.length > 0;
 
   if (titleEl) titleEl.textContent = sectionTitle;
@@ -387,7 +394,7 @@ function renderServices(d) {
     grid.style.display = 'block';
     grid.innerHTML = `
       <div class="animate-in" style="max-width:920px;margin:0 auto;text-align:center;">
-        <img src="${esc(d.services_image_url)}" alt="${esc(sectionTitle)}"
+        <img src="${esc(servicesImageUrl)}" alt="${esc(sectionTitle)}"
           style="width:100%;height:auto;max-height:1200px;object-fit:contain;border-radius:18px;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-sm);"
           onerror="this.closest('#servicos')?.remove()">
       </div>`;
@@ -495,28 +502,34 @@ function renderSocial(d) {
   if (!strip) return;
 
   const socials = [];
-  if (d.instagram) {
-    const url = d.instagram.startsWith('@') ? `https://instagram.com/${d.instagram.substring(1)}` : d.instagram.includes('instagram.com') ? (d.instagram.startsWith('http') ? d.instagram : `https://${d.instagram}`) : `https://instagram.com/${d.instagram}`;
+  const instagram = cleanText(d.instagram);
+  const facebook = cleanText(d.facebook);
+  const linkedin = cleanText(d.linkedin);
+  const tiktok = cleanText(d.tiktok);
+  const youtube = cleanText(d.youtube);
+  const twitter = cleanText(d.twitter);
+  if (instagram) {
+    const url = instagram.startsWith('@') ? `https://instagram.com/${instagram.substring(1)}` : instagram.includes('instagram.com') ? (instagram.startsWith('http') ? instagram : `https://${instagram}`) : `https://instagram.com/${instagram}`;
     socials.push({ url, icon: 'IG', label: 'Instagram' });
   }
-  if (d.facebook) {
-    const url = d.facebook.includes('facebook.com') ? (d.facebook.startsWith('http') ? d.facebook : `https://${d.facebook}`) : `https://facebook.com/${d.facebook}`;
+  if (facebook) {
+    const url = facebook.includes('facebook.com') ? (facebook.startsWith('http') ? facebook : `https://${facebook}`) : `https://facebook.com/${facebook}`;
     socials.push({ url, icon: 'f', label: 'Facebook' });
   }
-  if (d.linkedin) {
-    const url = d.linkedin.includes('linkedin.com') ? (d.linkedin.startsWith('http') ? d.linkedin : `https://${d.linkedin}`) : `https://linkedin.com/in/${d.linkedin}`;
+  if (linkedin) {
+    const url = linkedin.includes('linkedin.com') ? (linkedin.startsWith('http') ? linkedin : `https://${linkedin}`) : `https://linkedin.com/in/${linkedin}`;
     socials.push({ url, icon: 'in', label: 'LinkedIn' });
   }
-  if (d.tiktok) {
-    const url = d.tiktok.startsWith('@') ? `https://tiktok.com/${d.tiktok}` : `https://tiktok.com/@${d.tiktok}`;
+  if (tiktok) {
+    const url = tiktok.startsWith('@') ? `https://tiktok.com/${tiktok}` : `https://tiktok.com/@${tiktok}`;
     socials.push({ url, icon: 'TT', label: 'TikTok' });
   }
-  if (d.youtube) {
-    const url = d.youtube.includes('youtube.com') ? (d.youtube.startsWith('http') ? d.youtube : `https://${d.youtube}`) : `https://youtube.com/@${d.youtube}`;
+  if (youtube) {
+    const url = youtube.includes('youtube.com') ? (youtube.startsWith('http') ? youtube : `https://${youtube}`) : `https://youtube.com/@${youtube}`;
     socials.push({ url, icon: 'YT', label: 'YouTube' });
   }
-  if (d.twitter) {
-    const url = d.twitter.startsWith('@') ? `https://x.com/${d.twitter.substring(1)}` : `https://x.com/${d.twitter}`;
+  if (twitter) {
+    const url = twitter.startsWith('@') ? `https://x.com/${twitter.substring(1)}` : `https://x.com/${twitter}`;
     socials.push({ url, icon: 'X', label: 'X' });
   }
 
