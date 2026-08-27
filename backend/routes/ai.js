@@ -81,7 +81,10 @@ router.post('/generate', authMiddleware, requireCustomer, aiUserLimiter, async (
   const startedAt = Date.now();
   if (!apiKey) {
     logAiUsage(user.id, 'unavailable', startedAt);
-    return res.status(503).json({ error: 'O Assistente está temporariamente indisponível. Sua solicitação foi preservada no campo.' });
+    return res.status(503).json({
+      code: 'ai_provider_not_configured',
+      error: 'O Assistente está aguardando a configuração do provedor de IA. Sua solicitação foi preservada no campo.'
+    });
   }
 
   const systemPrompt = `Você é o Assistente de conteúdo do CardLink, uma ferramenta de apoio à redação de sites profissionais.
@@ -98,8 +101,14 @@ Entregue somente o texto solicitado, em português do Brasil, sem explicar seu r
     return res.json({ text, ai_meta: { source: 'nvidia', model: 'meta/llama-3.1-70b-instruct' } });
   } catch (err) {
     console.error('NVIDIA Text Assistant Error:', err.message);
-    logAiUsage(user.id, 'error', startedAt);
-    return res.status(503).json({ error: 'O Assistente está temporariamente indisponível. Sua solicitação foi preservada no campo.' });
+    const isTimeout = err?.name === 'AbortError';
+    logAiUsage(user.id, isTimeout ? 'timeout' : 'error', startedAt);
+    return res.status(503).json({
+      code: isTimeout ? 'ai_provider_timeout' : 'ai_provider_unavailable',
+      error: isTimeout
+        ? 'O provedor de IA demorou para responder. Tente novamente em instantes; sua solicitação foi preservada.'
+        : 'O provedor de IA está temporariamente indisponível. Tente novamente mais tarde; sua solicitação foi preservada.'
+    });
   }
 });
 
