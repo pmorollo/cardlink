@@ -255,30 +255,6 @@ body.has-owner-bar .lp-nav {
   width: 100%;
 }
 
-.lp-hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: var(--radius-full);
-  padding: 6px 16px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin-bottom: 24px;
-  backdrop-filter: blur(10px);
-}
-.lp-hero-badge .dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
-}
-
 .lp-hero-title {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 5vw, 4rem);
@@ -293,25 +269,16 @@ body.has-owner-bar .lp-nav {
   -webkit-text-fill-color: currentColor !important;
 }
 
-/* Nome em forma de assinatura (hero) */
-.lp-signature-name {
-  font-family: 'Great Vibes', 'Segoe Script', 'Brush Script MT', cursive;
-  font-weight: 400;
-  font-size: clamp(3rem, 7vw, 5.2rem);
-  line-height: 1.15;
+/* Nome do negócio com presença empresarial no início */
+.lp-business-name {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: clamp(3.35rem, 6.4vw, 5.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
   display: block;
   color: var(--text-primary);
-}
-
-/* Cargo logo abaixo do nome assinado */
-.lp-hero-title-role {
-  display: inline-block;
-  margin-top: 4px;
-  font-size: clamp(1rem, 2.4vw, 1.35rem);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
+  text-wrap: balance;
 }
 
 .lp-hero-actions {
@@ -379,25 +346,6 @@ body.has-owner-bar .lp-nav {
   height: 100%;
   object-fit: cover;
 }
-
-/* Stats pills below avatar */
-.lp-hero-stats {
-  display: flex;
-  gap: 12px;
-  margin-top: 28px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.lp-stat-pill {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  padding: 8px 18px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  backdrop-filter: blur(10px);
-}
-.lp-stat-pill strong { color: var(--accent); }
 
 @media (max-width: 768px) {
   .lp-hero-content {
@@ -506,26 +454,6 @@ body.has-owner-bar .lp-nav {
   color: var(--text-muted);
   font-size: 4rem;
 }
-.lp-about-badge {
-  position: absolute;
-  bottom: 24px; right: -20px;
-  background: var(--bg-card-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 16px 20px;
-  backdrop-filter: blur(20px);
-  box-shadow: var(--shadow-md);
-}
-.lp-about-badge-value {
-  font-size: 1.6rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.lp-about-badge-label { font-size: 0.78rem; color: var(--text-muted); }
-
 .lp-about-text h2 {
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 3vw, 2.5rem);
@@ -534,14 +462,6 @@ body.has-owner-bar .lp-nav {
   line-height: 1.2;
 }
 
-/* Nome da seção "Sobre": menor e em itálico */
-.lp-about-name {
-  font-family: var(--font-body);
-  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
-  font-weight: 500;
-  font-style: italic;
-  color: var(--text-secondary);
-}
 .lp-about-text p {
   color: var(--text-secondary);
   font-size: 1.05rem;
@@ -572,7 +492,6 @@ body.has-owner-bar .lp-nav {
 
 @media (max-width: 768px) {
   .lp-about-grid { grid-template-columns: 1fr; gap: 40px; }
-  .lp-about-badge { right: 0; }
 }
 
 /* ============================================
@@ -762,11 +681,26 @@ body.has-owner-bar .lp-nav {
   align-items: start;
 }
 .lp-contact-info h2 {
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3vw, 2.5rem);
-  font-weight: 800;
+  font-family: var(--font-body);
+  font-size: clamp(2rem, 3.4vw, 2.8rem);
+  font-weight: 750;
   margin-bottom: 16px;
-  line-height: 1.2;
+  line-height: 1.12;
+}
+.lp-contact-name {
+  display: block;
+  color: var(--text-primary);
+  letter-spacing: -0.035em;
+}
+.lp-contact-role {
+  display: block;
+  margin-top: 8px;
+  color: var(--accent);
+  font-size: clamp(0.9rem, 1.6vw, 1.08rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.3;
+  text-transform: uppercase;
 }
 .lp-contact-info p {
   color: var(--text-secondary);
@@ -1114,19 +1048,6 @@ body {
   gap: clamp(56px, 8vw, 112px);
 }
 
-.lp-hero-badge {
-  background: transparent;
-  border: 0;
-  padding: 0;
-  border-radius: 0;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-weight: 700;
-}
-
-.lp-hero-badge .dot { width: 6px; height: 6px; animation: none; }
-
 .lp-hero-title {
   max-width: 680px;
   font-size: clamp(3rem, 5.8vw, 5rem);
@@ -1168,20 +1089,6 @@ body {
   background: linear-gradient(145deg, var(--bg-card-2), var(--bg));
 }
 
-.lp-hero-stats {
-  margin-top: 20px;
-  gap: 8px;
-}
-
-.lp-stat-pill {
-  padding: 7px 12px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.2);
-  font-size: 0.72rem;
-}
-
-.lp-stat-pill strong { color: var(--text-secondary); font-weight: 600; }
-
 .lp-hero-services-link {
   padding-bottom: 2px;
   border-bottom: 1px solid transparent;
@@ -1205,7 +1112,6 @@ body {
 }
 
 .lp-about-image { border-radius: 22px; }
-.lp-about-badge { border-radius: 14px; }
 
 .lp-service-card,
 .lp-testimonial-card,
@@ -1310,12 +1216,11 @@ body {
   .lp-hero-visual { order: -1; }
   .lp-hero-avatar-wrap { width: 184px; height: 224px; }
   .lp-hero-avatar { font-size: 3.2rem; }
-  .lp-hero-title { font-size: clamp(2.65rem, 12vw, 3.55rem); }
+  .lp-hero-title { font-size: inherit; }
+  .lp-business-name { font-size: clamp(2.7rem, 12vw, 3.8rem); }
   .lp-hero-actions { flex-direction: column; }
   .lp-hero-actions .btn { width: 100%; justify-content: center; }
   .lp-hero-services-link { margin-top: 22px; }
-  .lp-hero-stats { max-width: 320px; margin-left: auto; margin-right: auto; }
-
   .lp-about-image { max-height: 520px; }
   .lp-contact-form { padding: 28px 22px; }
   .toast { max-width: calc(100vw - 32px); white-space: normal; }
