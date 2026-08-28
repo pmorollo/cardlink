@@ -163,8 +163,8 @@ Entregue somente o texto solicitado, em português do Brasil, sem explicar seu r
   return res.status(503).json({
     code: isTimeout ? 'ai_provider_timeout' : 'ai_provider_unavailable',
     error: isTimeout
-      ? 'Os provedores de IA demoraram para responder. Tente novamente em instantes; sua solicitação foi preservada.'
-      : 'Os provedores de IA estão temporariamente indisponíveis. Tente novamente mais tarde; sua solicitação foi preservada.'
+      ? 'O serviço de IA demorou para responder. Tente novamente em instantes; sua solicitação foi preservada.'
+      : 'O serviço de IA está temporariamente indisponível. Tente novamente mais tarde; sua solicitação foi preservada.'
   });
 });
 
