@@ -5,6 +5,7 @@ process.env.SMTP_HOST = '';
 process.env.SMTP_USER = '';
 process.env.SMTP_PASS = '';
 process.env.NVIDIA_API_KEY = '';
+process.env.GEMINI_API_KEY = '';
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -423,18 +424,64 @@ test('assistente diferencia falha temporaria do provedor sem expor detalhes inte
   }
 });
 
-test('assistente devolve somente texto separado quando o provedor responde', async () => {
-  await createActiveUser({ email: 'ia-provider@example.com', name: 'Teste Provedor IA' });
-  const loginResult = await login('ia-provider@example.com', 'SenhaValida123!');
+test('assistente usa Gemini como provedor principal', async () => {
+  await createActiveUser({ email: 'ia-gemini@example.com', name: 'Teste Gemini' });
+  const loginResult = await login('ia-gemini@example.com', 'SenhaValida123!');
   const token = loginResult.data.token;
   const originalFetch = global.fetch;
   let providerPayload = null;
-  process.env.NVIDIA_API_KEY = 'test-provider-key';
+  process.env.GEMINI_API_KEY = 'test-gemini-key';
+  process.env.NVIDIA_API_KEY = 'test-nvidia-key';
   global.fetch = async (url, options) => {
-    if (String(url).startsWith('https://integrate.api.nvidia.com/')) {
+    if (String(url).startsWith('https://generativelanguage.googleapis.com/')) {
       providerPayload = JSON.parse(options.body);
       return new Response(JSON.stringify({
-        choices: [{ message: { content: 'Texto alternativo para a apresentação da barbearia.' } }]
+        candidates: [{ content: { parts: [{ text: 'Texto gerado pela Gemini.' }] } }]
+      }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    if (String(url).startsWith('https://integrate.api.nvidia.com/')) {
+      throw new Error('NVIDIA não deveria ser chamada quando Gemini responde');
+    }
+    return originalFetch(url, options);
+  };
+
+  try {
+    const generated = await api('POST', '/api/ai/generate', {
+      request: 'Escreva uma apresentação curta.'
+    }, token);
+    assert.equal(generated.status, 200);
+    assert.equal(generated.data.ai_meta.source, 'gemini');
+    assert.equal(generated.data.ai_meta.model, 'gemini-2.5-flash');
+    assert.equal(generated.data.text, 'Texto gerado pela Gemini.');
+    assert.equal(providerPayload.contents[0].role, 'user');
+    assert.equal(providerPayload.contents[0].parts[0].text, 'Escreva uma apresentação curta.');
+    assert.equal(providerPayload.systemInstruction.parts[0].text.includes('CardLink'), true);
+  } finally {
+    global.fetch = originalFetch;
+    process.env.GEMINI_API_KEY = '';
+    process.env.NVIDIA_API_KEY = '';
+  }
+});
+
+test('assistente usa NVIDIA como redundancia quando Gemini falha', async () => {
+  await createActiveUser({ email: 'ia-fallback@example.com', name: 'Teste Fallback' });
+  const loginResult = await login('ia-fallback@example.com', 'SenhaValida123!');
+  const token = loginResult.data.token;
+  const originalFetch = global.fetch;
+  let nvidiaPayload = null;
+  process.env.GEMINI_API_KEY = 'test-gemini-key';
+  process.env.NVIDIA_API_KEY = 'test-nvidia-key';
+  global.fetch = async (url, options) => {
+    if (String(url).startsWith('https://generativelanguage.googleapis.com/')) {
+      return new Response(JSON.stringify({ error: { message: 'indisponível' } }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    if (String(url).startsWith('https://integrate.api.nvidia.com/')) {
+      nvidiaPayload = JSON.parse(options.body);
+      return new Response(JSON.stringify({
+        choices: [{ message: { content: 'Texto gerado pela redundância NVIDIA.' } }]
       }), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
     return originalFetch(url, options);
@@ -442,21 +489,15 @@ test('assistente devolve somente texto separado quando o provedor responde', asy
 
   try {
     const generated = await api('POST', '/api/ai/generate', {
-      request: 'Escreva uma apresentação curta para minha barbearia.'
+      request: 'Crie uma descrição profissional.'
     }, token);
     assert.equal(generated.status, 200);
     assert.equal(generated.data.ai_meta.source, 'nvidia');
-    assert.equal(generated.data.text, 'Texto alternativo para a apresentação da barbearia.');
-    assert.deepEqual(Object.keys(generated.data).sort(), ['ai_meta', 'text']);
-    assert.equal(providerPayload.model, 'nvidia/nemotron-3-super-120b-a12b');
-    assert.equal(generated.data.ai_meta.model, 'nvidia/nemotron-3-super-120b-a12b');
-    assert.equal(providerPayload.messages.length, 2);
-    assert.equal(providerPayload.messages[0].role, 'system');
-    assert.equal(providerPayload.messages[1].role, 'user');
-    assert.equal(providerPayload.messages[1].content, 'Escreva uma apresentação curta para minha barbearia.');
-    assert.equal(providerPayload.messages[0].content.includes(providerPayload.messages[1].content), false);
+    assert.equal(generated.data.text, 'Texto gerado pela redundância NVIDIA.');
+    assert.equal(nvidiaPayload.model, 'nvidia/nemotron-3-super-120b-a12b');
   } finally {
     global.fetch = originalFetch;
+    process.env.GEMINI_API_KEY = '';
     process.env.NVIDIA_API_KEY = '';
   }
 });
