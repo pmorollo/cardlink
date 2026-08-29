@@ -1,115 +1,126 @@
 # CardLink
 
-Aplicação SaaS para criação de sites profissionais rápidos para negócios e profissionais, com backend em Node/Express e frontend estático.
+Aplicação SaaS em Node.js/Express + PostgreSQL para criar e administrar uma apresentação profissional de negócios em um único link.
 
-## Como executar localmente
+Mensagem comercial atual:
 
-1. Instale dependências:
-   ```bash
-   npm install
-   cd backend
-   npm install
-   cd ..
-   ```
-2. Inicie o servidor:
-   ```bash
-   npm start
-   ```
-3. Abra no navegador:
-   ```
-   http://localhost:3000
-   ```
+> **Tudo o que seu cliente precisa ver antes de chamar você.**
 
-## Como compartilhar o aplicativo
+O CardLink reúne serviços, fotos, avaliações, localização, redes sociais e WhatsApp e pode ser compartilhado por link ou QR Code.
 
-- O produto público principal é o site profissional: `http://localhost:3000/site/<slug>`.
-- A rota compacta legada continua disponível em `http://localhost:3000/#card/<slug>` apenas como visualização complementar; ela não define o posicionamento comercial.
-- Para outras pessoas acessarem, é necessário hospedar o app em um servidor público ou usar um túnel como `ngrok`.
+## Execução local
 
-## Melhorias incluídas
+```bash
+npm install
+npm start
+```
 
-- `/` serve o frontend e `/api` serve a API backend.
-- Compartilhamento e QR Code direcionam para o site profissional completo.
-- Ação principal pelo WhatsApp e opção secundária para salvar o contato no celular (`.vcf`).
-- O login abre uma visão geral; o menu da conta reúne Configurações, Contatos, Minha conta e Sair.
-- As configurações públicas são separadas dos dados de login e organizadas por Perfil, Contato, Serviços, Imagens, Avaliações, Redes e Aparência.
-- O Assistente de conteúdo está oculto na versão comercial atual. O código foi preservado, mas a evolução de IA será tratada como subprojeto independente, sem bloquear a finalização do CardLink.
-- Não existe atendente de IA na página pública; o atendimento do visitante acontece pelo WhatsApp.
-- Seções sem conteúdo real ficam ocultas para visitantes, evitando produtos, imagens ou depoimentos demonstrativos.
-- Copiar link para área de transferência com fallback.
-- Suporte a `navigator.share` em dispositivos compatíveis.
+Abra `http://localhost:3000`.
+
+## Arquitetura atual
+
+- `frontend/` — SPA estática da landing, autenticação, painel, editor e página pública.
+- `backend/server.js` — servidor Express e rotas da API.
+- `backend/db/repository.js` — acesso a dados; PostgreSQL é o armazenamento indicado para produção.
+- `backend/routes/payments.js` — integração e eventos da Cakto.
+- `backend/routes/upload.js` — uploads autenticados com validação de extensão + MIME e limites anti-DoS.
+- `backend/utils/email.js` — e-mail transacional via Resend, com SMTP opcional.
+
+## Modelo de acesso
+
+- Não existe cadastro público gratuito antes da compra.
+- A conta comercial nasce após evento de pagamento aprovado da Cakto.
+- O comprador recebe um link de ativação, confirma o e-mail e define a própria senha.
+- Existe somente uma conta administrativa, sem assinatura e sem site público.
+- Contas internas de teste usam `subscription_source=internal_test`, não são vendas e também precisam ser ativadas pelo próprio usuário.
+- Cancelamento/estorno/chargeback pode suspender o acesso do cliente e a página pública sem exigir exclusão imediata dos dados.
+
+## Manutenção administrativa
+
+Criar ou regularizar o administrador exclusivo:
+
+```bash
+npm run admin:set -- email@exemplo.com SenhaCom8+ "Administrador"
+```
+
+Criar conta interna de teste e enviar o convite de ativação:
+
+```bash
+npm run test-user:create -- email@exemplo.com "Nome do teste"
+```
+
+A senha da conta de teste **não** deve ser definida pelo administrador; o usuário a cria pelo link recebido por e-mail.
 
 ## Testes
 
+Suite padrão:
+
 ```bash
-# Suite principal (armazenamento local JSON) — 7 testes + 1 skip do PG
-cd backend
 npm test
-
-# Teste de integração contra PostgreSQL real
-# (crie o banco antes: CREATE DATABASE cardlink_test;)
-DATABASE_URL=postgres://postgres@localhost:5433/cardlink_test node --test --test-concurrency=1 backend/test/pg.integration.test.js
-
-# Suite principal rodando contra PostgreSQL (dados compartilhados entre testes;
-# o banco deve estar limpo antes da execução)
-DATABASE_URL=postgres://postgres@localhost:5433/cardlink_test node --test --test-concurrency=1 backend/test/smoke.test.js
 ```
 
-Cobertura da suite principal: SPA servida, não exposição de `backend/.env`, CORS bloqueando origens estranhas, escalada de admin por e-mail, e o fluxo completo de recuperação de senha (com bloqueio de reuso/invalidação do código).
+Na homologação de fechamento de agosto de 2026, a suite descobriu 28 testes: 27 aprovados e 1 integração PostgreSQL ignorada quando `TEST_PG_URL` não é informada.
 
-O teste de integração (`pg.integration.test.js`) valida contra o PostgreSQL real: registro de admin e usuário comum, criação/atualização/exclusão de cartão, slug único, página pública (sem expor `user_id`/`views_count`), envio de contato público com anti-spam, listagem de contatos, stats, controle de acesso de admin, troca de plano e chamados de suporte. As tabelas são truncadas a cada execução.
-
-## Arquitetura de banco
-
-- `backend/db/repository.js` — repositório tipado e assíncrono (`users`, `cards`, `contacts`, `supportTickets`). Quando `DATABASE_URL` é um PostgreSQL válido, todas as operações vão para o banco (esquema criado automaticamente na inicialização). Se o PostgreSQL estiver indisponível, cai automaticamente no armazenamento local (memória/JSON) sem quebrar a API.
-- `backend/db/database.js` — camada de compatibilidade que exporta `query()` legado e o objeto `db` (usado pelos testes).
-- `backend/db/data.json` — armazenamento local de desenvolvimento.
-- Os novos endpoints/rotas devem usar `repository.*` (async/await) em vez do `query()` legado.
-
-## Deploy sugerido
-
-1. Use um serviço como Heroku, Render, Railway, Vercel (com backend separado) ou DigitalOcean App Platform.
-2. O backend já roda em Node com `npm start`.
-3. O `Procfile` está pronto para Heroku e o `Dockerfile` permite deploy containerizado.
-
-### Checklist obrigatório de produção
-
-Gere variáveis de ambiente fortes e NUNCA as deixe em repositórios:
+Para executar também a integração destrutiva contra PostgreSQL, use **somente um banco exclusivo de teste**:
 
 ```bash
-# Segredo do JWT — OBRIGATÓRIO (servidor não sobe em produção sem ele)
-JWT_SECRET=<gerar valor aleatório longo, ex: openssl rand -hex 64>
-NODE_ENV=production
-
-# E-mails autorizados como administradores (separados por vírgula)
-ADMIN_EMAILS=seu-email@dominio.com
-
-# CORS: liste os domínios do seu frontend (por padrão não aceita nada além de localhost)
-CORS_ORIGIN=https://seu-dominio.com
-
-# Banco de dados (opcional — sem ele o app usa backend/db/data.json local)
-DATABASE_URL=postgres://usuario:senha@host:5432/db
+TEST_PG_URL=postgres://usuario:senha@127.0.0.1:5432/cardlink_test npm test
 ```
 
-Pontos de atenção:
+O workflow `.github/workflows/tests.yml` cria um PostgreSQL temporário e executa a suite completa em pull requests e por acionamento manual.
 
-- **Recuperação de senha:** atualmente o código é gerado e registrado no **console do servidor** (retornado na API somente em desenvolvimento). Para produção, configure um serviço de e-mail (SMTP) para entregar o código ao usuário e remova o `console.log`.
-- **Uploads:** em produção é recomendado configurar o Cloudflare R2 (`R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `CLOUDFLARE_ACCOUNT_ID`, `R2_BUCKET`) — caso contrário as imagens vão para `backend/uploads/` (volátil em deploy efêmero).
-- **HTTPS**: habilite no serviço de hosting.
+Coberturas relevantes incluem: cadastro público bloqueado, isolamento admin/cliente, ativação pós-pagamento, conta interna de teste, cancelamento, verificação e troca de e-mail, recuperação de senha, CORS, proteção de segredos, contatos, mensagens administrativas, métricas e QR Code.
 
-## Docker
+Auditoria de dependências usada no fechamento:
 
-1. Construa a imagem:
-   ```bash
-   docker build -t cardlink .
-   ```
-2. Rode o container:
-   ```bash
-   docker run -p 3000:3000 --env-file .env cardlink
-   ```
+```bash
+npm audit --omit=dev --audit-level=high
+```
 
-## Observação
+## Variáveis importantes de produção
 
-- O app usa `backend/db/data.json` como banco local quando `DATABASE_URL` não é um PostgreSQL. Para produção com múltiplas instâncias, prefira PostgreSQL.
-- Os uploads de imagem são salvos em `backend/uploads`.
-- Em aplicações multi-instância o armazenamento local (JSON/uploads) deve ser substituído por serviços compartilhados.
+Nunca salve segredos no repositório.
+
+```bash
+NODE_ENV=production
+JWT_SECRET=<segredo longo e aleatório>
+DATABASE_URL=<postgresql de produção>
+CORS_ORIGIN=<origens autorizadas>
+PUBLIC_APP_URL=<url pública oficial>
+
+CAKTO_SECRET=<segredo do webhook>
+
+RESEND_API_KEY=<chave Resend>
+EMAIL_FROM=<remetente verificado>
+```
+
+Uploads podem usar armazenamento persistente local ou Cloudflare R2. Para R2:
+
+```bash
+CLOUDFLARE_ACCOUNT_ID=<id>
+R2_ACCESS_KEY_ID=<chave>
+R2_SECRET_ACCESS_KEY=<segredo>
+R2_BUCKET=<bucket>
+```
+
+O `JWT_SECRET` é obrigatório em produção. `PUBLIC_APP_URL`/`APP_URL` define a base usada nos links de ativação enviados por e-mail.
+
+## Segurança de uploads
+
+O projeto usa Multer 2.3.0, valida extensão e MIME de imagens e limita tamanho, quantidade de arquivos, campos e profundidade de campos multipart.
+
+## Assistente de conteúdo
+
+O código experimental de IA foi preservado, mas o Assistente está oculto da versão comercial atual e não integra a oferta da versão inicial. A evolução de IA é tratada em `docs/SUBPROJETO-IA-PARA-SAAS.md`.
+
+## Produção e abertura comercial
+
+A `master` é a referência da versão corrente. Antes de abrir vendas ao público:
+
+1. confirmar o domínio/deploy ativo no Railway e testar a landing publicada;
+2. concluir os testes reais pendentes do plano de homologação;
+3. realizar uma compra real separada pela Cakto e validar compra → webhook → e-mail → ativação;
+4. imediatamente antes da abertura pública, rotacionar o `CAKTO_SECRET`, atualizar Railway e Cakto e validar novamente o webhook;
+5. executar a auditoria final comercial conforme as premissas do **PLANO MESTRE DE OFERTAS E PUBLICIDADE**.
+
+Mais detalhes: `docs/README.md`, `docs/DIRETRIZES-PRODUTO-MARKETING.md` e `docs/PLANO-TESTE-SEMANA-1.md`.
