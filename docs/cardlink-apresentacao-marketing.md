@@ -1,166 +1,231 @@
-# CardLink — Apresentação para a Equipe de Marketing
+# CardLink — Apresentação para Marketing e Comercialização
 
-> **Objetivo:** orientar o plano de divulgação da landing page e do aplicativo CardLink, convertendo visitantes em **assinaturas pagas** através da plataforma de pagamento da **Cakto**.
+> **Objetivo:** orientar a divulgação da landing page e do aplicativo CardLink, convertendo visitantes em **assinaturas pagas** através da Cakto.
 >
-> **Produto:** o site profissional para colocar o seu negócio na internet em poucos minutos.
+> **Mensagem central aprovada:** **Tudo o que seu cliente precisa ver antes de chamar você.**
 
 ---
 
 ## 1. Visão Geral do Produto
 
-O **CardLink** coloca o seu negócio na internet por meio de um site profissional que você pode criar, publicar e atualizar. A página reúne apresentação do negócio, serviços ou produtos, fotos, avaliações, redes sociais e formas de contato — sem exigir conhecimento técnico ou um site convencional complexo.
+O **CardLink** organiza, em uma apresentação profissional única, as informações que ajudam um interessado a conhecer e avaliar um negócio antes de entrar em contato. Serviços, fotos, avaliações, localização, redes sociais e WhatsApp ficam reunidos em um endereço que pode ser compartilhado por link ou QR Code.
+
+O formato entregue ao assinante é um site profissional simples de administrar, mas **“ter um site” não é a razão central da compra**. O valor está em reduzir a dispersão das informações e facilitar o caminho entre descoberta, avaliação e contato.
 
 **Proposta de valor em uma frase:**
-> *"Seu negócio na internet em poucos minutos."*
+> **Tudo o que seu cliente precisa ver antes de chamar você.**
 
 **Definição comercial:**
-> *"Crie um site profissional para apresentar seu negócio, divulgar serviços, mostrar fotos, receber contatos e compartilhar tudo por link ou QR Code."*
+> **Reúna serviços, fotos, avaliações, localização, Instagram, Facebook e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.**
 
-**Missão:** simplificar a forma como autônomos, prestadores de serviços e pequenos negócios se apresentam e vendem no mundo digital — fortalecendo a economia e o comércio local.
+**Mecanismo comercial resumido:**
+> **Instagram · Facebook · QR Code → CardLink → WhatsApp**
+
+**Missão:** simplificar a forma como autônomos, prestadores de serviços e pequenos negócios organizam sua presença comercial e facilitam o contato com clientes.
 
 ---
 
-## 2. Público-Alvo
+## 2. Público-Alvo e Problema
 
-- Pequenos negócios e estabelecimentos locais (lojas, restaurantes, salões, barbearias, oficinas e clínicas)
-- Autônomos e profissionais liberais que divulgam serviços (advogados, designers, fotógrafos, corretores e terapeutas)
-- Prestadores de serviços (eletricistas, encanadores, técnicos e consultores)
-- Negócios que hoje dependem apenas de WhatsApp ou redes sociais e ainda não possuem uma página própria
+Públicos possíveis para validação:
 
-**Dor:** não ter um site profissional, simples de manter e acessível no celular do cliente na hora da decisão de compra.
-**Solução:** um site pronto para divulgar o negócio, acessível por link ou QR Code, com serviços, fotos, avaliações, mensagens e WhatsApp.
+- pequenos negócios e estabelecimentos locais;
+- autônomos e profissionais liberais;
+- prestadores de serviços;
+- negócios que já usam WhatsApp, Instagram ou Facebook, mas apresentam informações comerciais de forma dispersa.
+
+**Problema central:** o cliente potencial encontra o negócio em um canal, procura serviços ou provas em outro, precisa localizar endereço/contato em outro ponto e pode abandonar o caminho antes de chamar.
+
+**Solução:** oferecer uma apresentação única, fácil de compartilhar e atualizar, reunindo as informações comerciais relevantes e conduzindo o interessado ao contato.
 
 **Fora do foco inicial:** programas corporativos de cartões individuais para funcionários. Essa possibilidade não deve aparecer na comunicação principal.
 
+**Regra de especialização:** a landing institucional pode atender vários segmentos, mas anúncios e campanhas devem ser testados com mensagens e demonstrações adaptadas a nichos específicos antes de escalar investimento.
+
 ---
 
-## 3. Funcionalidades (para a copy da landing)
+## 3. Recursos e Benefícios
 
 | Recurso | Benefício para o cliente |
 |---|---|
-| **Link Compartilhável** | Um único link para bio do Instagram, assinatura de e-mail, QR code e WhatsApp |
-| **WhatsApp Integrado** | Cliente fala com você em um toque (botão direto + link de grupo) |
-| **Todas as Redes** | Instagram, Facebook, LinkedIn, TikTok, YouTube e X em um só lugar |
-| **Mensagens & Leads** | Clientes enviam mensagens pelo site; você gerencia os contatos no painel |
-| **6 Temas Premium** | Midnight, Ocean, Sunset, Forest, Rose e Monochrome |
-| **Tabela, Cardápio ou Serviços** | Envie sua arte pronta de preços/cardápio ou crie uma lista estruturada de produtos e serviços |
-| **Depoimentos & Avaliações** | Prova social que gera confiança antes do contato |
-| **Galeria de Fotos / Portfólio** | Mostre seu trabalho em imagens |
-| **Assistente de Conteúdo com IA** | Gera textos, descrições e sugestões de serviços em segundos |
-| **QR Code de Balcão + Métricas** | Cliente escaneia no balcão, abre o site profissional completo e os escaneamentos ficam registrados no painel |
-| **Página 100% Online** | Alterações de foto, preço e telefone aparecem imediatamente e permanecem disponíveis enquanto a assinatura estiver ativa |
+| **Link compartilhável** | Um endereço único para bio, mensagens, assinatura de e-mail e materiais promocionais |
+| **WhatsApp integrado** | O interessado chega ao contato em um toque |
+| **Redes sociais** | Instagram, Facebook, LinkedIn, TikTok, YouTube e X reunidos na apresentação |
+| **Mensagens e leads** | Visitantes podem enviar mensagens e o assinante acompanha os contatos recebidos |
+| **Temas visuais** | Aparência profissional adaptável ao negócio |
+| **Tabela, cardápio ou serviços** | Permite enviar uma arte pronta ou criar uma lista estruturada de produtos/serviços |
+| **Avaliações** | Ajuda a gerar confiança antes do contato |
+| **Galeria / portfólio** | Mostra trabalhos, ambiente, produtos ou resultados em imagens |
+| **Localização e contatos** | Centraliza informações práticas que o interessado precisa para decidir |
+| **QR Code de balcão + métricas** | Leva do ambiente físico à apresentação digital e registra os escaneamentos |
+| **Edição pelo assinante** | Informações podem ser atualizadas sem trocar o link ou o QR Code |
+
+O **Assistente de Conteúdo/IA não integra a oferta comercial da versão inicial**. Seu código experimental está preservado e a evolução de IA é tratada em subprojeto separado.
 
 ---
 
 ## 3.1. Demonstração visual na landing page
 
-- Remover completamente o vídeo atual.
-- Usar um carrossel com 4 ou 5 mockups/imagens demonstrativas.
-- Mostrar diferentes aplicações do CardLink, com textos curtos e imagens autoexplicativas.
-- Aprovar as imagens antes da implementação.
-- Garantir navegação por setas, indicadores e toque, com bom desempenho no celular.
+A landing utiliza um carrossel demonstrativo para mostrar o CardLink em situações reais de uso. A demonstração deve:
+
+- mostrar o caminho entre descoberta, apresentação e contato;
+- explicar visualmente por que o CardLink complementa WhatsApp, Instagram e Facebook em vez de tentar substituí-los;
+- exibir diferentes tipos de negócio sem inventar resultados;
+- usar textos curtos e imagens autoexplicativas;
+- manter navegação por setas, indicadores e toque, com bom desempenho no celular;
+- evoluir, após a homologação, para pelo menos um **CardLink real funcionando** como prova/demonstração.
+
+Não utilizar depoimentos, números de vendas ou resultados fictícios.
 
 ---
 
-## 4. Oferta & Preço
-
-**Plano único e completo — sem pegadinhas, sem limites ocultos.**
+## 4. Oferta e Preço
 
 | Plano | Valor |
 |---|---|
 | **Mensal** | **R$ 12,90 / mês** |
-| **Anual** | **R$ 99,00 / ano** (36% de economia) |
+| **Anual** | **R$ 99,00 / ano** (equivalente a R$ 8,25/mês) |
 
-**Garantias para o cliente:**
-- Sem taxa de adesão e sem mensalidade oculta
-- Sem multa de cancelamento — cancele quando quiser
-- Todos os recursos incluídos no plano único
+**Condições comunicadas:**
 
-**Como o cliente paga:**
-Pagamento processado pela **Cakto** (plataforma de pagamento):
-- **Pix:** 0% de taxa + R$ 2,49 por venda
-- **Cartão de crédito:** 4,99% + R$ 2,49 por venda
+- sem taxa de adesão;
+- cancelamento conforme as condições apresentadas pela Cakto;
+- os principais recursos da versão comercial estão incluídos na assinatura;
+- hospedagem da apresentação CardLink incluída enquanto a assinatura estiver ativa.
+
+O pagamento é processado pela **Cakto**. Taxas cobradas do produtor são informação operacional e devem ser verificadas no painel/contrato vigente da Cakto quando forem usadas em cálculos de margem; não devem ser tratadas como valor permanente neste documento.
 
 ---
 
-## 5. Funil de Conversão (como o visitante vira assinante)
+## 5. Funil de Conversão
 
-```
-Visitante
-   │
-   ▼
-Landing page + demonstrações reais
-   │
-   ▼
-Escolha da assinatura Mensal ou Anual
-   │
-   ▼
-Checkout da Cakto
-   │
-   ▼
+```text
+Pessoa encontra o CardLink ou um anúncio
+        │
+        ▼
+Landing + demonstração
+        │
+        ▼
+Entende a proposta e escolhe mensal ou anual
+        │
+        ▼
+Checkout Cakto
+        │
+        ▼
 Pagamento aprovado
-   │
-   ▼
-Webhook Cakto → CardLink registra/libera a conta
-   │
-   ▼
-Cliente ativa/acessa sua conta
-   │
-   ▼
-Painel completo + criação/publicação do CardLink + QR Code
+        │
+        ▼
+Webhook confirmado pelo backend
+        │
+        ▼
+Conta pendente + e-mail de ativação
+        │
+        ▼
+Cliente confirma e-mail e define a própria senha
+        │
+        ▼
+Monta e publica seu CardLink
+        │
+        ▼
+Compartilha link / QR → recebe contatos
 ```
 
-**Regra comercial:** não existe conta gratuita sem utilidade. A conta de cliente está vinculada a uma assinatura válida. O administrador é uma conta operacional separada, sem site publicado e sem assinatura.
+**Regra de segurança:** a página de retorno do navegador não prova pagamento. A liberação da conta depende do estado confirmado pelo backend a partir da integração de pagamento.
 
-**Pontos-chave para o marketing:**
-- A landing page e os sites demonstrativos devem mostrar o valor antes da compra.
-- O pagamento precede o acesso normal do cliente ao produto.
-- A criação da conta deve ser automática após a confirmação do pagamento pela Cakto; o cliente conclui a ativação definindo sua senha pelo link enviado por e-mail.
-- O CardLink deve ser apresentado diretamente como **o site profissional para colocar o seu negócio na internet em poucos minutos**.
-- Link e QR Code são canais de compartilhamento do site, não a definição do produto.
-- Evitar as expressões “cartão digital”, “cartão de visita”, “mini-site que evolui” e “produto híbrido” na comunicação comercial.
-- Priorizar a promessa de rapidez: o negócio pode estar na web em poucos minutos.
+**Regra comercial:** não existe cadastro público gratuito antes da compra. A conta administrativa é separada das contas de clientes e contas internas de teste não entram nas métricas de vendas.
 
----
+### O que o marketing deve comunicar
 
-## 6. Canais de Divulgação (sugestões)
-
-1. **QR code físico no balcão** (piloto Jundiaí/Várzea) — cliente escaneia e já fala no WhatsApp.
-2. **Redes sociais:** Instagram, TikTok e YouTube com demonstrações curtas ("coloquei meu negócio na internet em poucos minutos").
-3. **WhatsApp Business / listas de transmissão** para parceiros locais.
-4. **Parcerias locais:** barbearias, salões, clínicas e comércios como vitrine de exemplo.
-5. **Prova social:** usar um site demonstrativo de negócio como demonstração real.
+- O CardLink **não substitui** WhatsApp, Instagram ou Facebook; ele organiza esses canais e as informações comerciais em uma apresentação única.
+- O principal resultado prometido é facilitar o caminho até o contato.
+- Link e QR Code são mecanismos de distribuição, não a definição completa do produto.
+- O formato “site profissional” pode ser explicado, mas não deve reduzir a oferta a “mais um criador de sites”.
+- Evitar “cartão digital”, “cartão de visita” e promessas absolutas ou não verificáveis.
 
 ---
 
-## 7. Métricas para Acompanhar (via Cakto)
+## 6. Estratégia de Divulgação Inicial
 
-- **MRR** (Receita Mensal Recorrente) — assinaturas ativas × valor mensal
-- **LTV** (Valor do Tempo de Vida do cliente)
-- **Churn** (taxa de cancelamento)
-- Pedidos aprovados e valor de saldo
-- Escaneamentos de QR code (no painel do CardLink)
+A divulgação deve começar por validação, não por escala imediata.
 
----
+1. **Demonstração real:** usar CardLinks reais já homologados como prova do produto.
+2. **Testes por nicho:** comparar 2 ou 3 segmentos com dores claras e adaptar criativo/exemplo sem alterar o aplicativo central.
+3. **Meta Ads:** indicado para testar criativos visuais e ofertas por segmento quando o rastreamento estiver configurado.
+4. **WhatsApp e relacionamento local:** apresentar demonstrações a negócios e parceiros e registrar objeções/reação à oferta.
+5. **Parcerias locais:** obter primeiros casos reais e autorização para uso como demonstração/prova.
+6. **Conteúdo orgânico:** demonstrar “antes → CardLink → contato”, evitando posts genéricos sobre lista de funcionalidades.
 
-## 8. Decisão Estratégica Pendente
-
-**Vitrine de Afiliados na Cakto** — ainda **em aberto**:
-- A Cakto permite listar o produto na Vitrine para afiliados, que vendem e recebem **comissão automática** (split por venda aprovada, Pix na hora).
-- **Pró:** alcance maior e vendas por terceiros sem trabalho operacional.
-- **Contra:** margem reduzida por venda (comissão do afiliado) e necessidade de configurar regras.
-
-**Status:** decisão pendente — não considerar como canal ativo no plano até a definição.
+Campanhas pagas só devem ganhar orçamento após confirmação de rastreamento, conversão e custo de aquisição aceitável.
 
 ---
 
-## 9. Anexos (links úteis)
+## 7. Métricas do Funil
+
+Medir, sempre que tecnicamente possível:
+
+- visitas à landing;
+- clique em **Assinar CardLink**;
+- início de checkout;
+- compra aprovada;
+- ativação da conta;
+- primeiro CardLink publicado;
+- QR Codes escaneados;
+- contatos recebidos;
+- conversão landing → compra;
+- conversão compra → ativação;
+- CAC (custo de aquisição);
+- MRR/receita recorrente;
+- churn/cancelamentos;
+- LTV/duração e valor do cliente;
+- volume de suporte necessário por assinante.
+
+Contas internas de teste devem permanecer excluídas das métricas comerciais.
+
+---
+
+## 8. Afiliados
+
+A utilização de afiliados via Cakto permanece **adiada**. Não considerar esse canal como ativo no lançamento inicial.
+
+Primeiro devemos validar:
+
+- oferta;
+- conversão da landing;
+- onboarding;
+- retenção inicial;
+- margem real;
+- capacidade de suporte.
+
+Somente depois disso faz sentido avaliar comissão e abertura para terceiros.
+
+---
+
+## 9. Plano Mestre de Ofertas e Publicidade
+
+O **PLANO MESTRE DE OFERTAS E PUBLICIDADE** é uma referência geral para todos os projetos e **não é um plano específico do CardLink**.
+
+Neste projeto, suas premissas devem orientar a revisão da oferta, da landing, dos criativos, dos canais e das métricas. Na auditoria final antes da comercialização, verificar especialmente:
+
+- clareza da transformação/resultado;
+- público e situação de uso;
+- mecanismo/diferencial;
+- prova e demonstração;
+- percepção de valor e preço;
+- objeções e redução de risco;
+- coerência entre anúncio, landing, checkout e produto;
+- mensuração do funil.
+
+O planejamento próprio do CardLink continua sendo o documento operacional do projeto.
+
+---
+
+## 10. Links Operacionais
 
 | Item | Link |
 |---|---|
-| **Landing page oficial** | `https://cardlink-production-abd2.up.railway.app/` |
+| **Landing documentada** | `https://cardlink-production-abd2.up.railway.app/` |
 | **Checkout mensal (R$ 12,90)** | `https://pay.cakto.com.br/kawb7xd_1032085` |
 | **Checkout anual (R$ 99,00)** | `https://pay.cakto.com.br/3fjp83k_1032077` |
-| Painel Cakto (gestão/afiliados) | `https://app.cakto.com.br` |
+| Painel Cakto | `https://app.cakto.com.br` |
 
-> **Nota:** domínio atual é provisório do Railway. Quando houver domínio próprio, o link de divulgação será atualizado.
+> **Obrigatório antes da abertura comercial:** confirmar no Railway o domínio realmente ativo, testar os dois checkouts e atualizar este quadro se qualquer URL tiver mudado.
