@@ -194,3 +194,23 @@ Avançar para o segundo usuário interno somente se:
 - uploads estiverem estáveis;
 - suporte e mensagens administrativas estiverem operacionais;
 - não houver erro crítico ou risco de mistura de dados.
+
+## Auditoria de fechamento — 28/08/2026
+
+### Concluído no código e documentação
+- Landing alinhada à oferta aprovada: **“Tudo o que seu cliente precisa ver antes de chamar você.”**
+- Mecanismo comercial destacado: **Instagram · Facebook · QR Code → CardLink → WhatsApp**.
+- Assistente de conteúdo mantido oculto e retirado da oferta comercial da versão inicial.
+- Manual, modal de assinatura, Termos de Uso e Política de Privacidade revisados para o modelo pago atual, sem plano grátis/PRO legado.
+- `PLANO MESTRE DE OFERTAS E PUBLICIDADE` registrado como referência transversal obrigatória para a auditoria comercial final.
+- Multer atualizado para 2.3.0 e uploads endurecidos com limites de tamanho, arquivo, campos e profundidade.
+- Homologação automatizada após a atualização de segurança: **27 testes aprovados, 0 falhas e 1 teste PostgreSQL ignorado quando `TEST_PG_URL` não é informado**; `npm audit --omit=dev --audit-level=high` retornou **0 vulnerabilidades**.
+
+### Portões restantes para abertura comercial
+1. **Domínio/deploy:** confirmar no Railway qual é o domínio público ativo e verificar visualmente que ele serve o commit atual da `master`. O endereço histórico `cardlink-production.up.railway.app` não deve ser divulgado.
+2. **WhatsApp real:** concluir o teste de visitante preenchendo somente WhatsApp e validar que o assinante recebe o contato e abre o número correto para responder.
+3. **Compra real Cakto:** imediatamente antes da abertura pública, rotacionar `CAKTO_SECRET`, atualizar Railway + Cakto e realizar uma compra real com conta separada, validando `checkout → purchase_approved → conta pendente → e-mail → senha → login → publicação`.
+4. **Tráfego pago:** configurar e validar mensuração do funil antes de investir em anúncios. Isso não impede homologação técnica nem testes orgânicos, mas é requisito antes de comprar tráfego.
+
+Cumpridos os itens 1–3 sem erro crítico, a versão inicial pode ser considerada tecnicamente homologada para distribuição controlada. O item 4 deve estar concluído antes do início de mídia paga.
+
