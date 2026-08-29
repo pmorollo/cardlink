@@ -33,7 +33,7 @@ Aplicação SaaS para criação de sites profissionais rápidos para negócios e
 - Ação principal pelo WhatsApp e opção secundária para salvar o contato no celular (`.vcf`).
 - O login abre uma visão geral; o menu da conta reúne Configurações, Contatos, Minha conta e Sair.
 - As configurações públicas são separadas dos dados de login e organizadas por Perfil, Contato, Serviços, Imagens, Avaliações, Redes e Aparência.
-- A IA é exclusiva da área autenticada, com o nome Assistente de conteúdo, e devolve apenas texto para cópia manual; nunca altera campos do site.
+- O Assistente de conteúdo está oculto na versão comercial atual. O código foi preservado, mas a evolução de IA será tratada como subprojeto independente, sem bloquear a finalização do CardLink.
 - Não existe atendente de IA na página pública; o atendimento do visitante acontece pelo WhatsApp.
 - Seções sem conteúdo real ficam ocultas para visitantes, evitando produtos, imagens ou depoimentos demonstrativos.
 - Copiar link para área de transferência com fallback.
