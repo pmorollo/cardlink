@@ -1,3 +1,4 @@
+# trigger: 2026-08-28
 name: Apply approved CardLink commercial copy
 
 on:
@@ -28,7 +29,6 @@ jobs:
                   raise SystemExit(f'Expected text not found: {label}')
               return text.replace(old, new, 1)
 
-          # Landing page
           p = Path('frontend/index.html')
           s = p.read_text(encoding='utf-8')
           s = replace_once(s,
@@ -81,7 +81,6 @@ jobs:
               'final CTA')
           p.write_text(s, encoding='utf-8')
 
-          # Official product/marketing directions
           p = Path('docs/DIRETRIZES-PRODUTO-MARKETING.md')
           s = p.read_text(encoding='utf-8')
           s = s.replace('**Atualizado em:** 26/08/2026', '**Atualizado em:** 28/08/2026', 1)
@@ -93,10 +92,7 @@ jobs:
               '> Crie um site profissional para apresentar seu negócio, divulgar serviços, mostrar fotos, receber contatos e compartilhar tudo por link ou QR Code.',
               '> Reúna serviços, fotos, avaliações, localização, Instagram, Facebook e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.',
               'official commercial definition')
-          s = replace_once(s,
-              '- Assistente de conteúdo com IA.\n',
-              '',
-              'AI differential')
+          s = replace_once(s, '- Assistente de conteúdo com IA.\n', '', 'AI differential')
           s = replace_once(s,
               '## 8. Consequência para vendas e marketing\n\nA comunicação deve vender um resultado objetivo: **colocar o negócio do cliente na internet em poucos minutos**.',
               '## 8. Consequência para vendas e marketing\n\nA comunicação deve vender um resultado objetivo: **organizar em uma apresentação profissional tudo o que o cliente precisa ver antes de entrar em contato**, reduzindo o caminho entre descoberta, avaliação e conversa pelo WhatsApp ou outro canal.',
@@ -107,7 +103,6 @@ jobs:
               'master plan rule')
           p.write_text(s, encoding='utf-8')
 
-          # Planned improvements: update the approved commercial promise while preserving the rest
           p = Path('docs/MELHORIAS-PREVISTAS.md')
           s = p.read_text(encoding='utf-8')
           s = s.replace('**Atualizado em:** 26/08/2026', '**Atualizado em:** 28/08/2026', 1)
