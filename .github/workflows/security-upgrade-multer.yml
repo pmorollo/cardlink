@@ -1,4 +1,4 @@
-# trigger: 2026-08-28
+# trigger: 2026-08-28-v2
 name: Security upgrade Multer
 
 on:
@@ -25,11 +25,11 @@ jobs:
           cache: 'npm'
 
       - name: Upgrade Multer in root package
-        run: npm install multer@^2.2.0 --save --package-lock-only
+        run: npm install multer@2.3.0 --save --package-lock-only
 
       - name: Upgrade Multer in backend package
         working-directory: backend
-        run: npm install multer@^2.2.0 --save --package-lock-only
+        run: npm install multer@2.3.0 --save --package-lock-only
 
       - name: Harden upload limits
         run: |
@@ -56,7 +56,7 @@ jobs:
         run: npm audit --omit=dev --audit-level=high
 
       - name: Validate Multer version
-        run: node -e "const v=require('multer/package.json').version; if(v!=='2.2.0') throw new Error('Expected multer 2.2.0, got '+v); console.log('multer',v)"
+        run: node -e "const v=require('multer/package.json').version; if(v!=='2.3.0') throw new Error('Expected multer 2.3.0, got '+v); console.log('multer',v)"
 
       - name: Commit security update
         run: |
@@ -64,5 +64,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add package.json package-lock.json backend/package.json backend/package-lock.json backend/routes/upload.js
           git diff --cached --quiet && exit 0
-          git commit -m "security: atualizar Multer para 2.2.0 e endurecer uploads"
+          git commit -m "security: atualizar Multer para 2.3.0 e endurecer uploads"
           git push origin master
