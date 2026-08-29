@@ -59,7 +59,7 @@ const storage = isR2Configured() && S3Client
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 5, fieldNestingDepth: 1 }, // 5MB + limites anti-DoS
   fileFilter: (req, file, cb) => {
     if (safeImageExtension(file)) {
       return cb(null, true);
