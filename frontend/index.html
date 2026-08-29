@@ -488,13 +488,13 @@
               <button class="settings-nav-item" type="button" data-settings-target="testimonials" onclick="showSettingsSection('testimonials')">Avaliações de clientes</button>
               <button class="settings-nav-item" type="button" data-settings-target="social" onclick="showSettingsSection('social')">Redes sociais</button>
               <button class="settings-nav-item" type="button" data-settings-target="appearance" onclick="showSettingsSection('appearance')">Aparência do site</button>
-              <button class="settings-nav-item" type="button" data-settings-target="assistant" onclick="showSettingsSection('assistant')">Assistente de conteúdo</button>
+              <button class="settings-nav-item" type="button" data-settings-target="assistant" onclick="showSettingsSection('assistant')" hidden aria-hidden="true">Assistente de conteúdo</button>
             </nav>
             <button class="settings-nav-arrow" id="settings-nav-next" type="button" onclick="scrollSettingsNav(1)" aria-label="Ver mais opções">›</button>
           </div>
 
           <!-- Assistente de conteúdo: resposta separada para cópia manual -->
-          <div class="form-section settings-section assistant-workspace" data-settings-section="assistant">
+          <div class="form-section settings-section assistant-workspace" data-settings-section="assistant" hidden aria-hidden="true">
             <div class="form-section-title"><span class="icon">✦</span> Assistente de conteúdo</div>
             <p class="assistant-intro">Descreva o texto que você precisa ou cole um texto para receber uma versão alternativa. A resposta não altera nenhum campo do seu site.</p>
             <div class="assistant-examples">
@@ -1153,7 +1153,7 @@
           </ul>
         </div>
 
-        <div>
+        <div hidden aria-hidden="true">
           <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🤖</span> Passo 4: Usando a Inteligência Artificial</h3>
           <p style="margin:0;">Tem dificuldades para escrever? Abra a aba “Assistente de conteúdo” e diga o que precisa. Você também pode usar “Colar texto” para inserir um conteúdo existente e pedir uma versão melhor. A resposta aparecerá separadamente: confira, clique em “Copiar texto” e cole manualmente no campo desejado. O Assistente nunca altera ou salva seu site.</p>
         </div>
