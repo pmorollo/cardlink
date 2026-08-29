@@ -1,4 +1,4 @@
-# trigger: 2026-08-28
+# trigger: 2026-08-28-v2
 name: Apply approved CardLink commercial copy
 
 on:
@@ -24,97 +24,55 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          def replace_once(text, old, new, label):
-              if old not in text:
-                  raise SystemExit(f'Expected text not found: {label}')
-              return text.replace(old, new, 1)
+          def apply(path, replacements):
+              p = Path(path)
+              s = p.read_text(encoding='utf-8')
+              for old, new in replacements:
+                  s = s.replace(old, new, 1)
+              p.write_text(s, encoding='utf-8')
 
-          p = Path('frontend/index.html')
-          s = p.read_text(encoding='utf-8')
-          s = replace_once(s,
-              '  <meta name="description" content="CardLink — Coloque o seu negócio na internet em poucos minutos. Crie um site profissional, compartilhe o link e receba contatos pelo WhatsApp.">',
-              '  <meta name="description" content="CardLink — Reúna serviços, fotos, avaliações, localização, redes sociais e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.">',
-              'meta description')
-          s = replace_once(s,
-              '  <title>CardLink — Seu negócio na internet em poucos minutos</title>',
-              '  <title>CardLink — Tudo o que seu cliente precisa ver antes de chamar você</title>',
-              'title')
-          s = replace_once(s,
-              '''        <h1>\n          Seu <span class="text-gradient">negócio na internet</span><br>em poucos minutos\n        </h1>\n        <p>\n          Crie um site profissional para apresentar seu negócio, divulgar serviços, mostrar fotos e receber contatos. \n          Compartilhe por link ou QR Code.\n        </p>''',
-              '''        <h1>\n          Tudo o que seu cliente precisa ver<br><span class="text-gradient">antes de chamar você.</span>\n        </h1>\n        <p>\n          Reúna serviços, fotos, avaliações, localização, Instagram, Facebook e WhatsApp em uma apresentação profissional.\n          Compartilhe por um único link ou QR Code.\n        </p>''',
-              'hero')
-          s = replace_once(s,
-              '''        </div>\n\n        <!-- Carrossel demonstrativo -->''',
-              '''        </div>\n        <p style="margin:18px auto 0;color:var(--text-muted);font-size:0.95rem;font-weight:700;letter-spacing:0.01em;">Instagram · Facebook · QR Code → CardLink → WhatsApp</p>\n\n        <!-- Carrossel demonstrativo -->''',
-              'hero flow')
-          s = replace_once(s,
-              '            <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Veja como o CardLink coloca o seu negócio na internet</h3>',
-              '            <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Veja como o CardLink organiza sua apresentação e facilita o contato</h3>',
-              'demo heading')
-          s = replace_once(s,
-              '<div class="landing-carousel-copy"><h4>Seu negócio na internet em poucos minutos</h4><p>Apresente sua empresa com uma presença profissional e acessível.</p></div>',
-              '<div class="landing-carousel-copy"><h4>Tudo o que seu cliente precisa ver</h4><p>Organize as informações que ajudam o cliente a conhecer seu negócio antes do contato.</p></div>',
-              'carousel slide 1')
-          s = replace_once(s,
-              '          <p>Seu site profissional completo, pronto para divulgar em qualquer lugar.</p>',
-              '          <p>Organize sua presença comercial em um único endereço e facilite o caminho até o contato.</p>',
-              'features intro')
-          s = replace_once(s,
-              '              O CardLink é o site profissional para colocar o seu negócio na internet em poucos minutos. Em um link exclusivo, você pode apresentar seu negócio, divulgar produtos e serviços, mostrar fotos e avaliações e receber contatos pelo WhatsApp.',
-              '              O CardLink reúne em uma apresentação profissional as informações que seu cliente precisa antes do contato: serviços, fotos, avaliações, localização, redes sociais e WhatsApp. Você compartilha tudo por um único link ou QR Code e pode atualizar as informações quando quiser.',
-              'faq definition')
-          s = replace_once(s,
-              '          <p style="color:var(--text-secondary);">Sem pegadinhas ou limites ocultos. Crie seu site e use todos os recursos.</p>',
-              '          <p style="color:var(--text-secondary);">Os principais recursos do CardLink estão incluídos na assinatura.</p>',
-              'pricing copy')
-          s = replace_once(s,
-              '''          <div style="position:absolute;top:15px;right:-35px;background:var(--purple);color:#ffffff;font-size:0.68rem;font-weight:bold;padding:4px 35px;transform:rotate(45deg);letter-spacing:0.05em;text-transform:uppercase;">\n            Popular\n          </div>\n\n''',
-              '',
-              'popular ribbon')
-          s = replace_once(s,
-              '            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Assistente de Conteúdo com IA</span></li>\n',
-              '',
-              'AI pricing bullet')
-          s = replace_once(s,
-              '          <h2>Pronto para colocar seu <span class="text-gradient">negócio na internet</span>?</h2>\n          <p>Escolha o plano mensal por R$ 12,90 ou anual por R$ 99,00. Após a confirmação do pagamento, você recebe o acesso para criar e publicar seu site profissional.</p>',
-              '          <h2>Pronto para reunir tudo em <span class="text-gradient">um único lugar</span>?</h2>\n          <p>Escolha o plano mensal por R$ 12,90 ou anual por R$ 99,00. Após a confirmação do pagamento, você recebe o acesso para montar sua apresentação profissional e compartilhar por link ou QR Code.</p>',
-              'final CTA')
-          p.write_text(s, encoding='utf-8')
+          apply('frontend/index.html', [
+            ('  <meta name="description" content="CardLink — Coloque o seu negócio na internet em poucos minutos. Crie um site profissional, compartilhe o link e receba contatos pelo WhatsApp.">',
+             '  <meta name="description" content="CardLink — Reúna serviços, fotos, avaliações, localização, redes sociais e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.">'),
+            ('  <title>CardLink — Seu negócio na internet em poucos minutos</title>',
+             '  <title>CardLink — Tudo o que seu cliente precisa ver antes de chamar você</title>'),
+            ('''        <h1>\n          Seu <span class="text-gradient">negócio na internet</span><br>em poucos minutos\n        </h1>\n        <p>\n          Crie um site profissional para apresentar seu negócio, divulgar serviços, mostrar fotos e receber contatos. \n          Compartilhe por link ou QR Code.\n        </p>''',
+             '''        <h1>\n          Tudo o que seu cliente precisa ver<br><span class="text-gradient">antes de chamar você.</span>\n        </h1>\n        <p>\n          Reúna serviços, fotos, avaliações, localização, Instagram, Facebook e WhatsApp em uma apresentação profissional.\n          Compartilhe por um único link ou QR Code.\n        </p>'''),
+            ('''        </div>\n\n        <!-- Carrossel demonstrativo -->''',
+             '''        </div>\n        <p style="margin:18px auto 0;color:var(--text-muted);font-size:0.95rem;font-weight:700;letter-spacing:0.01em;">Instagram · Facebook · QR Code → CardLink → WhatsApp</p>\n\n        <!-- Carrossel demonstrativo -->'''),
+            ('Veja como o CardLink coloca o seu negócio na internet', 'Veja como o CardLink organiza sua apresentação e facilita o contato'),
+            ('<div class="landing-carousel-copy"><h4>Seu negócio na internet em poucos minutos</h4><p>Apresente sua empresa com uma presença profissional e acessível.</p></div>',
+             '<div class="landing-carousel-copy"><h4>Tudo o que seu cliente precisa ver</h4><p>Organize as informações que ajudam o cliente a conhecer seu negócio antes do contato.</p></div>'),
+            ('          <p>Seu site profissional completo, pronto para divulgar em qualquer lugar.</p>',
+             '          <p>Organize sua presença comercial em um único endereço e facilite o caminho até o contato.</p>'),
+            ('              O CardLink é o site profissional para colocar o seu negócio na internet em poucos minutos. Em um link exclusivo, você pode apresentar seu negócio, divulgar produtos e serviços, mostrar fotos e avaliações e receber contatos pelo WhatsApp.',
+             '              O CardLink reúne em uma apresentação profissional as informações que seu cliente precisa antes do contato: serviços, fotos, avaliações, localização, redes sociais e WhatsApp. Você compartilha tudo por um único link ou QR Code e pode atualizar as informações quando quiser.'),
+            ('          <p style="color:var(--text-secondary);">Sem pegadinhas ou limites ocultos. Crie seu site e use todos os recursos.</p>',
+             '          <p style="color:var(--text-secondary);">Os principais recursos do CardLink estão incluídos na assinatura.</p>'),
+            ('''          <div style="position:absolute;top:15px;right:-35px;background:var(--purple);color:#ffffff;font-size:0.68rem;font-weight:bold;padding:4px 35px;transform:rotate(45deg);letter-spacing:0.05em;text-transform:uppercase;">\n            Popular\n          </div>\n\n''', ''),
+            ('            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Assistente de Conteúdo com IA</span></li>\n', ''),
+            ('          <h2>Pronto para colocar seu <span class="text-gradient">negócio na internet</span>?</h2>\n          <p>Escolha o plano mensal por R$ 12,90 ou anual por R$ 99,00. Após a confirmação do pagamento, você recebe o acesso para criar e publicar seu site profissional.</p>',
+             '          <h2>Pronto para reunir tudo em <span class="text-gradient">um único lugar</span>?</h2>\n          <p>Escolha o plano mensal por R$ 12,90 ou anual por R$ 99,00. Após a confirmação do pagamento, você recebe o acesso para montar sua apresentação profissional e compartilhar por link ou QR Code.</p>'),
+          ])
 
-          p = Path('docs/DIRETRIZES-PRODUTO-MARKETING.md')
-          s = p.read_text(encoding='utf-8')
-          s = s.replace('**Atualizado em:** 26/08/2026', '**Atualizado em:** 28/08/2026', 1)
-          s = replace_once(s,
-              '> **CardLink — Seu negócio na internet em poucos minutos.**',
-              '> **Tudo o que seu cliente precisa ver antes de chamar você.**',
-              'official central promise')
-          s = replace_once(s,
-              '> Crie um site profissional para apresentar seu negócio, divulgar serviços, mostrar fotos, receber contatos e compartilhar tudo por link ou QR Code.',
-              '> Reúna serviços, fotos, avaliações, localização, Instagram, Facebook e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.',
-              'official commercial definition')
-          s = replace_once(s, '- Assistente de conteúdo com IA.\n', '', 'AI differential')
-          s = replace_once(s,
-              '## 8. Consequência para vendas e marketing\n\nA comunicação deve vender um resultado objetivo: **colocar o negócio do cliente na internet em poucos minutos**.',
-              '## 8. Consequência para vendas e marketing\n\nA comunicação deve vender um resultado objetivo: **organizar em uma apresentação profissional tudo o que o cliente precisa ver antes de entrar em contato**, reduzindo o caminho entre descoberta, avaliação e conversa pelo WhatsApp ou outro canal.',
-              'marketing consequence')
-          s = replace_once(s,
-              'Estas diretrizes serão a base para o futuro **Plano de Vendas e Marketing do CardLink**.',
-              '''### 8.1. Referência obrigatória do Plano Mestre\n\nO **PLANO MESTRE DE OFERTAS E PUBLICIDADE** é um documento geral e transversal, não um plano específico do CardLink. Ele deverá orientar a elaboração e a revisão dos documentos comerciais deste projeto. Na auditoria final antes da comercialização, a oferta, o posicionamento, a percepção de valor, o preço, os diferenciais, os criativos, o funil e a capacidade de conversão do CardLink deverão ser confrontados com as premissas do Plano Mestre.\n\nO planejamento próprio do CardLink permanece como documento operacional do projeto; não é necessário criar um plano comercial paralelo apenas para repetir essas decisões.''',
-              'master plan rule')
-          p.write_text(s, encoding='utf-8')
+          apply('docs/DIRETRIZES-PRODUTO-MARKETING.md', [
+            ('**Atualizado em:** 26/08/2026', '**Atualizado em:** 28/08/2026'),
+            ('> **CardLink — Seu negócio na internet em poucos minutos.**', '> **Tudo o que seu cliente precisa ver antes de chamar você.**'),
+            ('> Crie um site profissional para apresentar seu negócio, divulgar serviços, mostrar fotos, receber contatos e compartilhar tudo por link ou QR Code.',
+             '> Reúna serviços, fotos, avaliações, localização, Instagram, Facebook e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.'),
+            ('- Assistente de conteúdo com IA.\n', ''),
+            ('## 8. Consequência para vendas e marketing\n\nA comunicação deve vender um resultado objetivo: **colocar o negócio do cliente na internet em poucos minutos**.',
+             '## 8. Consequência para vendas e marketing\n\nA comunicação deve vender um resultado objetivo: **organizar em uma apresentação profissional tudo o que o cliente precisa ver antes de entrar em contato**, reduzindo o caminho entre descoberta, avaliação e conversa pelo WhatsApp ou outro canal.'),
+            ('Estas diretrizes serão a base para o futuro **Plano de Vendas e Marketing do CardLink**.',
+             '''### 8.1. Referência obrigatória do Plano Mestre\n\nO **PLANO MESTRE DE OFERTAS E PUBLICIDADE** é um documento geral e transversal, não um plano específico do CardLink. Ele orienta a elaboração e a revisão dos documentos comerciais deste projeto. Na auditoria final antes da comercialização, oferta, posicionamento, percepção de valor, preço, diferenciais, criativos, funil e capacidade de conversão do CardLink deverão ser confrontados com as premissas do Plano Mestre.\n\nO planejamento próprio do CardLink permanece como documento operacional do projeto; não é necessário criar um plano comercial paralelo apenas para repetir essas decisões.'''),
+          ])
 
-          p = Path('docs/MELHORIAS-PREVISTAS.md')
-          s = p.read_text(encoding='utf-8')
-          s = s.replace('**Atualizado em:** 26/08/2026', '**Atualizado em:** 28/08/2026', 1)
-          s = replace_once(s,
-              '> **Seu negócio na internet em poucos minutos.**',
-              '> **Tudo o que seu cliente precisa ver antes de chamar você.**',
-              'planned promise')
-          s = replace_once(s,
-              'O carrossel deverá reforçar a definição **“CardLink — Seu negócio na internet em poucos minutos”** e não poderá voltar a apresentar o produto como cartão digital.',
-              'O carrossel deverá reforçar a oferta **“Tudo o que seu cliente precisa ver antes de chamar você”**, mostrando o caminho entre descoberta, apresentação e contato, e não poderá voltar a apresentar o produto como cartão digital.',
-              'carousel alignment')
-          p.write_text(s, encoding='utf-8')
+          apply('docs/MELHORIAS-PREVISTAS.md', [
+            ('**Atualizado em:** 26/08/2026', '**Atualizado em:** 28/08/2026'),
+            ('> **Seu negócio na internet em poucos minutos.**', '> **Tudo o que seu cliente precisa ver antes de chamar você.**'),
+            ('O carrossel deverá reforçar a definição **“CardLink — Seu negócio na internet em poucos minutos”** e não poderá voltar a apresentar o produto como cartão digital.',
+             'O carrossel deverá reforçar a oferta **“Tudo o que seu cliente precisa ver antes de chamar você”**, mostrando o caminho entre descoberta, apresentação e contato, e não poderá voltar a apresentar o produto como cartão digital.'),
+          ])
           PY
 
       - name: Validate expected changes
