@@ -1,6 +1,6 @@
 # CardLink — Melhorias Previstas
 
-**Atualizado em:** 26/08/2026
+**Atualizado em:** 28/08/2026
 
 Este documento reúne melhorias aprovadas conceitualmente, mas que não devem desviar a Semana 1 do objetivo principal: testar o produto em uso real.
 
@@ -12,7 +12,7 @@ Este documento reúne melhorias aprovadas conceitualmente, mas que não devem de
 
 Promessa central:
 
-> **Seu negócio na internet em poucos minutos.**
+> **Tudo o que seu cliente precisa ver antes de chamar você.**
 
 Ajustes previstos, sempre em etapas curtas:
 

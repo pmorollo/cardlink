@@ -1,6 +1,6 @@
 # CardLink — Diretrizes Oficiais de Produto e Marketing
 
-**Atualizado em:** 26/08/2026
+**Atualizado em:** 28/08/2026
 
 Este documento registra decisões estruturais do CardLink que devem orientar desenvolvimento, vendas, comunicação e marketing.
 
@@ -10,11 +10,11 @@ O CardLink é o **site profissional para colocar o seu negócio na internet em p
 
 Proposta central de posicionamento:
 
-> **CardLink — Seu negócio na internet em poucos minutos.**
+> **Tudo o que seu cliente precisa ver antes de chamar você.**
 
 Definição comercial:
 
-> Crie um site profissional para apresentar seu negócio, divulgar serviços, mostrar fotos, receber contatos e compartilhar tudo por link ou QR Code.
+> Reúna serviços, fotos, avaliações, localização, Instagram, Facebook e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.
 
 O produto atende à necessidade de colocar uma loja, negócio ou atividade profissional na web com rapidez, sem exigir conhecimento técnico nem a contratação inicial de um site convencional complexo. O link e o QR Code são meios de divulgação e acesso ao site; não constituem o produto principal.
 
@@ -35,7 +35,6 @@ O produto atende à necessidade de colocar uma loja, negócio ou atividade profi
 - QR Code de balcão e materiais físicos como porta de entrada para o site profissional.
 - Galeria/portfólio e depoimentos para demonstrar trabalho e gerar confiança.
 - Captura e gestão de contatos recebidos pelo site.
-- Assistente de conteúdo com IA.
 - Conteúdo comercial flexível: tabela de preços, cardápio, relação de serviços, catálogo resumido ou lista estruturada de produtos/serviços.
 - Atualização pelo próprio assinante, sem depender de profissional técnico para cada alteração.
 - Alternativa inicial simples e acessível a um site convencional mais complexo.
@@ -134,7 +133,7 @@ O assinante escolhe o formato mais apropriado ao seu negócio. Exemplos:
 
 ## 8. Consequência para vendas e marketing
 
-A comunicação deve vender um resultado objetivo: **colocar o negócio do cliente na internet em poucos minutos**.
+A comunicação deve vender um resultado objetivo: **organizar em uma apresentação profissional tudo o que o cliente precisa ver antes de entrar em contato**, reduzindo o caminho entre descoberta, avaliação e conversa pelo WhatsApp ou outro canal.
 
 A landing page deve:
 
@@ -145,7 +144,11 @@ A landing page deve:
 - evitar “cartão digital”, “cartão de visita”, “mini-site que evolui” e outras definições híbridas;
 - destacar simplicidade, rapidez, autonomia e preço acessível.
 
-Estas diretrizes serão a base para o futuro **Plano de Vendas e Marketing do CardLink**.
+### 8.1. Referência obrigatória do Plano Mestre
+
+O **PLANO MESTRE DE OFERTAS E PUBLICIDADE** é um documento geral e transversal, não um plano específico do CardLink. Ele orienta a elaboração e a revisão dos documentos comerciais deste projeto. Na auditoria final antes da comercialização, oferta, posicionamento, percepção de valor, preço, diferenciais, criativos, funil e capacidade de conversão do CardLink deverão ser confrontados com as premissas do Plano Mestre.
+
+O planejamento próprio do CardLink permanece como documento operacional do projeto; não é necessário criar um plano comercial paralelo apenas para repetir essas decisões.
 
 ## Identidade e e-mail do assinante
 
