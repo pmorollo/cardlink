@@ -1,0 +1,93 @@
+name: Final commercial copy cleanup
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/final-copy-cleanup.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  clean-and-test:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Clean obsolete commercial terminology
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('frontend/index.html')
+          s = p.read_text(encoding='utf-8')
+
+          replacements = [
+            ('placeholder="Ex: Problema com imagens, Dúvida sobre plano Pro..."',
+             'placeholder="Ex: Problema com imagens, dúvida sobre assinatura..."'),
+            ('Ative seu site profissional para colocá-lo online e liberar todos os recursos: vitrine de produtos e serviços, portfólio de imagens, depoimentos de clientes e inteligência artificial avançada!',
+             'Assine o CardLink para reunir em uma apresentação profissional seus serviços, fotos, avaliações, contatos, redes sociais e WhatsApp, com divulgação por link ou QR Code.'),
+            ('<h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🎨</span> Passo 2: Personalizando seu Cartão (O Editor)</h3>',
+             '<h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🎨</span> Passo 2: Personalizando seu site</h3>'),
+            ('<p style="margin:0;margin-bottom:8px;">No menu do painel, clique em "Configurações" para abrir o editor do seu cartão:</p>',
+             '<p style="margin:0;margin-bottom:8px;">No menu do painel, clique em "Configurações" para organizar as informações do seu site:</p>'),
+            ('<h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>📱</span> Passo 5: QR Code de Balcão e Compartilhamento</h3>',
+             '<h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>📱</span> Passo 4: QR Code de Balcão e Compartilhamento</h3>'),
+            ('<li><strong>Link Único:</strong> Copie o seu link exclusivo (ex: <code>cardlink.app/site/seu-nome</code>) para divulgar nas redes sociais.</li>',
+             '<li><strong>Link Único:</strong> Copie o link exclusivo do seu CardLink para divulgar nas redes sociais, mensagens e materiais promocionais.</li>'),
+            ('<h3 style="color:var(--purple);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;margin-top:0;"><span>🚀</span> Passo 6: Ativação (Colocando no Ar)</h3>',
+             '<h3 style="color:var(--purple);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;margin-top:0;"><span>🚀</span> Passo 5: Publicação e uso</h3>'),
+            ('<p style="margin:0;font-size:0.88rem;">Seu cartão inicia em modo rascunho para você testar tudo de graça. Para que seu link público e QR Code fiquem ativos na internet para seus clientes, clique em "Ativar Página" no painel e assine o plano único de <strong>R$ 12,90/mês</strong>. Sem multas ou taxas de cancelamento!</p>',
+             '<p style="margin:0;font-size:0.88rem;">Após a confirmação da assinatura e a ativação da sua conta, monte sua apresentação, revise as informações e publique. O link e o QR Code passam a direcionar os clientes para sua página profissional enquanto a assinatura estiver ativa.</p>'),
+            ('>4. Planos e Assinatura PRO<', '>4. Planos e Assinatura CardLink<'),
+            ('Os dados do cartão podem ser preservados por período razoável para eventual regularização ou reativação, conforme a política vigente.',
+             'Os dados do site podem ser preservados por período razoável para eventual regularização ou reativação, conforme a política vigente.'),
+            ('gestão da sua assinatura PRO.', 'gestão da sua assinatura CardLink.'),
+            ('O CardLink não vende ou aluga seus dados a terceiros. Compartilhamos dados somente quando necessário para operar a plataforma, incluindo o processador de pagamentos Cakto, serviços de e-mail transacional e, quando você utiliza voluntariamente o Assistente de conteúdo, a NVIDIA, atual fornecedora do processamento de inteligência artificial, ou eventual fornecedora substituta informada nesta política. Não insira dados pessoais de clientes, informações sigilosas ou conteúdo confidencial no Assistente.',
+             'O CardLink não vende ou aluga seus dados a terceiros. Compartilhamos dados somente quando necessário para operar a plataforma, incluindo o processador de pagamentos Cakto, serviços de e-mail transacional e provedores de infraestrutura indispensáveis ao funcionamento do serviço.'),
+            ('''        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Assistente de Conteúdo</h3>\n        <p style="color:var(--text-secondary);">As respostas da inteligência artificial podem conter erros ou informações inadequadas. O Assistente entrega apenas uma alternativa textual em uma área separada e não preenche, altera ou salva campos do site. O usuário decide se deseja copiar, colar, revisar e publicar o conteúdo, permanecendo responsável pela exatidão das informações utilizadas.</p>\n        \n''', ''),
+            ('>5. Armazenamento e Segurança<', '>4. Armazenamento e Segurança<'),
+            ('Seus dados cadastrais e de cartões digitais são armazenados em servidores seguros em nuvem.',
+             'Seus dados cadastrais e conteúdos dos sites profissionais são armazenados em servidores seguros em nuvem.'),
+            ('>6. Seus Direitos<', '>5. Seus Direitos<'),
+          ]
+
+          for old, new in replacements:
+              if old not in s:
+                  raise SystemExit(f'Texto esperado não encontrado: {old[:90]}')
+              s = s.replace(old, new, 1)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Validate obsolete claims are gone
+        run: |
+          ! grep -q "testar tudo de graça" frontend/index.html
+          ! grep -q "Assinatura PRO" frontend/index.html
+          ! grep -q "inteligência artificial avançada" frontend/index.html
+          ! grep -q "Dúvida sobre plano Pro" frontend/index.html
+          grep -q "Passo 5: Publicação e uso" frontend/index.html
+          grep -q "Planos e Assinatura CardLink" frontend/index.html
+
+      - name: Install dependencies and test
+        run: |
+          npm ci
+          npm test
+          npm audit --omit=dev --audit-level=high
+
+      - name: Commit cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: remover textos obsoletos da versão comercial"
+          git push origin master
