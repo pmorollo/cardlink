@@ -1,0 +1,40 @@
+name: Register final audit in test plan
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/register-final-audit.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  register:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Append closing status
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('docs/PLANO-TESTE-SEMANA-1.md')
+          s = p.read_text(encoding='utf-8').rstrip()
+          marker = '## Auditoria de fechamento — 28/08/2026'
+          if marker not in s:
+              s += '''\n\n## Auditoria de fechamento — 28/08/2026\n\n### Concluído no código e documentação\n- Landing alinhada à oferta aprovada: **“Tudo o que seu cliente precisa ver antes de chamar você.”**\n- Mecanismo comercial destacado: **Instagram · Facebook · QR Code → CardLink → WhatsApp**.\n- Assistente de conteúdo mantido oculto e retirado da oferta comercial da versão inicial.\n- Manual, modal de assinatura, Termos de Uso e Política de Privacidade revisados para o modelo pago atual, sem plano grátis/PRO legado.\n- `PLANO MESTRE DE OFERTAS E PUBLICIDADE` registrado como referência transversal obrigatória para a auditoria comercial final.\n- Multer atualizado para 2.3.0 e uploads endurecidos com limites de tamanho, arquivo, campos e profundidade.\n- Homologação automatizada após a atualização de segurança: **27 testes aprovados, 0 falhas e 1 teste PostgreSQL ignorado quando `TEST_PG_URL` não é informado**; `npm audit --omit=dev --audit-level=high` retornou **0 vulnerabilidades**.\n\n### Portões restantes para abertura comercial\n1. **Domínio/deploy:** confirmar no Railway qual é o domínio público ativo e verificar visualmente que ele serve o commit atual da `master`. O endereço histórico `cardlink-production.up.railway.app` não deve ser divulgado.\n2. **WhatsApp real:** concluir o teste de visitante preenchendo somente WhatsApp e validar que o assinante recebe o contato e abre o número correto para responder.\n3. **Compra real Cakto:** imediatamente antes da abertura pública, rotacionar `CAKTO_SECRET`, atualizar Railway + Cakto e realizar uma compra real com conta separada, validando `checkout → purchase_approved → conta pendente → e-mail → senha → login → publicação`.\n4. **Tráfego pago:** configurar e validar mensuração do funil antes de investir em anúncios. Isso não impede homologação técnica nem testes orgânicos, mas é requisito antes de comprar tráfego.\n\nCumpridos os itens 1–3 sem erro crítico, a versão inicial pode ser considerada tecnicamente homologada para distribuição controlada. O item 4 deve estar concluído antes do início de mídia paga.\n'''
+              p.write_text(s + '\n', encoding='utf-8')
+          PY
+
+      - name: Commit planning update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/PLANO-TESTE-SEMANA-1.md
+          git diff --cached --quiet && exit 0
+          git commit -m "docs: registrar portões finais de homologação comercial"
+          git push origin master
