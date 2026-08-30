@@ -1,3 +1,4 @@
+# trigger-v2
 name: Final WhatsApp and UI cleanup
 
 on:
@@ -33,8 +34,8 @@ jobs:
           direct = 'https://wa.me/${cleanWhatsapp(whatsapp)}'
           tagged = "https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink. ✅')}"
           count = s.count(direct)
-          if count != 3:
-              raise SystemExit(f'Esperava 3 links públicos diretos do WhatsApp; encontrei {count}')
+          if count != 4:
+              raise SystemExit(f'Esperava 4 links públicos diretos do WhatsApp; encontrei {count}')
           s = s.replace(direct, tagged)
 
           replacements = [
@@ -62,7 +63,7 @@ jobs:
 
       - name: Validate final public copy
         run: |
-          grep -q "Olá! Vim pelo seu CardLink. ✅" frontend/app.js
+          test "$(grep -o "Olá! Vim pelo seu CardLink. ✅" frontend/app.js | wc -l)" -eq 4
           grep -q "Tudo o que seu cliente precisa ver antes de chamar você" frontend/app.js
           ! grep -q "CardLink PRO" frontend/app.js
           ! grep -q "Assinatura PRO confirmada" frontend/app.js
