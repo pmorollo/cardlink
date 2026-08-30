@@ -163,17 +163,16 @@ function handleRoute() {
       <div style="max-width:550px;margin:40px auto;padding:32px 24px;background:var(--surface);border:1.5px solid var(--border-subtle);border-radius:var(--radius-xl);text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.3);">
         <div style="font-size:3.5rem;margin-bottom:16px;">✨</div>
         <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:12px;color:var(--text-primary);">
-          Ativação do <span class="text-gradient">CardLink PRO</span>
+          Assinatura <span class="text-gradient">CardLink</span>
         </h1>
         <p style="color:var(--text-secondary);font-size:0.95rem;line-height:1.6;margin-bottom:24px;">
-          Olá, <strong>${escapeHtml(currentUser.name)}</strong>! O CardLink funciona exclusivamente com o plano PRO. Ative sua assinatura por apenas <strong>R$ 12,90/mês</strong> para acessar o painel de criação e publicar seu site profissional.
+          Olá, <strong>${escapeHtml(currentUser.name)}</strong>! Para acessar o painel de criação e publicar seu site profissional, é necessário manter uma assinatura CardLink ativa.
         </p>
 
         <div style="background:rgba(139,92,246,0.08);border:1px dashed var(--accent);border-radius:var(--radius-md);padding:16px;margin-bottom:24px;text-align:left;">
-          <div style="font-weight:700;color:var(--accent);margin-bottom:8px;font-size:0.9rem;">🚀 O que está incluído no seu CardLink PRO:</div>
+          <div style="font-weight:700;color:var(--accent);margin-bottom:8px;font-size:0.9rem;">🚀 O que está incluído no CardLink:</div>
           <ul style="margin:0;padding-left:20px;font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">
             <li>Editor do site com temas modernos</li>
-            <li>Geração de conteúdo com Inteligência Artificial</li>
             <li>Galeria de fotos e vitrine de produtos</li>
             <li>Captura de leads e contatos dos clientes</li>
             <li>QR Code exclusivo para balcão e redes sociais</li>
@@ -181,7 +180,7 @@ function handleRoute() {
         </div>
 
         <a href="/checkout/cardlink-pro" class="btn btn-primary btn-lg" onclick="openProPaymentModal(); return false;" style="display:inline-block;width:100%;font-weight:bold;font-size:1rem;padding:14px;box-shadow:0 6px 20px rgba(124,58,237,0.3);margin-bottom:12px;text-decoration:none;">
-          💳 Assinar CardLink PRO por R$ 12,90/mês
+          💳 Assinar CardLink
         </a>
 
         <div style="display:flex;justify-content:center;gap:16px;margin-top:16px;font-size:0.85rem;">
@@ -288,7 +287,7 @@ function handleRoute() {
     document.getElementById('landing-view').classList.add('active');
     if (navbar) navbar.style.display = '';
     if (bgAnimated) bgAnimated.style.display = '';
-    document.title = 'CardLink — Seu negócio na internet em poucos minutos';
+    document.title = 'CardLink — Tudo o que seu cliente precisa ver antes de chamar você';
     updateNavAuth();
   }
 
@@ -304,7 +303,7 @@ async function checkSubscriptionStatus() {
       return;
     }
     if (currentUser && !currentUser.is_admin && currentUser.plan === 'pro') {
-      showToast('🎉', 'Assinatura PRO confirmada! Redirecionando...');
+      showToast('🎉', 'Assinatura CardLink confirmada! Redirecionando...');
       handleRoute();
     } else {
       showToast('⚠️', 'Assinatura ainda pendente. Se você pagou agora, aguarde alguns instantes.');
@@ -1533,7 +1532,7 @@ function renderCard(data, isPreview) {
   let contactButtons = '';
   if (phone)    contactButtons += `<a href="tel:${escapeHtml(phone)}" class="card-contact-btn"><span class="icon">📞</span><span>Ligar</span></a>`;
   if (email)    contactButtons += `<a href="mailto:${escapeHtml(email)}" class="card-contact-btn"><span class="icon">📧</span><span>Email</span></a>`;
-  if (whatsapp) contactButtons += `<a href="https://wa.me/${cleanWhatsapp(whatsapp)}" target="_blank" rel="noopener" class="card-contact-btn"><span class="icon">💬</span><span>WhatsApp</span></a>`;
+  if (whatsapp) contactButtons += `<a href="https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink. ✅')}" target="_blank" rel="noopener" class="card-contact-btn"><span class="icon">💬</span><span>WhatsApp</span></a>`;
   if (address)  contactButtons += `<a href="https://www.google.com/maps/search/${encodeURIComponent(address)}" target="_blank" rel="noopener" class="card-contact-btn"><span class="icon">📍</span><span>Mapa</span></a>`;
 
   const socials = [
@@ -1550,7 +1549,7 @@ function renderCard(data, isPreview) {
   let whatsappSection = '';
   if (whatsapp || whatsappGroup) {
     whatsappSection = '<div class="card-whatsapp-section">';
-    if (whatsapp)      whatsappSection += `<a href="https://wa.me/${cleanWhatsapp(whatsapp)}" target="_blank" rel="noopener" class="btn btn-whatsapp">💬 Conversar no WhatsApp</a>`;
+    if (whatsapp)      whatsappSection += `<a href="https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink. ✅')}" target="_blank" rel="noopener" class="btn btn-whatsapp">💬 Conversar no WhatsApp</a>`;
     if (whatsappGroup) whatsappSection += `<a href="${escapeHtml(whatsappGroup)}" target="_blank" rel="noopener" class="btn btn-whatsapp-group">👥 Entrar no Grupo WhatsApp</a>`;
     whatsappSection += '</div>';
   }
@@ -1596,7 +1595,7 @@ function renderCard(data, isPreview) {
       productsHtml = `<div class="site-block-title">🛍️ ${escapeHtml(servicesTitle)}</div><div class="products-grid">`;
       validProducts.forEach(p => {
         const waMsg = encodeURIComponent(`Olá! Gostaria de encomendar: ${p.name}${p.price ? ' (R$ ' + p.price + ')' : ''}`);
-        const waUrl = whatsapp ? `https://wa.me/${cleanWhatsapp(whatsapp)}?text=${waMsg}` : '#';
+        const waUrl = whatsapp ? `https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink. ✅')}?text=${waMsg}` : '#';
         productsHtml += `
           <div class="product-card">
             ${p.photo_url ? `<img src="${escapeHtml(p.photo_url)}" class="product-img" alt="${escapeHtml(p.name)}" onerror="this.style.display='none'">` : ''}
@@ -1686,7 +1685,7 @@ function renderCard(data, isPreview) {
   if (whatsapp) {
     ctaButtonsHtml = `
       <div style="display:flex;gap:12px;margin:15px 0;width:100%;">
-        <a href="https://wa.me/${cleanWhatsapp(whatsapp)}" target="_blank" rel="noopener" class="btn btn-primary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:0.95rem;font-weight:bold;text-decoration:none;">
+        <a href="https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink. ✅')}" target="_blank" rel="noopener" class="btn btn-primary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:0.95rem;font-weight:bold;text-decoration:none;">
           <span>💬</span> WhatsApp
         </a>
         <button type="button" class="btn btn-secondary" onclick="document.getElementById('contactFormSection')?.scrollIntoView({behavior:'smooth'})" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:0.95rem;font-weight:bold;background:none;border:1.5px solid var(--border-subtle);color:var(--text-primary);">
