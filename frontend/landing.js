@@ -282,7 +282,7 @@ function renderHero(d) {
   const ctaBtn = document.getElementById('hero-cta-btn');
   if (ctaBtn) {
     if (d.whatsapp) {
-      ctaBtn.href = `https://wa.me/${cleanPhone(d.whatsapp)}`;
+      ctaBtn.href = `https://wa.me/${cleanPhone(d.whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink.')}`;
       ctaBtn.target = '_blank';
       ctaBtn.rel = 'noopener';
       ctaBtn.className = 'btn btn-whatsapp-action btn-lg';
@@ -680,7 +680,7 @@ function renderContact(d) {
 
   const items = [];
   if (d.whatsapp) items.push({
-    href: `https://wa.me/${cleanPhone(d.whatsapp)}`,
+    href: `https://wa.me/${cleanPhone(d.whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink.')}`,
     icon: '💬', label: 'WhatsApp', value: d.whatsapp, target: '_blank'
   });
   if (d.phone) items.push({
