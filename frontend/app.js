@@ -1595,7 +1595,7 @@ function renderCard(data, isPreview) {
       productsHtml = `<div class="site-block-title">🛍️ ${escapeHtml(servicesTitle)}</div><div class="products-grid">`;
       validProducts.forEach(p => {
         const waMsg = encodeURIComponent(`Olá! Gostaria de encomendar: ${p.name}${p.price ? ' (R$ ' + p.price + ')' : ''}`);
-        const waUrl = whatsapp ? `https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink. ✅')}?text=${waMsg}` : '#';
+        const waUrl = whatsapp ? `https://wa.me/${cleanWhatsapp(whatsapp)}?text=${waMsg}` : '#';
         productsHtml += `
           <div class="product-card">
             ${p.photo_url ? `<img src="${escapeHtml(p.photo_url)}" class="product-img" alt="${escapeHtml(p.name)}" onerror="this.style.display='none'">` : ''}
