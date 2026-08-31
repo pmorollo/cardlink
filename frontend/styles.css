@@ -2817,7 +2817,7 @@ textarea.form-input {
    Landing navigation hierarchy — 2026-08-15
    ============================================ */
 .navbar-link {
-  color: var(--text-secondary);
+  color: rgba(241, 245, 249, 0.82);
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
@@ -2825,11 +2825,15 @@ textarea.form-input {
 }
 
 .navbar-link:hover {
-  color: var(--text-primary);
+  color: #ffffff;
+}
+
+.navbar-brand {
+  color: #f8fafc;
 }
 
 .navbar-login {
-  color: var(--text-primary);
+  color: #f8fafc;
   font-size: 0.9rem;
   font-weight: 700;
   padding: 0.5rem 0.35rem;
