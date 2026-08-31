@@ -2001,6 +2001,55 @@ textarea.form-input {
   font-weight: 600;
 }
 
+.cardlink-support-whatsapp {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  background: #25d366;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 12px 34px rgba(37, 211, 102, 0.34);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+
+.cardlink-support-whatsapp:hover {
+  transform: translateY(-2px);
+  background: #20bd5a;
+  color: #fff;
+  box-shadow: 0 16px 40px rgba(37, 211, 102, 0.42);
+}
+
+.cardlink-support-whatsapp:focus-visible {
+  outline: 3px solid rgba(37, 211, 102, 0.3);
+  outline-offset: 3px;
+}
+
+.cardlink-support-whatsapp-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .cardlink-support-whatsapp {
+    right: 14px;
+    bottom: 14px;
+    min-height: 48px;
+    padding: 10px 14px;
+    font-size: 0.78rem;
+  }
+}
+
 /* ============================================
    AUTH VIEW
    ============================================ */
