@@ -154,6 +154,8 @@ test('cria a oferta anual, configura afiliados e confere o webhook existente', a
   assert.equal(state.hasAffiliateSalesPage, true);
   assert.equal(state.hasProductImage, false);
   assert.equal(state.hasSalesPage, true);
+  assert.equal(state.affiliateSalesPageUrl, 'https://cardlink.digitalnexoapp.com/');
+  assert.equal(state.salesPageUrl, 'https://cardlink.example.com/');
   assert.equal(state.productCategory, 'Apps & Software');
   assert.equal(calls.filter(call => call.options.method === 'POST' && call.url.endsWith('/offers/')).length, 1);
   assert.equal(calls.filter(call => call.options.method === 'PUT' && call.url.endsWith('/products/product-1/')).length, 1);

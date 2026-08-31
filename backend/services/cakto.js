@@ -31,6 +31,8 @@ let catalogState = {
   hasAffiliateSalesPage: false,
   hasProductImage: false,
   hasSalesPage: false,
+  affiliateSalesPageUrl: '',
+  salesPageUrl: '',
   productCategory: '',
   lastSyncAt: null
 };
@@ -270,6 +272,8 @@ async function performCatalogSync({ createAnnual = false, configureAffiliates = 
     hasAffiliateSalesPage: Boolean(String(productDetails.affiliateSalesPage || '').trim()),
     hasProductImage: Boolean(String(productDetails.image || '').trim()),
     hasSalesPage: Boolean(String(productDetails.salesPage || '').trim()),
+    affiliateSalesPageUrl: String(productDetails.affiliateSalesPage || '').trim(),
+    salesPageUrl: String(productDetails.salesPage || '').trim(),
     productCategory: String(
       (typeof product.category === 'object' ? product.category?.name : productDetails.category) || ''
     ),
@@ -308,6 +312,8 @@ function getPublicCatalogState() {
     hasAffiliateSalesPage: catalogState.hasAffiliateSalesPage,
     hasProductImage: catalogState.hasProductImage,
     hasSalesPage: catalogState.hasSalesPage,
+    affiliateSalesPageUrl: catalogState.affiliateSalesPageUrl,
+    salesPageUrl: catalogState.salesPageUrl,
     productCategory: catalogState.productCategory,
     lastSyncAt: catalogState.lastSyncAt
   };
@@ -335,6 +341,8 @@ function resetForTests() {
     hasAffiliateSalesPage: false,
     hasProductImage: false,
     hasSalesPage: false,
+    affiliateSalesPageUrl: '',
+    salesPageUrl: '',
     productCategory: '',
     lastSyncAt: null
   };
