@@ -143,6 +143,7 @@ test('cria a oferta anual, configura afiliados e confere o webhook existente', a
   assert.equal(state.affiliateApprovalRequired, true);
   assert.equal(state.affiliateCommission, '30.00');
   assert.equal(state.affiliateMarketplace, true);
+  assert.equal(state.affiliateConfigurationError, null);
   assert.equal(state.hasAffiliateDescription, true);
   assert.equal(state.hasAffiliateSupportEmail, true);
   assert.equal(state.hasAffiliateSalesPage, true);

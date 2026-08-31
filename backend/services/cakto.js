@@ -24,6 +24,7 @@ let catalogState = {
   affiliateApprovalRequired: false,
   affiliateCommission: null,
   affiliateMarketplace: false,
+  affiliateConfigurationError: null,
   hasAffiliateDescription: false,
   hasAffiliateSupportEmail: false,
   hasAffiliateSalesPage: false,
@@ -198,8 +199,14 @@ async function performCatalogSync({ createAnnual = false, configureAffiliates = 
   const productsBody = await caktoRequest('/products/?search=CardLink&status=active&limit=100');
   const product = selectCardLinkProduct(resultsOf(productsBody));
   let productDetails = await caktoRequest(`/products/${encodeURIComponent(product.id)}/`);
+  let affiliateConfigurationError = null;
   if (configureAffiliates) {
-    productDetails = await configureAffiliateProgram(productDetails);
+    try {
+      productDetails = await configureAffiliateProgram(productDetails);
+    } catch (error) {
+      affiliateConfigurationError = String(error.message || 'Falha ao configurar afiliados').substring(0, 300);
+      console.error(`❌ Cakto: configuração de afiliados não aplicada: ${affiliateConfigurationError}`);
+    }
   }
 
   const offersBody = await caktoRequest(`/offers/?product=${encodeURIComponent(product.id)}&status=active&limit=100`);
@@ -253,6 +260,7 @@ async function performCatalogSync({ createAnnual = false, configureAffiliates = 
     affiliateApprovalRequired: Boolean(productDetails.affiliateRequest),
     affiliateCommission: productDetails.affiliateCommission ?? null,
     affiliateMarketplace: Boolean(productDetails.affiliateMarketplace),
+    affiliateConfigurationError,
     hasAffiliateDescription: Boolean(String(productDetails.affiliateDescription || '').trim()),
     hasAffiliateSupportEmail: Boolean(String(productDetails.affiliateSupportEmail || '').trim()),
     hasAffiliateSalesPage: Boolean(String(productDetails.affiliateSalesPage || '').trim()),
@@ -290,6 +298,7 @@ function getPublicCatalogState() {
     affiliateApprovalRequired: catalogState.affiliateApprovalRequired,
     affiliateCommission: catalogState.affiliateCommission,
     affiliateMarketplace: catalogState.affiliateMarketplace,
+    affiliateConfigurationError: catalogState.affiliateConfigurationError,
     hasAffiliateDescription: catalogState.hasAffiliateDescription,
     hasAffiliateSupportEmail: catalogState.hasAffiliateSupportEmail,
     hasAffiliateSalesPage: catalogState.hasAffiliateSalesPage,
@@ -316,6 +325,7 @@ function resetForTests() {
     affiliateApprovalRequired: false,
     affiliateCommission: null,
     affiliateMarketplace: false,
+    affiliateConfigurationError: null,
     hasAffiliateDescription: false,
     hasAffiliateSupportEmail: false,
     hasAffiliateSalesPage: false,
