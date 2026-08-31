@@ -26,12 +26,6 @@ const PLACEHOLDER_GALLERY = [
   'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80',
 ];
 
-const PLACEHOLDER_TESTIMONIALS = [
-  { name: 'Mariana Souza', stars: 5, comment: 'Atendimento incrível! Superou todas as minhas expectativas. Profissional dedicado e muito competente. Recomendo sem hesitar.' },
-  { name: 'Carlos Oliveira', stars: 5, comment: 'Serviço de altíssima qualidade. Pontual, atencioso e entregou exatamente o que foi prometido. Com certeza voltarei!' },
-  { name: 'Ana Beatriz Lima', stars: 5, comment: 'Fiquei impressionada com o nível de profissionalismo. Resultado perfeito e atendimento humanizado. Nota 10!' },
-];
-
 // ============================================
 // Utils
 // ============================================
@@ -582,15 +576,19 @@ function renderTestimonials(d) {
   const grid = document.getElementById('testimonials-grid');
   if (!grid) return;
 
-  const hasReal = d.testimonials && d.testimonials.length > 0;
-  if (!hasReal && !ownerToken) {
+  const list = Array.isArray(d.testimonials)
+    ? d.testimonials.filter(t => {
+        const name = cleanText(t?.name);
+        const comment = cleanText(t?.comment);
+        const stars = Number(t?.stars);
+        return name && comment && stars >= 1 && stars <= 5;
+      })
+    : [];
+
+  if (!list.length) {
     removePublicSection('depoimentos');
     return;
   }
-  const list = hasReal ? d.testimonials : PLACEHOLDER_TESTIMONIALS;
-  const isPlaceholder = !hasReal;
-
-  if (isPlaceholder) makePlaceholderHint('testimonials-placeholder-hint', 'Adicionar depoimentos reais');
 
   grid.innerHTML = list.map(t => {
     const n = Math.min(5, Math.max(1, t.stars || 5));
