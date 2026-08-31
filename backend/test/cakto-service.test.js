@@ -76,6 +76,7 @@ test('cria a oferta anual, configura afiliados e confere o webhook existente', a
       assert.equal(payload.name, 'CardLink');
       assert.equal(payload.price, '12.90');
       assert.match(payload.description, /Cartão digital profissional/);
+      assert.equal(payload.salesPage, 'https://cardlink.digitalnexoapp.com/');
       assert.equal(payload.affiliate, true);
       assert.equal(payload.affiliateRequest, true);
       assert.equal(payload.affiliateCommission, '30.00');

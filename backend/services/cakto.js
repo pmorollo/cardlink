@@ -182,6 +182,7 @@ async function configureAffiliateProgram(product) {
       name: String(product.name || 'CardLink PRO'),
       description: String(product.description || CARDLINK_PRODUCT_DESCRIPTION),
       price: String(product.price || '12.90'),
+      salesPage: CARDLINK_PUBLIC_URL,
       affiliate: true,
       affiliateRequest: true,
       affiliateCommission: '30.00',
