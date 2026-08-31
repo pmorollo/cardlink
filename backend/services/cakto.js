@@ -57,7 +57,7 @@ async function parseResponse(response) {
   }
   if (!response.ok) {
     const detail = typeof body === 'object' && body
-      ? body.detail || body.error || body.message
+      ? body.detail || body.error || body.message || JSON.stringify(body)
       : body;
     const error = new Error(`Cakto API ${response.status}: ${String(detail || 'falha na requisição').substring(0, 300)}`);
     error.status = response.status;
