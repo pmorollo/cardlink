@@ -58,6 +58,17 @@ function sanitizeServicesTitle(value) {
   return String(value).trim().substring(0, 120);
 }
 
+function sanitizeTestimonials(value) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 50).flatMap(item => {
+    const name = typeof item?.name === 'string' ? item.name.trim().substring(0, 120) : '';
+    const comment = typeof item?.comment === 'string' ? item.comment.trim().substring(0, 1000) : '';
+    const stars = Number(item?.stars);
+    if (!name || !comment || !Number.isInteger(stars) || stars < 1 || stars > 5) return [];
+    return [{ name, comment, stars }];
+  });
+}
+
 router.get('/stats/summary', authMiddleware, requireCustomer, async (req, res) => {
   const card = await cardRepo.findOneByUserId(req.userId);
   if (!card) {
@@ -101,7 +112,7 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
 
   let productsToSave = req.body.products;
   let galleryToSave = req.body.gallery;
-  let testimonialsToSave = req.body.testimonials;
+  let testimonialsToSave = req.body.testimonials !== undefined ? sanitizeTestimonials(req.body.testimonials) : undefined;
 
 
 
@@ -232,7 +243,7 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
     services_image_url: req.body.services_image_url !== undefined ? sanitizeSocialUrl(req.body.services_image_url, 1000) : card.services_image_url,
     products: req.body.products !== undefined ? req.body.products : card.products,
     gallery: req.body.gallery !== undefined ? req.body.gallery : card.gallery,
-    testimonials: req.body.testimonials !== undefined ? req.body.testimonials : card.testimonials,
+    testimonials: req.body.testimonials !== undefined ? sanitizeTestimonials(req.body.testimonials) : card.testimonials,
     updated_at: new Date().toISOString()
   });
 
