@@ -2253,13 +2253,6 @@ textarea.form-input {
   flex-wrap: wrap;
 }
 
-.dash-card-mini-preview {
-  padding: var(--space-lg);
-  background: rgba(0, 0, 0, 0.2);
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
-}
-
 .dash-card-actions-bar {
   display: flex;
   gap: var(--space-sm);
