@@ -6,9 +6,22 @@ let syncPromise = null;
 let catalogState = {
   configured: false,
   ready: false,
+  productId: '',
+  productShortId: '',
+  productName: '',
   monthlyCheckoutUrl: process.env.CAKTO_MONTHLY_CHECKOUT_URL || DEFAULT_MONTHLY_CHECKOUT_URL,
   annualCheckoutUrl: process.env.CAKTO_ANNUAL_CHECKOUT_URL || '',
   webhookConfigured: null,
+  affiliateEnabled: false,
+  affiliateApprovalRequired: false,
+  affiliateCommission: null,
+  affiliateMarketplace: false,
+  hasAffiliateDescription: false,
+  hasAffiliateSupportEmail: false,
+  hasAffiliateSalesPage: false,
+  hasProductImage: false,
+  hasSalesPage: false,
+  productCategory: '',
   lastSyncAt: null
 };
 
@@ -147,6 +160,7 @@ async function performCatalogSync({ createAnnual = false } = {}) {
 
   const productsBody = await caktoRequest('/products/?search=CardLink&status=active&limit=100');
   const product = selectCardLinkProduct(resultsOf(productsBody));
+  const productDetails = await caktoRequest(`/products/${encodeURIComponent(product.id)}/`);
 
   const offersBody = await caktoRequest(`/offers/?product=${encodeURIComponent(product.id)}&status=active&limit=100`);
   const offers = resultsOf(offersBody);
@@ -189,9 +203,24 @@ async function performCatalogSync({ createAnnual = false } = {}) {
   catalogState = {
     configured: true,
     ready: Boolean((monthlyOffer || catalogState.monthlyCheckoutUrl) && annualOffer),
+    productId: String(productDetails.id || product.id || ''),
+    productShortId: String(productDetails.short_id || product.short_id || ''),
+    productName: String(productDetails.name || product.name || ''),
     monthlyCheckoutUrl: offerCheckoutUrl(monthlyOffer) || catalogState.monthlyCheckoutUrl,
     annualCheckoutUrl: offerCheckoutUrl(annualOffer) || catalogState.annualCheckoutUrl,
     webhookConfigured,
+    affiliateEnabled: Boolean(productDetails.affiliate),
+    affiliateApprovalRequired: Boolean(productDetails.affiliateRequest),
+    affiliateCommission: productDetails.affiliateCommission ?? null,
+    affiliateMarketplace: Boolean(productDetails.affiliateMarketplace),
+    hasAffiliateDescription: Boolean(String(productDetails.affiliateDescription || '').trim()),
+    hasAffiliateSupportEmail: Boolean(String(productDetails.affiliateSupportEmail || '').trim()),
+    hasAffiliateSalesPage: Boolean(String(productDetails.affiliateSalesPage || '').trim()),
+    hasProductImage: Boolean(String(productDetails.image || '').trim()),
+    hasSalesPage: Boolean(String(productDetails.salesPage || '').trim()),
+    productCategory: String(
+      (typeof product.category === 'object' ? product.category?.name : productDetails.category) || ''
+    ),
     lastSyncAt: new Date().toISOString()
   };
 
@@ -211,9 +240,22 @@ function getPublicCatalogState() {
   return {
     configured: catalogState.configured,
     ready: catalogState.ready,
+    productId: catalogState.productId,
+    productShortId: catalogState.productShortId,
+    productName: catalogState.productName,
     monthlyCheckoutUrl: catalogState.monthlyCheckoutUrl,
     annualCheckoutUrl: catalogState.annualCheckoutUrl,
     webhookConfigured: catalogState.webhookConfigured,
+    affiliateEnabled: catalogState.affiliateEnabled,
+    affiliateApprovalRequired: catalogState.affiliateApprovalRequired,
+    affiliateCommission: catalogState.affiliateCommission,
+    affiliateMarketplace: catalogState.affiliateMarketplace,
+    hasAffiliateDescription: catalogState.hasAffiliateDescription,
+    hasAffiliateSupportEmail: catalogState.hasAffiliateSupportEmail,
+    hasAffiliateSalesPage: catalogState.hasAffiliateSalesPage,
+    hasProductImage: catalogState.hasProductImage,
+    hasSalesPage: catalogState.hasSalesPage,
+    productCategory: catalogState.productCategory,
     lastSyncAt: catalogState.lastSyncAt
   };
 }
@@ -224,9 +266,22 @@ function resetForTests() {
   catalogState = {
     configured: false,
     ready: false,
+    productId: '',
+    productShortId: '',
+    productName: '',
     monthlyCheckoutUrl: process.env.CAKTO_MONTHLY_CHECKOUT_URL || DEFAULT_MONTHLY_CHECKOUT_URL,
     annualCheckoutUrl: process.env.CAKTO_ANNUAL_CHECKOUT_URL || '',
     webhookConfigured: null,
+    affiliateEnabled: false,
+    affiliateApprovalRequired: false,
+    affiliateCommission: null,
+    affiliateMarketplace: false,
+    hasAffiliateDescription: false,
+    hasAffiliateSupportEmail: false,
+    hasAffiliateSalesPage: false,
+    hasProductImage: false,
+    hasSalesPage: false,
+    productCategory: '',
     lastSyncAt: null
   };
 }

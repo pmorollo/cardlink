@@ -49,8 +49,26 @@ test('cria uma unica oferta anual no produto CardLink e confere o webhook existe
     if (String(url).endsWith('/token/')) {
       return jsonResponse({ access_token: 'token-test', expires_in: 3600 });
     }
-    if (String(url).includes('/products/')) {
-      return jsonResponse({ results: [{ id: 'product-1', name: 'CardLink', status: 'active', type: 'subscription' }] });
+    if (String(url).includes('/products/?')) {
+      return jsonResponse({ results: [{ id: 'product-1', short_id: 'short-1', name: 'CardLink', status: 'active', type: 'subscription', category: { name: 'Apps & Software' } }] });
+    }
+    if (String(url).endsWith('/products/product-1/')) {
+      return jsonResponse({
+        id: 'product-1',
+        short_id: 'short-1',
+        name: 'CardLink',
+        status: 'active',
+        type: 'subscription',
+        affiliate: true,
+        affiliateRequest: true,
+        affiliateCommission: '30.00',
+        affiliateMarketplace: false,
+        affiliateDescription: '',
+        affiliateSupportEmail: '',
+        affiliateSalesPage: '',
+        image: null,
+        salesPage: 'https://cardlink.example.com/'
+      });
     }
     if (String(url).includes('/offers/') && (options.method || 'GET') === 'GET') {
       return jsonResponse({
@@ -89,10 +107,22 @@ test('cria uma unica oferta anual no produto CardLink e confere o webhook existe
 
   assert.equal(state.configured, true);
   assert.equal(state.ready, true);
+  assert.equal(state.productId, 'product-1');
+  assert.equal(state.productShortId, 'short-1');
+  assert.equal(state.productName, 'CardLink');
   assert.equal(state.monthlyCheckoutUrl, 'https://pay.cakto.com.br/kawb7xd_1032085');
   assert.equal(state.annualCheckoutUrl, 'https://pay.cakto.com.br/annual-new');
   assert.equal(state.webhookConfigured, true);
+  assert.equal(state.affiliateEnabled, true);
+  assert.equal(state.affiliateApprovalRequired, true);
+  assert.equal(state.affiliateCommission, '30.00');
+  assert.equal(state.affiliateMarketplace, false);
+  assert.equal(state.hasAffiliateDescription, false);
+  assert.equal(state.hasAffiliateSupportEmail, false);
+  assert.equal(state.hasAffiliateSalesPage, false);
+  assert.equal(state.hasProductImage, false);
+  assert.equal(state.hasSalesPage, true);
+  assert.equal(state.productCategory, 'Apps & Software');
   assert.equal(calls.filter(call => call.options.method === 'POST' && call.url.endsWith('/offers/')).length, 1);
   assert.deepEqual(getPublicCatalogState(), state);
 });
-
