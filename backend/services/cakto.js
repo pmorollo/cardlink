@@ -1,5 +1,13 @@
 const CAKTO_API_BASE = 'https://api.cakto.com.br/public_api';
 const DEFAULT_MONTHLY_CHECKOUT_URL = 'https://pay.cakto.com.br/kawb7xd_1032085';
+const CARDLINK_PUBLIC_URL = 'https://cardlink.digitalnexoapp.com/';
+const CARDLINK_AFFILIATE_MATERIALS_URL = `${CARDLINK_PUBLIC_URL}afiliados`;
+const CARDLINK_AFFILIATE_DESCRIPTION = [
+  'CardLink é um cartão digital profissional por assinatura para autônomos, prestadores de serviço e pequenos negócios.',
+  'Reúne serviços, fotos, avaliações, localização, redes sociais, WhatsApp, link e QR Code em uma única apresentação.',
+  'Planos: R$ 12,90 por mês ou R$ 99 por ano.',
+  `Materiais oficiais de divulgação: ${CARDLINK_AFFILIATE_MATERIALS_URL}`
+].join(' ');
 
 let tokenCache = null;
 let syncPromise = null;
@@ -151,7 +159,36 @@ function selectCardLinkProduct(products) {
   throw new Error('Produto CardLink ativo não encontrado na Cakto');
 }
 
-async function performCatalogSync({ createAnnual = false } = {}) {
+function affiliateConfigurationMatches(product) {
+  return Boolean(product?.affiliate) &&
+    Boolean(product?.affiliateRequest) &&
+    numberEquals(product?.affiliateCommission, 30) &&
+    Boolean(product?.affiliateMarketplace) &&
+    String(product?.affiliateSupportEmail || '').trim().toLowerCase() === 'cardlink@yahoo.com' &&
+    String(product?.affiliateSalesPage || '').trim() === CARDLINK_PUBLIC_URL &&
+    String(product?.affiliateDescription || '').includes(CARDLINK_AFFILIATE_MATERIALS_URL);
+}
+
+async function configureAffiliateProgram(product) {
+  if (affiliateConfigurationMatches(product)) return product;
+
+  const updated = await caktoRequest(`/products/${encodeURIComponent(product.id)}/`, {
+    method: 'PUT',
+    body: {
+      affiliate: true,
+      affiliateRequest: true,
+      affiliateCommission: '30.00',
+      affiliateDescription: CARDLINK_AFFILIATE_DESCRIPTION,
+      affiliateSupportEmail: 'cardlink@yahoo.com',
+      affiliateMarketplace: true,
+      affiliateSalesPage: CARDLINK_PUBLIC_URL
+    }
+  });
+  console.log(`✅ Cakto: programa de afiliados configurado no produto CardLink (produto=${product.id}).`);
+  return updated;
+}
+
+async function performCatalogSync({ createAnnual = false, configureAffiliates = false } = {}) {
   const { clientId, clientSecret } = apiCredentials();
   catalogState.configured = Boolean(clientId && clientSecret);
   if (!catalogState.configured) {
@@ -160,7 +197,10 @@ async function performCatalogSync({ createAnnual = false } = {}) {
 
   const productsBody = await caktoRequest('/products/?search=CardLink&status=active&limit=100');
   const product = selectCardLinkProduct(resultsOf(productsBody));
-  const productDetails = await caktoRequest(`/products/${encodeURIComponent(product.id)}/`);
+  let productDetails = await caktoRequest(`/products/${encodeURIComponent(product.id)}/`);
+  if (configureAffiliates) {
+    productDetails = await configureAffiliateProgram(productDetails);
+  }
 
   const offersBody = await caktoRequest(`/offers/?product=${encodeURIComponent(product.id)}&status=active&limit=100`);
   const offers = resultsOf(offersBody);

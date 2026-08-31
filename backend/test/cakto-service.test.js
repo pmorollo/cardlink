@@ -38,7 +38,7 @@ test('sem credenciais preserva o checkout mensal e nao chama a Cakto', async () 
   assert.equal(state.annualCheckoutUrl, '');
 });
 
-test('cria uma unica oferta anual no produto CardLink e confere o webhook existente', async () => {
+test('cria a oferta anual, configura afiliados e confere o webhook existente', async () => {
   process.env.CAKTO_CLIENT_ID = 'client-test';
   process.env.CAKTO_CLIENT_SECRET = 'secret-test';
   _resetForTests();
@@ -52,7 +52,33 @@ test('cria uma unica oferta anual no produto CardLink e confere o webhook existe
     if (String(url).includes('/products/?')) {
       return jsonResponse({ results: [{ id: 'product-1', short_id: 'short-1', name: 'CardLink', status: 'active', type: 'subscription', category: { name: 'Apps & Software' } }] });
     }
-    if (String(url).endsWith('/products/product-1/')) {
+    if (String(url).endsWith('/products/product-1/') && (options.method || 'GET') === 'GET') {
+      return jsonResponse({
+        id: 'product-1',
+        short_id: 'short-1',
+        name: 'CardLink',
+        status: 'active',
+        type: 'subscription',
+        affiliate: false,
+        affiliateRequest: false,
+        affiliateCommission: null,
+        affiliateMarketplace: false,
+        affiliateDescription: '',
+        affiliateSupportEmail: '',
+        affiliateSalesPage: '',
+        image: null,
+        salesPage: 'https://cardlink.example.com/'
+      });
+    }
+    if (String(url).endsWith('/products/product-1/') && options.method === 'PUT') {
+      const payload = JSON.parse(options.body);
+      assert.equal(payload.affiliate, true);
+      assert.equal(payload.affiliateRequest, true);
+      assert.equal(payload.affiliateCommission, '30.00');
+      assert.equal(payload.affiliateMarketplace, true);
+      assert.equal(payload.affiliateSupportEmail, 'cardlink@yahoo.com');
+      assert.equal(payload.affiliateSalesPage, 'https://cardlink.digitalnexoapp.com/');
+      assert.match(payload.affiliateDescription, /cardlink\.digitalnexoapp\.com\/afiliados/);
       return jsonResponse({
         id: 'product-1',
         short_id: 'short-1',
@@ -62,10 +88,10 @@ test('cria uma unica oferta anual no produto CardLink e confere o webhook existe
         affiliate: true,
         affiliateRequest: true,
         affiliateCommission: '30.00',
-        affiliateMarketplace: false,
-        affiliateDescription: '',
-        affiliateSupportEmail: '',
-        affiliateSalesPage: '',
+        affiliateMarketplace: true,
+        affiliateDescription: payload.affiliateDescription,
+        affiliateSupportEmail: payload.affiliateSupportEmail,
+        affiliateSalesPage: payload.affiliateSalesPage,
         image: null,
         salesPage: 'https://cardlink.example.com/'
       });
@@ -103,7 +129,7 @@ test('cria uma unica oferta anual no produto CardLink e confere o webhook existe
     throw new Error(`URL inesperada: ${url}`);
   };
 
-  const state = await syncCaktoCatalog({ createAnnual: true });
+  const state = await syncCaktoCatalog({ createAnnual: true, configureAffiliates: true });
 
   assert.equal(state.configured, true);
   assert.equal(state.ready, true);
@@ -116,13 +142,14 @@ test('cria uma unica oferta anual no produto CardLink e confere o webhook existe
   assert.equal(state.affiliateEnabled, true);
   assert.equal(state.affiliateApprovalRequired, true);
   assert.equal(state.affiliateCommission, '30.00');
-  assert.equal(state.affiliateMarketplace, false);
-  assert.equal(state.hasAffiliateDescription, false);
-  assert.equal(state.hasAffiliateSupportEmail, false);
-  assert.equal(state.hasAffiliateSalesPage, false);
+  assert.equal(state.affiliateMarketplace, true);
+  assert.equal(state.hasAffiliateDescription, true);
+  assert.equal(state.hasAffiliateSupportEmail, true);
+  assert.equal(state.hasAffiliateSalesPage, true);
   assert.equal(state.hasProductImage, false);
   assert.equal(state.hasSalesPage, true);
   assert.equal(state.productCategory, 'Apps & Software');
   assert.equal(calls.filter(call => call.options.method === 'POST' && call.url.endsWith('/offers/')).length, 1);
+  assert.equal(calls.filter(call => call.options.method === 'PUT' && call.url.endsWith('/products/product-1/')).length, 1);
   assert.deepEqual(getPublicCatalogState(), state);
 });

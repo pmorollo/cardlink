@@ -171,6 +171,11 @@ app.get('/site/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'frontend', 'landing.html'));
 });
 
+// Kit público de divulgação para afiliados aprovados.
+app.get('/afiliados', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'afiliados.html'));
+});
+
 // Entrada administrativa canônica. O SPA autentica e direciona para o painel admin.
 app.get('/admin', (req, res) => res.redirect('/#admin'));
 
@@ -191,7 +196,7 @@ module.exports = app;
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
-    syncCaktoCatalog({ createAnnual: true })
+    syncCaktoCatalog({ createAnnual: true, configureAffiliates: true })
       .then(state => {
         if (!state.configured) {
           console.warn('⚠️ Cakto API: credenciais não configuradas; sincronização ignorada.');
