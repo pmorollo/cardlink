@@ -54,7 +54,8 @@ app.use(cors({
       return cb(null, true);
     }
     const allowed = (corsEnv || '').split(',').map(o => o.trim()).filter(Boolean);
-    const ok = allowed.includes(origin) || origin.endsWith('.railway.app') || origin.includes('localhost');
+    const canonicalOrigins = ['https://cardlink.digitalnexoapp.com'];
+    const ok = allowed.includes(origin) || canonicalOrigins.includes(origin) || origin.endsWith('.railway.app') || origin.includes('localhost');
     if (ok) {
       return cb(null, true);
     }
