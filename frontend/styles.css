@@ -1007,8 +1007,7 @@ img {
    ============================================ */
 .builder-layout {
   display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: var(--space-xl);
+  grid-template-columns: minmax(0, 1fr);
   min-height: 100vh;
   padding: calc(80px + var(--space-xl)) 0 var(--space-xl);
 }
@@ -1036,24 +1035,6 @@ img {
 .builder-form-panel::-webkit-scrollbar-thumb {
   background: var(--border-subtle);
   border-radius: 3px;
-}
-
-.builder-preview-panel {
-  position: sticky;
-  top: 100px;
-  height: calc(100vh - 120px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-lg);
-}
-
-.preview-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
 }
 
 .builder-title {
@@ -1690,67 +1671,6 @@ textarea.form-input {
 }
 
 /* ============================================
-   Preview Scaling
-   ============================================ */
-.preview-container {
-  position: relative;
-  width: 310px;
-  height: 590px;
-  border: 10px solid #1e293b; /* Slate-800 phone shell */
-  border-radius: 36px;
-  background: #ffffff;
-  box-shadow: var(--shadow-lg), 0 20px 40px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transform: scale(0.95);
-  transform-origin: top center;
-}
-
-.preview-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 16px;
-  background: #1e293b;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-  z-index: 10;
-}
-
-.preview-label {
-  text-align: center;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-bottom: var(--space-sm);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  order: -1; /* Keep label above phone frame in flex layout */
-}
-
-#preview-card {
-  height: 100%;
-  overflow-y: auto;
-  scrollbar-width: none; /* Hide scrollbar */
-  padding: 16px 0 0 0;
-}
-
-#preview-card::-webkit-scrollbar {
-  display: none;
-}
-
-#preview-card .card-container {
-  min-height: 100%;
-  box-shadow: none !important;
-  border: none !important;
-  border-radius: 0 !important;
-}
-
-/* ============================================
    Toast Notification
    ============================================ */
 .toast {
@@ -1884,18 +1804,6 @@ textarea.form-input {
 @media (max-width: 768px) {
   .builder-layout {
     grid-template-columns: 1fr;
-  }
-
-  .builder-preview-panel {
-    position: relative;
-    top: auto;
-    height: auto;
-    order: -1;
-    padding: var(--space-md);
-  }
-
-  .preview-container {
-    transform: scale(0.7);
   }
 
   .form-row {
