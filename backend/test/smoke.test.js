@@ -166,6 +166,13 @@ test('/backend/.env NAO expoe segredos', async () => {
   assert.equal(html.includes('NVIDIA_API_KEY'), false);
 });
 
+test('CORS permite o dominio oficial do CardLink', async () => {
+  const res = await fetch(base + '/api/cards/stats/summary', {
+    headers: { Origin: 'https://cardlink.digitalnexoapp.com' }
+  });
+  assert.equal(res.headers.get('access-control-allow-origin'), 'https://cardlink.digitalnexoapp.com');
+});
+
 test('CORS rejeita origem nao permitida', async () => {
   const res = await fetch(base + '/api/cards/stats/summary', {
     headers: { Origin: 'https://evil.example.com' }
