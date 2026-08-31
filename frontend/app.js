@@ -1354,16 +1354,16 @@ function addTestimonialRow(data = {}) {
     <div class="form-row">
       <div class="form-group" style="flex:2;">
         <label class="form-label">Nome do Cliente</label>
-        <input class="form-input testimonial-name-input" type="text" placeholder="Ex: Maria Santos" value="${escapeHtml(data.name || '')}">
+        <input class="form-input testimonial-name-input" type="text" placeholder="Digite o nome do cliente" value="${escapeHtml(data.name || '')}">
       </div>
       <div class="form-group" style="flex:1;">
         <label class="form-label">Estrelas (1-5)</label>
-        <input class="form-input testimonial-stars-input" type="number" min="1" max="5" placeholder="5" value="${data.stars || 5}">
+        <input class="form-input testimonial-stars-input" type="number" min="1" max="5" placeholder="Escolha de 1 a 5" value="${data.stars || ''}">
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Depoimento</label>
-      <textarea class="form-input testimonial-comment-input" placeholder="Ex: Excelente atendimento!" rows="2">${escapeHtml(data.comment || '')}</textarea>
+      <textarea class="form-input testimonial-comment-input" placeholder="Escreva a avaliação do cliente" rows="2">${escapeHtml(data.comment || '')}</textarea>
     </div>
   `;
   container.appendChild(div);
@@ -1398,9 +1398,9 @@ function getFormData() {
   const testimonials = [];
   document.querySelectorAll('#builder-testimonials-container .builder-item-row').forEach(row => {
     const name = row.querySelector('.testimonial-name-input')?.value.trim();
-    const stars = Number(row.querySelector('.testimonial-stars-input')?.value || 5);
+    const stars = Number(row.querySelector('.testimonial-stars-input')?.value || 0);
     const comment = row.querySelector('.testimonial-comment-input')?.value.trim();
-    if (name) testimonials.push({ name, stars, comment });
+    if (name && comment && stars >= 1 && stars <= 5) testimonials.push({ name, stars, comment });
   });
   data.testimonials = testimonials;
 
@@ -1576,7 +1576,15 @@ function renderCard(data, isPreview) {
   const hasServicesImage = servicesMode === 'image' && !!servicesImageUrl;
   const hasProducts    = servicesMode === 'list' && validProducts.length > 0;
   const hasGallery     = data.gallery     && data.gallery.length     > 0;
-  const hasTestimonials= data.testimonials&& data.testimonials.length> 0;
+  const validTestimonials = Array.isArray(data.testimonials)
+    ? data.testimonials.filter(t => {
+        const testimonialName = typeof t?.name === 'string' ? t.name.trim() : '';
+        const testimonialComment = typeof t?.comment === 'string' ? t.comment.trim() : '';
+        const testimonialStars = Number(t?.stars);
+        return testimonialName && testimonialComment && testimonialStars >= 1 && testimonialStars <= 5;
+      })
+    : [];
+  const hasTestimonials= validTestimonials.length > 0;
   const hasSiteContent = hasServicesImage || hasProducts || hasGallery || hasTestimonials;
 
   let siteToggleButton = '';
@@ -1633,7 +1641,7 @@ function renderCard(data, isPreview) {
     let testimonialsHtml = '';
     if (hasTestimonials) {
       testimonialsHtml = `<div class="site-block-title">⭐ Avaliações de Clientes</div><div class="testimonials-grid">`;
-      data.testimonials.forEach(t => {
+      validTestimonials.forEach(t => {
         const n = Math.min(5, Math.max(1, t.stars || 5));
         const stars = '★'.repeat(n) + '☆'.repeat(5 - n);
         testimonialsHtml += `
