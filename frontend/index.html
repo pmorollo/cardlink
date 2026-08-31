@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="CardLink — Reúna serviços, fotos, avaliações, localização, redes sociais e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.">
   <title>CardLink — Tudo o que seu cliente precisa ver antes de chamar você</title>
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#8b5cf6">
+  <meta name="theme-color" content="#f8b900">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="CardLink">
@@ -47,26 +47,41 @@
     <!-- Hero -->
     <div class="hero">
       <div class="hero-content container">
-        <div class="hero-badge">
-          <span class="dot"></span>
-          A partir de R$ 12,90/mês
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="hero-badge">
+              <span class="dot"></span>
+              A partir de R$ 12,90/mês
+            </div>
+            <h1>
+              Preencha seus dados.<br>O <span class="hero-word-yellow">CardLink</span><br><span class="text-gradient">cria sua página.</span>
+            </h1>
+            <p>
+              Você informa seus dados, serviços, fotos e contatos, e o CardLink organiza tudo automaticamente em uma página pronta na web para compartilhar.
+            </p>
+
+            <div class="hero-benefits" aria-label="Principais benefícios">
+              <span>🔗 Link ou QR Code próprios</span>
+              <span>✎ Fácil de editar</span>
+              <span>☁ Hospedagem inclusa</span>
+              <span>⚡ Configuração simples e rápida</span>
+            </div>
+
+            <div class="hero-buttons">
+              <button class="btn btn-primary btn-lg" onclick="document.getElementById('demonstracao').scrollIntoView({behavior:'smooth'})">
+                Ver demonstração <span aria-hidden="true">→</span>
+              </button>
+              <button class="btn btn-secondary btn-lg" onclick="document.getElementById('recursos').scrollIntoView({behavior:'smooth'})">
+                Conhecer recursos
+              </button>
+            </div>
+            <p class="hero-audience">☆ Ideal para autônomos, salões, barbearias, clínicas e pequenos negócios.</p>
+          </div>
+
+          <div class="hero-visual" aria-label="Exemplo de uma página profissional criada com o CardLink">
+            <img src="assets/hero-cardlink-studio-v2.webp" width="1600" height="900" alt="Profissional de salão ao lado de um celular mostrando uma página criada com o CardLink" fetchpriority="high">
+          </div>
         </div>
-        <h1>
-          Tudo o que seu cliente precisa ver<br><span class="text-gradient">antes de chamar você.</span>
-        </h1>
-        <p>
-          Reúna serviços, fotos, avaliações, localização, Instagram, Facebook e WhatsApp em uma apresentação profissional.
-          Compartilhe por um único link ou QR Code.
-        </p>
-        <div class="hero-buttons">
-          <button class="btn btn-primary btn-lg" onclick="document.getElementById('demonstracao').scrollIntoView({behavior:'smooth'})">
-            Ver demonstração
-          </button>
-          <button class="btn btn-secondary btn-lg" onclick="document.getElementById('recursos').scrollIntoView({behavior:'smooth'})">
-            Conhecer recursos
-          </button>
-        </div>
-        <p style="margin:18px auto 0;color:var(--text-muted);font-size:0.95rem;font-weight:700;letter-spacing:0.01em;">Instagram · Facebook · QR Code → CardLink → WhatsApp</p>
 
         <!-- Carrossel demonstrativo -->
         <div class="hero-mockup" id="demonstracao" style="display:flex;flex-direction:column;align-items:center;margin-top:50px;width:100%;">
