@@ -174,7 +174,7 @@ function affiliateConfigurationMatches(product) {
 async function configureAffiliateProgram(product) {
   if (affiliateConfigurationMatches(product)) return product;
 
-  const updated = await caktoRequest(`/products/${encodeURIComponent(product.id)}/`, {
+  await caktoRequest(`/products/${encodeURIComponent(product.id)}/`, {
     method: 'PUT',
     body: {
       name: String(product.name || 'CardLink PRO'),
@@ -190,7 +190,7 @@ async function configureAffiliateProgram(product) {
     }
   });
   console.log(`✅ Cakto: programa de afiliados configurado no produto CardLink (produto=${product.id}).`);
-  return updated;
+  return caktoRequest(`/products/${encodeURIComponent(product.id)}/`);
 }
 
 async function performCatalogSync({ createAnnual = false, configureAffiliates = false } = {}) {
