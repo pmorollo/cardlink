@@ -168,6 +168,8 @@ function affiliateConfigurationMatches(product) {
     Boolean(product?.affiliateRequest) &&
     numberEquals(product?.affiliateCommission, 30) &&
     Boolean(product?.affiliateMarketplace) &&
+    String(product?.affiliateClick || '').trim().toLowerCase() === 'last' &&
+    Number(product?.cookieTime) === -1 &&
     String(product?.affiliateSupportEmail || '').trim().toLowerCase() === 'cardlink@yahoo.com' &&
     String(product?.affiliateSalesPage || '').trim() === CARDLINK_PUBLIC_URL &&
     String(product?.affiliateDescription || '').includes(CARDLINK_AFFILIATE_MATERIALS_URL);
@@ -186,14 +188,25 @@ async function configureAffiliateProgram(product) {
       affiliate: true,
       affiliateRequest: true,
       affiliateCommission: '30.00',
+      affiliateContact: false,
       affiliateDescription: CARDLINK_AFFILIATE_DESCRIPTION,
       affiliateSupportEmail: 'cardlink@yahoo.com',
       affiliateMarketplace: true,
+      affiliateClick: 'last',
+      cookieTime: -1,
+      affiliateShareBump: false,
+      affiliateShareUpsell: false,
+      affiliateCloneQuiz: false,
+      affiliateCloneQuizUrl: '',
       affiliateSalesPage: CARDLINK_PUBLIC_URL
     }
   });
+  const updatedProduct = await caktoRequest(`/products/${encodeURIComponent(product.id)}/`);
+  if (!affiliateConfigurationMatches(updatedProduct)) {
+    throw new Error('A API da Cakto aceitou a atualização, mas não gravou a configuração do programa de afiliados');
+  }
   console.log(`✅ Cakto: programa de afiliados configurado no produto CardLink (produto=${product.id}).`);
-  return caktoRequest(`/products/${encodeURIComponent(product.id)}/`);
+  return updatedProduct;
 }
 
 async function performCatalogSync({ createAnnual = false, configureAffiliates = false } = {}) {
