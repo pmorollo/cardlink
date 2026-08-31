@@ -196,7 +196,7 @@ module.exports = app;
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
-    syncCaktoCatalog({ createAnnual: true, configureAffiliates: true })
+    syncCaktoCatalog({ createAnnual: true })
       .then(state => {
         if (!state.configured) {
           console.warn('⚠️ Cakto API: credenciais não configuradas; sincronização ignorada.');
