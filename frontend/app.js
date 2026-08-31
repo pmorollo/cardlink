@@ -1034,8 +1034,6 @@ async function loadDashboard() {
           </div>
         </div>
 
-        <div class="dash-card-mini-preview" id="dash-mini-preview"></div>
-
         <div class="dash-card-actions-bar">
           <button class="btn btn-secondary btn-sm" onclick="shareCard('${escapeHtml(card.slug)}')">Compartilhar</button>
           <button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">Mensagens recebidas (${stats.contacts})</button>
@@ -1087,11 +1085,6 @@ async function loadDashboard() {
         </div>
       </div>
     `;
-
-    const miniPreview = document.getElementById('dash-mini-preview');
-    if (miniPreview) {
-      miniPreview.innerHTML = `<div style="max-width:320px;margin:0 auto;">${renderCard(card, true)}</div>`;
-    }
 
   } catch (err) {
     content.innerHTML = `<p style="color:#ef4444;text-align:center;padding:var(--space-xl);">Erro ao carregar: ${err.message}</p>`;
