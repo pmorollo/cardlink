@@ -479,7 +479,7 @@
             <nav class="settings-nav" id="settings-nav" aria-label="Áreas de configuração">
               <button class="settings-nav-item active" type="button" data-settings-target="profile" onclick="showSettingsSection('profile')">Apresentação do negócio</button>
               <button class="settings-nav-item" type="button" data-settings-target="contact" onclick="showSettingsSection('contact')">Contato e WhatsApp</button>
-              <button class="settings-nav-item" type="button" data-settings-target="services" onclick="showSettingsSection('services')" hidden aria-hidden="true">Serviços / Produtos</button>
+              <button class="settings-nav-item" type="button" data-settings-target="services" onclick="showSettingsSection('services')">Serviços / Produtos</button>
               <button class="settings-nav-item" type="button" data-settings-target="gallery" onclick="showSettingsSection('gallery')">Galeria de fotos</button>
               <button class="settings-nav-item" type="button" data-settings-target="testimonials" onclick="showSettingsSection('testimonials')">Avaliações de clientes</button>
               <button class="settings-nav-item" type="button" data-settings-target="social" onclick="showSettingsSection('social')">Redes sociais</button>
@@ -589,7 +589,7 @@
               <label class="form-label" for="field-address">Endereço</label>
               <input class="form-input" type="text" id="field-address" placeholder="Rua, número, cidade — SP" data-field="address">
             </div>
-            <div class="form-group">
+            <div class="form-group" hidden aria-hidden="true">
               <label class="form-label" for="field-message">Mensagem</label>
               <textarea class="form-input" id="field-message" maxlength="1800" placeholder="Ex: Agende pelo WhatsApp ou visite-nos no fim de semana" data-field="message" rows="3"></textarea>
             </div>
@@ -662,7 +662,7 @@
           </div>
 
           <!-- Flexible services / menu / price list -->
-          <div class="form-section settings-section" data-settings-section="services" hidden aria-hidden="true">
+          <div class="form-section settings-section" data-settings-section="services">
             <div class="form-section-title"><span class="icon">📋</span> Serviços / Produtos</div>
             <p style="color:var(--text-secondary);font-size:0.86rem;line-height:1.55;margin:-4px 0 16px;">
               Mostre seu conteúdo do seu jeito: envie uma arte pronta com preços/cardápio ou monte uma lista de itens no CardLink.
