@@ -191,6 +191,16 @@ test('/api/diag foi removido', async () => {
   assert.equal(r.data.error, 'Endpoint não encontrado');
 });
 
+test('checkout publico nao expoe credenciais da Cakto', async () => {
+  const r = await api('GET', '/api/payments/cakto-checkout-links');
+  assert.equal(r.status, 200);
+  assert.equal(r.data.monthlyCheckoutUrl, 'https://pay.cakto.com.br/kawb7xd_1032085');
+  assert.equal(r.data.annualCheckoutUrl, '');
+  assert.equal('clientId' in r.data, false);
+  assert.equal('clientSecret' in r.data, false);
+  assert.equal('accessToken' in r.data, false);
+});
+
 test('subscription_created sozinho nao libera conta antes do pagamento aprovado', async () => {
   const email = 'assinatura-sem-pagamento@example.com';
   const hook = await api('POST', '/api/payments/cakto-webhook', {

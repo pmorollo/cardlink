@@ -27,6 +27,7 @@ const uploadRoutes = require('./routes/upload');
 const aiRoutes = require('./routes/ai');
 const { adminRouter, supportRouter, messageRouter } = require('./routes/admin');
 const paymentRoutes = require('./routes/payments');
+const { syncCaktoCatalog } = require('./services/cakto');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('./db/repository');
 const { sendEmail } = require('./utils/email');
 const { hasActiveCustomerAccess } = require('./utils/subscription');
@@ -190,5 +191,14 @@ module.exports = app;
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
+    syncCaktoCatalog({ createAnnual: true })
+      .then(state => {
+        if (!state.configured) {
+          console.warn('⚠️ Cakto API: credenciais não configuradas; sincronização ignorada.');
+          return;
+        }
+        console.log(`✅ Cakto API sincronizada: checkouts=${state.ready ? 'prontos' : 'incompletos'}, webhook=${state.webhookConfigured === null ? 'não consultado' : state.webhookConfigured ? 'vinculado' : 'não vinculado'}.`);
+      })
+      .catch(error => console.error(`❌ Falha na sincronização Cakto: ${error.message}`));
   });
 }

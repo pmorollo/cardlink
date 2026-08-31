@@ -4,11 +4,31 @@ const crypto = require('crypto');
 const { users } = require('../db/repository');
 const { sendEmail } = require('../utils/email');
 const { createActivationToken, sendActivationEmail } = require('../utils/accountActivation');
+const authMiddleware = require('../middleware/auth');
+const { requireAdmin } = require('../middleware/roles');
+const { syncCaktoCatalog, getPublicCatalogState } = require('../services/cakto');
 
 const router = express.Router();
 
 const ACTIVATE_EVENTS = ['purchase_approved', 'subscription_renewed'];
 const CANCEL_EVENTS = ['subscription_canceled', 'refund', 'chargeback'];
+
+// Expõe somente links públicos de checkout e indicadores não sensíveis.
+// As credenciais da Cakto nunca são enviadas ao navegador.
+router.get('/cakto-checkout-links', (req, res) => {
+  res.json(getPublicCatalogState());
+});
+
+// Permite ao administrador repetir a sincronização sem reiniciar o serviço.
+router.post('/cakto-sync', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const state = await syncCaktoCatalog({ createAnnual: true });
+    res.json(state);
+  } catch (error) {
+    console.error(`Erro ao sincronizar catálogo Cakto: ${error.message}`);
+    res.status(502).json({ error: 'Não foi possível sincronizar o catálogo da Cakto.' });
+  }
+});
 
 function cleanEmail(value) {
   return String(Array.isArray(value) ? value[0] : value || '').trim().toLowerCase().substring(0, 200);

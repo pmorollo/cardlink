@@ -393,8 +393,22 @@ function updateNavAuth() {
 // ============================================
 // App Init
 // ============================================
+async function loadCheckoutConfig() {
+  try {
+    const res = await fetch(API + '/payments/cakto-checkout-links');
+    if (!res.ok) return;
+    const config = await res.json();
+    if (!window.CARD_LINK) window.CARD_LINK = {};
+    if (config.monthlyCheckoutUrl) window.CARD_LINK.monthlyCheckoutUrl = config.monthlyCheckoutUrl;
+    if (config.annualCheckoutUrl) window.CARD_LINK.annualCheckoutUrl = config.annualCheckoutUrl;
+  } catch (error) {
+    console.warn('Não foi possível atualizar os links de checkout:', error.message);
+  }
+}
+
 window.addEventListener('hashchange', handleRoute);
 window.addEventListener('DOMContentLoaded', async () => {
+  await loadCheckoutConfig();
   if (authToken) {
     try {
       currentUser = await api('/auth/me');
