@@ -3,6 +3,7 @@
    ============================================ */
 
 const API = window.location.origin + '/api';
+const CARDLINK_SUPPORT_WHATSAPP = '5511994551249';
 
 let authToken = localStorage.getItem('cardlink_token') || null;
 let currentUser = null;
@@ -42,6 +43,13 @@ function escapeHtml(str) {
 function cleanWhatsapp(num) {
   if (!num) return '';
   return num.replace(/\D/g, '');
+}
+
+function openCardLinkSupport(context = 'subscriber') {
+  const message = context === 'prepurchase'
+    ? 'Olá! Tenho uma dúvida sobre o CardLink antes de assinar.'
+    : 'Olá! Sou assinante do CardLink e preciso de ajuda.';
+  window.open(`https://wa.me/${CARDLINK_SUPPORT_WHATSAPP}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
 }
 
 function setFieldValue(id, val) {
@@ -1081,7 +1089,10 @@ async function loadDashboard() {
             <h3 style="font-family:var(--font-display);font-weight:700;margin-bottom:4px;">💬 Central de Ajuda & Suporte</h3>
             <p style="color:var(--text-secondary);font-size:0.85rem;">Teve algum problema ou tem alguma dúvida sobre seu site? Fale conosco.</p>
           </div>
-          <button class="btn btn-secondary btn-sm" onclick="openSupportModal()">Enviar dúvida</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="openCardLinkSupport('subscriber')" style="background:#25d366;border-color:#25d366;color:#fff;">💬 Falar no WhatsApp</button>
+            <button class="btn btn-secondary btn-sm" onclick="openSupportModal()">Enviar chamado</button>
+          </div>
         </div>
       </div>
     `;
