@@ -2861,6 +2861,16 @@ textarea.form-input {
   border-bottom-color: rgba(248, 185, 0, 0.55);
 }
 
+.navbar .navbar-subscribe {
+  background: linear-gradient(135deg, #ffd331, var(--yellow));
+  color: #05070b;
+  box-shadow: 0 6px 22px rgba(248, 185, 0, 0.28);
+}
+
+.navbar .navbar-subscribe:hover {
+  box-shadow: 0 9px 30px rgba(248, 185, 0, 0.4);
+}
+
 #demonstracao,
 #recursos,
 #como-funciona,
