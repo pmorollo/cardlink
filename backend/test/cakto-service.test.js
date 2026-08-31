@@ -72,6 +72,9 @@ test('cria a oferta anual, configura afiliados e confere o webhook existente', a
     }
     if (String(url).endsWith('/products/product-1/') && options.method === 'PUT') {
       const payload = JSON.parse(options.body);
+      assert.equal(payload.name, 'CardLink');
+      assert.equal(payload.price, '12.90');
+      assert.match(payload.description, /Cartão digital profissional/);
       assert.equal(payload.affiliate, true);
       assert.equal(payload.affiliateRequest, true);
       assert.equal(payload.affiliateCommission, '30.00');

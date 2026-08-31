@@ -8,6 +8,7 @@ const CARDLINK_AFFILIATE_DESCRIPTION = [
   'Planos: R$ 12,90 por mês ou R$ 99 por ano.',
   `Materiais oficiais de divulgação: ${CARDLINK_AFFILIATE_MATERIALS_URL}`
 ].join(' ');
+const CARDLINK_PRODUCT_DESCRIPTION = 'Cartão digital profissional para reunir serviços, fotos, avaliações, localização, redes sociais e WhatsApp em um único link ou QR Code.';
 
 let tokenCache = null;
 let syncPromise = null;
@@ -176,6 +177,9 @@ async function configureAffiliateProgram(product) {
   const updated = await caktoRequest(`/products/${encodeURIComponent(product.id)}/`, {
     method: 'PUT',
     body: {
+      name: String(product.name || 'CardLink PRO'),
+      description: String(product.description || CARDLINK_PRODUCT_DESCRIPTION),
+      price: String(product.price || '12.90'),
       affiliate: true,
       affiliateRequest: true,
       affiliateCommission: '30.00',
