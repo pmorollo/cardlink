@@ -64,6 +64,8 @@ test('cria a oferta anual, configura afiliados e confere o webhook existente', a
         affiliateRequest: affiliateConfigured,
         affiliateCommission: affiliateConfigured ? '30.00' : null,
         affiliateMarketplace: affiliateConfigured,
+        affiliateClick: affiliateConfigured ? 'last' : '',
+        cookieTime: affiliateConfigured ? -1 : null,
         affiliateDescription: affiliateConfigured ? 'Materiais: https://cardlink.digitalnexoapp.com/afiliados' : '',
         affiliateSupportEmail: affiliateConfigured ? 'cardlink@yahoo.com' : '',
         affiliateSalesPage: affiliateConfigured ? 'https://cardlink.digitalnexoapp.com/' : '',
@@ -80,7 +82,14 @@ test('cria a oferta anual, configura afiliados e confere o webhook existente', a
       assert.equal(payload.affiliate, true);
       assert.equal(payload.affiliateRequest, true);
       assert.equal(payload.affiliateCommission, '30.00');
+      assert.equal(payload.affiliateContact, false);
       assert.equal(payload.affiliateMarketplace, true);
+      assert.equal(payload.affiliateClick, 'last');
+      assert.equal(payload.cookieTime, -1);
+      assert.equal(payload.affiliateShareBump, false);
+      assert.equal(payload.affiliateShareUpsell, false);
+      assert.equal(payload.affiliateCloneQuiz, false);
+      assert.equal(payload.affiliateCloneQuizUrl, '');
       assert.equal(payload.affiliateSupportEmail, 'cardlink@yahoo.com');
       assert.equal(payload.affiliateSalesPage, 'https://cardlink.digitalnexoapp.com/');
       assert.match(payload.affiliateDescription, /cardlink\.digitalnexoapp\.com\/afiliados/);
@@ -95,6 +104,8 @@ test('cria a oferta anual, configura afiliados e confere o webhook existente', a
         affiliateRequest: true,
         affiliateCommission: '30.00',
         affiliateMarketplace: true,
+        affiliateClick: 'last',
+        cookieTime: -1,
         affiliateDescription: payload.affiliateDescription,
         affiliateSupportEmail: payload.affiliateSupportEmail,
         affiliateSalesPage: payload.affiliateSalesPage,
