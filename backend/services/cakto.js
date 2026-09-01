@@ -1,6 +1,7 @@
 const CAKTO_API_BASE = 'https://api.cakto.com.br/public_api';
 const DEFAULT_MONTHLY_CHECKOUT_URL = 'https://pay.cakto.com.br/kawb7xd_1032085';
 const KIT_FILHOTES_PRODUCT_ID = '1c1dcd12-bc81-4e19-bef0-155c396d347f';
+const KIT_FILHOTES_IMAGE_URL = 'https://cardlink.digitalnexoapp.com/assets/kit-filhotes-produto.png';
 const CARDLINK_PUBLIC_URL = 'https://cardlink.digitalnexoapp.com/';
 const CARDLINK_AFFILIATE_MATERIALS_URL = `${CARDLINK_PUBLIC_URL}afiliados`;
 const CARDLINK_AFFILIATE_DESCRIPTION = [
@@ -145,6 +146,31 @@ function categoryName(product) {
 function deliveryTypes(product) {
   const value = product?.contentDeliveries || product?.content_deliveries;
   return Array.isArray(value) ? value.map(item => String(item)) : [];
+}
+
+async function ensureKitFilhotesImage() {
+  const product = await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`);
+  if (String(product?.image || '').trim() === KIT_FILHOTES_IMAGE_URL) {
+    return { updated: false, image: KIT_FILHOTES_IMAGE_URL };
+  }
+
+  await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`, {
+    method: 'PUT',
+    body: {
+      name: String(product?.name || 'Meu Kit Filhotes — 50 Atividades Infantis'),
+      description: String(product?.description || ''),
+      price: String(product?.price || '27.90'),
+      image: KIT_FILHOTES_IMAGE_URL
+    }
+  });
+
+  const updatedProduct = await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`);
+  if (String(updatedProduct?.image || '').trim() !== KIT_FILHOTES_IMAGE_URL) {
+    throw new Error('A API da Cakto aceitou a atualização, mas não gravou a imagem do Kit Filhotes');
+  }
+
+  console.log(`✅ Cakto: imagem cadastrada no Kit Filhotes (produto=${KIT_FILHOTES_PRODUCT_ID}).`);
+  return { updated: true, image: KIT_FILHOTES_IMAGE_URL };
 }
 
 async function getKitFilhotesStatus() {
@@ -422,5 +448,6 @@ module.exports = {
   syncCaktoCatalog,
   getPublicCatalogState,
   getKitFilhotesStatus,
+  ensureKitFilhotesImage,
   _resetForTests: resetForTests
 };

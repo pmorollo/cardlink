@@ -27,7 +27,7 @@ const uploadRoutes = require('./routes/upload');
 const aiRoutes = require('./routes/ai');
 const { adminRouter, supportRouter, messageRouter } = require('./routes/admin');
 const paymentRoutes = require('./routes/payments');
-const { syncCaktoCatalog } = require('./services/cakto');
+const { syncCaktoCatalog, ensureKitFilhotesImage } = require('./services/cakto');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('./db/repository');
 const { sendEmail } = require('./utils/email');
 const { hasActiveCustomerAccess } = require('./utils/subscription');
@@ -206,5 +206,7 @@ if (require.main === module) {
         console.log(`✅ Cakto API sincronizada: checkouts=${state.ready ? 'prontos' : 'incompletos'}, webhook=${state.webhookConfigured === null ? 'não consultado' : state.webhookConfigured ? 'vinculado' : 'não vinculado'}.`);
       })
       .catch(error => console.error(`❌ Falha na sincronização Cakto: ${error.message}`));
+    ensureKitFilhotesImage()
+      .catch(error => console.error(`❌ Falha ao cadastrar imagem do Kit Filhotes: ${error.message}`));
   });
 }

@@ -6,6 +6,7 @@ const {
   syncCaktoCatalog,
   getPublicCatalogState,
   getKitFilhotesStatus,
+  ensureKitFilhotesImage,
   _resetForTests
 } = require('../services/cakto');
 
@@ -96,6 +97,46 @@ test('consulta o Kit Filhotes sem alterar produto, oferta ou webhook', async () 
   assert.deepEqual(new Set(calls.map(call => call.method)), new Set(['GET', 'POST']));
   assert.equal(calls.some(call => ['PUT', 'PATCH', 'DELETE'].includes(call.method)), false);
   assert.equal(calls.some(call => call.url.includes('/webhook/')), false);
+});
+
+test('cadastra somente a imagem oficial no Kit Filhotes e confirma a gravação', async () => {
+  process.env.CAKTO_CLIENT_ID = 'client-test';
+  process.env.CAKTO_CLIENT_SECRET = 'secret-test';
+  _resetForTests();
+  let savedImage = '';
+  const calls = [];
+  global.fetch = async (url, options = {}) => {
+    calls.push({ url: String(url), options });
+    if (String(url).endsWith('/token/')) {
+      return jsonResponse({ access_token: 'token', expires_in: 3600 });
+    }
+    if (String(url).endsWith('/products/1c1dcd12-bc81-4e19-bef0-155c396d347f/') && (options.method || 'GET') === 'GET') {
+      return jsonResponse({
+        id: '1c1dcd12-bc81-4e19-bef0-155c396d347f',
+        name: 'Meu Kit Filhotes — 50 Atividades Infantis',
+        description: 'Produto digital infantil.',
+        price: 27.9,
+        image: savedImage
+      });
+    }
+    if (String(url).endsWith('/products/1c1dcd12-bc81-4e19-bef0-155c396d347f/') && options.method === 'PUT') {
+      const payload = JSON.parse(options.body);
+      assert.equal(payload.name, 'Meu Kit Filhotes — 50 Atividades Infantis');
+      assert.equal(payload.description, 'Produto digital infantil.');
+      assert.equal(payload.price, '27.9');
+      assert.equal(payload.image, 'https://cardlink.digitalnexoapp.com/assets/kit-filhotes-produto.png');
+      savedImage = payload.image;
+      return jsonResponse({ ...payload, id: '1c1dcd12-bc81-4e19-bef0-155c396d347f' });
+    }
+    throw new Error(`URL inesperada: ${url}`);
+  };
+
+  const result = await ensureKitFilhotesImage();
+
+  assert.equal(result.updated, true);
+  assert.equal(result.image, 'https://cardlink.digitalnexoapp.com/assets/kit-filhotes-produto.png');
+  assert.equal(calls.filter(call => call.options.method === 'PUT').length, 1);
+  assert.equal(calls.filter(call => ['PATCH', 'DELETE', 'POST'].includes(call.options.method) && !call.url.endsWith('/token/')).length, 0);
 });
 
 test('cria a oferta anual, configura afiliados e confere o webhook existente', async () => {
