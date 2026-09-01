@@ -6,7 +6,7 @@ const { sendEmail } = require('../utils/email');
 const { createActivationToken, sendActivationEmail } = require('../utils/accountActivation');
 const authMiddleware = require('../middleware/auth');
 const { requireAdmin } = require('../middleware/roles');
-const { syncCaktoCatalog, getPublicCatalogState } = require('../services/cakto');
+const { syncCaktoCatalog, getPublicCatalogState, getKitFilhotesStatus } = require('../services/cakto');
 
 const router = express.Router();
 
@@ -17,6 +17,18 @@ const CANCEL_EVENTS = ['subscription_canceled', 'refund', 'chargeback'];
 // As credenciais da Cakto nunca são enviadas ao navegador.
 router.get('/cakto-checkout-links', (req, res) => {
   res.json(getPublicCatalogState());
+});
+
+// Auditoria somente leitura do produto digital hospedado na mesma conta Cakto.
+// Expõe apenas configuração comercial pública; credenciais e dados de compradores
+// permanecem exclusivamente no servidor.
+router.get('/cakto-kit-filhotes-status', async (req, res) => {
+  try {
+    res.json(await getKitFilhotesStatus());
+  } catch (error) {
+    console.error(`Erro ao consultar Kit Filhotes na Cakto: ${error.message}`);
+    res.status(502).json({ error: 'Não foi possível consultar o Kit Filhotes na Cakto.' });
+  }
 });
 
 // Permite ao administrador repetir a sincronização sem reiniciar o serviço.

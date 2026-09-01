@@ -2,7 +2,12 @@ process.env.NODE_ENV = 'test';
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { syncCaktoCatalog, getPublicCatalogState, _resetForTests } = require('../services/cakto');
+const {
+  syncCaktoCatalog,
+  getPublicCatalogState,
+  getKitFilhotesStatus,
+  _resetForTests
+} = require('../services/cakto');
 
 const originalFetch = global.fetch;
 const originalClientId = process.env.CAKTO_CLIENT_ID;
@@ -36,6 +41,61 @@ test('sem credenciais preserva o checkout mensal e nao chama a Cakto', async () 
   assert.equal(state.ready, false);
   assert.equal(state.monthlyCheckoutUrl, 'https://pay.cakto.com.br/kawb7xd_1032085');
   assert.equal(state.annualCheckoutUrl, '');
+});
+
+test('consulta o Kit Filhotes sem alterar produto, oferta ou webhook', async () => {
+  process.env.CAKTO_CLIENT_ID = 'client-test';
+  process.env.CAKTO_CLIENT_SECRET = 'secret-test';
+  _resetForTests();
+  const calls = [];
+
+  global.fetch = async (url, options = {}) => {
+    calls.push({ url: String(url), method: options.method || 'GET' });
+    if (String(url).endsWith('/token/')) {
+      return jsonResponse({ access_token: 'token-test', expires_in: 3600 });
+    }
+    if (String(url).endsWith('/products/1c1dcd12-bc81-4e19-bef0-155c396d347f/')) {
+      return jsonResponse({
+        id: '1c1dcd12-bc81-4e19-bef0-155c396d347f',
+        short_id: 'filhotes-50',
+        name: 'Meu Kit Filhotes — 50 Atividades Infantis',
+        status: 'active',
+        type: 'unique',
+        price: 27.9,
+        image: 'https://example.com/filhotes.png',
+        salesPage: 'https://lojanexobrasil.com/kit-infantil-filhotes/',
+        paymentMethods: ['pix', 'credit_card'],
+        contentDeliveries: ['cakto_v2'],
+        category: { name: 'Educacional' }
+      });
+    }
+    if (String(url).includes('/offers/?product=1c1dcd12-bc81-4e19-bef0-155c396d347f')) {
+      return jsonResponse({
+        results: [{
+          id: '3eccdeq_1078204',
+          name: 'Meu Kit Filhotes',
+          price: 27.9,
+          product: '1c1dcd12-bc81-4e19-bef0-155c396d347f',
+          status: 'active',
+          type: 'unique',
+          default: true
+        }]
+      });
+    }
+    throw new Error(`URL inesperada: ${url}`);
+  };
+
+  const state = await getKitFilhotesStatus();
+
+  assert.equal(state.ready, true);
+  assert.equal(state.productName, 'Meu Kit Filhotes — 50 Atividades Infantis');
+  assert.equal(state.category, 'Educacional');
+  assert.equal(state.hasCaktoMembers, true);
+  assert.equal(state.launchCheckoutUrl, 'https://pay.cakto.com.br/3eccdeq_1078204');
+  assert.equal(state.offers.length, 1);
+  assert.deepEqual(new Set(calls.map(call => call.method)), new Set(['GET', 'POST']));
+  assert.equal(calls.some(call => ['PUT', 'PATCH', 'DELETE'].includes(call.method)), false);
+  assert.equal(calls.some(call => call.url.includes('/webhook/')), false);
 });
 
 test('cria a oferta anual, configura afiliados e confere o webhook existente', async () => {

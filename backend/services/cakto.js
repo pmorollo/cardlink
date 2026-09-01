@@ -1,5 +1,6 @@
 const CAKTO_API_BASE = 'https://api.cakto.com.br/public_api';
 const DEFAULT_MONTHLY_CHECKOUT_URL = 'https://pay.cakto.com.br/kawb7xd_1032085';
+const KIT_FILHOTES_PRODUCT_ID = '1c1dcd12-bc81-4e19-bef0-155c396d347f';
 const CARDLINK_PUBLIC_URL = 'https://cardlink.digitalnexoapp.com/';
 const CARDLINK_AFFILIATE_MATERIALS_URL = `${CARDLINK_PUBLIC_URL}afiliados`;
 const CARDLINK_AFFILIATE_DESCRIPTION = [
@@ -133,6 +134,61 @@ function numberEquals(value, expected) {
 function offerCheckoutUrl(offer) {
   if (!offer?.id) return '';
   return `https://pay.cakto.com.br/${offer.id}`;
+}
+
+function categoryName(product) {
+  return String(
+    (typeof product?.category === 'object' ? product.category?.name : product?.category) || ''
+  );
+}
+
+function deliveryTypes(product) {
+  const value = product?.contentDeliveries || product?.content_deliveries;
+  return Array.isArray(value) ? value.map(item => String(item)) : [];
+}
+
+async function getKitFilhotesStatus() {
+  const product = await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`);
+  const offersBody = await caktoRequest(
+    `/offers/?product=${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}&status=active&limit=100`
+  );
+  const offers = resultsOf(offersBody).map(offer => ({
+    id: String(offer.id || ''),
+    name: String(offer.name || ''),
+    price: Number(offer.price),
+    status: String(offer.status || ''),
+    type: String(offer.type || ''),
+    default: Boolean(offer.default),
+    checkoutUrl: offerCheckoutUrl(offer)
+  }));
+  const deliveries = deliveryTypes(product);
+  const launchOffer = offers.find(offer =>
+    offer.status === 'active' && offer.type === 'unique' && numberEquals(offer.price, 27.9)
+  );
+
+  return {
+    configured: true,
+    ready: Boolean(product?.status === 'active' && launchOffer),
+    productId: String(product?.id || KIT_FILHOTES_PRODUCT_ID),
+    productShortId: String(product?.short_id || ''),
+    productName: String(product?.name || ''),
+    status: String(product?.status || ''),
+    type: String(product?.type || ''),
+    price: Number(product?.price),
+    category: categoryName(product),
+    hasProductImage: Boolean(String(product?.image || '').trim()),
+    hasSalesPage: Boolean(String(product?.salesPage || '').trim()),
+    salesPageUrl: String(product?.salesPage || '').trim(),
+    paymentMethods: Array.isArray(product?.paymentMethods)
+      ? product.paymentMethods.map(item => String(item))
+      : [],
+    contentDeliveries: deliveries,
+    hasCaktoMembers: deliveries.includes('cakto_v2'),
+    hasEmailAccess: deliveries.includes('emailAccess'),
+    offers,
+    launchCheckoutUrl: launchOffer?.checkoutUrl || '',
+    lastSyncAt: new Date().toISOString()
+  };
 }
 
 function isMonthlyOffer(offer) {
@@ -365,5 +421,6 @@ function resetForTests() {
 module.exports = {
   syncCaktoCatalog,
   getPublicCatalogState,
+  getKitFilhotesStatus,
   _resetForTests: resetForTests
 };
