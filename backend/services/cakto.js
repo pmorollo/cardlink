@@ -1,7 +1,7 @@
 const CAKTO_API_BASE = 'https://api.cakto.com.br/public_api';
-const CAKTO_APP_API_BASE = 'https://api.cakto.com.br/api';
 const DEFAULT_MONTHLY_CHECKOUT_URL = 'https://pay.cakto.com.br/kawb7xd_1032085';
 const KIT_FILHOTES_PRODUCT_ID = '1c1dcd12-bc81-4e19-bef0-155c396d347f';
+const KIT_FILHOTES_IMAGE_URL = 'https://raw.githubusercontent.com/pmorollo/cardlink/master/frontend/assets/kit-filhotes-produto.jpg';
 const CARDLINK_PUBLIC_URL = 'https://cardlink.digitalnexoapp.com/';
 const CARDLINK_AFFILIATE_MATERIALS_URL = `${CARDLINK_PUBLIC_URL}afiliados`;
 const CARDLINK_AFFILIATE_DESCRIPTION = [
@@ -150,37 +150,6 @@ function deliveryTypes(product) {
   return Array.isArray(value) ? value.map(item => String(item)) : [];
 }
 
-async function uploadKitFilhotesImage() {
-  const fs = require('fs');
-  const path = require('path');
-  const imagePath = path.join(__dirname, '..', '..', 'frontend', 'assets', 'kit-filhotes-produto.jpg');
-  const imageBuffer = process.env.NODE_ENV === 'test'
-    ? Buffer.from('test-image')
-    : fs.readFileSync(imagePath);
-  const form = new FormData();
-  form.append('file', new Blob([imageBuffer], { type: 'image/jpeg' }), 'kit-filhotes-produto.jpg');
-
-  const token = await getAccessToken();
-  const timeout = withTimeout(30000);
-  try {
-    const response = await fetch(
-      `${CAKTO_APP_API_BASE}/gallery/upload/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`,
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
-        signal: timeout.signal
-      }
-    );
-    const body = await parseResponse(response);
-    const imageUrl = String(body?.file || body?.url || body?.preview || '').trim();
-    if (!imageUrl) throw new Error('A Cakto não retornou a URL da imagem enviada');
-    return imageUrl;
-  } finally {
-    timeout.clear();
-  }
-}
-
 async function ensureKitFilhotesImage() {
   kitImageSyncState = { attempted: true, success: false, error: null };
   try {
@@ -191,15 +160,13 @@ async function ensureKitFilhotesImage() {
       return { updated: false, image: currentImage };
     }
 
-    const uploadedImage = await uploadKitFilhotesImage();
-
     await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`, {
       method: 'PUT',
       body: {
         name: String(product?.name || 'Meu Kit Filhotes — 50 Atividades Infantis'),
         description: String(product?.description || ''),
         price: String(product?.price || '27.90'),
-        image: uploadedImage
+        image: KIT_FILHOTES_IMAGE_URL
       }
     });
 
