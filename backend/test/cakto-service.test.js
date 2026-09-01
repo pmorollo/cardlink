@@ -124,7 +124,7 @@ test('cadastra somente a imagem oficial no Kit Filhotes e confirma a gravação'
       assert.equal(payload.name, 'Meu Kit Filhotes — 50 Atividades Infantis');
       assert.equal(payload.description, 'Produto digital infantil.');
       assert.equal(payload.price, '27.9');
-      assert.equal(payload.image, 'https://cardlink.digitalnexoapp.com/assets/kit-filhotes-produto.png');
+      assert.equal(payload.image, 'https://cardlink.digitalnexoapp.com/assets/kit-filhotes-produto.jpg');
       savedImage = payload.image;
       return jsonResponse({ ...payload, id: '1c1dcd12-bc81-4e19-bef0-155c396d347f' });
     }
@@ -134,7 +134,7 @@ test('cadastra somente a imagem oficial no Kit Filhotes e confirma a gravação'
   const result = await ensureKitFilhotesImage();
 
   assert.equal(result.updated, true);
-  assert.equal(result.image, 'https://cardlink.digitalnexoapp.com/assets/kit-filhotes-produto.png');
+  assert.equal(result.image, 'https://cardlink.digitalnexoapp.com/assets/kit-filhotes-produto.jpg');
   assert.equal(calls.filter(call => call.options.method === 'PUT').length, 1);
   assert.equal(calls.filter(call => ['PATCH', 'DELETE', 'POST'].includes(call.options.method) && !call.url.endsWith('/token/')).length, 0);
 });
