@@ -110,14 +110,6 @@ test('cadastra somente a imagem oficial no Kit Filhotes e confirma a gravação'
     if (String(url).endsWith('/token/')) {
       return jsonResponse({ access_token: 'token', expires_in: 3600 });
     }
-    if (String(url).includes('/api/gallery/upload/1c1dcd12-bc81-4e19-bef0-155c396d347f/')) {
-      assert.equal(options.method, 'POST');
-      assert.ok(options.body instanceof FormData);
-      return jsonResponse({
-        id: 'gallery-image-1',
-        file: 'https://cdn-checkout.cakto.com.br/products/kit-filhotes.jpg'
-      });
-    }
     if (String(url).endsWith('/products/1c1dcd12-bc81-4e19-bef0-155c396d347f/') && (options.method || 'GET') === 'GET') {
       return jsonResponse({
         id: '1c1dcd12-bc81-4e19-bef0-155c396d347f',
@@ -132,7 +124,7 @@ test('cadastra somente a imagem oficial no Kit Filhotes e confirma a gravação'
       assert.equal(payload.name, 'Meu Kit Filhotes — 50 Atividades Infantis');
       assert.equal(payload.description, 'Produto digital infantil.');
       assert.equal(payload.price, '27.9');
-      assert.equal(payload.image, 'https://cdn-checkout.cakto.com.br/products/kit-filhotes.jpg');
+      assert.equal(payload.image, 'https://raw.githubusercontent.com/pmorollo/cardlink/master/frontend/assets/kit-filhotes-produto.jpg');
       savedImage = payload.image;
       return jsonResponse({ ...payload, id: '1c1dcd12-bc81-4e19-bef0-155c396d347f' });
     }
@@ -142,9 +134,9 @@ test('cadastra somente a imagem oficial no Kit Filhotes e confirma a gravação'
   const result = await ensureKitFilhotesImage();
 
   assert.equal(result.updated, true);
-  assert.equal(result.image, 'https://cdn-checkout.cakto.com.br/products/kit-filhotes.jpg');
+  assert.equal(result.image, 'https://raw.githubusercontent.com/pmorollo/cardlink/master/frontend/assets/kit-filhotes-produto.jpg');
   assert.equal(calls.filter(call => call.options.method === 'PUT').length, 1);
-  assert.equal(calls.filter(call => call.options.method === 'POST' && call.url.includes('/gallery/upload/')).length, 1);
+  assert.equal(calls.filter(call => call.options.method === 'POST' && call.url.includes('/gallery/upload/')).length, 0);
   assert.equal(calls.filter(call => ['PATCH', 'DELETE'].includes(call.options.method)).length, 0);
 });
 
