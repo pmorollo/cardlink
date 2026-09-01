@@ -14,6 +14,7 @@ const CARDLINK_PRODUCT_DESCRIPTION = 'Cartão digital profissional para reunir s
 
 let tokenCache = null;
 let syncPromise = null;
+let kitImageSyncState = { attempted: false, success: false, error: null };
 let catalogState = {
   configured: false,
   ready: false,
@@ -32,6 +33,7 @@ let catalogState = {
   hasAffiliateSupportEmail: false,
   hasAffiliateSalesPage: false,
   hasProductImage: false,
+  productImageUrl: '',
   hasSalesPage: false,
   affiliateSalesPageUrl: '',
   salesPageUrl: '',
@@ -149,28 +151,40 @@ function deliveryTypes(product) {
 }
 
 async function ensureKitFilhotesImage() {
-  const product = await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`);
-  if (String(product?.image || '').trim() === KIT_FILHOTES_IMAGE_URL) {
-    return { updated: false, image: KIT_FILHOTES_IMAGE_URL };
-  }
-
-  await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`, {
-    method: 'PUT',
-    body: {
-      name: String(product?.name || 'Meu Kit Filhotes — 50 Atividades Infantis'),
-      description: String(product?.description || ''),
-      price: String(product?.price || '27.90'),
-      image: KIT_FILHOTES_IMAGE_URL
+  kitImageSyncState = { attempted: true, success: false, error: null };
+  try {
+    const product = await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`);
+    if (String(product?.image || '').trim() === KIT_FILHOTES_IMAGE_URL) {
+      kitImageSyncState = { attempted: true, success: true, error: null };
+      return { updated: false, image: KIT_FILHOTES_IMAGE_URL };
     }
-  });
 
-  const updatedProduct = await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`);
-  if (String(updatedProduct?.image || '').trim() !== KIT_FILHOTES_IMAGE_URL) {
-    throw new Error('A API da Cakto aceitou a atualização, mas não gravou a imagem do Kit Filhotes');
+    await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`, {
+      method: 'PUT',
+      body: {
+        name: String(product?.name || 'Meu Kit Filhotes — 50 Atividades Infantis'),
+        description: String(product?.description || ''),
+        price: String(product?.price || '27.90'),
+        image: KIT_FILHOTES_IMAGE_URL
+      }
+    });
+
+    const updatedProduct = await caktoRequest(`/products/${encodeURIComponent(KIT_FILHOTES_PRODUCT_ID)}/`);
+    if (String(updatedProduct?.image || '').trim() !== KIT_FILHOTES_IMAGE_URL) {
+      throw new Error('A API da Cakto aceitou a atualização, mas não gravou a imagem do Kit Filhotes');
+    }
+
+    kitImageSyncState = { attempted: true, success: true, error: null };
+    console.log(`✅ Cakto: imagem cadastrada no Kit Filhotes (produto=${KIT_FILHOTES_PRODUCT_ID}).`);
+    return { updated: true, image: KIT_FILHOTES_IMAGE_URL };
+  } catch (error) {
+    kitImageSyncState = {
+      attempted: true,
+      success: false,
+      error: String(error?.message || 'Falha desconhecida').substring(0, 300)
+    };
+    throw error;
   }
-
-  console.log(`✅ Cakto: imagem cadastrada no Kit Filhotes (produto=${KIT_FILHOTES_PRODUCT_ID}).`);
-  return { updated: true, image: KIT_FILHOTES_IMAGE_URL };
 }
 
 async function getKitFilhotesStatus() {
@@ -203,6 +217,8 @@ async function getKitFilhotesStatus() {
     price: Number(product?.price),
     category: categoryName(product),
     hasProductImage: Boolean(String(product?.image || '').trim()),
+    productImageUrl: String(product?.image || '').trim(),
+    imageSync: { ...kitImageSyncState },
     hasSalesPage: Boolean(String(product?.salesPage || '').trim()),
     salesPageUrl: String(product?.salesPage || '').trim(),
     paymentMethods: Array.isArray(product?.paymentMethods)
@@ -367,6 +383,7 @@ async function performCatalogSync({ createAnnual = false, configureAffiliates = 
     hasAffiliateSupportEmail: Boolean(String(productDetails.affiliateSupportEmail || '').trim()),
     hasAffiliateSalesPage: Boolean(String(productDetails.affiliateSalesPage || '').trim()),
     hasProductImage: Boolean(String(productDetails.image || '').trim()),
+    productImageUrl: String(productDetails.image || '').trim(),
     hasSalesPage: Boolean(String(productDetails.salesPage || '').trim()),
     affiliateSalesPageUrl: String(productDetails.affiliateSalesPage || '').trim(),
     salesPageUrl: String(productDetails.salesPage || '').trim(),
@@ -407,6 +424,7 @@ function getPublicCatalogState() {
     hasAffiliateSupportEmail: catalogState.hasAffiliateSupportEmail,
     hasAffiliateSalesPage: catalogState.hasAffiliateSalesPage,
     hasProductImage: catalogState.hasProductImage,
+    productImageUrl: catalogState.productImageUrl,
     hasSalesPage: catalogState.hasSalesPage,
     affiliateSalesPageUrl: catalogState.affiliateSalesPageUrl,
     salesPageUrl: catalogState.salesPageUrl,
@@ -436,12 +454,14 @@ function resetForTests() {
     hasAffiliateSupportEmail: false,
     hasAffiliateSalesPage: false,
     hasProductImage: false,
+    productImageUrl: '',
     hasSalesPage: false,
     affiliateSalesPageUrl: '',
     salesPageUrl: '',
     productCategory: '',
     lastSyncAt: null
   };
+  kitImageSyncState = { attempted: false, success: false, error: null };
 }
 
 module.exports = {
