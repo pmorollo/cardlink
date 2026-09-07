@@ -248,16 +248,6 @@ function renderNav(d) {
   if (brandEl) brandEl.textContent = d.business || d.name || 'CardLink';
   const brandMark = document.getElementById('nav-brand-mark');
   if (brandMark) brandMark.textContent = (d.business || d.name || 'C').trim().charAt(0).toUpperCase();
-
-  const userPhoto = document.getElementById('nav-user-photo');
-  if (userPhoto) {
-    if (d.photo_url) {
-      userPhoto.src = d.photo_url;
-      userPhoto.style.display = 'block';
-    } else {
-      userPhoto.style.display = 'none';
-    }
-  }
 }
 
 // ============================================
@@ -651,6 +641,15 @@ function renderContact(d) {
   if (!links) return;
 
   const contactTitle = document.getElementById('contact-title');
+  const contactPhoto = document.getElementById('contact-user-photo');
+  if (contactPhoto) {
+    if (d.photo_url) {
+      contactPhoto.src = d.photo_url;
+      contactPhoto.hidden = false;
+    } else {
+      contactPhoto.hidden = true;
+    }
+  }
   if (contactTitle) {
     const name = d.name || 'Profissional';
     const role = typeof d.title === 'string' ? d.title.trim() : '';

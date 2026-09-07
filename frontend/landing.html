@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Landing page profissional criada com CardLink">
   <title>Carregando...</title>
-  <link rel="stylesheet" href="/landing.css?v=5">
+  <link rel="stylesheet" href="/landing.css?v=6">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
 </head>
 <body>
@@ -29,7 +29,6 @@
       <div class="lp-nav-brand" onclick="scrollToTop()" style="display:inline-flex;align-items:center;gap:8px;">
         <div class="logo-icon" id="nav-brand-mark">C</div>
         <span id="nav-business-name">CardLink</span>
-        <img id="nav-user-photo" style="display:none;width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,0.7);box-shadow:var(--shadow-sm);margin-left:4px;" alt="Vendedor">
       </div>
       <ul class="lp-nav-links" id="lp-nav-links">
         <li><a href="#sobre">Sobre</a></li>
@@ -165,10 +164,13 @@
         <!-- Info -->
         <div class="lp-contact-info animate-in">
           <span class="lp-section-tag">Entre em contato</span>
-          <h2 id="contact-title" class="lp-contact-identity">
-            <span class="lp-contact-name">Profissional</span>
-            <span class="lp-contact-role"></span>
-          </h2>
+          <div class="lp-contact-heading">
+            <img id="contact-user-photo" class="lp-contact-photo" hidden alt="Foto do profissional">
+            <h2 id="contact-title" class="lp-contact-identity">
+              <span class="lp-contact-name">Profissional</span>
+              <span class="lp-contact-role"></span>
+            </h2>
+          </div>
           <p id="contact-desc" style="color:var(--text-secondary);line-height:1.7;margin:16px 0 32px;">
             Estou disponível para atendimento. Entre em contato e responderei o mais breve possível.
           </p>
@@ -233,6 +235,6 @@
     <span id="toast-message"></span>
   </div>
 
-  <script src="/landing.js?v=13"></script>
+  <script src="/landing.js?v=14"></script>
 </body>
 </html>
