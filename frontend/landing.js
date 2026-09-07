@@ -194,6 +194,7 @@ async function init() {
   renderSocial(cardData);
   renderContact(cardData);
   renderFooter(cardData);
+  renderWhatsAppFab(cardData);
   showHomeScreenGuide();
 
 
@@ -272,29 +273,11 @@ function renderHero(d) {
     titleEl.innerHTML = `<span class="lp-business-name">${esc(business || name)}</span>`;
   }
 
-  // CTA Button
-  const ctaBtn = document.getElementById('hero-cta-btn');
-  if (ctaBtn) {
-    if (d.whatsapp) {
-      ctaBtn.href = `https://wa.me/${cleanPhone(d.whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink.')}`;
-      ctaBtn.target = '_blank';
-      ctaBtn.rel = 'noopener';
-      ctaBtn.className = 'btn btn-whatsapp-action btn-lg';
-      ctaBtn.innerHTML = `${WHATSAPP_ICON}<span>Falar no WhatsApp</span>`;
-    } else if (d.phone) {
-      ctaBtn.href = `tel:${d.phone}`;
-      ctaBtn.className = 'btn btn-primary btn-lg';
-      ctaBtn.innerHTML = 'Ligar agora';
-    } else {
-      ctaBtn.href = '#contato';
-      ctaBtn.className = 'btn btn-primary btn-lg';
-      ctaBtn.innerHTML = 'Entrar em contato';
-    }
-  }
-
-  const saveBtn = document.getElementById('save-contact-btn');
-  if (saveBtn) {
-    saveBtn.addEventListener('click', saveContact);
+  const complementEl = document.getElementById('hero-business-complement');
+  const complement = cleanText(d.business_complement);
+  if (complementEl) {
+    complementEl.textContent = complement;
+    complementEl.hidden = !complement;
   }
 
   // Avatar
@@ -326,9 +309,6 @@ function renderAbout(d) {
   }
 
   // A seção apresenta o negócio sem repetir nome ou atividade do profissional.
-  const aboutTitle = document.getElementById('about-title');
-  if (aboutTitle) aboutTitle.textContent = 'Apresentação';
-
   // O selo identifica apenas o negócio, sem repetir nome ou atividade.
   const badge = document.getElementById('about-badge');
   const badgeBusiness = document.getElementById('about-badge-business');
@@ -379,7 +359,10 @@ function renderServices(d) {
   const hasImage = mode === 'image' && !!servicesImageUrl;
   const hasRealServices = mode === 'list' && products.length > 0;
 
-  if (titleEl) titleEl.textContent = sectionTitle;
+  if (titleEl) {
+    titleEl.textContent = sectionTitle;
+    titleEl.style.display = mode === 'image' && sectionTitle.trim().toLowerCase() === 'destaque' ? 'none' : '';
+  }
   if (descEl) {
     descEl.textContent = hasImage
       ? 'Confira as informações em destaque.'
@@ -676,9 +659,12 @@ function renderContact(d) {
       ${role ? `<span class="lp-contact-role">${esc(role)}</span>` : ''}`;
   }
 
+  const saveBtn = document.getElementById('save-contact-btn');
+  if (saveBtn) saveBtn.addEventListener('click', saveContact);
+
   const items = [];
   if (d.whatsapp) items.push({
-    href: `https://wa.me/${cleanPhone(d.whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink.')}`,
+    href: `https://wa.me/${cleanPhone(d.whatsapp)}`,
     icon: '💬', label: 'WhatsApp', value: d.whatsapp, target: '_blank'
   });
   if (d.phone) items.push({
@@ -702,6 +688,20 @@ function renderContact(d) {
         <div class="lp-contact-link-value">${esc(item.value)}</div>
       </div>
     </a>`).join('');
+}
+
+function renderWhatsAppFab(d) {
+  const whatsapp = cleanPhone(d.whatsapp);
+  if (!whatsapp) return;
+
+  const fab = document.createElement('a');
+  fab.className = 'fab-whatsapp';
+  fab.href = `https://wa.me/${whatsapp}`;
+  fab.target = '_blank';
+  fab.rel = 'noopener';
+  fab.setAttribute('aria-label', 'Conversar pelo WhatsApp');
+  fab.innerHTML = `${WHATSAPP_ICON}<span>WhatsApp</span>`;
+  document.body.appendChild(fab);
 }
 
 // ============================================

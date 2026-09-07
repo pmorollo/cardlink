@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Landing page profissional criada com CardLink">
   <title>Carregando...</title>
-  <link rel="stylesheet" href="/landing.css?v=4">
+  <link rel="stylesheet" href="/landing.css?v=5">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
 </head>
 <body>
@@ -55,10 +55,7 @@
           <h1 class="lp-hero-title" id="hero-title">
             <span class="lp-business-name">Seu negócio</span>
           </h1>
-          <div class="lp-hero-actions">
-            <a href="#contato" class="btn btn-whatsapp-action btn-lg" id="hero-cta-btn">Falar no WhatsApp</a>
-            <button type="button" class="btn btn-outline btn-lg" id="save-contact-btn">Salvar contato</button>
-          </div>
+          <p class="lp-business-complement" id="hero-business-complement" hidden></p>
           <a href="#servicos" class="lp-hero-services-link">Conhecer serviços ↓</a>
         </div>
 
@@ -94,7 +91,6 @@
 
         <div class="lp-about-text animate-in" style="transition-delay:0.15s;">
           <span class="lp-section-tag">Sobre o negócio</span>
-          <h2 id="about-title">Apresentação</h2>
           <div id="about-content">
             <p id="about-description"></p>
           </div>
@@ -126,7 +122,6 @@
     <div class="container">
       <div class="lp-section-header animate-in">
         <span class="lp-section-tag">Portfólio</span>
-        <h2 class="lp-section-title">Galeria de <span class="text-gradient">Fotos</span></h2>
         <p class="lp-section-desc">Conheça nosso trabalho e resultados.</p>
         <div id="gallery-placeholder-hint"></div>
       </div>
@@ -177,6 +172,7 @@
           <p id="contact-desc" style="color:var(--text-secondary);line-height:1.7;margin:16px 0 32px;">
             Estou disponível para atendimento. Entre em contato e responderei o mais breve possível.
           </p>
+          <button type="button" class="btn btn-outline lp-save-contact" id="save-contact-btn">Salvar contato</button>
           <div class="lp-contact-links" id="contact-links"></div>
         </div>
 
@@ -237,6 +233,6 @@
     <span id="toast-message"></span>
   </div>
 
-  <script src="/landing.js?v=12"></script>
+  <script src="/landing.js?v=13"></script>
 </body>
 </html>

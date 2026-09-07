@@ -809,7 +809,11 @@ body.has-owner-bar .lp-nav {
 .lp-contact-name {
   display: block;
   color: var(--text-primary);
-  letter-spacing: -0.035em;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.55rem, 2.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 .lp-contact-role {
   display: block;
@@ -830,6 +834,18 @@ body.has-owner-bar .lp-nav {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+.lp-save-contact {
+  margin: 0 0 22px;
+}
+
+.lp-business-complement {
+  max-width: 620px;
+  margin: 14px 0 0;
+  color: var(--text-secondary);
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 }
 .lp-contact-link {
   display: flex;
@@ -1011,6 +1027,11 @@ body.has-owner-bar .lp-nav {
   z-index: 9000;
   transition: transform var(--transition), box-shadow var(--transition);
   animation: fabEntry 0.6s 1s ease both;
+}
+.fab-whatsapp svg {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
 }
 .fab-whatsapp:hover {
   transform: scale(1.12);

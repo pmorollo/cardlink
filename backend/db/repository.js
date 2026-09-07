@@ -130,6 +130,7 @@ async function initPostgres(pool) {
       slug VARCHAR(255) UNIQUE NOT NULL,
       name VARCHAR(255) NOT NULL,
       business VARCHAR(255),
+      business_complement VARCHAR(180),
       title VARCHAR(255),
       photo_url TEXT,
       logo_url TEXT,
@@ -210,6 +211,7 @@ async function initPostgres(pool) {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMP;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by VARCHAR(100);
     ALTER TABLE cards ADD COLUMN IF NOT EXISTS logo_url TEXT;
+    ALTER TABLE cards ADD COLUMN IF NOT EXISTS business_complement VARCHAR(180);
     ALTER TABLE cards ADD COLUMN IF NOT EXISTS services_mode VARCHAR(20) DEFAULT 'image';
     ALTER TABLE cards ADD COLUMN IF NOT EXISTS services_title VARCHAR(255);
     ALTER TABLE cards ADD COLUMN IF NOT EXISTS services_image_url TEXT;
@@ -465,15 +467,15 @@ const cards = {
     if (pool) {
       const r = await pool.query(
         `INSERT INTO cards (
-           user_id, slug, name, business, title, photo_url, logo_url, description, message,
+           user_id, slug, name, business, business_complement, title, photo_url, logo_url, description, message,
            phone, email, address, whatsapp, whatsapp_group, instagram, facebook,
            linkedin, tiktok, youtube, twitter, theme, site_button_text, services_mode,
            services_title, services_image_url, products, gallery, testimonials, views_count, qr_scans_count
          ) VALUES (
-           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30
+           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31
          ) RETURNING *`,
         [
-          data.user_id, data.slug, data.name, data.business || null, data.title || null, data.photo_url || null,
+          data.user_id, data.slug, data.name, data.business || null, data.business_complement || null, data.title || null, data.photo_url || null,
           data.logo_url || null, data.description || null, data.message || null, data.phone || null, data.email || null,
           data.address || null, data.whatsapp || null, data.whatsapp_group || null, data.instagram || null,
           data.facebook || null, data.linkedin || null, data.tiktok || null, data.youtube || null, data.twitter || null,
@@ -507,7 +509,7 @@ const cards = {
       const fields = [];
       const values = [];
       let i = 1;
-      for (const k of ['slug', 'name', 'business', 'title', 'photo_url', 'logo_url', 'description', 'message', 'phone', 'email',
+      for (const k of ['slug', 'name', 'business', 'business_complement', 'title', 'photo_url', 'logo_url', 'description', 'message', 'phone', 'email',
         'address', 'whatsapp', 'whatsapp_group', 'instagram', 'facebook', 'linkedin', 'tiktok', 'youtube', 'twitter',
         'theme', 'site_button_text', 'services_mode', 'services_title', 'services_image_url',
         'products', 'gallery', 'testimonials', 'views_count', 'qr_scans_count']) {

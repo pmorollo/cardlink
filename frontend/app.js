@@ -1108,7 +1108,7 @@ async function loadDashboard() {
 function createNewCard() {
   try {
     editingCardId = null;
-    ['field-name','field-business','field-title','field-photo','field-logo','field-description',
+    ['field-name','field-business','field-business-complement','field-title','field-photo','field-logo','field-description',
      'field-message','field-phone','field-email','field-address','field-whatsapp',
      'field-whatsapp-group','field-instagram','field-facebook','field-linkedin',
      'field-tiktok','field-youtube','field-twitter','field-site-button','field-gallery',
@@ -1154,6 +1154,7 @@ async function editCard(id) {
 
     setFieldValue('field-name', card.name || '');
     setFieldValue('field-business', card.business || '');
+    setFieldValue('field-business-complement', card.business_complement || '');
     setFieldValue('field-title', card.title || '');
     setFieldValue('field-photo', card.photo_url || '');
     setFieldValue('field-logo', card.logo_url || '');
