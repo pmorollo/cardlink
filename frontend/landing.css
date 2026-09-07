@@ -1064,7 +1064,10 @@ body.has-owner-bar .lp-nav {
 }
 
 @media (max-width: 768px) {
-  .lp-hero { padding: 112px 0 72px; }
+  .lp-hero {
+    min-height: 100svh;
+    padding: 112px 0 72px;
+  }
   .lp-hero-text::before { margin: 0 auto 20px; }
   .lp-hero-avatar-wrap { width: 210px; height: 210px; }
   .lp-hero-avatar-wrap::before { inset: -25px; }
@@ -1555,7 +1558,10 @@ body {
 .lp-hero-avatar img { object-fit: contain; }
 
 @media (max-width: 768px) {
-  .lp-hero { padding: 112px 0 72px; }
+  .lp-hero {
+    min-height: 100svh;
+    padding: 112px 0 72px;
+  }
   .lp-hero-avatar-wrap { width: 210px; height: 210px; }
   .lp-hero-avatar-wrap::before { inset: -25px; }
   .lp-hero-avatar-wrap::after { top: -20px; right: 20px; transform-origin: -76px 125px; }
