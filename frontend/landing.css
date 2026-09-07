@@ -42,22 +42,22 @@
 }
 
 [data-theme="ocean"] {
-  --hero-from: #fff8df;
-  --hero-via: #f3c766;
-  --hero-to: #d5901c;
-  --accent: #9a5b00;
-  --accent-2: #d9981f;
-  --accent-glow: rgba(190,123,13,0.22);
-  --bg: #fffaf0;
-  --bg-card: #fff3d6;
-  --bg-card-2: #ffe6ad;
-  --border: rgba(92,60,18,0.16);
-  --text-primary: #382612;
-  --text-secondary: #6c4d27;
-  --text-muted: #8d7049;
-  --shadow-sm: 0 2px 10px rgba(92,60,18,0.09);
-  --shadow-md: 0 10px 34px rgba(92,60,18,0.13);
-  --shadow-lg: 0 26px 70px rgba(92,60,18,0.16);
+  --hero-from: #052f2d;
+  --hero-via: #0b4843;
+  --hero-to: #173b34;
+  --accent: #d4af37;
+  --accent-2: #f2d675;
+  --accent-glow: rgba(212,175,55,0.24);
+  --bg: #071f1d;
+  --bg-card: #0d2b28;
+  --bg-card-2: #123631;
+  --border: rgba(226,190,88,0.20);
+  --text-primary: #fffaf0;
+  --text-secondary: #d8d0bd;
+  --text-muted: #a9a18e;
+  --shadow-sm: 0 2px 10px rgba(0,20,18,0.22);
+  --shadow-md: 0 10px 34px rgba(0,20,18,0.30);
+  --shadow-lg: 0 26px 70px rgba(0,20,18,0.38);
 }
 [data-theme="forest"] {
   --hero-from: #07111e;
@@ -176,32 +176,36 @@ body.has-owner-bar .lp-nav {
    Temas de contraste ampliado
    ============================================ */
 [data-theme="ocean"] {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 [data-theme="ocean"] .lp-nav {
-  background: rgba(255,250,240,0.88);
-  box-shadow: 0 8px 26px rgba(92,60,18,0.07);
+  background: rgba(5,47,45,0.90);
+  box-shadow: 0 8px 26px rgba(0,20,18,0.24);
 }
 
 [data-theme="ocean"] .lp-section-alt {
-  background: rgba(190,123,13,0.055);
+  background: rgba(212,175,55,0.045);
 }
 
 [data-theme="ocean"] .lp-hero::before {
   background:
-    linear-gradient(rgba(92,60,18,0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(92,60,18,0.055) 1px, transparent 1px);
+    linear-gradient(rgba(242,214,117,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242,214,117,0.045) 1px, transparent 1px);
   background-size: 64px 64px;
 }
 
+[data-theme="ocean"] .btn-primary {
+  color: #062b28;
+}
+
 [data-theme="ocean"] .btn-outline {
-  background: rgba(255,255,255,0.32);
-  border-color: rgba(92,60,18,0.24);
+  background: rgba(255,250,240,0.05);
+  border-color: rgba(226,190,88,0.32);
 }
 
 [data-theme="ocean"] .lp-footer {
-  background: #fff0c8;
+  background: #051a18;
 }
 
 [data-theme="forest"] .lp-section-title,
