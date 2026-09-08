@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CardLink — Reúna serviços, fotos, avaliações, localização, redes sociais e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.">
+  <title>CardLink — Tudo o que seu cliente precisa ver antes de chamar você</title>
+  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#f8b900">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CardLink">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+</head>
+<body>
+
+  <!-- Animated Background -->
+  <div class="bg-animated" id="bgAnimated">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <div class="navbar-brand" onclick="navigateTo('home')">
+        <div class="logo-icon">C</div>
+        <span>Card<span class="text-gradient">Link</span></span>
+      </div>
+      <div class="navbar-cta" id="nav-cta">
+        <a href="#como-funciona" class="navbar-link hide-mobile">Como funciona</a>
+        <a href="#demonstracao" class="navbar-link hide-mobile">Demonstração</a>
+        <button class="navbar-login" onclick="navigateTo('auth'); toggleAuthForm('login');">Entrar na conta</button>
+        <button class="btn btn-primary btn-sm navbar-subscribe" onclick="openProPaymentModal()">Assinar CardLink</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================
+       VIEW 1: LANDING PAGE
+       ============================================ -->
+  <section class="view active" id="landing-view">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-content container">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="hero-badge">
+              <span class="dot"></span>
+              A partir de R$ 12,90/mês
+            </div>
+            <h1>
+              Preencha seus dados.<br>O <span class="hero-word-yellow">CardLink</span><br><span class="text-gradient">cria sua página.</span>
+            </h1>
+            <p>
+              Você informa seus dados, serviços, fotos e contatos, e o CardLink organiza tudo automaticamente em uma página pronta na web para compartilhar.
+            </p>
+
+            <div class="hero-benefits" aria-label="Principais benefícios">
+              <span>🔗 Link ou QR Code próprios</span>
+              <span>✎ Fácil de editar</span>
+              <span>☁ Hospedagem inclusa</span>
+              <span>⚡ Configuração simples e rápida</span>
+            </div>
+
+            <div class="hero-buttons">
+              <button class="btn btn-primary btn-lg" onclick="document.getElementById('demonstracao').scrollIntoView({behavior:'smooth'})">
+                Ver demonstração <span aria-hidden="true">→</span>
+              </button>
+              <button class="btn btn-secondary btn-lg" onclick="document.getElementById('recursos').scrollIntoView({behavior:'smooth'})">
+                Conhecer recursos
+              </button>
+            </div>
+            <p class="hero-audience">☆ Ideal para autônomos, salões, barbearias, clínicas e pequenos negócios.</p>
+          </div>
+
+          <div class="hero-visual" aria-label="Exemplo de uma página profissional criada com o CardLink">
+            <img src="assets/hero-cardlink-studio-v2.webp" width="1600" height="900" alt="Profissional de salão ao lado de um celular mostrando uma página criada com o CardLink" fetchpriority="high">
+          </div>
+        </div>
+
+        <!-- Carrossel demonstrativo -->
+        <div class="hero-mockup" id="demonstracao" style="display:flex;flex-direction:column;align-items:center;margin-top:50px;width:100%;">
+          
+          <div style="width: 100%; text-align: center; margin-bottom: 25px;">
+            <span class="hero-badge" style="display:inline-flex;margin-bottom:8px;">🔍 Demonstração Visual</span>
+            <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Veja como o CardLink organiza sua apresentação e facilita o contato</h3>
+          </div>
+
+          <div class="landing-carousel" id="landing-carousel" aria-roledescription="carrossel" aria-label="Demonstração do CardLink">
+            <div class="landing-carousel-track">
+              <article class="landing-carousel-slide is-active" aria-hidden="false">
+                <img src="assets/carousel/carrossel-01-atendimento.webp" alt="Cliente sendo atendido no balcão de um negócio" width="1440" height="960" fetchpriority="high">
+                <div class="landing-carousel-copy"><h4>Tudo o que seu cliente precisa ver</h4><p>Organize as informações que ajudam o cliente a conhecer seu negócio antes do contato.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/carrossel-02-site.webp" alt="Site profissional completo exibido em um celular" width="1440" height="960" loading="lazy">
+                <div class="landing-carousel-copy"><h4>Um site completo em um único link</h4><p>Mostre apresentação, serviços, fotos, avaliações e contatos.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/carrossel-03-painel.webp" alt="Painel de configuração do site e prévia no celular" width="1440" height="960" loading="lazy">
+                <div class="landing-carousel-copy"><h4>Você mesmo atualiza quando quiser</h4><p>Edite as informações pelo painel e acompanhe o resultado.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/carrossel-04-divulgacao.webp" alt="Divulgação do site por link, QR Code e WhatsApp" width="1440" height="960" loading="lazy">
+                <div class="landing-carousel-copy"><h4>Divulgue e receba contatos</h4><p>Compartilhe por link ou QR Code e converse pelo WhatsApp.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/carrossel-05-negocios.webp" alt="Indústria, escritório e barbearia usando presença digital" width="1440" height="960" loading="lazy">
+                <div class="landing-carousel-copy"><h4>Feito para o seu negócio</h4><p>Uma solução profissional para diferentes atividades e segmentos.</p></div>
+              </article>
+            </div>
+            <button class="landing-carousel-arrow landing-carousel-prev" type="button" aria-label="Imagem anterior">‹</button>
+            <button class="landing-carousel-arrow landing-carousel-next" type="button" aria-label="Próxima imagem">›</button>
+            <div class="landing-carousel-dots" role="group" aria-label="Escolher imagem do carrossel">
+              <button class="is-active" type="button" aria-label="Mostrar imagem 1" aria-current="true"></button>
+              <button type="button" aria-label="Mostrar imagem 2"></button>
+              <button type="button" aria-label="Mostrar imagem 3"></button>
+              <button type="button" aria-label="Mostrar imagem 4"></button>
+              <button type="button" aria-label="Mostrar imagem 5"></button>
+            </div>
+            <span class="sr-only" id="landing-carousel-status" aria-live="polite">Imagem 1 de 5</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features" id="recursos">
+      <div class="container">
+        <div class="section-header">
+          <h2>Tudo que você precisa <span class="text-gradient">num só link</span></h2>
+          <p>Organize sua presença comercial em um único endereço e facilite o caminho até o contato.</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card animate-in">
+            <div class="feature-icon">📱</div>
+            <h3>Link Compartilhável</h3>
+            <p>Gere um link único para seu site e compartilhe em qualquer lugar — bio do Instagram, assinatura de email ou QR Code.</p>
+          </div>
+          <div class="feature-card animate-in">
+            <div class="feature-icon">💬</div>
+            <h3>WhatsApp Integrado</h3>
+            <p>Botão direto para WhatsApp e link para grupo. Seus clientes falam com você em um toque.</p>
+          </div>
+          <div class="feature-card animate-in">
+            <div class="feature-icon">🌐</div>
+            <h3>Todas as Redes</h3>
+            <p>Instagram, Facebook, LinkedIn, TikTok, YouTube e X — todos seus perfis em um só lugar.</p>
+          </div>
+          <div class="feature-card animate-in">
+            <div class="feature-icon">📧</div>
+            <h3>Mensagens & Leads</h3>
+            <p>Seus clientes enviam mensagens pelo site e você gerencia todos os contatos recebidos direto no seu painel.</p>
+          </div>
+          <div class="feature-card animate-in">
+            <div class="feature-icon">🎨</div>
+            <h3>6 Temas Premium</h3>
+            <p>Escolha entre temas elegantes: Midnight, Mel Claro, Sunset, Executivo Premium, Rose e Monochrome.</p>
+          </div>
+          <div class="feature-card animate-in">
+            <div class="feature-icon">⚡</div>
+            <h3>Página Web em Tempo Real</h3>
+            <p>Seu site fica 100% online. Altere promoções, produtos ou informações e atualize seus clientes instantaneamente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How it Works -->
+    <div class="how-it-works" id="como-funciona">
+      <div class="container">
+        <div class="section-header">
+          <h2>Como <span class="text-gradient">funciona</span></h2>
+          <p>Três passos simples para colocar o seu negócio na internet.</p>
+        </div>
+        <div class="steps">
+          <div class="step animate-in">
+            <div class="step-number">1</div>
+            <h3>Assine o CardLink</h3>
+            <p>Escolha o plano mensal ou anual e conclua o pagamento com segurança pela Cakto.</p>
+          </div>
+          <div class="step animate-in">
+            <div class="step-number">2</div>
+            <h3>Ative e personalize</h3>
+            <p>Após a confirmação, defina sua senha e monte sua página com seus dados, imagens e conteúdos.</p>
+          </div>
+          <div class="step animate-in">
+            <div class="step-number">3</div>
+            <h3>Compartilhe e use</h3>
+            <p>Distribua seu link e QR Code, receba contatos e volte ao painel sempre que quiser atualizar sua página.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quem Somos -->
+    <div class="about-section" id="about" style="padding:var(--space-3xl) 0;background:var(--bg-surface);border-top:1px solid var(--border-subtle);">
+      <div class="container" style="max-width:800px;text-align:center;">
+        <div class="section-header" style="margin-bottom:var(--space-xl);">
+          <div class="hero-badge" style="margin:0 auto var(--space-md);width:fit-content;display:inline-flex;">🌱 Nossa Missão</div>
+          <h2>Quem <span class="text-gradient">Somos</span></h2>
+        </div>
+        <p style="color:var(--text-secondary);font-size:1.1rem;line-height:1.8;max-width:700px;margin:0 auto var(--space-lg);">
+          O <strong>CardLink</strong> nasceu com o propósito de simplificar a forma como autônomos, profissionais, prestadores de serviços e negócios se apresentam e vendem no mundo digital. Acreditamos que você não precisa gastar milhares de reais com sites complexos para ter uma presença profissional incrível.
+        </p>
+        <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.7;max-width:700px;margin:0 auto;">
+          Nossa plataforma foi desenhada para ser rápida, acessível e focada em resultados práticos — unindo a agilidade do WhatsApp com a credibilidade de um portfólio completo. Criado com dedicação para fortalecer a economia e o comércio local.
+        </p>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section" id="faq" style="padding:var(--space-3xl) 0;background:var(--bg-card);border-top:1px solid var(--border-subtle);">
+      <div class="container" style="max-width:800px;">
+        <div class="section-header" style="text-align:center;margin-bottom:var(--space-2xl);">
+          <div class="hero-badge" style="margin:0 auto var(--space-md);width:fit-content;display:inline-flex;">🤔 Tira-Dúvidas</div>
+          <h2>Perguntas <span class="text-gradient">Frequentes</span></h2>
+          <p style="color:var(--text-secondary);">Respondemos às principais dúvidas sobre o CardLink.</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:15px;margin:0 auto;max-width:680px;">
+          
+          <details style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:var(--space-md);cursor:pointer;transition:all 0.3s;" ontoggle="this.style.borderColor = this.open ? 'var(--purple)' : 'var(--border-subtle)'">
+            <summary style="font-weight:700;color:var(--text-primary);list-style:none;display:flex;justify-content:space-between;align-items:center;outline:none;">
+              <span>O que é o CardLink?</span>
+              <span style="font-size:0.8rem;color:var(--purple);">▼</span>
+            </summary>
+            <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
+              O CardLink reúne em uma apresentação profissional as informações que seu cliente precisa antes do contato: serviços, fotos, avaliações, localização, redes sociais e WhatsApp. Você compartilha tudo por um único link ou QR Code e pode atualizar as informações quando quiser.
+            </div>
+          </details>
+
+          <details style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:var(--space-md);cursor:pointer;transition:all 0.3s;" ontoggle="this.style.borderColor = this.open ? 'var(--purple)' : 'var(--border-subtle)'">
+            <summary style="font-weight:700;color:var(--text-primary);list-style:none;display:flex;justify-content:space-between;align-items:center;outline:none;">
+              <span>Como funciona o QR Code de Balcão?</span>
+              <span style="font-size:0.8rem;color:var(--purple);">▼</span>
+            </summary>
+            <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
+              Você pode exibir o QR Code em um display no balcão do seu negócio. Quando o cliente escaneia o código, o sistema registra uma estatística no painel e abre sua página profissional completa, onde ele pode conhecer o negócio e escolher como entrar em contato, inclusive pelo WhatsApp.
+            </div>
+          </details>
+
+          <details style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:var(--space-md);cursor:pointer;transition:all 0.3s;" ontoggle="this.style.borderColor = this.open ? 'var(--purple)' : 'var(--border-subtle)'">
+            <summary style="font-weight:700;color:var(--text-primary);list-style:none;display:flex;justify-content:space-between;align-items:center;outline:none;">
+              <span>Preciso ter um cartão físico NFC para usar?</span>
+              <span style="font-size:0.8rem;color:var(--purple);">▼</span>
+            </summary>
+            <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
+              Não. O CardLink funciona por um link e por QR Code, sem exigir cartão físico ou NFC. Basta compartilhar o endereço do seu site ou exibir o QR Code para o cliente acessar sua página profissional.
+            </div>
+          </details>
+
+          <details style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:var(--space-md);cursor:pointer;transition:all 0.3s;" ontoggle="this.style.borderColor = this.open ? 'var(--purple)' : 'var(--border-subtle)'">
+            <summary style="font-weight:700;color:var(--text-primary);list-style:none;display:flex;justify-content:space-between;align-items:center;outline:none;">
+              <span>Onde meu site fica hospedado? Preciso de domínio próprio?</span>
+              <span style="font-size:0.8rem;color:var(--purple);">▼</span>
+            </summary>
+            <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
+              A hospedagem do seu site já está incluída na assinatura, sem custo adicional. Você não precisa comprar um domínio: recebe um link profissional e exclusivo, pronto para colocar na bio do Instagram, enviar no WhatsApp ou divulgar por QR Code.
+            </div>
+          </details>
+
+          <details style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:var(--space-md);cursor:pointer;transition:all 0.3s;" ontoggle="this.style.borderColor = this.open ? 'var(--purple)' : 'var(--border-subtle)'">
+            <summary style="font-weight:700;color:var(--text-primary);list-style:none;display:flex;justify-content:space-between;align-items:center;outline:none;">
+              <span>Posso alterar minhas informações quando quiser?</span>
+              <span style="font-size:0.8rem;color:var(--purple);">▼</span>
+            </summary>
+            <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
+              Sim, o acesso ao painel de edição é livre 24 horas por dia. Qualquer alteração (nova foto, novo preço de produto ou mudança de telefone) é atualizada no seu link e no QR Code no mesmo instante.
+            </div>
+          </details>
+
+          <details style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:var(--space-md);cursor:pointer;transition:all 0.3s;" ontoggle="this.style.borderColor = this.open ? 'var(--purple)' : 'var(--border-subtle)'">
+            <summary style="font-weight:700;color:var(--text-primary);list-style:none;display:flex;justify-content:space-between;align-items:center;outline:none;">
+              <span>Como funciona a cobrança e cancelamento?</span>
+              <span style="font-size:0.8rem;color:var(--purple);">▼</span>
+            </summary>
+            <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
+              A assinatura do CardLink é de R$ 12,90/mês no plano mensal ou R$ 99,00/ano no plano anual (equivalente a R$ 8,25/mês, com 36% OFF). É processada com segurança via Cakto, por PIX ou cartão, e você pode cancelar a qualquer momento sem taxas adicionais diretamente pelo sistema de pagamento.
+            </div>
+          </details>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <div class="pricing-section" id="pricing" style="padding:var(--space-3xl) 0;background:var(--bg-card);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);">
+      <div class="container" style="max-width:800px;text-align:center;">
+        <div class="section-header" style="margin-bottom:var(--space-2xl);">
+          <div class="hero-badge" style="margin:0 auto var(--space-md);width:fit-content;display:inline-flex;">💵 Transparente & Acessível</div>
+          <h2>Plano <span class="text-gradient">Único & Completo</span></h2>
+          <p style="color:var(--text-secondary);">Os principais recursos do CardLink estão incluídos na assinatura.</p>
+        </div>
+
+        <div style="background:var(--bg-surface);border:1.5px solid rgba(139,92,246,0.3);border-radius:var(--radius-xl);padding:var(--space-xl);max-width:440px;margin:0 auto;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+          <h3 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:8px;">Assinatura CardLink</h3>
+          <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:20px;">Ideal para autônomos, profissionais e comércios locais.</p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
+            <div style="border:2px solid var(--accent);border-radius:12px;padding:14px 10px;background:rgba(139,92,246,0.12);transition:all 0.2s;">
+              <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Mensal</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--text-primary);line-height:1.1;">R$ 12,90<span style="font-size:0.7rem;font-weight:400;">/mês</span></div>
+            </div>
+            <div style="border:1.5px solid var(--border-subtle);border-radius:12px;padding:14px 10px;background:var(--bg-surface);position:relative;transition:all 0.2s;">
+              <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
+              <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Anual</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--text-primary);line-height:1.1;">R$ 99,00<span style="font-size:0.7rem;font-weight:400;">/ano</span></div>
+            </div>
+          </div>
+          <p style="color:var(--text-secondary);font-size:0.82rem;margin:-16px 0 24px;">Assine mensal por R$ 12,90/mês ou anual por R$ 99,00 (equivalente a R$ 8,25/mês, economize R$ 55,80 por ano).</p>
+
+          <ul style="list-style:none;padding:0;margin:0 0 32px 0;text-align:left;display:flex;flex-direction:column;gap:12px;font-size:0.92rem;color:var(--text-secondary);">
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Página profissional 100% online</span></li>
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Vitrine de Produtos & Serviços</span></li>
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Depoimentos & Avaliações</span></li>
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Galeria de Fotos / Portfólio</span></li>
+            <li style="display:flex;align-items:center;gap:10px;">✅ <span>QR Code de Balcão e Métricas</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <div class="container">
+        <div class="cta-box">
+          <h2>Pronto para reunir tudo em <span class="text-gradient">um único lugar</span>?</h2>
+          <p>Escolha o plano mensal por R$ 12,90 ou anual por R$ 99,00. Após a confirmação do pagamento, você recebe o acesso para montar sua apresentação profissional e compartilhar por link ou QR Code.</p>
+          <button class="btn btn-primary btn-lg" onclick="openProPaymentModal()">
+            Quero meu CardLink
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container" style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <p>Feito com 💜 por <a href="#">CardLink</a> — Seu site profissional</p>
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px 15px;font-size:0.85rem;">
+          <a href="#/terms" style="color:var(--text-secondary);text-decoration:none;">Termos de Uso</a>
+          <span style="color:var(--border-subtle);">|</span>
+          <a href="#/privacy" style="color:var(--text-secondary);text-decoration:none;">Política de Privacidade</a>
+          <span style="color:var(--border-subtle);">|</span>
+          <a href="mailto:cardlink@yahoo.com" style="color:var(--text-secondary);text-decoration:none;">Suporte: cardlink@yahoo.com</a>
+          <span style="color:var(--border-subtle);">|</span>
+          <a href="https://wa.me/5511994551249?text=Ol%C3%A1%21%20Tenho%20uma%20d%C3%BAvida%20sobre%20o%20CardLink." target="_blank" rel="noopener" style="color:var(--text-secondary);text-decoration:none;">WhatsApp: (11) 99455-1249</a>
+          <span style="color:var(--border-subtle);">|</span>
+          <a href="javascript:void(0)" onclick="openUserManualModal()" style="color:var(--text-secondary);text-decoration:none;">Manual do Usuário</a>
+        </div>
+      </div>
+    </footer>
+
+    <a class="cardlink-support-whatsapp" href="https://wa.me/5511994551249?text=Ol%C3%A1%21%20Tenho%20uma%20d%C3%BAvida%20sobre%20o%20CardLink%20antes%20de%20assinar." target="_blank" rel="noopener" aria-label="Tirar dúvidas sobre o CardLink pelo WhatsApp">
+      <span class="cardlink-support-whatsapp-icon" aria-hidden="true">💬</span>
+      <span>Dúvidas? Fale conosco</span>
+    </a>
+  </section>
+
+  <!-- ============================================
+       VIEW 2: AUTH (Login / Register)
+       ============================================ -->
+  <section class="view" id="auth-view">
+    <div class="auth-container">
+      <div class="auth-card">
+        <!-- Login Form -->
+        <div id="login-form">
+          <h1 class="auth-title">Entrar no <span class="text-gradient">CardLink</span></h1>
+          <p class="auth-subtitle">Acesse seu CardLink e gerencie sua página profissional</p>
+          <div class="form-group">
+            <label class="form-label" for="login-email">E-mail</label>
+            <input class="form-input" type="email" id="login-email" placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Senha</label>
+            <input class="form-input" type="password" id="login-password" placeholder="Sua senha">
+            <div style="text-align:right;margin-top:4px;">
+              <a href="#" onclick="toggleAuthForm('forgot');return false;" style="color:var(--accent);font-size:0.8rem;text-decoration:none;">Esqueceu a senha?</a>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleLogin()">
+            Entrar
+          </button>
+          <p class="auth-toggle">
+            Ainda não é assinante? <a href="#" onclick="openProPaymentModal();return false;">Escolher um plano</a>
+          </p>
+        </div>
+
+        <!-- Activation Form: exibido somente pelo link enviado após pagamento -->
+        <div id="activation-form" style="display:none;">
+          <h1 class="auth-title">Ativar <span class="text-gradient">CardLink</span></h1>
+          <p class="auth-subtitle">Pagamento confirmado. Defina sua senha para começar.</p>
+          <div class="form-group">
+            <label class="form-label" for="activation-email">E-mail da assinatura</label>
+            <input class="form-input" type="email" id="activation-email" readonly>
+          </div>
+          <input type="hidden" id="activation-token">
+          <div class="form-group">
+            <label class="form-label" for="activation-password">Crie sua senha</label>
+            <input class="form-input" type="password" id="activation-password" minlength="8" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="activation-password-confirm">Confirme a senha</label>
+            <input class="form-input" type="password" id="activation-password-confirm" minlength="8" placeholder="Repita sua senha" autocomplete="new-password">
+          </div>
+          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleActivateAccount()">
+            Ativar e entrar no CardLink
+          </button>
+        </div>
+
+        <!-- Email Change Verification Form -->
+        <div id="verify-email-form" style="display:none;">
+          <h1 class="auth-title">Confirmar <span class="text-gradient">E-mail</span></h1>
+          <p class="auth-subtitle">Confirme o novo endereço para concluir a alteração da conta.</p>
+          <div class="form-group">
+            <label class="form-label" for="verify-email-address">Novo e-mail</label>
+            <input class="form-input" type="email" id="verify-email-address" readonly>
+          </div>
+          <input type="hidden" id="verify-email-token">
+          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleConfirmEmailChange()">
+            Confirmar novo e-mail
+          </button>
+          <p class="auth-toggle">
+            O endereço atual permanece válido até esta confirmação.
+          </p>
+        </div>
+
+        <!-- Forgot Password Form -->
+        <div id="forgot-form" style="display:none;">
+          <h1 class="auth-title">Recuperar <span class="text-gradient">Senha</span></h1>
+          <p class="auth-subtitle">Digite seu e-mail para redefinir sua senha</p>
+
+          <div id="forgot-step-1">
+            <div class="form-group">
+              <label class="form-label" for="forgot-email">E-mail Cadastrado</label>
+              <input class="form-input" type="email" id="forgot-email" placeholder="seu@email.com">
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleForgotPassword()">
+              Gerar Código de Recuperação
+            </button>
+          </div>
+
+          <div id="forgot-step-2" style="display:none;margin-top:12px;">
+            <div id="forgot-code-banner" style="background:rgba(139,92,246,0.15);border:1px solid var(--accent);border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.85rem;color:var(--text-primary);text-align:center;"></div>
+            <div class="form-group">
+              <label class="form-label" for="forgot-code">Código de 6 Dígitos</label>
+              <input class="form-input" type="text" id="forgot-code" placeholder="Ex: 123456" style="letter-spacing:4px;font-weight:700;text-align:center;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="forgot-new-password">Nova Senha</label>
+              <input class="form-input" type="password" id="forgot-new-password" placeholder="Mínimo 8 caracteres">
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleResetPassword()">
+              Redefinir Senha
+            </button>
+          </div>
+
+          <p class="auth-toggle">
+            Lembrou da senha? <a href="#" onclick="toggleAuthForm('login');return false;">Voltar para o Login</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       VIEW 3: DASHBOARD
+       ============================================ -->
+  <section class="view" id="dashboard-view">
+    <div class="container" style="padding-top:calc(80px + var(--space-xl));">
+      <div id="dashboard-content">
+        <p style="color:var(--text-muted);text-align:center;padding:var(--space-3xl);">Carregando...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       VIEW 4: CONFIGURAÇÕES DA PÁGINA
+       ============================================ -->
+  <section class="view" id="builder-view">
+    <div class="container">
+      <div class="builder-layout">
+        <!-- Form Panel -->
+        <div class="builder-form-panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
+            <div>
+              <h1 class="builder-title">Configurações do <span class="text-gradient">site</span></h1>
+              <p class="builder-subtitle">Organize as informações nas mesmas seções que seus clientes encontrarão.</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="navigateTo('dashboard')">← Voltar</button>
+          </div>
+
+          <div class="settings-nav-shell">
+            <button class="settings-nav-arrow" id="settings-nav-prev" type="button" onclick="scrollSettingsNav(-1)" aria-label="Ver opções anteriores">‹</button>
+            <nav class="settings-nav" id="settings-nav" aria-label="Áreas de configuração">
+              <button class="settings-nav-item active" type="button" data-settings-target="profile" onclick="showSettingsSection('profile')">Apresentação do negócio</button>
+              <button class="settings-nav-item" type="button" data-settings-target="contact" onclick="showSettingsSection('contact')">Contato e WhatsApp</button>
+              <button class="settings-nav-item" type="button" data-settings-target="services" onclick="showSettingsSection('services')">Serviços / Produtos</button>
+              <button class="settings-nav-item" type="button" data-settings-target="gallery" onclick="showSettingsSection('gallery')">Galeria de fotos</button>
+              <button class="settings-nav-item" type="button" data-settings-target="testimonials" onclick="showSettingsSection('testimonials')">Avaliações de clientes</button>
+              <button class="settings-nav-item" type="button" data-settings-target="social" onclick="showSettingsSection('social')">Redes sociais</button>
+              <button class="settings-nav-item" type="button" data-settings-target="appearance" onclick="showSettingsSection('appearance')">Aparência do site</button>
+              <button class="settings-nav-item" type="button" data-settings-target="assistant" onclick="showSettingsSection('assistant')" hidden aria-hidden="true">Assistente de conteúdo</button>
+            </nav>
+            <button class="settings-nav-arrow" id="settings-nav-next" type="button" onclick="scrollSettingsNav(1)" aria-label="Ver mais opções">›</button>
+          </div>
+
+          <!-- Assistente de conteúdo: resposta separada para cópia manual -->
+          <div class="form-section settings-section assistant-workspace" data-settings-section="assistant" hidden aria-hidden="true">
+            <div class="form-section-title"><span class="icon">✦</span> Assistente de conteúdo</div>
+            <p class="assistant-intro">Descreva o texto que você precisa ou cole um texto para receber uma versão alternativa. A resposta não altera nenhum campo do seu site.</p>
+            <div class="assistant-examples">
+              <strong>Exemplos:</strong>
+              <span>“Escreva uma apresentação curta para minha barbearia.”</span>
+              <span>“Melhore o texto abaixo e deixe mais profissional: …”</span>
+              <span>“Crie uma mensagem convidando o cliente a entrar em contato.”</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ai-request">O que você precisa?</label>
+              <textarea class="form-input assistant-request" id="ai-request" maxlength="2500" rows="8" oninput="updateAssistantCounter()" placeholder="Explique o texto desejado. Se quiser melhorar algo existente, cole o texto aqui e diga como deseja que ele fique."></textarea>
+              <div class="assistant-request-toolbar">
+                <button class="btn btn-secondary btn-sm" type="button" onclick="pasteAssistantRequest()">Colar texto</button>
+                <div class="assistant-counter"><span id="ai-request-count">0</span>/2500 caracteres</div>
+              </div>
+              <small class="assistant-paste-help">No celular, você também pode tocar e segurar dentro do campo e escolher “Colar”.</small>
+            </div>
+            <button class="btn btn-primary" type="button" id="ai-generate-btn" onclick="generateAssistantText()">Gerar resposta</button>
+            <div class="assistant-response-panel" id="ai-response-panel" hidden>
+              <div class="assistant-response-header"><strong>Resposta do Assistente</strong><span>Confira antes de utilizar</span></div>
+              <textarea class="form-input assistant-response" id="ai-response" rows="10" readonly aria-label="Resposta do Assistente"></textarea>
+              <div class="assistant-response-actions">
+                <button class="btn btn-primary btn-sm" type="button" onclick="copyAssistantResponse()">Copiar texto</button>
+                <button class="btn btn-secondary btn-sm" type="button" onclick="clearAssistantResponse()">Limpar resposta</button>
+              </div>
+            </div>
+            <small class="assistant-safety">A IA pode cometer erros. Não envie dados pessoais, sigilosos ou informações de clientes. O texto só será usado no site se você copiar, colar no campo desejado e salvar.</small>
+          </div>
+
+          <!-- Personal Info -->
+          <div class="form-section settings-section active" data-settings-section="profile">
+            <div class="form-section-title"><span class="icon">🏢</span> Apresentação do negócio</div>
+            <div class="form-group">
+              <label class="form-label" for="field-name">Nome do profissional ou responsável *</label>
+              <input class="form-input" type="text" id="field-name" placeholder="Ex: Pedro" data-field="name">
+              <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Quando houver uma marca preenchida, este nome será apresentado com o cargo na área de contato, ao fim do site.</small>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="field-business">Nome do negócio ou marca (opcional)</label>
+                <input class="form-input" type="text" id="field-business" placeholder="Ex: PMJ" data-field="business">
+                <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Quando preenchido, este será o nome principal em destaque no topo do site.</small>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="field-business-complement">Complemento do nome do negócio (opcional)</label>
+                <input class="form-input" type="text" id="field-business-complement" maxlength="180" placeholder="Ex: Eletrodomésticos de qualidade" data-field="business_complement">
+                <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Aparece logo abaixo do nome principal no topo do site.</small>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="field-title">Cargo, função ou especialidade</label>
+                <input class="form-input" type="text" id="field-title" placeholder="Ex: Diretor" data-field="title">
+                <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Será apresentado junto ao nome do profissional ou responsável na área de contato, por exemplo: Pedro — Diretor.</small>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Foto do profissional (opcional)</label>
+                <div class="photo-upload-area" id="photo-upload-area" onclick="document.getElementById('field-photo-file').click()" style="padding:16px 12px;text-align:center;">
+                  <img id="photo-preview-img" style="display:none;width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px;margin-left:auto;margin-right:auto;">
+                  <div id="photo-placeholder" style="color:var(--text-muted);font-size:0.8rem;">
+                    👤 Enviar foto do profissional
+                  </div>
+                  <input type="file" id="field-photo-file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)">
+                </div>
+                <input type="hidden" id="field-photo" data-field="photo_url">
+              </div>
+
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Logo ou imagem principal do negócio</label>
+                <div class="photo-upload-area" id="logo-upload-area" onclick="document.getElementById('field-logo-file').click()" style="padding:16px 12px;text-align:center;">
+                  <img id="logo-preview-img" style="display:none;width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px;margin-left:auto;margin-right:auto;">
+                  <div id="logo-placeholder" style="color:var(--text-muted);font-size:0.8rem;">
+                    🏢 Enviar logo ou imagem
+                  </div>
+                  <input type="file" id="field-logo-file" accept="image/*" style="display:none;" onchange="handleLogoUpload(this)">
+                </div>
+                <input type="hidden" id="field-logo" data-field="logo_url">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="field-description">Descrição do negócio</label>
+              <textarea class="form-input" id="field-description" maxlength="1800" placeholder="Apresente seu negócio, seus diferenciais e o atendimento oferecido..." data-field="description" rows="3"></textarea>
+              <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Este texto aparecerá na seção “Sobre o negócio”. Se o campo ficar vazio, a seção não será exibida no site público.</small>
+            </div>
+          </div>
+
+          <!-- Contact -->
+          <div class="form-section settings-section" data-settings-section="contact">
+            <div class="form-section-title"><span class="icon">📞</span> Contato e localização</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="field-phone">Telefone</label>
+                <input class="form-input" type="tel" id="field-phone" placeholder="(11) 99999-9999" data-field="phone">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="field-email">Email</label>
+                <input class="form-input" type="email" id="field-email" placeholder="seu@email.com" data-field="email">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="field-address">Endereço</label>
+              <input class="form-input" type="text" id="field-address" placeholder="Rua, número, cidade — SP" data-field="address">
+            </div>
+            <div class="form-group" hidden aria-hidden="true">
+              <label class="form-label" for="field-message">Mensagem</label>
+              <textarea class="form-input" id="field-message" maxlength="1800" placeholder="Ex: Agende pelo WhatsApp ou visite-nos no fim de semana" data-field="message" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- WhatsApp -->
+          <div class="form-section settings-section" data-settings-section="contact">
+            <div class="form-section-title"><span class="icon">💬</span> WhatsApp</div>
+            <div class="form-group">
+              <label class="form-label" for="field-whatsapp">Número do WhatsApp (com DDD + código do país)</label>
+              <input class="form-input" type="tel" id="field-whatsapp" placeholder="+55 (11) 9 9999-9999" data-field="whatsapp">
+              <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">
+                Ex: <strong style="color:var(--text-secondary)">+55 (11) 9 9999-9999</strong> — inclua o código do país (+55) e o DDD
+              </small>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="field-whatsapp-group">Link do Grupo WhatsApp (opcional)</label>
+              <input class="form-input" type="url" id="field-whatsapp-group" placeholder="https://chat.whatsapp.com/XXXXX" data-field="whatsapp_group">
+              <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">
+                No WhatsApp: Grupo → ⋯ → Info do grupo → Convidar via link → Copiar link
+              </small>
+            </div>
+          </div>
+
+          <!-- Social Media -->
+          <div class="form-section settings-section" data-settings-section="social">
+            <div class="form-section-title"><span class="icon">🌐</span> Redes sociais</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="field-instagram">📷 Instagram</label>
+                <input class="form-input" type="text" id="field-instagram" placeholder="@seuuser" data-field="instagram">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="field-facebook">📘 Facebook</label>
+                <input class="form-input" type="text" id="field-facebook" placeholder="facebook.com/seuperfil" data-field="facebook">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="field-linkedin">💼 LinkedIn</label>
+                <input class="form-input" type="text" id="field-linkedin" placeholder="linkedin.com/in/seuperfil" data-field="linkedin">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="field-tiktok">🎵 TikTok</label>
+                <input class="form-input" type="text" id="field-tiktok" placeholder="@seuuser" data-field="tiktok">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="field-youtube">▶️ YouTube</label>
+                <input class="form-input" type="text" id="field-youtube" placeholder="youtube.com/@seucanal" data-field="youtube">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="field-twitter">✖️ X (Twitter)</label>
+                <input class="form-input" type="text" id="field-twitter" placeholder="@seuuser" data-field="twitter">
+              </div>
+            </div>
+          </div>
+
+          <!-- Landing Page / Site Config (Optional) -->
+          <div class="form-section settings-section" data-settings-section="appearance">
+            <div class="form-section-title"><span class="icon">🌐</span> Botão de destaque (opcional)</div>
+            <div class="form-group">
+              <label class="form-label" for="field-site-button">Texto do botão</label>
+              <input class="form-input" type="text" id="field-site-button" placeholder="Vá para o site" data-field="site_button_text">
+              <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">
+                Este botão só aparecerá no seu site quando houver produtos, fotos ou avaliações cadastradas.
+              </small>
+            </div>
+          </div>
+
+          <!-- Flexible services / menu / price list -->
+          <div class="form-section settings-section" data-settings-section="services">
+            <div class="form-section-title"><span class="icon">📋</span> Serviços / Produtos</div>
+            <p style="color:var(--text-secondary);font-size:0.86rem;line-height:1.55;margin:-4px 0 16px;">
+              Mostre seu conteúdo do seu jeito: envie uma arte pronta com preços/cardápio ou monte uma lista de itens no CardLink.
+            </p>
+
+            <div class="form-row">
+              <div class="form-group" style="flex:1;">
+                <label class="form-label" for="field-services-mode">Como deseja apresentar?</label>
+                <select class="form-input" id="field-services-mode" data-field="services_mode" onchange="toggleServicesMode(); updatePreview();">
+                  <option value="image">Enviar uma imagem pronta</option>
+                  <option value="list">Criar lista de produtos / serviços</option>
+                </select>
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label class="form-label" for="field-services-title">Título da seção</label>
+                <input class="form-input" type="text" id="field-services-title" data-field="services_title" placeholder="Ex: Destaque, Promoção, Cardápio ou Tabela de Preços">
+              </div>
+            </div>
+
+            <div id="services-image-builder">
+              <div class="form-group">
+                <label class="form-label">Imagem em destaque</label>
+                <div style="border:1.5px dashed var(--border-subtle);border-radius:var(--radius-lg);padding:16px;text-align:center;background:var(--bg-surface);">
+                  <img id="services-image-preview" alt="Prévia da imagem em destaque" style="display:none;max-width:100%;max-height:520px;object-fit:contain;border-radius:12px;margin:0 auto 12px;">
+                  <div id="services-image-placeholder" style="color:var(--text-secondary);font-size:0.86rem;line-height:1.5;margin-bottom:12px;">
+                    Envie uma tabela, cardápio, promoção, banner, catálogo ou outra arte do seu negócio.
+                  </div>
+                  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+                    <button class="btn btn-secondary btn-sm" type="button" onclick="document.getElementById('services-image-file').click()">📷 Escolher imagem</button>
+                    <button class="btn btn-outline btn-sm" type="button" id="services-image-remove" onclick="clearServicesImage()" style="display:none;">Remover</button>
+                  </div>
+                  <input type="file" id="services-image-file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="handleServicesImageUpload(this)">
+                  <input type="hidden" id="field-services-image" data-field="services_image_url">
+                  <small style="color:var(--text-muted);display:block;margin-top:10px;">JPG, PNG ou WebP. O CardLink otimiza a imagem antes do envio.</small>
+                </div>
+              </div>
+            </div>
+
+            <div id="services-list-builder" style="display:none;">
+              <div id="builder-products-container"></div>
+              <button class="btn btn-secondary btn-sm" type="button" onclick="addProductRow()" style="margin-top:8px;">
+                + Adicionar Produto / Serviço
+              </button>
+            </div>
+          </div>
+
+          <!-- Photo Gallery -->
+          <div class="form-section settings-section" data-settings-section="gallery">
+            <div class="form-section-title"><span class="icon">🖼️</span> Galeria de fotos</div>
+            <div id="gallery-upload-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;"></div>
+            <button class="btn btn-secondary btn-sm" type="button" onclick="addGallerySlot()" style="width:100%;">
+              📷 Adicionar Foto
+            </button>
+            <!-- Hidden field keeps URL list for save/load compatibility -->
+            <input type="hidden" id="field-gallery">
+          </div>
+
+          <!-- Testimonials -->
+          <div class="form-section settings-section" data-settings-section="testimonials">
+            <div class="form-section-title"><span class="icon">⭐</span> Avaliações de clientes</div>
+            <div id="builder-testimonials-container"></div>
+            <button class="btn btn-secondary btn-sm" type="button" onclick="addTestimonialRow()" style="margin-top:8px;">
+              + Adicionar Depoimento
+            </button>
+          </div>
+
+          <!-- Theme -->
+          <div class="form-section settings-section" data-settings-section="appearance">
+            <div class="form-section-title"><span class="icon">🎨</span> Aparência do site</div>
+            <div class="theme-grid" id="themeGrid">
+              <div>
+                <div class="theme-swatch active" data-theme="midnight" onclick="selectTheme('midnight')"></div>
+                <div class="theme-label">Midnight</div>
+              </div>
+              <div>
+                <div class="theme-swatch" data-theme="ocean" onclick="selectTheme('ocean')"></div>
+                <div class="theme-label">Mel Claro</div>
+              </div>
+              <div>
+                <div class="theme-swatch" data-theme="sunset" onclick="selectTheme('sunset')"></div>
+                <div class="theme-label">Sunset</div>
+              </div>
+              <div>
+                <div class="theme-swatch" data-theme="forest" onclick="selectTheme('forest')"></div>
+                <div class="theme-label">Executivo Premium</div>
+              </div>
+              <div>
+                <div class="theme-swatch" data-theme="rose" onclick="selectTheme('rose')"></div>
+                <div class="theme-label">Rose</div>
+              </div>
+              <div>
+                <div class="theme-swatch" data-theme="monochrome" onclick="selectTheme('monochrome')"></div>
+                <div class="theme-label">Mono</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PRO Lock Section -->
+          <div class="form-section settings-section" data-settings-section="pro-lock" style="text-align:center;padding:40px 20px;background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);margin-bottom:var(--space-xl);">
+            <div style="font-size:3rem;margin-bottom:15px;">🔒</div>
+            <h3 style="font-size:1.4rem;color:var(--text-primary);margin-bottom:10px;" id="pro-lock-title">Recurso Exclusivo PRO</h3>
+            <p style="color:var(--text-secondary);font-size:0.95rem;line-height:1.6;margin-bottom:25px;max-width:400px;margin-left:auto;margin-right:auto;" id="pro-lock-desc">
+              Esta é uma funcionalidade premium do CardLink. Assine o plano PRO por apenas R$ 12,90/mês para desbloquear!
+            </p>
+            <button class="btn btn-primary" type="button" onclick="openProPaymentModal()" style="padding:12px 24px;font-size:1rem;font-weight:bold;margin:0 auto;">
+              Assinar Plano PRO — R$ 12,90/mês
+            </button>
+          </div>
+
+          <!-- Generate Buttons -->
+          <div class="generate-section">
+            <button class="btn btn-primary btn-lg" onclick="saveCard()" id="generate-btn">
+              Salvar alterações
+            </button>
+            <button class="btn btn-secondary btn-lg" onclick="navigateTo('dashboard')">
+              Cancelar
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       VIEW 5: CARD (Full Page - Public)
+       ============================================ -->
+  <section class="view" id="card-view">
+    <!-- Logged in Admin/Owner top bar -->
+    <div id="card-owner-bar" style="display:none;background:#2e1065;color:#ffffff;padding:10px 16px;font-size:0.85rem;text-align:center;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);z-index:9999;position:sticky;top:0;font-family:var(--font-sans);width:100%;">
+      <span>⚙️ Você está visualizando o seu cartão público</span>
+      <button class="btn btn-primary btn-sm" onclick="navigateTo('dashboard')" style="padding:4px 12px;font-size:0.8rem;background:var(--purple);border:none;">Voltar ao Painel</button>
+    </div>
+    <div class="card-fullpage" id="cardFullpage">
+      <div class="card-wrapper">
+        <div id="rendered-card">
+        </div>
+      </div>
+      <div class="card-share-bar" id="cardShareBar">
+        <button class="btn btn-secondary btn-sm" onclick="copyCardLink()" id="copy-link-btn">
+          📋 Copiar Link
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="shareCard()" id="share-btn">
+          📤 Compartilhar
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="installFromCard()" id="install-card-btn" style="display:none;">
+          📲 Fixar na Tela
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="navigateTo('dashboard')" id="dashboard-card-btn" style="display:none;">
+          Visão geral
+        </button>
+      </div>
+      <div class="card-qr" id="cardQr">
+        <img id="qrCodeImg" alt="QR Code do cartão" src="" />
+      </div>
+      <div style="text-align:center;padding:20px 16px 32px;">
+        <a href="/" onclick="navigateTo('auth');return false;" style="color:var(--purple);font-size:0.85rem;text-decoration:none;font-weight:500;opacity:0.7;transition:opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+          ✨ Conheça o CardLink e crie sua presença profissional
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       VIEW 6: CONTACTS (Dashboard detail)
+       ============================================ -->
+  <section class="view" id="contacts-view">
+    <div class="container" style="padding-top:calc(80px + var(--space-xl));">
+      <div class="dashboard-header">
+        <div>
+          <h1 class="builder-title">Mensagens do <span class="text-gradient" id="contacts-card-name">Cartão</span></h1>
+          <p class="builder-subtitle" id="contacts-count">0 mensagens recebidas</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="navigateTo('dashboard')">← Voltar</button>
+      </div>
+      <div class="contacts-list" id="contacts-list">
+        <p style="color:var(--text-muted);text-align:center;padding:var(--space-3xl);">
+          Nenhum contato recebido ainda.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       VIEW 7: MINHA CONTA
+       ============================================ -->
+  <section class="view" id="account-view">
+    <div class="container account-page">
+      <div class="dashboard-header">
+        <div>
+          <h1 class="builder-title">Minha <span class="text-gradient">conta</span></h1>
+          <p class="builder-subtitle">Dados usados para entrar e administrar o CardLink. Eles não alteram sua página pública.</p>
+        </div>
+      </div>
+
+      <div class="account-grid">
+        <div class="account-card">
+          <h2>Dados de acesso</h2>
+          <div class="form-group">
+            <label class="form-label" for="account-name">Seu nome</label>
+            <input class="form-input" type="text" id="account-name" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="account-email">E-mail de acesso</label>
+            <input class="form-input" type="email" id="account-email" autocomplete="email">
+            <div id="account-email-status" style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="account-email-password">Senha atual <span style="font-weight:400;color:var(--text-muted);">(somente para trocar o e-mail)</span></label>
+            <input class="form-input" type="password" id="account-email-password" autocomplete="current-password" placeholder="Confirme sua senha para alterar o e-mail">
+          </div>
+          <button class="btn btn-primary" type="button" onclick="saveAccountProfile()">Salvar dados da conta</button>
+        </div>
+
+        <div class="account-card">
+          <h2>Alterar senha</h2>
+          <div class="form-group">
+            <label class="form-label" for="account-current-password">Senha atual</label>
+            <input class="form-input" type="password" id="account-current-password" autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="account-new-password">Nova senha</label>
+            <input class="form-input" type="password" id="account-new-password" minlength="8" autocomplete="new-password" placeholder="Mínimo de 8 caracteres">
+          </div>
+          <button class="btn btn-secondary" type="button" onclick="changeAccountPassword()">Atualizar senha</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       VIEW 8: PAINEL DO PROPRIETÁRIO (ADMIN)
+       ============================================ -->
+  <section class="view" id="admin-view">
+    <div class="container">
+      <div class="dashboard-header" style="margin-bottom:var(--space-xl);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-md);">
+        <div>
+          <h1 class="builder-title">Painel do <span class="text-gradient">Proprietário</span></h1>
+          <p class="builder-subtitle">Gerenciamento de usuários, métricas globais e chamados de suporte.</p>
+        </div>
+        <button class="btn btn-secondary" onclick="handleLogout()">Sair do administrador</button>
+      </div>
+
+      <!-- Métricas Globais -->
+      <div class="stats-grid" style="margin-bottom:var(--space-xl);">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="admin-metric-users">-</div>
+          <div class="stat-label">Clientes comerciais</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🌐</div>
+          <div class="stat-value" id="admin-metric-cards">-</div>
+          <div class="stat-label">Páginas Criadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👁️</div>
+          <div class="stat-value" id="admin-metric-views">-</div>
+          <div class="stat-label">Visualizações Globais</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📩</div>
+          <div class="stat-value" id="admin-metric-contacts">-</div>
+          <div class="stat-label">Contatos Gerados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔳</div>
+          <div class="stat-value" id="admin-metric-qr-scans">-</div>
+          <div class="stat-label">QR escaneados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💳</div>
+          <div class="stat-value" id="admin-metric-active-subscriptions">-</div>
+          <div class="stat-label">Assinaturas ativas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🧪</div>
+          <div class="stat-value" id="admin-metric-internal-tests">-</div>
+          <div class="stat-label">Testes internos</div>
+        </div>
+      </div>
+
+      <!-- Seções com Abas Internas no Admin -->
+      <nav class="settings-nav" aria-label="Gerenciamento administrativo" style="margin-bottom:var(--space-md);border-bottom:1px solid var(--border-subtle);background:none;">
+        <button class="settings-nav-item active" type="button" id="admin-tab-users" onclick="switchAdminSubSection('users')">Gerenciar Usuários</button>
+        <button class="settings-nav-item" type="button" id="admin-tab-support" onclick="switchAdminSubSection('support')">Chamados de Suporte</button>
+      </nav>
+
+      <!-- Sub-view 1: Gerenciar Usuários -->
+      <div class="admin-section" id="admin-section-users">
+        <div class="dash-card-full" style="padding:var(--space-lg);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md);flex-wrap:wrap;gap:var(--space-sm);">
+            <h2>Lista de Usuários</h2>
+            <input type="text" id="admin-user-search" class="form-input" placeholder="🔍 Buscar por nome ou e-mail..." oninput="filterAdminUsers()" style="max-width:300px;">
+          </div>
+          
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;text-align:left;" class="admin-table">
+              <thead>
+                <tr style="border-bottom:2px solid var(--border-subtle);color:var(--text-muted);font-size:0.85rem;">
+                  <th style="padding:12px 8px;">Usuário</th>
+                  <th style="padding:12px 8px;">Status Página</th>
+                  <th style="padding:12px 8px;">Assinatura</th>
+                  <th style="padding:12px 8px;text-align:right;">Origem</th>
+                  <th style="padding:12px 8px;text-align:right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-table-body">
+                <tr><td colspan="5" style="text-align:center;padding:var(--space-lg);color:var(--text-secondary);">Carregando usuários...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-view 2: Chamados de Suporte -->
+      <div class="admin-section" id="admin-section-support" style="display:none;">
+        <div class="dash-card-full" style="padding:var(--space-lg);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);">
+          <h2>Chamados de Ajuda</h2>
+          <p class="builder-subtitle" style="margin-bottom:var(--space-md);">Dúvidas enviadas pelos assinantes do CardLink.</p>
+          
+          <div style="display:flex;flex-direction:column;gap:var(--space-md);" id="admin-support-list">
+            <p style="color:var(--text-secondary);text-align:center;padding:var(--space-lg);">Carregando chamados...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Modal de Mensagem Administrativa -->
+  <div class="modal-overlay" id="admin-message-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:110;align-items:center;justify-content:center;">
+    <div class="builder-form-panel" style="max-width:520px;width:92%;max-height:90vh;margin:auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-lg);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;">
+        <div>
+          <h2 class="builder-title" style="margin:0;font-size:1.25rem;">Mensagem ao usuário</h2>
+          <p id="admin-message-recipient" style="color:var(--text-secondary);font-size:0.82rem;margin-top:4px;"></p>
+        </div>
+        <button type="button" onclick="closeAdminMessageModal()" style="font-size:1.6rem;color:var(--text-secondary);">&times;</button>
+      </div>
+      <input type="hidden" id="admin-message-user-id">
+      <div class="form-group">
+        <label class="form-label" for="admin-message-subject">Assunto</label>
+        <input class="form-input" type="text" id="admin-message-subject" maxlength="120" value="Mensagem do CardLink">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="admin-message-body">Mensagem *</label>
+        <textarea class="form-input" id="admin-message-body" rows="5" maxlength="3000" placeholder="Escreva a mensagem que aparecerá no painel do usuário."></textarea>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:18px;">
+        <button class="btn btn-primary" type="button" onclick="sendAdminMessage()" style="flex:1;">Enviar mensagem</button>
+        <button class="btn btn-secondary" type="button" onclick="closeAdminMessageModal()" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Ajuda & Suporte -->
+  <div class="modal-overlay" id="support-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;">
+    <div class="builder-form-panel" style="max-width:500px;width:90%;max-height:90vh;margin:10vh auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-lg);">
+      <h2 class="builder-title" style="margin-bottom:8px;">Falar com o <span class="text-gradient">Suporte</span></h2>
+      <p class="builder-subtitle" style="margin-bottom:16px;">Sua mensagem será enviada diretamente para o proprietário do CardLink.</p>
+      
+      <div class="form-group" style="margin-bottom:var(--space-md);">
+        <label class="form-label" for="support-subject">Assunto</label>
+        <input class="form-input" type="text" id="support-subject" placeholder="Ex: Problema com imagens, dúvida sobre assinatura...">
+      </div>
+      <div class="form-group" style="margin-bottom:var(--space-md);">
+        <label class="form-label" for="support-message">Mensagem *</label>
+        <textarea class="form-input" id="support-message" rows="5" placeholder="Descreva sua dúvida ou problema detalhadamente..." required></textarea>
+      </div>
+      
+      <div style="display:flex;gap:12px;margin-top:20px;">
+        <button class="btn btn-primary" onclick="submitSupportTicket()" style="flex:1;">Enviar chamado</button>
+        <button class="btn btn-secondary" onclick="closeSupportModal()" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Assinatura CardLink -->
+  <div class="modal-overlay" id="pro-payment-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;">
+    <div class="builder-form-panel" style="max-width:440px;width:90%;max-height:90vh;margin:10vh auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-lg);text-align:center;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;text-align:left;">
+        <h2 class="builder-title" style="margin-bottom:0;font-size:1.25rem;"><span class="icon">👑</span> Plano <span class="text-gradient">Único</span></h2>
+        <button type="button" onclick="closeProPaymentModal()" style="background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+      
+      <p style="color:var(--text-secondary);font-size:0.88rem;line-height:1.6;margin-bottom:20px;text-align:left;">
+        Assine o CardLink para reunir em uma apresentação profissional seus serviços, fotos, avaliações, contatos, redes sociais e WhatsApp, com divulgação por link ou QR Code.
+      </p>
+      
+      <div style="background:rgba(139,92,246,0.06);border:1.5px dashed rgba(139,92,246,0.2);border-radius:var(--radius-lg);padding:16px;margin-bottom:16px;">
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--purple);font-weight:bold;margin-bottom:8px;">Valor da Assinatura</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;" id="pro-modal-plans">
+          <div id="pro-plan-m" onclick="selectProModalPlan('monthly')" style="border:2px solid var(--accent);border-radius:10px;padding:10px 8px;cursor:pointer;transition:all 0.2s;">
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-secondary);">Mensal</div>
+            <div style="font-size:1.25rem;font-weight:800;color:var(--text-primary);">R$ 12,90<span style="font-size:0.65rem;font-weight:400;">/mês</span></div>
+          </div>
+          <div id="pro-plan-a" onclick="selectProModalPlan('annual')" style="border:1.5px solid var(--border-subtle);border-radius:10px;padding:10px 8px;cursor:pointer;position:relative;transition:all 0.2s;">
+            <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.55rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-secondary);">Anual</div>
+            <div style="font-size:1.25rem;font-weight:800;color:var(--text-primary);">R$ 99,00<span style="font-size:0.65rem;font-weight:400;">/ano</span></div>
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;" id="pro-modal-note">Mensal: R$ 12,90/mês · Anual: R$ 99,00/ano (equivalente a R$ 8,25/mês, economize R$ 55,80/ano).</div>
+      </div>
+      
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <button class="btn btn-primary" onclick="redirectToProCheckout()" style="width:100%;padding:12px;font-size:0.95rem;font-weight:bold;text-align:center;" id="pro-modal-checkout-btn">
+          💳 Pagar R$ 12,90/mês na Cakto
+        </button>
+        <button class="btn btn-secondary" onclick="closeProPaymentModal()" style="width:100%;">
+          Voltar depois
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal do QR Code -->
+  <div class="modal-overlay" id="qr-code-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;">
+    <div class="builder-form-panel" style="max-width:400px;width:90%;max-height:90vh;margin:10vh auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-lg);text-align:center;display:flex;flex-direction:column;align-items:center;gap:15px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;">
+        <h2 class="builder-title" style="margin-bottom:0;font-size:1.2rem;"><span class="icon">📱</span> QR Code do CardLink</h2>
+        <button type="button" onclick="closeQrCodeModal()" style="background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+      
+      <p style="color:var(--text-secondary);font-size:0.82rem;line-height:1.5;margin:0 0 10px;text-align:left;">
+        Apresente este QR Code no celular ou salve a imagem para imprimir e exibir no balcão. O cliente abrirá sua página profissional completa e o escaneamento será contabilizado.
+      </p>
+
+      <div style="background:#ffffff;padding:16px;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);display:inline-flex;align-items:center;justify-content:center;margin:10px 0;">
+        <img id="qr-code-modal-img" style="width:200px;height:200px;display:block;" alt="QR Code de Balcão">
+      </div>
+
+      <div style="font-size:0.75rem;color:var(--purple);font-weight:bold;letter-spacing:0.02em;background:rgba(124,58,237,0.06);padding:6px 12px;border-radius:20px;width:100%;max-width:280px;text-align:center;word-break:break-all;" id="qr-code-modal-url">
+        -
+      </div>
+      
+      <div style="display:flex;gap:10px;width:100%;margin-top:10px;">
+        <button class="btn btn-primary" onclick="copyQrCodeLink()" style="flex:1;font-size:0.85rem;padding:10px 14px;">Copiar Link</button>
+        <button class="btn btn-secondary" onclick="closeQrCodeModal()" style="flex:1;font-size:0.85rem;padding:10px 14px;">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal do Manual do Usuário -->
+  <div class="modal-overlay" id="user-manual-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;">
+    <div class="builder-form-panel" style="max-width:650px;width:90%;max-height:85vh;overflow-y:auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-xl);display:flex;flex-direction:column;gap:15px;text-align:left;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-subtle);padding-bottom:12px;margin-bottom:8px;">
+        <h2 class="builder-title" style="margin-bottom:0;font-size:1.35rem;display:flex;align-items:center;gap:8px;"><span class="icon">📖</span> Manual do Usuário CardLink</h2>
+        <button type="button" onclick="closeUserManualModal()" style="background:none;border:none;color:var(--text-secondary);font-size:1.6rem;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+      
+      <div style="font-size:0.9rem;line-height:1.6;color:var(--text-secondary);display:flex;flex-direction:column;gap:20px;">
+        
+        <div>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🛠️</span> Passo 1: Assinatura e Primeiro Acesso</h3>
+          <p style="margin:0;">Assine o <strong>CardLink</strong> pelo botão de assinatura. Após a confirmação do pagamento pela Cakto, você receberá no e-mail informado um link seguro para confirmar o endereço, definir sua senha e ativar a conta. Depois disso, use <strong>Entrar na conta</strong> sempre que quiser voltar ao painel.</p>
+        </div>
+
+        <div>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🎨</span> Passo 2: Personalizando seu site</h3>
+          <p style="margin:0;margin-bottom:8px;">No menu do painel, clique em "Configurações" para organizar as informações do seu site:</p>
+          <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;">
+            <li><strong>Perfil:</strong> Preencha seu nome profissional, profissão/cargo, empresa e uma descrição (bio) de 2 a 3 frases.</li>
+            <li><strong>Imagens:</strong> Envie uma foto de perfil e a logo da sua empresa (arquivos JPG ou PNG quadrados facilitam o enquadramento).</li>
+            <li><strong>Contatos e Redes Sociais:</strong> Insira seu WhatsApp (somente números com DDD) e links das suas redes sociais.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🛍️</span> Passo 3: Vitrine, Galeria e Depoimentos</h3>
+          <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;">
+            <li><strong>Destaque ou Serviços:</strong> envie uma imagem pronta — como tabela, cardápio, promoção, banner ou catálogo — ou crie uma lista de produtos e serviços dentro do CardLink. Na lista estruturada, o cliente pode solicitar diretamente pelo WhatsApp.</li>
+            <li><strong>Galeria:</strong> Faça o upload de fotos reais do seu trabalho (portfólio) para gerar credibilidade imediata.</li>
+            <li><strong>Depoimentos:</strong> Insira avaliações e avalie com estrelas para comprovar a qualidade do seu atendimento.</li>
+          </ul>
+        </div>
+
+        <div hidden aria-hidden="true">
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🤖</span> Passo 4: Usando a Inteligência Artificial</h3>
+          <p style="margin:0;">Tem dificuldades para escrever? Abra a aba “Assistente de conteúdo” e diga o que precisa. Você também pode usar “Colar texto” para inserir um conteúdo existente e pedir uma versão melhor. A resposta aparecerá separadamente: confira, clique em “Copiar texto” e cole manualmente no campo desejado. O Assistente nunca altera ou salva seu site.</p>
+        </div>
+
+        <div>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>📱</span> Passo 4: QR Code de Balcão e Compartilhamento</h3>
+          <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;">
+            <li><strong>Link Único:</strong> Copie o link exclusivo do seu CardLink para divulgar nas redes sociais, mensagens e materiais promocionais.</li>
+            <li><strong>QR Code:</strong> Abra a miniatura no painel e salve ou imprima a imagem. Ideal para expor no balcão e direcionar clientes à página profissional completa do seu negócio.</li>
+          </ul>
+        </div>
+
+        <div style="background:rgba(124,58,237,0.06);border:1px dashed rgba(124,58,237,0.25);border-radius:var(--radius-lg);padding:14px;">
+          <h3 style="color:var(--purple);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;margin-top:0;"><span>🚀</span> Passo 5: Publicação e uso</h3>
+          <p style="margin:0;font-size:0.88rem;">Após a confirmação da assinatura e a ativação da sua conta, monte sua apresentação, revise as informações e publique. O link e o QR Code passam a direcionar os clientes para sua página profissional enquanto a assinatura estiver ativa.</p>
+        </div>
+
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:10px;border-top:1px solid var(--border-subtle);padding-top:12px;">
+        <button class="btn btn-primary" onclick="closeUserManualModal()" style="padding:8px 20px;font-size:0.85rem;font-weight:bold;">Entendi, fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View: Termos de Uso -->
+  <section class="view" id="terms-view" style="background:var(--bg-surface);min-height:100vh;">
+    <div class="container" style="max-width:800px;padding:40px var(--space-md);color:var(--text-primary);">
+      <h1 class="text-gradient" style="font-size:2.5rem;margin-bottom:20px;text-align:center;">Termos de Uso</h1>
+      <p style="color:var(--text-secondary);margin-bottom:30px;font-size:0.9rem;text-align:center;">Última atualização: Agosto de 2026</p>
+      
+      <div class="legal-content" style="line-height:1.8;font-size:0.95rem;display:flex;flex-direction:column;gap:20px;text-align:left;">
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">1. Aceitação dos Termos</h3>
+        <p style="color:var(--text-secondary);">Ao contratar, ativar e utilizar o CardLink, você concorda plenamente com estes Termos de Uso. Se você não concorda com qualquer parte destes termos, não deve utilizar a plataforma.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">2. Cadastro e Responsabilidade da Conta</h3>
+        <p style="color:var(--text-secondary);">Para utilizar o CardLink, o assinante deve fornecer dados válidos no pagamento e na ativação da conta. A senha criada é pessoal e intransferível. O usuário é inteiramente responsável por todas as atividades e conteúdos publicados sob o seu login e link público.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">3. Uso Permitido e Conteúdo</h3>
+        <p style="color:var(--text-secondary);">É expressamente proibido utilizar o CardLink para publicar ou transmitir conteúdos ilegais, difamatórios, abusivos, ameaçadores, fraudulentos ou de cunho sexual explícito. O uso da plataforma para a prática de SPAM ou envio em massa de mensagens não autorizadas também resultará no banimento imediato da conta.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Planos e Assinatura CardLink</h3>
+        <p style="color:var(--text-secondary);">O CardLink é um serviço por assinatura, com opções mensal e anual apresentadas no checkout. O pagamento é processado pela Cakto e o acesso normal do cliente é liberado após a confirmação da assinatura e a ativação da conta. Em caso de cancelamento, estorno, chargeback ou assinatura inativa, o acesso aos recursos de cliente e a página pública podem ser suspensos. Os dados do site podem ser preservados por período razoável para eventual regularização ou reativação, conforme a política vigente.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">5. Alterações nos Termos</h3>
+        <p style="color:var(--text-secondary);">O CardLink reserva-se o direito de atualizar estes termos a qualquer momento. Modificações substanciais serão notificadas aos usuários ou publicadas com destaque em nosso website.</p>
+
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">6. Contato e Suporte</h3>
+        <p style="color:var(--text-secondary);">Para dúvidas sobre o serviço, cancelamento, acesso à conta ou estes Termos de Uso, fale pelo WhatsApp <a href="https://wa.me/5511994551249" target="_blank" rel="noopener" style="color:var(--purple);">(11) 99455-1249</a> ou pelo e-mail <a href="mailto:cardlink@yahoo.com" style="color:var(--purple);">cardlink@yahoo.com</a>.</p>
+      </div>
+      
+      <div style="margin-top:40px;text-align:center;">
+        <button class="btn btn-secondary" onclick="window.history.back()" style="padding:10px 24px;">Voltar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- View: Política de Privacidade -->
+  <section class="view" id="privacy-view" style="background:var(--bg-surface);min-height:100vh;">
+    <div class="container" style="max-width:800px;padding:40px var(--space-md);color:var(--text-primary);">
+      <h1 class="text-gradient" style="font-size:2.5rem;margin-bottom:20px;text-align:center;">Política de Privacidade</h1>
+      <p style="color:var(--text-secondary);margin-bottom:30px;font-size:0.9rem;text-align:center;">Última atualização: Agosto de 2026</p>
+      
+      <div class="legal-content" style="line-height:1.8;font-size:0.95rem;display:flex;flex-direction:column;gap:20px;text-align:left;">
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">1. Informações que Coletamos</h3>
+        <p style="color:var(--text-secondary);">Coletamos os dados necessários para o fornecimento dos nossos serviços, incluindo seu nome, endereço de e-mail e senha criptografada. Também processamos e armazenamos quaisquer conteúdos que você insira ativamente no seu site profissional (ex: links de redes sociais, fotos, produtos, avaliações).</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">2. Finalidade do Tratamento de Dados (LGPD)</h3>
+        <p style="color:var(--text-secondary);">Seus dados são tratados com a finalidade exclusiva de prestar o serviço contratado, especificamente: autenticação em sua conta, geração e exibição pública do seu site profissional, entrega de leads/mensagens recebidas diretamente no seu e-mail cadastrado e gestão da sua assinatura CardLink.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">3. Compartilhamento de Dados</h3>
+        <p style="color:var(--text-secondary);">O CardLink não vende ou aluga seus dados a terceiros. Compartilhamos dados somente quando necessário para operar a plataforma, incluindo o processador de pagamentos Cakto, serviços de e-mail transacional e provedores de infraestrutura indispensáveis ao funcionamento do serviço.</p>
+
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Armazenamento e Segurança</h3>
+        <p style="color:var(--text-secondary);">Adotamos medidas técnicas de segurança para proteger seus dados contra acessos não autorizados. Seus dados cadastrais e conteúdos dos sites profissionais são armazenados em servidores seguros em nuvem.</p>
+        
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">5. Seus Direitos</h3>
+        <p style="color:var(--text-secondary);">Em conformidade com a LGPD (Lei Geral de Proteção de Dados), você tem direito de solicitar a confirmação do tratamento, acesso aos seus dados, retificação de dados incompletos ou a exclusão total da sua conta e de todos os dados a ela associados.</p>
+
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">6. Canal de Privacidade</h3>
+        <p style="color:var(--text-secondary);">Para exercer seus direitos ou esclarecer dúvidas sobre o tratamento de dados pessoais, entre em contato pelo e-mail <a href="mailto:cardlink@yahoo.com" style="color:var(--purple);">cardlink@yahoo.com</a>.</p>
+      </div>
+      
+      <div style="margin-top:40px;text-align:center;">
+        <button class="btn btn-secondary" onclick="window.history.back()" style="padding:10px 24px;">Voltar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span id="toast-icon">✅</span>
+    <span id="toast-message"></span>
+  </div>
+
+  <script>
+    // Unregister all service workers and clear caches before loading app
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(reg => reg.unregister());
+      });
+      if (window.caches) {
+        caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+      }
+    }
+  </script>
+  <script>
+    // Links de checkout da Cakto (formato real: https://pay.cakto.com.br/{id_da_oferta})
+    window.CARD_LINK = {
+      monthlyCheckoutUrl: 'https://pay.cakto.com.br/kawb7xd',
+      annualCheckoutUrl: 'https://pay.cakto.com.br/5g7f23g'
+    };
+  </script>
+  <script src="app.js?v=35"></script>
+  <script src="landing-carousel.js?v=1"></script>
+  <script>
+
+    let deferredPrompt = null;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!isStandalone) {
+        const btn = document.getElementById('install-card-btn');
+        if (btn) btn.style.display = '';
+        const banner = document.getElementById('pwa-install-banner');
+        if (banner) banner.style.display = 'flex';
+      }
+    });
+
+    window.triggerPwaInstall = function() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            deferredPrompt = null;
+            const btn = document.getElementById('install-card-btn');
+            if (btn) btn.style.display = 'none';
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) banner.style.display = 'none';
+          }
+        });
+      } else if (isIOS) {
+        showToast('📲', 'iPhone: Toque em "Compartilhar" no Safari e escolha "Adicionar à Tela de Início"');
+      } else {
+        showToast('📲', 'Instalação: Toque no menu do navegador e escolha "Instalar App" ou "Adicionar à Tela Inicial"');
+      }
+    };
+
+    function installFromCard() {
+      window.triggerPwaInstall();
+    }
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      const btn = document.getElementById('install-card-btn');
+      if (btn) btn.style.display = 'none';
+      const banner = document.getElementById('pwa-install-banner');
+      if (banner) banner.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
