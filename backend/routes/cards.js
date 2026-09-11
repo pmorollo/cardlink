@@ -27,7 +27,7 @@ function sanitizeSocialUrl(value, maxLen = 500) {
   const v = String(value).trim();
   if (!v) return '';
   const clean = v.substring(0, maxLen);
-  if (/^(https?:\/\/|wa\.me\/|@)/i.test(clean)) {
+  if (/^(https?:\/\/|wa\.me\/|@|\/uploads\/)/i.test(clean)) {
     if (isDangerousScheme(clean)) return undefined;
     return clean;
   }
@@ -149,6 +149,8 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
       services_mode: req.body.services_mode !== undefined ? sanitizeServicesMode(req.body.services_mode, existing.services_mode || 'image') : existing.services_mode,
       services_title: req.body.services_title !== undefined ? sanitizeServicesTitle(req.body.services_title) : existing.services_title,
       services_image_url: req.body.services_image_url !== undefined ? sanitizeSocialUrl(req.body.services_image_url, 1000) : existing.services_image_url,
+      catalog_pdf_url: req.body.catalog_pdf_url !== undefined ? sanitizeSocialUrl(req.body.catalog_pdf_url, 1000) : existing.catalog_pdf_url,
+      catalog_pdf_title: req.body.catalog_pdf_title !== undefined ? String(req.body.catalog_pdf_title).substring(0, 120) : existing.catalog_pdf_title,
       products: productsToSave !== undefined ? productsToSave : existing.products,
       gallery: galleryToSave !== undefined ? galleryToSave : existing.gallery,
       testimonials: testimonialsToSave !== undefined ? testimonialsToSave : existing.testimonials,
@@ -187,6 +189,8 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
     services_mode: sanitizeServicesMode(req.body.services_mode, 'image'),
     services_title: sanitizeServicesTitle(req.body.services_title) || '',
     services_image_url: sanitizeSocialUrl(req.body.services_image_url, 1000) || '',
+    catalog_pdf_url: req.body.catalog_pdf_url ? sanitizeSocialUrl(req.body.catalog_pdf_url, 1000) : '',
+    catalog_pdf_title: req.body.catalog_pdf_title ? String(req.body.catalog_pdf_title).substring(0, 120) : '',
     products: productsToSave || [],
     gallery: galleryToSave || [],
     testimonials: testimonialsToSave || [],
@@ -244,6 +248,8 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
     services_mode: req.body.services_mode !== undefined ? sanitizeServicesMode(req.body.services_mode, card.services_mode || 'image') : card.services_mode,
     services_title: req.body.services_title !== undefined ? sanitizeServicesTitle(req.body.services_title) : card.services_title,
     services_image_url: req.body.services_image_url !== undefined ? sanitizeSocialUrl(req.body.services_image_url, 1000) : card.services_image_url,
+    catalog_pdf_url: req.body.catalog_pdf_url !== undefined ? sanitizeSocialUrl(req.body.catalog_pdf_url, 1000) : card.catalog_pdf_url,
+    catalog_pdf_title: req.body.catalog_pdf_title !== undefined ? String(req.body.catalog_pdf_title).substring(0, 120) : card.catalog_pdf_title,
     products: req.body.products !== undefined ? req.body.products : card.products,
     gallery: req.body.gallery !== undefined ? req.body.gallery : card.gallery,
     testimonials: req.body.testimonials !== undefined ? sanitizeTestimonials(req.body.testimonials) : card.testimonials,

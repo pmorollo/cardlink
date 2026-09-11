@@ -181,15 +181,68 @@ test('CORS rejeita origem nao permitida', async () => {
   assert.ok(!acao || res.status >= 400);
 });
 
-test('cadastro publico fica desativado: conta nasce da assinatura', async () => {
-  const r = await api('POST', '/api/auth/register', {
-    name: 'Sem Assinatura',
-    email: 'naopago@example.com',
-    password: 'SenhaValida123!'
+test('cadastro gratuito de 30 dias exige confirmacao de e-mail antes de criar a conta', async () => {
+  // 1. Tentar criar conta diretamente sem confirmar e-mail é bloqueado
+  const directAttempt = await api('POST', '/api/auth/register', {
+    name: 'Tentativa Direta',
+    email: 'inventado@example.com',
+    password: 'SenhaSegura123!'
   });
-  assert.equal(r.status, 410);
-  assert.equal(r.data.error, 'public_registration_disabled');
+  assert.equal(directAttempt.status, 400);
+  assert.equal(directAttempt.data.error, 'email_verification_required');
   assert.equal(db.users.length, 0);
+
+  // 2. Solicita o código de confirmação por e-mail
+  const sendRes = await api('POST', '/api/auth/register/send-code', {
+    name: 'Cliente Confirmado',
+    email: 'confirmado@example.com',
+    password: 'SenhaSegura123!',
+    whatsapp: '11999998888'
+  });
+  assert.equal(sendRes.status, 200);
+  assert.ok(sendRes.data.verificationTicket);
+  assert.ok(sendRes.data.code);
+  assert.equal(db.users.length, 0); // nenhuma conta criada ainda!
+
+  // 3. Tentar finalizar com código incorreto é rejeitado
+  const wrongCodeRes = await api('POST', '/api/auth/register', {
+    verificationTicket: sendRes.data.verificationTicket,
+    code: '000000'
+  });
+  assert.equal(wrongCodeRes.status, 400);
+  assert.equal(wrongCodeRes.data.error, 'invalid_code');
+  assert.equal(db.users.length, 0); // ainda nenhuma conta criada!
+
+  // 4. Finalizar com o código de 6 dígitos recebido por e-mail confirma e cria a conta
+  const validRes = await api('POST', '/api/auth/register', {
+    verificationTicket: sendRes.data.verificationTicket,
+    code: sendRes.data.code
+  });
+  assert.equal(validRes.status, 201);
+  assert.ok(validRes.data.token);
+  assert.equal(validRes.data.user.email, 'confirmado@example.com');
+  assert.equal(validRes.data.user.plan, 'pro');
+  assert.equal(validRes.data.user.subscription_source, 'free_trial');
+  assert.equal(validRes.data.user.subscription_status, 'active');
+  assert.ok(validRes.data.user.trial_ends_at);
+  assert.ok(validRes.data.user.email_verified_at);
+  assert.equal(db.users.length, 1);
+
+  // 5. Verifica que o token permite imediatamente criar o cartão
+  const cardRes = await api('POST', '/api/cards', {
+    name: 'Barbearia do Confirmado',
+    title: 'Estilo & Barba'
+  }, validRes.data.token);
+  assert.equal(cardRes.status, 201);
+  assert.equal(cardRes.data.name, 'Barbearia do Confirmado');
+
+  // 6. Tentar solicitar novo código para o mesmo e-mail já cadastrado retorna 409
+  const dupRes = await api('POST', '/api/auth/register/send-code', {
+    name: 'Outro Nome',
+    email: 'confirmado@example.com',
+    password: 'OutraSenha123!'
+  });
+  assert.equal(dupRes.status, 409);
 });
 
 test('/api/diag foi removido', async () => {
@@ -766,3 +819,44 @@ test('QR de balcão conta scan separado de contato e abre o cartão público', a
   assert.equal(summary.data.stats.qrScans, 2);
   assert.equal(summary.data.stats.contacts, 0);
 });
+
+test('suporte a catalogo PDF e galeria com PDF no cartao e na pagina publica', async () => {
+  await createActiveUser({ email: 'pdf-tester@example.com', name: 'PDF Tester' });
+  const rLogin = await login('pdf-tester@example.com', 'SenhaValida123!');
+  const token = rLogin.data.token;
+
+  // Criar cartão com catálogo em PDF e galeria mista (imagem + PDF)
+  const rCard = await api('POST', '/api/cards', {
+    name: 'Negócio com Catálogo PDF',
+    catalog_pdf_url: '/uploads/catalogo-2026.pdf',
+    catalog_pdf_title: 'Catálogo de Produtos 2026',
+    gallery: [
+      '/uploads/foto1.webp',
+      '/uploads/documento-tecnico.pdf'
+    ]
+  }, token);
+
+  assert.equal(rCard.status, 201);
+  assert.equal(rCard.data.catalog_pdf_url, '/uploads/catalogo-2026.pdf');
+  assert.equal(rCard.data.catalog_pdf_title, 'Catálogo de Produtos 2026');
+  assert.equal(rCard.data.gallery.length, 2);
+
+  // Atualizar catálogo
+  const rUpdate = await api('PUT', `/api/cards/${rCard.data.id}`, {
+    name: 'Negócio Atualizado',
+    catalog_pdf_url: '/uploads/catalogo-revisado.pdf',
+    catalog_pdf_title: 'Catálogo Revisado V2'
+  }, token);
+
+  assert.equal(rUpdate.status, 200);
+  assert.equal(rUpdate.data.catalog_pdf_url, '/uploads/catalogo-revisado.pdf');
+  assert.equal(rUpdate.data.catalog_pdf_title, 'Catálogo Revisado V2');
+
+  // Buscar via endpoint público
+  const rPublic = await api('GET', `/api/public/${rUpdate.data.slug}`);
+  assert.equal(rPublic.status, 200);
+  assert.equal(rPublic.data.catalog_pdf_url, '/uploads/catalogo-revisado.pdf');
+  assert.equal(rPublic.data.catalog_pdf_title, 'Catálogo Revisado V2');
+  assert.equal(rPublic.data.gallery[1], '/uploads/documento-tecnico.pdf');
+});
+

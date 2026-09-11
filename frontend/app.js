@@ -447,13 +447,28 @@ window.addEventListener('DOMContentLoaded', async () => {
 // ============================================
 // Auth Forms
 // ============================================
+let currentRegisterTicket = null;
+
 function toggleAuthForm(form) {
   const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
   const activationForm = document.getElementById('activation-form');
   const forgotForm = document.getElementById('forgot-form');
   const verifyEmailForm = document.getElementById('verify-email-form');
 
   if (loginForm) loginForm.style.display = form === 'login' ? '' : 'none';
+  if (registerForm) {
+    registerForm.style.display = form === 'register' ? '' : 'none';
+    if (form === 'register') {
+      const step1 = document.getElementById('register-step-1');
+      const step2 = document.getElementById('register-step-2');
+      if (step1) step1.style.display = 'block';
+      if (step2) step2.style.display = 'none';
+      const existingEmail = (document.getElementById('login-email')?.value || '').trim();
+      const regEmail = document.getElementById('register-email');
+      if (regEmail && !regEmail.value && existingEmail) regEmail.value = existingEmail;
+    }
+  }
   if (activationForm) activationForm.style.display = form === 'activate' ? '' : 'none';
   if (verifyEmailForm) verifyEmailForm.style.display = form === 'verify-email' ? '' : 'none';
   if (forgotForm) {
@@ -465,13 +480,154 @@ function toggleAuthForm(form) {
       if (step2) step2.style.display = 'none';
       
       // Preenche o e-mail já digitado no login, quando houver
-      const existingEmail = (document.getElementById('login-email')?.value || '').trim();
+      const existingEmail = (document.getElementById('login-email')?.value || document.getElementById('register-email')?.value || '').trim();
       const emailInput = document.getElementById('forgot-email');
       const codeInput = document.getElementById('forgot-code');
       const passInput = document.getElementById('forgot-new-password');
       if (emailInput) emailInput.value = existingEmail;
       if (codeInput) codeInput.value = '';
       if (passInput) passInput.value = '';
+    }
+  }
+}
+
+function backToRegisterStep1() {
+  const step1 = document.getElementById('register-step-1');
+  const step2 = document.getElementById('register-step-2');
+  if (step1) step1.style.display = 'block';
+  if (step2) step2.style.display = 'none';
+  const codeEl = document.getElementById('register-code');
+  if (codeEl) codeEl.value = '';
+}
+
+async function handleSendRegisterCode() {
+  const nameEl = document.getElementById('register-name');
+  const emailEl = document.getElementById('register-email');
+  const passwordEl = document.getElementById('register-password');
+  const whatsappEl = document.getElementById('register-whatsapp');
+  const btnEl = document.getElementById('btn-register-send-code');
+
+  if (!nameEl || !emailEl || !passwordEl) {
+    showToast('❌', 'Formulário de cadastro não encontrado');
+    return;
+  }
+
+  const name = nameEl.value.trim();
+  const email = emailEl.value.trim().toLowerCase();
+  const password = passwordEl.value;
+  const whatsapp = whatsappEl ? whatsappEl.value.trim() : '';
+
+  if (!name) {
+    showToast('⚠️', 'Informe seu nome ou o nome do seu negócio!');
+    nameEl.focus();
+    return;
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email) || email.includes('..')) {
+    showToast('⚠️', 'Preencha um e-mail válido!');
+    emailEl.focus();
+    return;
+  }
+  if (!password || password.length < 8) {
+    showToast('⚠️', 'A senha deve ter no mínimo 8 caracteres!');
+    passwordEl.focus();
+    return;
+  }
+
+  const originalBtnText = btnEl ? btnEl.innerHTML : '';
+  if (btnEl) {
+    btnEl.disabled = true;
+    btnEl.innerHTML = '⏳ Enviando código de confirmação...';
+  }
+
+  try {
+    const data = await api('/auth/register/send-code', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, whatsapp })
+    });
+
+    currentRegisterTicket = data.verificationTicket;
+
+    const sentEmailEl = document.getElementById('register-sent-email');
+    if (sentEmailEl) sentEmailEl.textContent = email;
+
+    const devBanner = document.getElementById('register-dev-banner');
+    if (devBanner) {
+      if (data.code) {
+        devBanner.style.display = 'block';
+        devBanner.innerHTML = `<strong>Código para teste:</strong> <code style="font-size:1.1rem;font-weight:700;letter-spacing:2px;">${data.code}</code>`;
+      } else {
+        devBanner.style.display = 'none';
+        devBanner.innerHTML = '';
+      }
+    }
+
+    const step1 = document.getElementById('register-step-1');
+    const step2 = document.getElementById('register-step-2');
+    if (step1) step1.style.display = 'none';
+    if (step2) step2.style.display = 'block';
+
+    const codeEl = document.getElementById('register-code');
+    if (codeEl) {
+      codeEl.value = '';
+      codeEl.focus();
+    }
+
+    showToast('✉️', 'Código enviado! Verifique sua caixa de entrada.');
+  } catch (err) {
+    showToast('❌', err.message);
+  } finally {
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.innerHTML = originalBtnText;
+    }
+  }
+}
+
+async function handleVerifyAndRegister() {
+  if (!currentRegisterTicket) {
+    showToast('⚠️', 'Solicite o código de confirmação primeiro.');
+    backToRegisterStep1();
+    return;
+  }
+
+  const codeEl = document.getElementById('register-code');
+  const code = (codeEl ? codeEl.value : '').trim();
+  const btnEl = document.getElementById('btn-register-verify');
+
+  if (!code || code.length < 6) {
+    showToast('⚠️', 'Digite o código de 6 dígitos enviado para seu e-mail!');
+    if (codeEl) codeEl.focus();
+    return;
+  }
+
+  const originalBtnText = btnEl ? btnEl.innerHTML : '';
+  if (btnEl) {
+    btnEl.disabled = true;
+    btnEl.innerHTML = '⏳ Confirmando e criando conta...';
+  }
+
+  try {
+    const data = await api('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ verificationTicket: currentRegisterTicket, code })
+    });
+
+    authToken = data.token;
+    currentUser = data.user;
+    currentRegisterTicket = null;
+    localStorage.setItem('cardlink_token', data.token);
+    updateNavAuth();
+    showToast('🎉', 'E-mail confirmado com sucesso! Aproveite seus 30 dias grátis.');
+
+    currentUserCardId = null;
+    createNewCard();
+  } catch (err) {
+    showToast('❌', err.message);
+  } finally {
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.innerHTML = originalBtnText;
     }
   }
 }
@@ -493,6 +649,7 @@ async function handleLogin() {
     authToken = data.token;
     currentUser = data.user;
     localStorage.setItem('cardlink_token', data.token);
+    updateNavAuth();
     showToast('✅', 'Login realizado!');
 
     if (currentUser.is_admin) {
@@ -1178,6 +1335,9 @@ async function editCard(id) {
     setFieldValue('field-services-image', card.services_image_url || '');
     syncServicesImagePreview(card.services_image_url || '');
     toggleServicesMode();
+    setFieldValue('field-catalog-pdf-url', card.catalog_pdf_url || '');
+    setFieldValue('field-catalog-pdf-title', card.catalog_pdf_title || '');
+    syncCatalogPdfPreview(card.catalog_pdf_url || '', card.catalog_pdf_title || '');
     setFieldValue('field-gallery', (card.gallery || []).join('\n'));
     loadGalleryFromUrls(card.gallery || []);
 
@@ -1303,6 +1463,70 @@ function clearServicesImage() {
   setFieldValue('field-services-image', '');
   syncServicesImagePreview('');
   updatePreview();
+}
+
+// ============================================
+// Catálogo ou Documento do Negócio (PDF)
+// ============================================
+function syncCatalogPdfPreview(url, title = '') {
+  const preview = document.getElementById('catalog-pdf-preview');
+  const placeholder = document.getElementById('catalog-pdf-placeholder');
+  const removeBtn = document.getElementById('catalog-pdf-remove');
+  const filenameEl = document.getElementById('catalog-pdf-filename');
+  if (!preview) return;
+  if (url) {
+    if (filenameEl) {
+      filenameEl.textContent = title || url.split('/').pop() || 'Catálogo do Negócio.pdf';
+    }
+    preview.style.display = 'flex';
+    if (placeholder) placeholder.style.display = 'none';
+    if (removeBtn) removeBtn.style.display = '';
+  } else {
+    preview.style.display = 'none';
+    if (placeholder) placeholder.style.display = '';
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+}
+
+function clearCatalogPdf() {
+  setFieldValue('field-catalog-pdf-url', '');
+  setFieldValue('field-catalog-pdf-title', '');
+  syncCatalogPdfPreview('', '');
+  updatePreview();
+}
+
+async function handleCatalogPdfUpload(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+
+  const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+  if (!isPdf) {
+    showToast('⚠️', 'Por favor, selecione um arquivo em formato PDF.');
+    input.value = '';
+    return;
+  }
+
+  showToast('⏳', 'Enviando documento PDF...');
+
+  try {
+    const url = await uploadFile(file);
+    setFieldValue('field-catalog-pdf-url', url);
+    const titleInput = document.getElementById('field-catalog-pdf-title');
+    if (titleInput && !titleInput.value.trim()) {
+      const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      const formattedName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+      setFieldValue('field-catalog-pdf-title', formattedName);
+    }
+    const currentTitle = document.getElementById('field-catalog-pdf-title')?.value || file.name;
+    syncCatalogPdfPreview(url, currentTitle);
+    showToast('✅', 'Catálogo em PDF enviado com sucesso!');
+    updatePreview();
+  } catch (err) {
+    syncCatalogPdfPreview(document.getElementById('field-catalog-pdf-url')?.value || '', document.getElementById('field-catalog-pdf-title')?.value || '');
+    showToast('❌', 'Erro ao enviar PDF: ' + err.message);
+  } finally {
+    input.value = '';
+  }
 }
 
 // ============================================
@@ -1585,6 +1809,9 @@ function renderCard(data, isPreview) {
   const servicesMode   = data.services_mode || (validProducts.length ? 'list' : 'image');
   const servicesTitle  = data.services_title || (servicesMode === 'image' ? 'Destaque' : 'Produtos & Serviços');
   const servicesImageUrl = typeof data.services_image_url === 'string' ? data.services_image_url.trim() : '';
+  const catalogPdfUrl = typeof data.catalog_pdf_url === 'string' ? data.catalog_pdf_url.trim() : '';
+  const catalogPdfTitle = (typeof data.catalog_pdf_title === 'string' && data.catalog_pdf_title.trim()) || 'Catálogo do Negócio';
+  const hasCatalogPdf  = !!catalogPdfUrl;
   const hasServicesImage = servicesMode === 'image' && !!servicesImageUrl;
   const hasProducts    = servicesMode === 'list' && validProducts.length > 0;
   const hasGallery     = data.gallery     && data.gallery.length     > 0;
@@ -1597,7 +1824,7 @@ function renderCard(data, isPreview) {
       })
     : [];
   const hasTestimonials= validTestimonials.length > 0;
-  const hasSiteContent = hasServicesImage || hasProducts || hasGallery || hasTestimonials;
+  const hasSiteContent = hasServicesImage || hasProducts || hasGallery || hasTestimonials || hasCatalogPdf;
 
   let siteToggleButton = '';
   let siteExpandedContent = '';
@@ -1607,6 +1834,24 @@ function renderCard(data, isPreview) {
       <button type="button" class="btn-site-toggle" onclick="toggleSiteSection()">
         📋 ${escapeHtml(siteBtnText)} ↓
       </button>`;
+
+    let catalogPdfHtml = '';
+    if (hasCatalogPdf) {
+      catalogPdfHtml = `
+        <div class="site-block-title">📑 Catálogo & Documentos</div>
+        <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:14px;padding:16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;overflow:hidden;text-align:left;">
+            <span style="font-size:2.2rem;line-height:1;">📄</span>
+            <div style="overflow:hidden;">
+              <div style="font-size:0.95rem;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(catalogPdfTitle)}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">PDF Protegido • Modo Somente Leitura</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="openPdfViewerModal('${escapeHtml(catalogPdfUrl)}', '${escapeHtml(catalogPdfTitle)}')" style="flex-shrink:0;padding:8px 14px;font-weight:700;display:flex;align-items:center;gap:6px;">
+            <span>👁️</span> Visualizar
+          </button>
+        </div>`;
+    }
 
     let servicesImageHtml = '';
     if (hasServicesImage) {
@@ -1639,10 +1884,20 @@ function renderCard(data, isPreview) {
 
     let galleryHtml = '';
     if (hasGallery) {
-      galleryHtml = `<div class="site-block-title">🖼️ Galeria de Fotos</div><div class="gallery-carousel-compact">
+      galleryHtml = `<div class="site-block-title">🖼️ Galeria & Portfólio</div><div class="gallery-carousel-compact">
         <div class="gallery-track-compact" onscroll="syncCompactGalleryCarousel(this)">`;
-      data.gallery.forEach((imgUrl, index) => {
-        galleryHtml += `<button type="button" class="gallery-slide-compact" data-image-src="${escapeHtml(imgUrl)}" onclick="openCompactGalleryImage(this.dataset.imageSrc, 'Foto ${index + 1}')" aria-label="Ampliar foto ${index + 1}"><img src="${escapeHtml(imgUrl)}" alt="Foto ${index + 1}" onerror="refreshCompactGalleryCarousel(this.closest('.gallery-carousel-compact'), this.closest('.gallery-slide-compact'))"></button>`;
+      data.gallery.forEach((itemUrl, index) => {
+        const isPdf = typeof itemUrl === 'string' && itemUrl.toLowerCase().includes('.pdf');
+        if (isPdf) {
+          galleryHtml += `
+            <button type="button" class="gallery-slide-compact gallery-slide-pdf" onclick="openPdfViewerModal('${escapeHtml(itemUrl)}', 'Documento ${index + 1}')" aria-label="Visualizar PDF ${index + 1}" style="background:var(--bg-card);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;text-align:center;gap:6px;border:1px solid var(--border-subtle);">
+              <span style="font-size:2rem;line-height:1;">📄</span>
+              <span style="font-size:0.75rem;font-weight:700;color:var(--text-primary);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:95%;">Documento ${index + 1}</span>
+              <span style="font-size:0.68rem;font-weight:bold;color:var(--primary);background:rgba(124,58,237,0.12);padding:2px 8px;border-radius:6px;">👁️ Ver PDF</span>
+            </button>`;
+        } else {
+          galleryHtml += `<button type="button" class="gallery-slide-compact" data-image-src="${escapeHtml(itemUrl)}" onclick="openCompactGalleryImage(this.dataset.imageSrc, 'Foto ${index + 1}')" aria-label="Ampliar foto ${index + 1}"><img src="${escapeHtml(itemUrl)}" alt="Foto ${index + 1}" onerror="refreshCompactGalleryCarousel(this.closest('.gallery-carousel-compact'), this.closest('.gallery-slide-compact'))"></button>`;
+        }
       });
       galleryHtml += `</div>${data.gallery.length > 1 ? `
         <button type="button" class="gallery-arrow-compact gallery-prev-compact" onclick="moveCompactGallery(this, -1)" aria-label="Foto anterior">‹</button>
@@ -1670,7 +1925,7 @@ function renderCard(data, isPreview) {
 
     siteExpandedContent = `
       <div class="site-expanded-section" id="site-expanded-section" style="${isPreview ? '' : 'display:none;'}">
-        ${servicesImageHtml}${productsHtml}${galleryHtml}${testimonialsHtml}
+        ${catalogPdfHtml}${servicesImageHtml}${productsHtml}${galleryHtml}${testimonialsHtml}
       </div>`;
   }
 
@@ -1993,9 +2248,19 @@ function resizeImage(file, maxDim = 1200, quality = 0.85) {
 }
 
 async function uploadFile(file) {
-  const resized = await resizeImage(file);
+  let fileToUpload = file;
+  const isPdf = (file.type && file.type === 'application/pdf') || (file.name && file.name.toLowerCase().endsWith('.pdf'));
+  if (!isPdf) {
+    try {
+      fileToUpload = await resizeImage(file);
+    } catch (e) {
+      console.warn('Não foi possível redimensionar imagem, enviando arquivo original:', e.message);
+      fileToUpload = file;
+    }
+  }
+
   const formData = new FormData();
-  formData.append('photo', resized);
+  formData.append('photo', fileToUpload);
   const res = await fetch(API + '/upload', {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + authToken },
@@ -2100,23 +2365,44 @@ function addGallerySlot(existingUrl = '') {
 
   const slot = document.createElement('div');
   slot.id = `gallery-slot-${idx}`;
-  slot.style.cssText = 'position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--bg-card);border:1.5px dashed var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;';
+  slot.style.cssText = 'position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--bg-card);border:1.5px dashed var(--border-subtle);cursor:pointer;display:flex;align-items:center;justify-content:center;';
 
-  const hasImg = !!existingUrl;
+  const hasItem = !!existingUrl;
+  const isPdf = typeof existingUrl === 'string' && existingUrl.toLowerCase().includes('.pdf');
+
+  let contentHtml = '';
+  if (!hasItem) {
+    contentHtml = `
+      <div id="gallery-placeholder-${idx}" style="text-align:center;color:var(--text-muted);font-size:0.75rem;padding:8px;">
+        <div style="font-size:1.8rem;margin-bottom:4px;">📷/📄</div>+ Foto ou PDF
+      </div>`;
+  } else if (isPdf) {
+    contentHtml = `
+      <div id="gallery-pdf-box-${idx}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px;background:var(--bg-surface);text-align:center;">
+        <span style="font-size:1.8rem;line-height:1;">📄</span>
+        <span style="font-size:0.72rem;font-weight:700;color:var(--primary);margin-top:4px;">PDF</span>
+        <span style="font-size:0.65rem;color:var(--text-muted);margin-top:2px;">Visualização</span>
+      </div>`;
+  } else {
+    contentHtml = `<img src="${escapeHtml(existingUrl)}" style="width:100%;height:100%;object-fit:cover;" id="gallery-img-${idx}">`;
+  }
+
   slot.innerHTML = `
-    <input type="file" accept="image/*" style="display:none;" id="gallery-file-${idx}"
+    <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;" id="gallery-file-${idx}"
       onchange="handleGalleryPhotoUpload(this, ${idx})">
-    ${hasImg
-      ? `<img src="${escapeHtml(existingUrl)}" style="width:100%;height:100%;object-fit:cover;" id="gallery-img-${idx}">`
-      : `<div id="gallery-placeholder-${idx}" style="text-align:center;color:var(--text-muted);font-size:0.78rem;padding:8px;">
-           <div style="font-size:1.8rem;margin-bottom:4px;">📷</div>Adicionar
-         </div>`}
+    ${contentHtml}
     <button type="button" onclick="removeGallerySlot(${idx})"
-      style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center;">✕</button>
+      style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.65);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center;z-index:2;">✕</button>
   `;
 
   slot.addEventListener('click', e => {
-    if (e.target.tagName !== 'BUTTON') document.getElementById(`gallery-file-${idx}`).click();
+    if (e.target.tagName !== 'BUTTON') {
+      if (isPdf && existingUrl) {
+        openPdfViewerModal(existingUrl, `Documento ${idx + 1}`);
+      } else {
+        document.getElementById(`gallery-file-${idx}`).click();
+      }
+    }
   });
 
   grid.appendChild(slot);
@@ -2127,29 +2413,37 @@ async function handleGalleryPhotoUpload(input, idx) {
   const file = input.files[0];
   if (!file) return;
 
-  const imgEl = document.getElementById(`gallery-img-${idx}`);
-  const placeholder = document.getElementById(`gallery-placeholder-${idx}`);
   const slot = document.getElementById(`gallery-slot-${idx}`);
+  const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
-  // Local preview
-  const localUrl = URL.createObjectURL(file);
-  if (imgEl) {
-    imgEl.src = localUrl;
-  } else if (slot) {
-    const newImg = document.createElement('img');
-    newImg.id = `gallery-img-${idx}`;
-    newImg.src = localUrl;
-    newImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-    if (placeholder) placeholder.style.display = 'none';
-    slot.insertBefore(newImg, slot.firstChild);
+  if (slot) {
+    if (isPdf) {
+      slot.innerHTML = `
+        <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;" id="gallery-file-${idx}" onchange="handleGalleryPhotoUpload(this, ${idx})">
+        <div id="gallery-pdf-box-${idx}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px;background:var(--bg-surface);text-align:center;">
+          <span style="font-size:1.8rem;line-height:1;">📄</span>
+          <span style="font-size:0.72rem;font-weight:700;color:var(--primary);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90%;">${escapeHtml(file.name)}</span>
+          <span style="font-size:0.65rem;color:var(--text-muted);margin-top:2px;">Enviando...</span>
+        </div>
+        <button type="button" onclick="removeGallerySlot(${idx})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.65);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center;z-index:2;">✕</button>
+      `;
+    } else {
+      const localUrl = URL.createObjectURL(file);
+      slot.innerHTML = `
+        <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;" id="gallery-file-${idx}" onchange="handleGalleryPhotoUpload(this, ${idx})">
+        <img src="${localUrl}" style="width:100%;height:100%;object-fit:cover;" id="gallery-img-${idx}">
+        <button type="button" onclick="removeGallerySlot(${idx})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.65);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center;z-index:2;">✕</button>
+      `;
+    }
   }
-  showToast('⏳', 'Enviando foto...');
+
+  showToast('⏳', isPdf ? 'Enviando documento PDF...' : 'Enviando foto...');
 
   try {
     const url = await uploadFile(file);
     galleryUrls[idx] = url;
     syncGalleryField();
-    showToast('✅', 'Foto adicionada à galeria!');
+    showToast('✅', isPdf ? 'Documento PDF adicionado à galeria!' : 'Foto adicionada à galeria!');
   } catch (err) {
     showToast('❌', 'Erro: ' + err.message);
   }
@@ -2500,3 +2794,45 @@ async function submitSupportTicket() {
 }
 
 // ============================================
+// Visualizador de PDF (Somente Leitura - Sem Opção de Download)
+// ============================================
+function openPdfViewerModal(pdfUrl, title = 'Documento PDF') {
+  if (!pdfUrl) return;
+  const modal = document.getElementById('pdf-viewer-modal');
+  const frame = document.getElementById('pdf-viewer-frame');
+  const titleEl = document.getElementById('pdf-viewer-title');
+  if (titleEl) titleEl.textContent = title;
+  if (frame) {
+    // Parâmetros para suprimir barra de ferramentas e botões de download nativos do visualizador PDF
+    const cleanUrl = pdfUrl.split('#')[0] + '#toolbar=0&navpanes=0&scrollbar=0&view=FitH';
+    frame.src = cleanUrl;
+  }
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closePdfViewerModal() {
+  const modal = document.getElementById('pdf-viewer-modal');
+  const frame = document.getElementById('pdf-viewer-frame');
+  if (frame) frame.src = '';
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+// Bloqueio de atalhos de impressão/salvar quando o modal de PDF estiver aberto
+document.addEventListener('keydown', (e) => {
+  const modal = document.getElementById('pdf-viewer-modal');
+  if (modal && modal.style.display === 'flex') {
+    if (e.key === 'Escape') {
+      closePdfViewerModal();
+    }
+    if ((e.ctrlKey || e.metaKey) && ['p', 's', 'u'].includes(e.key.toLowerCase())) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+});

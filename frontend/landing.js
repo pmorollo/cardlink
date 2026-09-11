@@ -346,12 +346,32 @@ function renderServices(d) {
   const mode = d.services_mode || (products.length ? 'list' : 'image');
   const sectionTitle = d.services_title || (mode === 'image' ? 'Destaque' : 'Meus Serviços');
   const servicesImageUrl = cleanText(d.services_image_url);
+  const catalogPdfUrl = cleanText(d.catalog_pdf_url);
+  const catalogPdfTitle = cleanText(d.catalog_pdf_title) || 'Catálogo do Negócio';
   const hasImage = mode === 'image' && !!servicesImageUrl;
   const hasRealServices = mode === 'list' && products.length > 0;
 
+  let catalogBoxHtml = '';
+  if (catalogPdfUrl) {
+    catalogBoxHtml = `
+      <div class="animate-in" style="max-width:800px;margin:0 auto 32px;background:var(--surface);border:1.5px solid var(--border);border-radius:18px;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:var(--shadow-sm);">
+        <div style="display:flex;align-items:center;gap:14px;overflow:hidden;text-align:left;">
+          <span style="font-size:2.4rem;line-height:1;">📄</span>
+          <div style="overflow:hidden;">
+            <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--primary);font-weight:700;">Catálogo / Documento em PDF</div>
+            <div style="font-size:1.1rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(catalogPdfTitle)}</div>
+            <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:2px;">Visualização protegida • Modo somente leitura</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" onclick="openPdfViewerModal('${esc(catalogPdfUrl)}', '${esc(catalogPdfTitle)}')" style="flex-shrink:0;padding:10px 18px;font-weight:700;display:flex;align-items:center;gap:8px;">
+          <span>👁️</span> Visualizar Catálogo
+        </button>
+      </div>`;
+  }
+
   if (titleEl) {
     titleEl.textContent = sectionTitle;
-    titleEl.style.display = mode === 'image' && sectionTitle.trim().toLowerCase() === 'destaque' ? 'none' : '';
+    titleEl.style.display = mode === 'image' && sectionTitle.trim().toLowerCase() === 'destaque' && !catalogPdfUrl ? 'none' : '';
   }
   if (descEl) {
     descEl.textContent = hasImage
@@ -362,6 +382,7 @@ function renderServices(d) {
   if (hasImage) {
     grid.style.display = 'block';
     grid.innerHTML = `
+      ${catalogBoxHtml}
       <div class="animate-in" style="max-width:920px;margin:0 auto;text-align:center;">
         <img src="${esc(servicesImageUrl)}" alt="${esc(sectionTitle)}"
           style="width:100%;height:auto;max-height:1200px;object-fit:contain;border-radius:18px;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-sm);"
@@ -370,15 +391,21 @@ function renderServices(d) {
     return;
   }
 
-  if (!hasRealServices) {
+  if (!hasRealServices && !catalogPdfUrl) {
     removePublicSection('servicos');
+    return;
+  }
+
+  if (!hasRealServices && catalogPdfUrl) {
+    grid.style.display = 'block';
+    grid.innerHTML = catalogBoxHtml;
     return;
   }
 
   grid.style.display = '';
   const services = products;
 
-  grid.innerHTML = services.map((s, i) => {
+  const servicesCardsHtml = services.map((s, i) => {
     const waMsg = encodeURIComponent(`Olá! Tenho interesse no serviço: ${s.name}${s.price ? ' (R$ ' + s.price + ')' : ''}`);
     const waUrl = d.whatsapp ? `https://wa.me/${cleanPhone(d.whatsapp)}?text=${waMsg}` : '#contato';
     const serviceNumber = String(i + 1).padStart(2, '0');
@@ -400,6 +427,8 @@ function renderServices(d) {
         </div>
       </div>`;
   }).join('');
+
+  grid.innerHTML = (catalogBoxHtml ? `<div style="grid-column:1/-1;">${catalogBoxHtml}</div>` : '') + servicesCardsHtml;
 }
 
 // ============================================
@@ -419,14 +448,25 @@ function renderGallery(d) {
 
   if (isPlaceholder) makePlaceholderHint('gallery-placeholder-hint', 'Adicionar suas fotos reais');
 
-  const visiblePhotos = photos.slice(0, 6);
+  const visiblePhotos = photos.slice(0, 8);
   grid.innerHTML = `
     <div class="lp-gallery-carousel animate-in" tabindex="0" aria-label="Galeria de fotos">
       <div class="lp-gallery-track" id="gallery-track">
-        ${visiblePhotos.map((url, i) => `
-          <button class="lp-gallery-slide" type="button" data-image-src="${esc(url)}" onclick="openGalleryLightbox(this.dataset.imageSrc, 'Foto ${i + 1}')" aria-label="Ampliar foto ${i + 1}">
-            <img src="${esc(url)}" alt="Foto ${i + 1}" loading="lazy" onerror="this.closest('.lp-gallery-slide').remove(); refreshGalleryCarousel()">
-          </button>`).join('')}
+        ${visiblePhotos.map((url, i) => {
+          const isPdf = typeof url === 'string' && url.toLowerCase().includes('.pdf');
+          if (isPdf) {
+            return `
+              <button class="lp-gallery-slide" type="button" onclick="openPdfViewerModal('${esc(url)}', 'Documento ${i + 1}')" aria-label="Visualizar documento PDF ${i + 1}" style="background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;text-align:center;gap:8px;border:1px solid var(--border);">
+                <span style="font-size:2.6rem;line-height:1;">📄</span>
+                <span style="font-size:0.85rem;font-weight:700;color:var(--text);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90%;">Documento ${i + 1}</span>
+                <span style="font-size:0.72rem;font-weight:bold;color:var(--primary);background:rgba(124,58,237,0.12);padding:3px 10px;border-radius:6px;">👁️ Ver PDF</span>
+              </button>`;
+          }
+          return `
+            <button class="lp-gallery-slide" type="button" data-image-src="${esc(url)}" onclick="openGalleryLightbox(this.dataset.imageSrc, 'Foto ${i + 1}')" aria-label="Ampliar foto ${i + 1}">
+              <img src="${esc(url)}" alt="Foto ${i + 1}" loading="lazy" onerror="this.closest('.lp-gallery-slide').remove(); refreshGalleryCarousel()">
+            </button>`;
+        }).join('')}
       </div>
       ${visiblePhotos.length > 1 ? `
         <button class="lp-gallery-arrow lp-gallery-prev" type="button" onclick="moveGallery(-1, true)" aria-label="Foto anterior">‹</button>
@@ -776,3 +816,41 @@ function initScrollAnimations() {
 document.addEventListener('DOMContentLoaded', init);
 
 // ============================================
+// Visualizador de PDF (Somente Leitura - Sem Opção de Download)
+// ============================================
+function openPdfViewerModal(pdfUrl, title = 'Documento PDF') {
+  if (!pdfUrl) return;
+  const modal = document.getElementById('pdf-viewer-modal');
+  const frame = document.getElementById('pdf-viewer-frame');
+  const titleEl = document.getElementById('pdf-viewer-title');
+  if (titleEl) titleEl.textContent = title;
+  if (frame) {
+    const cleanUrl = pdfUrl.split('#')[0] + '#toolbar=0&navpanes=0&scrollbar=0&view=FitH';
+    frame.src = cleanUrl;
+  }
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closePdfViewerModal() {
+  const modal = document.getElementById('pdf-viewer-modal');
+  const frame = document.getElementById('pdf-viewer-frame');
+  if (frame) frame.src = '';
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  const modal = document.getElementById('pdf-viewer-modal');
+  if (modal && modal.style.display === 'flex') {
+    if (e.key === 'Escape') closePdfViewerModal();
+    if ((e.ctrlKey || e.metaKey) && ['p', 's', 'u'].includes(e.key.toLowerCase())) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+});

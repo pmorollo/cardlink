@@ -25,22 +25,24 @@ if (isR2Configured()) {
   }
 }
 
-const ALLOWED_IMAGE_TYPES = {
+const ALLOWED_UPLOAD_TYPES = {
   'image/jpeg': new Set(['.jpg', '.jpeg']),
   'image/png': new Set(['.png']),
   'image/gif': new Set(['.gif']),
   'image/webp': new Set(['.webp']),
+  'application/pdf': new Set(['.pdf']),
 };
 
-function safeImageExtension(file) {
+function safeUploadExtension(file) {
   const mime = String(file?.mimetype || '').toLowerCase();
   const originalExt = path.extname(file?.originalname || '').toLowerCase();
-  const allowedExts = ALLOWED_IMAGE_TYPES[mime];
+  const allowedExts = ALLOWED_UPLOAD_TYPES[mime];
   if (!allowedExts || !allowedExts.has(originalExt)) return null;
   if (mime === 'image/jpeg') return '.jpg';
   if (mime === 'image/png') return '.png';
   if (mime === 'image/gif') return '.gif';
   if (mime === 'image/webp') return '.webp';
+  if (mime === 'application/pdf') return '.pdf';
   return null;
 }
 
@@ -50,8 +52,8 @@ const storage = isR2Configured() && S3Client
   : multer.diskStorage({
       destination: path.join(__dirname, '..', 'uploads'),
       filename: (req, file, cb) => {
-        const ext = safeImageExtension(file);
-        if (!ext) return cb(new Error('Tipo de imagem inválido'));
+        const ext = safeUploadExtension(file);
+        if (!ext) return cb(new Error('Tipo de arquivo inválido'));
         const name = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
         cb(null, name);
       }
@@ -59,12 +61,12 @@ const storage = isR2Configured() && S3Client
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 5, fieldNestingDepth: 1 }, // 5MB + limites anti-DoS
+  limits: { fileSize: 15 * 1024 * 1024, files: 1, fields: 5, fieldNestingDepth: 1 }, // 15MB + limites anti-DoS
   fileFilter: (req, file, cb) => {
-    if (safeImageExtension(file)) {
+    if (safeUploadExtension(file)) {
       return cb(null, true);
     }
-    cb(new Error('Apenas imagens JPG, PNG, GIF ou WebP válidas são aceitas'));
+    cb(new Error('Apenas imagens (JPG, PNG, GIF, WebP) ou documentos PDF válidos são aceitos'));
   }
 });
 
@@ -74,9 +76,10 @@ router.post('/', authMiddleware, requireCustomer, upload.single('photo'), async 
   }
 
   try {
-    const ext = safeImageExtension(req.file);
-    if (!ext) return res.status(400).json({ error: 'Tipo de imagem inválido' });
+    const ext = safeUploadExtension(req.file);
+    if (!ext) return res.status(400).json({ error: 'Tipo de arquivo inválido' });
     const filename = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
+    const isPdf = ext === '.pdf';
 
     if (isR2Configured() && S3Client) {
       const s3 = new S3Client({
@@ -94,21 +97,22 @@ router.post('/', authMiddleware, requireCustomer, upload.single('photo'), async 
         Bucket: bucketName,
         Key: filename,
         Body: req.file.buffer,
-        ContentType: req.file.mimetype || 'image/webp',
+        ContentType: req.file.mimetype || (isPdf ? 'application/pdf' : 'image/webp'),
+        ContentDisposition: 'inline',
       });
 
       await s3.send(command);
 
       const url = '/uploads/' + filename;
-      return res.json({ url });
+      return res.json({ url, isPdf, originalName: req.file.originalname });
     } else {
       // Local file fallback
       const url = '/uploads/' + (req.file.filename || filename);
-      return res.json({ url });
+      return res.json({ url, isPdf, originalName: req.file.originalname });
     }
   } catch (err) {
     console.error('Erro no upload:', err);
-    res.status(500).json({ error: 'Erro ao salvar a imagem: ' + err.message });
+    res.status(500).json({ error: 'Erro ao salvar o arquivo: ' + err.message });
   }
 });
 

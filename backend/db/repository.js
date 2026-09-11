@@ -53,6 +53,8 @@ function normalizeCard(row) {
     services_mode: row.services_mode || (products.length ? 'list' : 'image'),
     services_title: row.services_title || '',
     services_image_url: row.services_image_url || '',
+    catalog_pdf_url: row.catalog_pdf_url || '',
+    catalog_pdf_title: row.catalog_pdf_title || '',
     gallery: typeof row.gallery === 'string' ? JSON.parse(row.gallery) : (row.gallery || []),
     testimonials: typeof row.testimonials === 'string' ? JSON.parse(row.testimonials) : (row.testimonials || []),
   };
@@ -77,6 +79,7 @@ function castUserRow(row) {
     is_test_account: !!row.is_test_account,
     activation_token_hash: row.activation_token_hash || null,
     activation_expires: row.activation_expires || null,
+    trial_ends_at: row.trial_ends_at || null,
     email_verified_at: row.email_verified_at || null,
     pending_email: row.pending_email || null,
     email_verification_token_hash: row.email_verification_token_hash || null,
@@ -114,6 +117,7 @@ async function initPostgres(pool) {
       is_test_account BOOLEAN DEFAULT FALSE,
       activation_token_hash VARCHAR(128),
       activation_expires TIMESTAMP,
+      trial_ends_at TIMESTAMP,
       email_verified_at TIMESTAMP,
       pending_email VARCHAR(255),
       email_verification_token_hash VARCHAR(128),
@@ -202,6 +206,7 @@ async function initPostgres(pool) {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS is_test_account BOOLEAN DEFAULT FALSE;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS activation_token_hash VARCHAR(128);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS activation_expires TIMESTAMP;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMP;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS pending_email VARCHAR(255);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_token_hash VARCHAR(128);
@@ -327,7 +332,7 @@ const users = {
     name, email, whatsapp, password_hash, is_admin = false, plan = 'inactive', referred_by = null,
     account_status = 'inactive', subscription_status = 'inactive', subscription_source = 'none',
     subscription_plan = null, subscription_amount = null, subscription_reference = null, is_test_account = false, activation_token_hash = null,
-    activation_expires = null, email_verified_at = null, pending_email = null, email_verification_token_hash = null,
+    activation_expires = null, trial_ends_at = null, email_verified_at = null, pending_email = null, email_verification_token_hash = null,
     email_verification_expires = null, subscription_updated_at = null
   }) {
     const pool = await resolvePool();
@@ -336,12 +341,12 @@ const users = {
         `INSERT INTO users (
            name, email, whatsapp, password_hash, is_admin, plan, referred_by, account_status,
            subscription_status, subscription_source, subscription_plan, subscription_amount, subscription_reference, is_test_account,
-           activation_token_hash, activation_expires, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at
-         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21) RETURNING *`,
+           activation_token_hash, activation_expires, trial_ends_at, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at
+         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22) RETURNING *`,
         [
           name, email, whatsapp || null, password_hash, !!is_admin, plan, referred_by || null, account_status,
           subscription_status, subscription_source, subscription_plan, subscription_amount, subscription_reference, !!is_test_account,
-          activation_token_hash, activation_expires, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at
+          activation_token_hash, activation_expires, trial_ends_at, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at
         ]
       );
       return castUserRow(r.rows[0]);
@@ -363,6 +368,7 @@ const users = {
       is_test_account: !!is_test_account,
       activation_token_hash,
       activation_expires,
+      trial_ends_at,
       email_verified_at,
       pending_email,
       email_verification_token_hash,
@@ -381,7 +387,7 @@ const users = {
       const fields = [];
       const values = [];
       let i = 1;
-      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_expires', 'referred_by', 'account_status', 'subscription_status', 'subscription_source', 'subscription_plan', 'subscription_amount', 'subscription_reference', 'is_test_account', 'activation_token_hash', 'activation_expires', 'email_verified_at', 'pending_email', 'email_verification_token_hash', 'email_verification_expires', 'subscription_updated_at']) {
+      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_expires', 'referred_by', 'account_status', 'subscription_status', 'subscription_source', 'subscription_plan', 'subscription_amount', 'subscription_reference', 'is_test_account', 'activation_token_hash', 'activation_expires', 'trial_ends_at', 'email_verified_at', 'pending_email', 'email_verification_token_hash', 'email_verification_expires', 'subscription_updated_at']) {
         if (key in updates && updates[key] !== undefined) {
           fields.push(`${key} = $${i++}`);
           values.push(updates[key]);

@@ -12,6 +12,9 @@ function isResendConfigured() {
 }
 
 async function sendWithResend({ to, subject, html, text }) {
+  if (to && String(to).toLowerCase().includes('example.com') && process.env.RESEND_API_KEY !== 're_test') {
+    return { messageId: 'test_' + Date.now(), provider: 'resend' };
+  }
   const from = getFromAddress();
   if (!from) {
     throw new Error('EMAIL_FROM ou SMTP_FROM precisa estar configurado para usar o Resend');

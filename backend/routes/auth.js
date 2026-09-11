@@ -22,14 +22,167 @@ function signToken(userId) {
 // Para testes em desenvolvimento (NODE_ENV !== 'production') ele ainda é retornado.
 const isProduction = process.env.NODE_ENV === 'production';
 
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+router.post('/register/send-code', async (req, res) => {
+  try {
+    const name = String(req.body.name || '').trim();
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
+    const whatsapp = String(req.body.whatsapp || '').trim();
+
+    if (!name) {
+      return res.status(400).json({ error: 'Nome é obrigatório' });
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email) || email.includes('..')) {
+      return res.status(400).json({ error: 'E-mail inválido' });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Senha deve ter pelo menos 8 caracteres' });
+    }
+
+    const existing = await users.findByEmail(email);
+    if (existing) {
+      return res.status(409).json({ error: 'Este e-mail já está cadastrado. Faça login ou recupere sua senha.' });
+    }
+
+    const code = crypto.randomInt(100000, 1000000).toString();
+    const codeHash = crypto.createHash('sha256').update(code).digest('hex');
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const verificationTicket = jwt.sign(
+      {
+        name,
+        email,
+        whatsapp: whatsapp || null,
+        passwordHash,
+        codeHash,
+      },
+      JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+
+    await sendEmail({
+      to: email,
+      subject: 'Código de confirmação do seu CardLink (30 dias grátis)',
+      text: `Olá, ${name}. Seu código de verificação para criar sua conta gratuita no CardLink é: ${code}. Ele é válido por 15 minutos.`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:540px;margin:auto;padding:24px;color:#111827;">
+          <h2 style="color:#7c3aed;">Confirmação de E-mail • CardLink</h2>
+          <p>Olá, <strong>${escapeHtml(name)}</strong>!</p>
+          <p>Falta apenas confirmar este endereço de e-mail para ativar seus <strong>30 dias de teste gratuito</strong> no CardLink.</p>
+          <p>Digite o código de 6 dígitos abaixo no formulário:</p>
+          <div style="font-size:28px;font-weight:bold;letter-spacing:4px;color:#7c3aed;background:#f5f3ff;border:1px solid #ddd6fe;padding:16px;border-radius:8px;text-align:center;margin:20px 0;">
+            ${code}
+          </div>
+          <p style="font-size:12px;color:#6b7280;">Este código expira em 15 minutos. Se você não solicitou este cadastro, desconsidere esta mensagem.</p>
+        </div>
+      `
+    }).catch(err => console.error('Erro ao enviar e-mail com código de confirmação:', err.message));
+
+    const payload = {
+      message: 'Código de confirmação enviado para o seu e-mail!',
+      verificationTicket,
+      email
+    };
+    if (!isProduction) {
+      payload.code = code;
+    }
+    return res.json(payload);
+  } catch (err) {
+    console.error('Erro ao gerar código de confirmação:', err);
+    return res.status(500).json({ error: 'Erro interno ao processar confirmação de e-mail' });
+  }
+});
+
 router.post('/register', async (req, res) => {
-  // O CardLink não oferece cadastro público gratuito.
-  // A conta de cliente é criada após confirmação de pagamento pela Cakto
-  // ou por ferramenta administrativa de teste interno.
-  return res.status(410).json({
-    error: 'public_registration_disabled',
-    message: 'A conta CardLink é criada após a confirmação da assinatura. Escolha um plano na página inicial.'
-  });
+  try {
+    const { verificationTicket, code } = req.body;
+
+    if (!verificationTicket || !code) {
+      return res.status(400).json({
+        error: 'email_verification_required',
+        message: 'É necessário confirmar o código enviado para o seu e-mail antes de criar a conta.'
+      });
+    }
+
+    let payload;
+    try {
+      payload = jwt.verify(verificationTicket, JWT_SECRET);
+    } catch (err) {
+      return res.status(400).json({
+        error: 'invalid_verification_ticket',
+        message: 'O código de confirmação expirou ou é inválido. Solicite um novo código.'
+      });
+    }
+
+    const providedHash = crypto.createHash('sha256').update(String(code).trim()).digest('hex');
+    const expected = Buffer.from(String(payload.codeHash), 'hex');
+    const provided = Buffer.from(providedHash, 'hex');
+
+    if (expected.length !== provided.length || !crypto.timingSafeEqual(expected, provided)) {
+      return res.status(400).json({
+        error: 'invalid_code',
+        message: 'Código de verificação incorreto. Verifique os 6 dígitos recebidos no seu e-mail.'
+      });
+    }
+
+    const existing = await users.findByEmail(payload.email);
+    if (existing) {
+      return res.status(409).json({ error: 'Já existe uma conta com este e-mail' });
+    }
+
+    const now = new Date();
+    const trialEndsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    const user = await users.insert({
+      name: payload.name,
+      email: payload.email,
+      whatsapp: payload.whatsapp || null,
+      password_hash: payload.passwordHash,
+      is_admin: false,
+      plan: 'pro',
+      account_status: 'active',
+      subscription_status: 'active',
+      subscription_source: 'free_trial',
+      subscription_plan: 'trial_30d',
+      trial_ends_at: trialEndsAt,
+      email_verified_at: now.toISOString(),
+      subscription_updated_at: now.toISOString(),
+    });
+
+    const token = signToken(user.id);
+
+    return res.status(201).json({
+      message: 'E-mail confirmado e conta criada com sucesso! Você tem 30 dias de teste gratuito.',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        whatsapp: user.whatsapp,
+        is_admin: false,
+        plan: user.plan,
+        account_status: user.account_status,
+        subscription_status: user.subscription_status,
+        subscription_source: user.subscription_source,
+        subscription_plan: user.subscription_plan,
+        trial_ends_at: user.trial_ends_at,
+        email_verified_at: user.email_verified_at,
+      }
+    });
+  } catch (err) {
+    console.error('Erro no registro com confirmação de e-mail:', err);
+    return res.status(500).json({ error: 'Erro interno ao criar conta' });
+  }
 });
 
 router.post('/activate', async (req, res) => {
@@ -115,7 +268,7 @@ router.post('/login', async (req, res) => {
 
   res.json({
     token,
-    user: { id: user.id, name: user.name, email: user.email || user.whatsapp, is_admin: user.is_admin || false, plan: user.plan, account_status: user.account_status, subscription_status: user.subscription_status, subscription_source: user.subscription_source, is_test_account: user.is_test_account || false, email_verified_at: user.email_verified_at }
+    user: { id: user.id, name: user.name, email: user.email || user.whatsapp, is_admin: user.is_admin || false, plan: user.plan, account_status: user.account_status, subscription_status: user.subscription_status, subscription_source: user.subscription_source, trial_ends_at: user.trial_ends_at || null, is_test_account: user.is_test_account || false, email_verified_at: user.email_verified_at }
   });
 });
 

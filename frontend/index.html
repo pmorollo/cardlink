@@ -34,7 +34,7 @@
         <a href="#como-funciona" class="navbar-link hide-mobile">Como funciona</a>
         <a href="#demonstracao" class="navbar-link hide-mobile">Demonstração</a>
         <button class="navbar-login" onclick="navigateTo('auth'); toggleAuthForm('login');">Entrar na conta</button>
-        <button class="btn btn-primary btn-sm navbar-subscribe" onclick="openProPaymentModal()">Assinar CardLink</button>
+        <button class="btn btn-primary btn-sm navbar-subscribe" onclick="navigateTo('auth'); toggleAuthForm('register');">Testar Grátis (30 Dias)</button>
       </div>
     </div>
   </nav>
@@ -49,9 +49,9 @@
       <div class="hero-content container">
         <div class="hero-grid">
           <div class="hero-copy">
-            <div class="hero-badge">
-              <span class="dot"></span>
-              A partir de R$ 12,90/mês
+            <div class="hero-badge" style="background:rgba(124,58,237,0.15);border-color:var(--purple);color:#c4b5fd;">
+              <span class="dot" style="background:#22c55e;"></span>
+              🎁 30 Dias Grátis para Testar • Sem Cartão de Crédito
             </div>
             <h1>
               Preencha seus dados.<br>O <span class="hero-word-yellow">CardLink</span><br><span class="text-gradient">cria sua página.</span>
@@ -62,20 +62,21 @@
 
             <div class="hero-benefits" aria-label="Principais benefícios">
               <span>🔗 Link ou QR Code próprios</span>
+              <span>📄 Suporte a Catálogo em PDF</span>
               <span>✎ Fácil de editar</span>
               <span>☁ Hospedagem inclusa</span>
               <span>⚡ Configuração simples e rápida</span>
             </div>
 
             <div class="hero-buttons">
-              <button class="btn btn-primary btn-lg" onclick="document.getElementById('demonstracao').scrollIntoView({behavior:'smooth'})">
-                Ver demonstração <span aria-hidden="true">→</span>
+              <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
+                🚀 Criar CardLink Grátis (30 Dias)
               </button>
-              <button class="btn btn-secondary btn-lg" onclick="document.getElementById('recursos').scrollIntoView({behavior:'smooth'})">
-                Conhecer recursos
+              <button class="btn btn-secondary btn-lg" onclick="document.getElementById('demonstracao').scrollIntoView({behavior:'smooth'})">
+                👀 Ver Demonstração (Carrossel)
               </button>
             </div>
-            <p class="hero-audience">☆ Ideal para autônomos, salões, barbearias, clínicas e pequenos negócios.</p>
+            <p class="hero-audience">☆ Ideal para autônomos, salões, barbearias, clínicas, restaurantes e negócios locais.</p>
           </div>
 
           <div class="hero-visual" aria-label="Exemplo de uma página profissional criada com o CardLink">
@@ -83,35 +84,56 @@
           </div>
         </div>
 
-        <!-- Carrossel demonstrativo -->
+        <!-- Carrossel demonstrativo com 10 imagens aprovadas -->
         <div class="hero-mockup" id="demonstracao" style="display:flex;flex-direction:column;align-items:center;margin-top:50px;width:100%;">
           
           <div style="width: 100%; text-align: center; margin-bottom: 25px;">
-            <span class="hero-badge" style="display:inline-flex;margin-bottom:8px;">🔍 Demonstração Visual</span>
-            <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Veja como o CardLink organiza sua apresentação e facilita o contato</h3>
+            <span class="hero-badge" style="display:inline-flex;margin-bottom:8px;">🔍 Conheça Passo a Passo</span>
+            <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0 0 6px;">Veja em 10 passos como o CardLink transforma a presença do seu negócio</h3>
+            <p style="color:var(--text-secondary);font-size:0.95rem;margin:0;">Você pode navegar pelas etapas abaixo ou criar seu cartão agora mesmo de graça por 30 dias.</p>
           </div>
 
           <div class="landing-carousel" id="landing-carousel" aria-roledescription="carrossel" aria-label="Demonstração do CardLink">
             <div class="landing-carousel-track">
               <article class="landing-carousel-slide is-active" aria-hidden="false">
-                <img src="assets/carousel/carrossel-01-atendimento.webp" alt="Cliente sendo atendido no balcão de um negócio" width="1440" height="960" fetchpriority="high">
-                <div class="landing-carousel-copy"><h4>Tudo o que seu cliente precisa ver</h4><p>Organize as informações que ajudam o cliente a conhecer seu negócio antes do contato.</p></div>
+                <img src="assets/carousel/approved/01-acesso-whatsapp.webp" alt="Acesso prático pelo WhatsApp" width="1122" height="1402" fetchpriority="high">
+                <div class="landing-carousel-copy"><h4>1. Acesso Imediato via WhatsApp & Link</h4><p>Comece em segundos pelo WhatsApp ou receba seu link exclusivo para montar seu cartão digital.</p></div>
               </article>
               <article class="landing-carousel-slide" aria-hidden="true">
-                <img src="assets/carousel/carrossel-02-site.webp" alt="Site profissional completo exibido em um celular" width="1440" height="960" loading="lazy">
-                <div class="landing-carousel-copy"><h4>Um site completo em um único link</h4><p>Mostre apresentação, serviços, fotos, avaliações e contatos.</p></div>
+                <img src="assets/carousel/approved/02-landing-cardlink.webp" alt="Landing page profissional do CardLink" width="1122" height="1402" loading="lazy">
+                <div class="landing-carousel-copy"><h4>2. Landing Page Profissional</h4><p>Uma apresentação completa e moderna que transmite credibilidade instantânea ao seu cliente.</p></div>
               </article>
               <article class="landing-carousel-slide" aria-hidden="true">
-                <img src="assets/carousel/carrossel-03-painel.webp" alt="Painel de configuração do site e prévia no celular" width="1440" height="960" loading="lazy">
-                <div class="landing-carousel-copy"><h4>Você mesmo atualiza quando quiser</h4><p>Edite as informações pelo painel e acompanhe o resultado.</p></div>
+                <img src="assets/carousel/approved/03-login.webp" alt="Painel de login seguro" width="1122" height="1402" loading="lazy">
+                <div class="landing-carousel-copy"><h4>3. Acesso Seguro e Descomplicado</h4><p>Entre com seu e-mail e senha no seu painel para gerenciar suas informações 24 horas por dia.</p></div>
               </article>
               <article class="landing-carousel-slide" aria-hidden="true">
-                <img src="assets/carousel/carrossel-04-divulgacao.webp" alt="Divulgação do site por link, QR Code e WhatsApp" width="1440" height="960" loading="lazy">
-                <div class="landing-carousel-copy"><h4>Divulgue e receba contatos</h4><p>Compartilhe por link ou QR Code e converse pelo WhatsApp.</p></div>
+                <img src="assets/carousel/approved/04-preparacao.webp" alt="Preparação e configuração" width="1122" height="1402" loading="lazy">
+                <div class="landing-carousel-copy"><h4>4. Preparação Rápida da Sua Presença</h4><p>O assistente orienta os passos essenciais para deixar seu negócio pronto para atender e vender.</p></div>
               </article>
               <article class="landing-carousel-slide" aria-hidden="true">
-                <img src="assets/carousel/carrossel-05-negocios.webp" alt="Indústria, escritório e barbearia usando presença digital" width="1440" height="960" loading="lazy">
-                <div class="landing-carousel-copy"><h4>Feito para o seu negócio</h4><p>Uma solução profissional para diferentes atividades e segmentos.</p></div>
+                <img src="assets/carousel/approved/05-apresentacao-do-negocio.webp" alt="Apresentação do negócio" width="1122" height="1402" loading="lazy">
+                <div class="landing-carousel-copy"><h4>5. Apresentação Completa do Negócio</h4><p>Nome comercial, slogan, bio descritiva e foto de capa organizados com padrão profissional.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/approved/06-contatos-e-redes.webp" alt="Contatos e redes sociais" width="1122" height="1402" loading="lazy">
+                <div class="landing-carousel-copy"><h4>6. Todos os Contatos e Redes em Um Só Lugar</h4><p>WhatsApp, Instagram, telefone, endereço com mapa e mensagens centralizados no seu link.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/approved/07-servicos-e-imagens.webp" alt="Serviços, produtos e catálogo" width="1122" height="1402" loading="lazy">
+                <div class="landing-carousel-copy"><h4>7. Serviços, Produtos & Catálogo em PDF</h4><p>Exiba preços, cardápio, galeria de fotos e catálogo em PDF com visualização protegida.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/approved/08-aparencia-do-site.webp" alt="Temas e aparência do site" width="1122" height="1402" loading="lazy">
+                <div class="landing-carousel-copy"><h4>8. Design e Temas Exclusivos</h4><p>Escolha cores e temas refinados como Midnight, Mel Claro, Sunset e Executivo Premium.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/approved/09-painel-qr-e-atalho.webp" alt="QR Code de balcão e atalho no celular" width="1122" height="1402" loading="lazy">
+                <div class="landing-carousel-copy"><h4>9. QR Code de Balcão e Atalho no Celular</h4><p>Baixe seu QR Code para balcão e instale seu cartão direto na tela inicial do celular.</p></div>
+              </article>
+              <article class="landing-carousel-slide" aria-hidden="true">
+                <img src="assets/carousel/approved/10-site-e-compartilhamento.webp" alt="Site pronto e compartilhamento" width="1122" height="1402" loading="lazy">
+                <div class="landing-carousel-copy"><h4>10. Compartilhamento Instantâneo</h4><p>Divulgue no WhatsApp, bio das redes ou envie para clientes com um toque e multiplique contatos.</p></div>
               </article>
             </div>
             <button class="landing-carousel-arrow landing-carousel-prev" type="button" aria-label="Imagem anterior">‹</button>
@@ -122,8 +144,21 @@
               <button type="button" aria-label="Mostrar imagem 3"></button>
               <button type="button" aria-label="Mostrar imagem 4"></button>
               <button type="button" aria-label="Mostrar imagem 5"></button>
+              <button type="button" aria-label="Mostrar imagem 6"></button>
+              <button type="button" aria-label="Mostrar imagem 7"></button>
+              <button type="button" aria-label="Mostrar imagem 8"></button>
+              <button type="button" aria-label="Mostrar imagem 9"></button>
+              <button type="button" aria-label="Mostrar imagem 10"></button>
             </div>
-            <span class="sr-only" id="landing-carousel-status" aria-live="polite">Imagem 1 de 5</span>
+            <span class="sr-only" id="landing-carousel-status" aria-live="polite">Imagem 1 de 10</span>
+          </div>
+
+          <!-- Botão de Ação Direta após o Carrossel -->
+          <div style="margin-top:28px;text-align:center;">
+            <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="font-size:1.05rem;padding:14px 32px;box-shadow:0 8px 24px rgba(124,58,237,0.35);">
+              🚀 Criar Meu CardLink Grátis (Válido por 30 Dias) →
+            </button>
+            <p style="color:var(--text-muted);font-size:0.84rem;margin-top:8px;">Acesso liberado imediatamente • Sem compromisso</p>
           </div>
         </div>
       </div>
@@ -332,10 +367,15 @@
       <div class="container">
         <div class="cta-box">
           <h2>Pronto para reunir tudo em <span class="text-gradient">um único lugar</span>?</h2>
-          <p>Escolha o plano mensal por R$ 12,90 ou anual por R$ 99,00. Após a confirmação do pagamento, você recebe o acesso para montar sua apresentação profissional e compartilhar por link ou QR Code.</p>
-          <button class="btn btn-primary btn-lg" onclick="openProPaymentModal()">
-            Quero meu CardLink
-          </button>
+          <p>Experimente grátis por 30 dias sem compromisso e sem precisar de cartão de crédito. Crie sua página profissional em minutos e compartilhe por link ou QR Code.</p>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+            <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
+              🚀 Criar CardLink Grátis (30 Dias)
+            </button>
+            <button class="btn btn-secondary btn-lg" onclick="openProPaymentModal()">
+              Ver Planos Pagos
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -389,8 +429,66 @@
             Entrar
           </button>
           <p class="auth-toggle">
-            Ainda não é assinante? <a href="#" onclick="openProPaymentModal();return false;">Escolher um plano</a>
+            Ainda não tem conta? <a href="#" onclick="toggleAuthForm('register');return false;">Criar conta grátis (30 dias)</a>
           </p>
+        </div>
+
+        <!-- Register Form: Criar conta grátis por 30 dias com confirmação de e-mail -->
+        <div id="register-form" style="display:none;">
+          <h1 class="auth-title">Criar Conta no <span class="text-gradient">CardLink</span></h1>
+          <p class="auth-subtitle">🎁 Experimente grátis por 30 dias. Sem cartão de crédito.</p>
+
+          <!-- Passo 1: Informações Cadastrais -->
+          <div id="register-step-1">
+            <div class="form-group">
+              <label class="form-label" for="register-name">Seu Nome ou Nome do Negócio</label>
+              <input class="form-input" type="text" id="register-name" placeholder="Ex: Studio Bella / Dr. Ricardo Silva">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="register-email">Seu Melhor E-mail</label>
+              <input class="form-input" type="email" id="register-email" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="register-whatsapp">WhatsApp (opcional)</label>
+              <input class="form-input" type="tel" id="register-whatsapp" placeholder="(11) 99999-9999">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="register-password">Crie uma Senha</label>
+              <input class="form-input" type="password" id="register-password" minlength="8" placeholder="Mínimo 8 caracteres">
+            </div>
+            <button class="btn btn-primary btn-lg" id="btn-register-send-code" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleSendRegisterCode()">
+              ✉️ Enviar Código de Confirmação
+            </button>
+            <p class="auth-toggle">
+              Já tem uma conta? <a href="#" onclick="toggleAuthForm('login');return false;">Entrar na minha conta</a>
+            </p>
+          </div>
+
+          <!-- Passo 2: Digitar código de 6 dígitos recebido por e-mail -->
+          <div id="register-step-2" style="display:none;">
+            <div style="background:rgba(124,58,237,0.1);border:1px solid var(--accent);border-radius:8px;padding:12px;margin-bottom:16px;text-align:center;">
+              <p style="font-size:0.9rem;margin:0 0 4px;color:var(--text-primary);font-weight:600;">Confirme seu endereço de e-mail</p>
+              <p style="font-size:0.85rem;margin:0;color:var(--text-secondary);">
+                Enviamos um código de 6 dígitos para <strong id="register-sent-email" style="color:var(--accent);">seu@email.com</strong>.
+              </p>
+            </div>
+
+            <div id="register-dev-banner" style="display:none;background:rgba(16,185,129,0.15);border:1px solid #10b981;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.85rem;color:var(--text-primary);text-align:center;"></div>
+
+            <div class="form-group">
+              <label class="form-label" for="register-code">Código de Verificação (6 Dígitos)</label>
+              <input class="form-input" type="text" id="register-code" maxlength="6" placeholder="Ex: 123456" style="letter-spacing:6px;font-size:1.2rem;font-weight:700;text-align:center;" autocomplete="one-time-code">
+            </div>
+
+            <button class="btn btn-primary btn-lg" id="btn-register-verify" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleVerifyAndRegister()">
+              🚀 Confirmar E-mail e Começar Grátis
+            </button>
+
+            <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:0.85rem;">
+              <a href="#" onclick="handleSendRegisterCode();return false;" style="color:var(--accent);text-decoration:none;">Reenviar código</a>
+              <a href="#" onclick="backToRegisterStep1();return false;" style="color:var(--text-secondary);text-decoration:none;">Alterar e-mail</a>
+            </div>
+          </div>
         </div>
 
         <!-- Activation Form: exibido somente pelo link enviado após pagamento -->
@@ -740,12 +838,51 @@
             </div>
           </div>
 
-          <!-- Photo Gallery -->
+          <!-- Document / Catalog PDF -->
+          <div class="form-section settings-section" data-settings-section="services">
+            <div class="form-section-title"><span class="icon">📑</span> Catálogo ou Documento do Negócio (PDF)</div>
+            <p style="color:var(--text-secondary);font-size:0.86rem;line-height:1.55;margin:-4px 0 16px;">
+              Disponibilize seu catálogo de produtos, tabela de preços, cardápio ou apresentação em PDF. Os clientes poderão visualizar diretamente no site (modo de visualização protegido, sem download).
+            </p>
+            <div class="form-group">
+              <label class="form-label" for="field-catalog-pdf-title">Título do Documento</label>
+              <input class="form-input" type="text" id="field-catalog-pdf-title" data-field="catalog_pdf_title" placeholder="Ex: Catálogo de Produtos 2026, Tabela de Serviços ou Cardápio Completo">
+            </div>
+            <div class="form-group">
+              <div style="border:1.5px dashed var(--border-subtle);border-radius:var(--radius-lg);padding:16px;text-align:center;background:var(--bg-surface);">
+                <div id="catalog-pdf-preview" style="display:none;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;margin-bottom:12px;align-items:center;justify-content:space-between;gap:10px;">
+                  <div style="display:flex;align-items:center;gap:10px;overflow:hidden;text-align:left;">
+                    <span style="font-size:1.8rem;">📄</span>
+                    <div style="overflow:hidden;">
+                      <div id="catalog-pdf-filename" style="font-weight:600;font-size:0.9rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">arquivo.pdf</div>
+                      <span style="font-size:0.75rem;color:var(--text-muted);display:inline-block;">PDF Protegido • Somente Visualização</span>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="openPdfViewerModal(document.getElementById('field-catalog-pdf-url').value, document.getElementById('field-catalog-pdf-title').value || 'Catálogo')" style="flex-shrink:0;">👁️ Ver prévia</button>
+                </div>
+                <div id="catalog-pdf-placeholder" style="color:var(--text-secondary);font-size:0.86rem;line-height:1.5;margin-bottom:12px;">
+                  Envie um arquivo PDF do catálogo, cardápio ou apresentação (até 15MB).
+                </div>
+                <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+                  <button class="btn btn-secondary btn-sm" type="button" onclick="document.getElementById('catalog-pdf-file').click()">📄 Escolher arquivo PDF</button>
+                  <button class="btn btn-outline btn-sm" type="button" id="catalog-pdf-remove" onclick="clearCatalogPdf()" style="display:none;">Remover PDF</button>
+                </div>
+                <input type="file" id="catalog-pdf-file" accept="application/pdf" style="display:none;" onchange="handleCatalogPdfUpload(this)">
+                <input type="hidden" id="field-catalog-pdf-url" data-field="catalog_pdf_url">
+                <small style="color:var(--text-muted);display:block;margin-top:10px;">Visualização protegida: os clientes navegam pelo documento sem opção de baixar.</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Photo & PDF Gallery -->
           <div class="form-section settings-section" data-settings-section="gallery">
-            <div class="form-section-title"><span class="icon">🖼️</span> Galeria de fotos</div>
+            <div class="form-section-title"><span class="icon">🖼️</span> Galeria & Portfólio (Fotos e PDFs)</div>
+            <p style="color:var(--text-secondary);font-size:0.86rem;line-height:1.55;margin:-4px 0 12px;">
+              Adicione fotos dos seus trabalhos ou arquivos PDF ao portfólio.
+            </p>
             <div id="gallery-upload-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;"></div>
             <button class="btn btn-secondary btn-sm" type="button" onclick="addGallerySlot()" style="width:100%;">
-              📷 Adicionar Foto
+              📷 Adicionar Foto ou Documento PDF
             </button>
             <!-- Hidden field keeps URL list for save/load compatibility -->
             <input type="hidden" id="field-gallery">
@@ -1195,6 +1332,24 @@
       <div style="display:flex;justify-content:flex-end;margin-top:10px;border-top:1px solid var(--border-subtle);padding-top:12px;">
         <button class="btn btn-primary" onclick="closeUserManualModal()" style="padding:8px 20px;font-size:0.85rem;font-weight:bold;">Entendi, fechar</button>
       </div>
+  </div>
+
+  <!-- Modal de Visualização de PDF (Somente Leitura - Sem Opção de Download) -->
+  <div class="modal-overlay" id="pdf-viewer-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.88);backdrop-filter:blur(6px);z-index:300;align-items:center;justify-content:center;padding:16px;">
+    <div style="background:var(--bg-surface, #1e1b4b);border:1px solid var(--border-subtle, rgba(255,255,255,0.15));border-radius:16px;width:100%;max-width:960px;height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border-subtle, rgba(255,255,255,0.1));background:var(--bg-card, #2e1065);">
+        <div style="display:flex;align-items:center;gap:10px;overflow:hidden;">
+          <span style="font-size:1.4rem;">📄</span>
+          <div style="overflow:hidden;">
+            <h4 id="pdf-viewer-title" style="margin:0;font-size:0.95rem;color:#ffffff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;">Documento PDF</h4>
+            <span style="font-size:0.75rem;color:#a5b4fc;">Modo de Visualização Protegida • Somente Leitura</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closePdfViewerModal()" style="padding:6px 14px;border-radius:8px;font-weight:600;">✕ Fechar</button>
+      </div>
+      <div style="flex:1;position:relative;background:#0f172a;overflow:hidden;" oncontextmenu="return false;">
+        <iframe id="pdf-viewer-frame" src="" style="width:100%;height:100%;border:none;" title="Visualizador de PDF"></iframe>
+      </div>
     </div>
   </div>
 
@@ -1286,7 +1441,7 @@
       annualCheckoutUrl: 'https://pay.cakto.com.br/5g7f23g'
     };
   </script>
-  <script src="app.js?v=35"></script>
+  <script src="app.js?v=37"></script>
   <script src="landing-carousel.js?v=1"></script>
   <script>
 
