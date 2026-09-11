@@ -119,10 +119,10 @@
 }
 
 [data-theme="rose"] {
-  --theme-gradient: linear-gradient(135deg, #831843, #701a3e, #4a1942);
-  --theme-accent: #ec4899;
-  --theme-accent-rgb: 236, 72, 153;
-  --theme-bg: #1a070f;
+  --theme-gradient: linear-gradient(135deg, #ff2d75, #f43f5e, #be123c);
+  --theme-accent: #ff2d75;
+  --theme-accent-rgb: 255, 45, 117;
+  --theme-bg: #1c0813;
 }
 
 [data-theme="monochrome"] {
@@ -183,6 +183,11 @@
 .card-container[data-theme="forest"] .site-block-title {
   font-family: var(--font-display);
   letter-spacing: -0.015em;
+}
+
+.card-container[data-theme="rose"] {
+  border-color: rgba(255, 45, 117, 0.28);
+  box-shadow: 0 20px 60px rgba(255, 45, 117, 0.16);
 }
 
 /* ============================================
@@ -1317,7 +1322,7 @@ textarea.form-input {
   background: linear-gradient(135deg, #091525 0 58%, #c6a15b 58% 72%, #f5f0e6 72%);
 }
 .theme-swatch[data-theme="rose"] {
-  background: linear-gradient(135deg, #831843, #4a1942);
+  background: linear-gradient(135deg, #ff4081, #f43f5e);
 }
 .theme-swatch[data-theme="monochrome"] {
   background: linear-gradient(135deg, #1e293b, #334155);

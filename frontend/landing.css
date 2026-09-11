@@ -82,6 +82,14 @@
   --accent-2: #ef4444;
   --accent-glow: rgba(245,158,11,0.3);
 }
+[data-theme="rose"] {
+  --hero-from: #260718;
+  --hero-via: #4a0d2d;
+  --hero-to: #18030e;
+  --accent: #ff2d75;
+  --accent-2: #fb7185;
+  --accent-glow: rgba(255,45,117,0.35);
+}
 
 /* ============================================
    Reset & Base
@@ -1222,12 +1230,12 @@ body.has-owner-bar .lp-nav {
    Visual refinement v3
    ============================================ */
 [data-theme="rose"] {
-  --hero-from: #1d1018;
-  --hero-via: #351523;
-  --hero-to: #160d13;
-  --accent: #f472b6;
+  --hero-from: #260718;
+  --hero-via: #4a0d2d;
+  --hero-to: #18030e;
+  --accent: #ff2d75;
   --accent-2: #fb7185;
-  --accent-glow: rgba(244,114,182,0.22);
+  --accent-glow: rgba(255,45,117,0.35);
 }
 
 [data-theme="monochrome"] {
