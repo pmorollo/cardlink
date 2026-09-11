@@ -213,10 +213,12 @@ function handleRoute() {
     updateNavAuth();
     toggleAuthForm('activate');
     loadActivationFromHash();
-  } else if (hash === '#auth' || hash === '#register' || hash.startsWith('#register')) {
+  } else if (hash.startsWith('#auth') || hash.startsWith('#register')) {
     if (!authToken) {
       document.getElementById('auth-view').classList.add('active');
-      if (hash.includes('register')) {
+      if (hash.includes('login')) {
+        toggleAuthForm('login');
+      } else {
         toggleAuthForm('register');
       }
     } else {
@@ -458,6 +460,31 @@ function toggleAuthForm(form) {
   const activationForm = document.getElementById('activation-form');
   const forgotForm = document.getElementById('forgot-form');
   const verifyEmailForm = document.getElementById('verify-email-form');
+  const tabRegister = document.getElementById('tab-auth-register');
+  const tabLogin = document.getElementById('tab-auth-login');
+  const authTabs = document.querySelector('.auth-tabs');
+
+  if (authTabs) {
+    authTabs.style.display = (form === 'register' || form === 'login') ? 'flex' : 'none';
+  }
+
+  if (tabRegister && tabLogin) {
+    if (form === 'register') {
+      tabRegister.style.background = 'linear-gradient(135deg,var(--accent),#9333ea)';
+      tabRegister.style.color = '#fff';
+      tabRegister.style.fontWeight = '700';
+      tabLogin.style.background = 'transparent';
+      tabLogin.style.color = 'var(--text-secondary)';
+      tabLogin.style.fontWeight = '600';
+    } else if (form === 'login') {
+      tabLogin.style.background = 'linear-gradient(135deg,var(--accent),#9333ea)';
+      tabLogin.style.color = '#fff';
+      tabLogin.style.fontWeight = '700';
+      tabRegister.style.background = 'transparent';
+      tabRegister.style.color = 'var(--text-secondary)';
+      tabRegister.style.fontWeight = '600';
+    }
+  }
 
   if (loginForm) loginForm.style.display = form === 'login' ? '' : 'none';
   if (registerForm) {

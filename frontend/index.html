@@ -410,8 +410,18 @@
   <section class="view" id="auth-view">
     <div class="auth-container">
       <div class="auth-card">
+        <!-- Auth Mode Tabs (Alternar entre Cadastro 30 Dias e Login) -->
+        <div class="auth-tabs" style="display:flex;background:rgba(255,255,255,0.06);padding:4px;border-radius:12px;margin-bottom:24px;gap:4px;">
+          <button type="button" id="tab-auth-register" onclick="toggleAuthForm('register')" style="flex:1;padding:10px 14px;border:none;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;background:linear-gradient(135deg,var(--accent),#9333ea);color:#fff;transition:all 0.2s;">
+            🎁 30 Dias Grátis
+          </button>
+          <button type="button" id="tab-auth-login" onclick="toggleAuthForm('login')" style="flex:1;padding:10px 14px;border:none;border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;background:transparent;color:var(--text-secondary);transition:all 0.2s;">
+            🔑 Entrar na Conta
+          </button>
+        </div>
+
         <!-- Login Form -->
-        <div id="login-form">
+        <div id="login-form" style="display:none;">
           <h1 class="auth-title">Entrar no <span class="text-gradient">CardLink</span></h1>
           <p class="auth-subtitle">Acesse seu CardLink e gerencie sua página profissional</p>
           <div class="form-group">
@@ -434,7 +444,7 @@
         </div>
 
         <!-- Register Form: Criar conta grátis por 30 dias com confirmação de e-mail -->
-        <div id="register-form" style="display:none;">
+        <div id="register-form">
           <h1 class="auth-title">Criar Conta no <span class="text-gradient">CardLink</span></h1>
           <p class="auth-subtitle">🎁 Experimente grátis por 30 dias. Sem cartão de crédito.</p>
 
@@ -1441,7 +1451,7 @@
       annualCheckoutUrl: 'https://pay.cakto.com.br/5g7f23g'
     };
   </script>
-  <script src="app.js?v=38"></script>
+  <script src="app.js?v=39"></script>
   <script src="landing-carousel.js?v=1"></script>
   <script>
 
