@@ -657,7 +657,7 @@ async function handleVerifyAndRegister() {
     currentRegisterTicket = null;
     localStorage.setItem('cardlink_token', data.token);
     updateNavAuth();
-    showToast('🎉', 'E-mail confirmado com sucesso! Aproveite seus 30 dias grátis.');
+    showToast('🎉', 'E-mail confirmado com sucesso! Aproveite sua conta gratuita.');
 
     currentUserCardId = null;
     createNewCard();
