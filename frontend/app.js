@@ -213,9 +213,12 @@ function handleRoute() {
     updateNavAuth();
     toggleAuthForm('activate');
     loadActivationFromHash();
-  } else if (hash === '#auth') {
+  } else if (hash === '#auth' || hash === '#register' || hash.startsWith('#register')) {
     if (!authToken) {
       document.getElementById('auth-view').classList.add('active');
+      if (hash.includes('register')) {
+        toggleAuthForm('register');
+      }
     } else {
       navigateTo(currentUser?.is_admin ? 'admin' : 'dashboard');
       return;
