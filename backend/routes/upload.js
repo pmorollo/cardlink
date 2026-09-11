@@ -78,8 +78,10 @@ router.post('/', authMiddleware, requireCustomer, upload.single('photo'), async 
   try {
     const ext = safeUploadExtension(req.file);
     if (!ext) return res.status(400).json({ error: 'Tipo de arquivo inválido' });
-    const filename = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
     const isPdf = ext === '.pdf';
+    if (isPdf && req.user?.plan !== 'pro') {
+      return res.status(403).json({ error: 'O upload de catálogo em PDF está disponível exclusivamente no Plano Pro.' });
+    }
 
     if (isR2Configured() && S3Client) {
       const s3 = new S3Client({

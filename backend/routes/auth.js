@@ -78,7 +78,7 @@ router.post('/register/send-code', async (req, res) => {
         <div style="font-family:Arial,sans-serif;max-width:540px;margin:auto;padding:24px;color:#111827;">
           <h2 style="color:#7c3aed;">Confirmação de E-mail • CardLink</h2>
           <p>Olá, <strong>${escapeHtml(name)}</strong>!</p>
-          <p>Falta apenas confirmar este endereço de e-mail para ativar seus <strong>30 dias de teste gratuito</strong> no CardLink.</p>
+          <p>Falta apenas confirmar este endereço de e-mail para ativar sua <strong>conta gratuita permanente</strong> no CardLink.</p>
           <p>Digite o código de 6 dígitos abaixo no formulário:</p>
           <div style="font-size:28px;font-weight:bold;letter-spacing:4px;color:#7c3aed;background:#f5f3ff;border:1px solid #ddd6fe;padding:16px;border-radius:8px;text-align:center;margin:20px 0;">
             ${code}
@@ -141,7 +141,6 @@ router.post('/register', async (req, res) => {
     }
 
     const now = new Date();
-    const trialEndsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     const user = await users.insert({
       name: payload.name,
@@ -149,12 +148,12 @@ router.post('/register', async (req, res) => {
       whatsapp: payload.whatsapp || null,
       password_hash: payload.passwordHash,
       is_admin: false,
-      plan: 'pro',
+      plan: 'free',
       account_status: 'active',
       subscription_status: 'active',
-      subscription_source: 'free_trial',
-      subscription_plan: 'trial_30d',
-      trial_ends_at: trialEndsAt,
+      subscription_source: 'free_tier',
+      subscription_plan: 'free',
+      trial_ends_at: null,
       email_verified_at: now.toISOString(),
       subscription_updated_at: now.toISOString(),
     });
@@ -162,7 +161,7 @@ router.post('/register', async (req, res) => {
     const token = signToken(user.id);
 
     return res.status(201).json({
-      message: 'E-mail confirmado e conta criada com sucesso! Você tem 30 dias de teste gratuito.',
+      message: 'E-mail confirmado e conta gratuita criada com sucesso!',
       token,
       user: {
         id: user.id,

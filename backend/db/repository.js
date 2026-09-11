@@ -64,8 +64,8 @@ function castUserRow(row) {
   if (!row) return null;
   const isAdmin = !!row.is_admin;
   const legacyPlan = row.plan || (isAdmin ? 'none' : 'inactive');
-  const plan = isAdmin ? 'none' : (legacyPlan === 'free' ? 'inactive' : legacyPlan);
-  const legacyActive = !isAdmin && legacyPlan === 'pro';
+  const plan = isAdmin ? 'none' : legacyPlan;
+  const legacyActive = !isAdmin && (legacyPlan === 'pro' || legacyPlan === 'free');
   return {
     ...row,
     is_admin: isAdmin,

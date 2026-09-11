@@ -181,7 +181,7 @@ test('CORS rejeita origem nao permitida', async () => {
   assert.ok(!acao || res.status >= 400);
 });
 
-test('cadastro gratuito de 30 dias exige confirmacao de e-mail antes de criar a conta', async () => {
+test('cadastro gratuito permanente exige confirmacao de e-mail antes de criar a conta', async () => {
   // 1. Tentar criar conta diretamente sem confirmar e-mail é bloqueado
   const directAttempt = await api('POST', '/api/auth/register', {
     name: 'Tentativa Direta',
@@ -221,10 +221,10 @@ test('cadastro gratuito de 30 dias exige confirmacao de e-mail antes de criar a 
   assert.equal(validRes.status, 201);
   assert.ok(validRes.data.token);
   assert.equal(validRes.data.user.email, 'confirmado@example.com');
-  assert.equal(validRes.data.user.plan, 'pro');
-  assert.equal(validRes.data.user.subscription_source, 'free_trial');
+  assert.equal(validRes.data.user.plan, 'free');
+  assert.equal(validRes.data.user.subscription_source, 'free_tier');
   assert.equal(validRes.data.user.subscription_status, 'active');
-  assert.ok(validRes.data.user.trial_ends_at);
+  assert.equal(validRes.data.user.trial_ends_at, null);
   assert.ok(validRes.data.user.email_verified_at);
   assert.equal(db.users.length, 1);
 

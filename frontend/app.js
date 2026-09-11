@@ -369,25 +369,34 @@ function updateNavAuth() {
   if (!navCta) return;
   if (authToken && currentUser) {
     const initials = (currentUser.name || 'U').split(' ').map(part => part[0]).join('').substring(0, 2).toUpperCase();
+    const isPro = currentUser.plan === 'pro' && !currentUser.is_admin;
     navCta.innerHTML = `
-      <div class="user-menu" id="user-menu" onclick="event.stopPropagation()">
-        <button class="user-menu-trigger" type="button" onclick="toggleUserMenu(event)" aria-label="Abrir menu da conta">
-          <span class="user-menu-avatar">${initials}</span>
-          <span class="user-menu-name">${escapeHtml(currentUser.name)}</span>
-          <span class="user-menu-chevron">⌄</span>
-        </button>
-        <div class="user-menu-dropdown">
-          ${currentUser.is_admin ? `
-            <button type="button" onclick="navigateTo('admin');closeUserMenu()" style="font-weight:bold;color:var(--purple);"><span>👑 Painel Administrativo</span></button>
-            <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Segurança da conta</span></button>
-          ` : `
-            <button type="button" onclick="navigateTo('dashboard');closeUserMenu()"><span>Visão geral</span></button>
-            <button type="button" onclick="openPageSettings();closeUserMenu()"><span>Configurações da página</span></button>
-            ${currentUserCardId ? `<button type="button" onclick="viewContacts(${currentUserCardId}, 'Minha página');closeUserMenu()"><span>Contatos recebidos</span></button>` : ''}
-            <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Minha conta</span></button>
-          `}
-          <div class="user-menu-divider"></div>
-          <button type="button" class="danger" onclick="handleLogout()"><span>Sair</span></button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${!currentUser.is_admin && !isPro ? `
+          <button class="btn btn-primary btn-sm hide-mobile" onclick="openProPaymentModal()" style="background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;font-size:0.8rem;padding:7px 12px;border-radius:8px;">
+            ⭐ Assinar Pro (R$ 12,90)
+          </button>
+        ` : ''}
+        <div class="user-menu" id="user-menu" onclick="event.stopPropagation()">
+          <button class="user-menu-trigger" type="button" onclick="toggleUserMenu(event)" aria-label="Abrir menu da conta">
+            <span class="user-menu-avatar">${initials}</span>
+            <span class="user-menu-name">${escapeHtml(currentUser.name)}</span>
+            <span class="user-menu-chevron">⌄</span>
+          </button>
+          <div class="user-menu-dropdown">
+            ${currentUser.is_admin ? `
+              <button type="button" onclick="navigateTo('admin');closeUserMenu()" style="font-weight:bold;color:var(--purple);"><span>👑 Painel Administrativo</span></button>
+              <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Segurança da conta</span></button>
+            ` : `
+              ${!isPro ? `<button type="button" onclick="openProPaymentModal();closeUserMenu()" style="font-weight:bold;color:var(--accent);"><span>⭐ Fazer Upgrade para o Pro</span></button>` : ''}
+              <button type="button" onclick="navigateTo('dashboard');closeUserMenu()"><span>Visão geral</span></button>
+              <button type="button" onclick="openPageSettings();closeUserMenu()"><span>Configurações da página</span></button>
+              ${currentUserCardId ? `<button type="button" onclick="viewContacts(${currentUserCardId}, 'Minha página');closeUserMenu()"><span>Contatos recebidos</span></button>` : ''}
+              <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Minha conta</span></button>
+            `}
+            <div class="user-menu-divider"></div>
+            <button type="button" class="danger" onclick="handleLogout()"><span>Sair</span></button>
+          </div>
         </div>
       </div>
     `;
@@ -396,7 +405,7 @@ function updateNavAuth() {
       <a href="#como-funciona" class="navbar-link hide-mobile">Como funciona</a>
       <a href="#demonstracao" class="navbar-link hide-mobile">Demonstração</a>
       <button class="navbar-login" onclick="navigateTo('auth'); toggleAuthForm('login');">Entrar na conta</button>
-      <button class="btn btn-primary btn-sm navbar-subscribe" onclick="openProPaymentModal()">Assinar CardLink</button>
+      <button class="btn btn-primary btn-sm navbar-subscribe" onclick="redirectToCheckout('monthly')">Assinar Pro — R$ 12,90</button>
     `;
   }
 }
@@ -914,15 +923,17 @@ function openProPaymentModal() {
 function redirectToCheckout(planOverride) {
   const plan = planOverride || 'monthly';
   const email = currentUser ? encodeURIComponent(currentUser.email) : '';
-  const base = (plan === 'annual'
-    ? window.CARD_LINK && window.CARD_LINK.annualCheckoutUrl
-    : window.CARD_LINK && window.CARD_LINK.monthlyCheckoutUrl) || '';
+  const fallbackMonthly = 'https://pay.cakto.com.br/kawb7xd_1032085';
+  const fallbackAnnual = 'https://pay.cakto.com.br/5g7f23g';
+  let base = (plan === 'annual'
+    ? (window.CARD_LINK?.annualCheckoutUrl || fallbackAnnual)
+    : (window.CARD_LINK?.monthlyCheckoutUrl || fallbackMonthly));
   if (!base || base.startsWith('PREENCHER')) {
-    showToast('⚠️', 'Checkout ainda não configurado. Tente novamente em instantes.');
-    return;
+    base = plan === 'annual' ? fallbackAnnual : fallbackMonthly;
   }
   const sep = base.includes('?') ? '&' : '?';
-  window.open(`${base}${sep}email=${email}`, '_blank');
+  const finalUrl = email ? `${base}${sep}email=${email}` : base;
+  window.location.href = finalUrl;
 }
 
 let currentQrCodeSlug = '';
@@ -1529,6 +1540,14 @@ async function handleCatalogPdfUpload(input) {
   const file = input.files?.[0];
   if (!file) return;
 
+  const isPro = currentUser && !currentUser.is_admin && currentUser.plan === 'pro';
+  if (!isPro) {
+    showToast('⭐', 'O upload de catálogo em PDF é exclusivo do Plano Pro. Assine por R$ 12,90/mês!');
+    openProPaymentModal();
+    input.value = '';
+    return;
+  }
+
   const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
   if (!isPdf) {
     showToast('⚠️', 'Por favor, selecione um arquivo em formato PDF.');
@@ -1706,6 +1725,12 @@ async function saveCard() {
 // Theme
 // ============================================
 function selectTheme(theme) {
+  const isPro = currentUser && !currentUser.is_admin && currentUser.plan === 'pro';
+  if (!isPro && (theme === 'sunset' || theme === 'forest')) {
+    showToast('⭐', 'Os temas Sunset e Executivo são exclusivos do Plano Pro (R$ 12,90/mês). Faça o upgrade!');
+    openProPaymentModal();
+    return;
+  }
   currentTheme = theme;
   document.querySelectorAll('.theme-swatch').forEach(s => {
     s.classList.toggle('active', s.dataset.theme === theme);
@@ -2390,6 +2415,19 @@ function syncGalleryField() {
 function addGallerySlot(existingUrl = '') {
   const grid = document.getElementById('gallery-upload-grid');
   if (!grid) return;
+
+  const isPro = currentUser && !currentUser.is_admin && currentUser.plan === 'pro';
+  const maxSlots = isPro ? 10 : 4;
+  if (!existingUrl && galleryUrls.length >= maxSlots) {
+    if (!isPro) {
+      showToast('⭐', 'O Plano Gratuito permite até 4 fotos. Assine o Pro para até 10 fotos!');
+      openProPaymentModal();
+    } else {
+      showToast('⚠️', 'Limite máximo de 10 fotos atingido.');
+    }
+    return;
+  }
+
   const idx = galleryUrls.length;
   galleryUrls.push(existingUrl);
 
@@ -2443,8 +2481,16 @@ async function handleGalleryPhotoUpload(input, idx) {
   const file = input.files[0];
   if (!file) return;
 
-  const slot = document.getElementById(`gallery-slot-${idx}`);
+  const isPro = currentUser && !currentUser.is_admin && currentUser.plan === 'pro';
   const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+  if (isPdf && !isPro) {
+    showToast('⭐', 'O upload de PDF na galeria é exclusivo do Plano Pro.');
+    openProPaymentModal();
+    input.value = '';
+    return;
+  }
+
+  const slot = document.getElementById(`gallery-slot-${idx}`);
 
   if (slot) {
     if (isPdf) {

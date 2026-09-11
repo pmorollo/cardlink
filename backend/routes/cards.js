@@ -102,19 +102,29 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
     return res.status(400).json({ error: 'Nome é obrigatório' });
   }
 
-  // Somente clientes PRO podem criar ou editar cartão.
   const user = req.currentUser || await userRepo.findById(req.userId);
   const isPro = user && user.plan === 'pro';
-
-  if (!isPro) {
-    return res.status(402).json({ error: 'subscription_required', message: 'Assinatura ativa do CardLink PRO necessária para salvar ou editar cartões' });
-  }
+  const FREE_THEMES = new Set(['midnight', 'ocean', 'rose']);
 
   let productsToSave = req.body.products;
   let galleryToSave = req.body.gallery;
+  if (Array.isArray(galleryToSave) && !isPro && galleryToSave.length > 4) {
+    galleryToSave = galleryToSave.slice(0, 4);
+  }
+
+  let themeToSave = req.body.theme;
+  if (themeToSave && !isPro && !FREE_THEMES.has(themeToSave)) {
+    themeToSave = 'midnight';
+  }
+
+  let catalogPdfUrlToSave = req.body.catalog_pdf_url;
+  let catalogPdfTitleToSave = req.body.catalog_pdf_title;
+  if (!isPro) {
+    catalogPdfUrlToSave = '';
+    catalogPdfTitleToSave = '';
+  }
+
   let testimonialsToSave = req.body.testimonials !== undefined ? sanitizeTestimonials(req.body.testimonials) : undefined;
-
-
 
   const existing = await cardRepo.findOneByUserId(req.userId);
   if (existing) {
@@ -144,13 +154,13 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
       tiktok: req.body.tiktok !== undefined ? sanitizeSocialUrl(req.body.tiktok) : existing.tiktok,
       youtube: req.body.youtube !== undefined ? sanitizeSocialUrl(req.body.youtube) : existing.youtube,
       twitter: req.body.twitter !== undefined ? sanitizeSocialUrl(req.body.twitter) : existing.twitter,
-      theme: req.body.theme || existing.theme,
+      theme: themeToSave || existing.theme,
       site_button_text: req.body.site_button_text !== undefined ? String(req.body.site_button_text).substring(0, 200) : existing.site_button_text,
       services_mode: req.body.services_mode !== undefined ? sanitizeServicesMode(req.body.services_mode, existing.services_mode || 'image') : existing.services_mode,
       services_title: req.body.services_title !== undefined ? sanitizeServicesTitle(req.body.services_title) : existing.services_title,
       services_image_url: req.body.services_image_url !== undefined ? sanitizeSocialUrl(req.body.services_image_url, 1000) : existing.services_image_url,
-      catalog_pdf_url: req.body.catalog_pdf_url !== undefined ? sanitizeSocialUrl(req.body.catalog_pdf_url, 1000) : existing.catalog_pdf_url,
-      catalog_pdf_title: req.body.catalog_pdf_title !== undefined ? String(req.body.catalog_pdf_title).substring(0, 120) : existing.catalog_pdf_title,
+      catalog_pdf_url: catalogPdfUrlToSave !== undefined ? sanitizeSocialUrl(catalogPdfUrlToSave, 1000) : existing.catalog_pdf_url,
+      catalog_pdf_title: catalogPdfTitleToSave !== undefined ? String(catalogPdfTitleToSave).substring(0, 120) : existing.catalog_pdf_title,
       products: productsToSave !== undefined ? productsToSave : existing.products,
       gallery: galleryToSave !== undefined ? galleryToSave : existing.gallery,
       testimonials: testimonialsToSave !== undefined ? testimonialsToSave : existing.testimonials,
@@ -184,13 +194,13 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
     tiktok: sanitizeSocialUrl(req.body.tiktok),
     youtube: sanitizeSocialUrl(req.body.youtube),
     twitter: sanitizeSocialUrl(req.body.twitter),
-    theme: req.body.theme || 'midnight',
+    theme: themeToSave || 'midnight',
     site_button_text: req.body.site_button_text ? String(req.body.site_button_text).substring(0, 200) : null,
     services_mode: sanitizeServicesMode(req.body.services_mode, 'image'),
     services_title: sanitizeServicesTitle(req.body.services_title) || '',
     services_image_url: sanitizeSocialUrl(req.body.services_image_url, 1000) || '',
-    catalog_pdf_url: req.body.catalog_pdf_url ? sanitizeSocialUrl(req.body.catalog_pdf_url, 1000) : '',
-    catalog_pdf_title: req.body.catalog_pdf_title ? String(req.body.catalog_pdf_title).substring(0, 120) : '',
+    catalog_pdf_url: catalogPdfUrlToSave ? sanitizeSocialUrl(catalogPdfUrlToSave, 1000) : '',
+    catalog_pdf_title: catalogPdfTitleToSave ? String(catalogPdfTitleToSave).substring(0, 120) : '',
     products: productsToSave || [],
     gallery: galleryToSave || [],
     testimonials: testimonialsToSave || [],
@@ -222,6 +232,27 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
     slug = await generateUniqueSlug(req.body.name, card.id);
   }
 
+  const user = req.currentUser || await userRepo.findById(req.userId);
+  const isPro = user && user.plan === 'pro';
+  const FREE_THEMES = new Set(['midnight', 'ocean', 'rose']);
+
+  let galleryToSave = req.body.gallery !== undefined ? req.body.gallery : card.gallery;
+  if (Array.isArray(galleryToSave) && !isPro && galleryToSave.length > 4) {
+    galleryToSave = galleryToSave.slice(0, 4);
+  }
+
+  let themeToSave = req.body.theme !== undefined ? req.body.theme : card.theme;
+  if (themeToSave && !isPro && !FREE_THEMES.has(themeToSave)) {
+    themeToSave = 'midnight';
+  }
+
+  let catalogPdfUrlToSave = req.body.catalog_pdf_url !== undefined ? req.body.catalog_pdf_url : card.catalog_pdf_url;
+  let catalogPdfTitleToSave = req.body.catalog_pdf_title !== undefined ? req.body.catalog_pdf_title : card.catalog_pdf_title;
+  if (!isPro) {
+    catalogPdfUrlToSave = '';
+    catalogPdfTitleToSave = '';
+  }
+
   const updated = await cardRepo.update(card.id, {
     slug,
     name: (req.body.name || '').toString().substring(0, 100) || card.name,
@@ -243,15 +274,15 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
     tiktok: req.body.tiktok !== undefined ? sanitizeSocialUrl(req.body.tiktok) : card.tiktok,
     youtube: req.body.youtube !== undefined ? sanitizeSocialUrl(req.body.youtube) : card.youtube,
     twitter: req.body.twitter !== undefined ? sanitizeSocialUrl(req.body.twitter) : card.twitter,
-    theme: req.body.theme || card.theme,
+    theme: themeToSave || card.theme,
     site_button_text: req.body.site_button_text !== undefined ? String(req.body.site_button_text).substring(0, 200) : card.site_button_text,
     services_mode: req.body.services_mode !== undefined ? sanitizeServicesMode(req.body.services_mode, card.services_mode || 'image') : card.services_mode,
     services_title: req.body.services_title !== undefined ? sanitizeServicesTitle(req.body.services_title) : card.services_title,
     services_image_url: req.body.services_image_url !== undefined ? sanitizeSocialUrl(req.body.services_image_url, 1000) : card.services_image_url,
-    catalog_pdf_url: req.body.catalog_pdf_url !== undefined ? sanitizeSocialUrl(req.body.catalog_pdf_url, 1000) : card.catalog_pdf_url,
-    catalog_pdf_title: req.body.catalog_pdf_title !== undefined ? String(req.body.catalog_pdf_title).substring(0, 120) : card.catalog_pdf_title,
+    catalog_pdf_url: catalogPdfUrlToSave !== undefined ? sanitizeSocialUrl(catalogPdfUrlToSave, 1000) : card.catalog_pdf_url,
+    catalog_pdf_title: catalogPdfTitleToSave !== undefined ? String(catalogPdfTitleToSave).substring(0, 120) : card.catalog_pdf_title,
     products: req.body.products !== undefined ? req.body.products : card.products,
-    gallery: req.body.gallery !== undefined ? req.body.gallery : card.gallery,
+    gallery: galleryToSave !== undefined ? galleryToSave : card.gallery,
     testimonials: req.body.testimonials !== undefined ? sanitizeTestimonials(req.body.testimonials) : card.testimonials,
     updated_at: new Date().toISOString()
   });

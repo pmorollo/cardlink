@@ -51,7 +51,7 @@
           <div class="hero-copy">
             <div class="hero-badge" style="background:rgba(124,58,237,0.15);border-color:var(--purple);color:#c4b5fd;">
               <span class="dot" style="background:#22c55e;"></span>
-              🎁 30 Dias Grátis para Testar • Sem Cartão de Crédito
+              🎁 Plano Gratuito Permanente • Sem Cartão de Crédito
             </div>
             <h1>
               Preencha seus dados.<br>O <span class="hero-word-yellow">CardLink</span><br><span class="text-gradient">cria sua página.</span>
@@ -70,10 +70,10 @@
 
             <div class="hero-buttons">
               <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
-                🚀 Criar CardLink Grátis (30 Dias)
+                🚀 Criar CardLink Grátis
               </button>
-              <button class="btn btn-secondary btn-lg" onclick="document.getElementById('demonstracao').scrollIntoView({behavior:'smooth'})">
-                👀 Ver Demonstração (Carrossel)
+              <button class="btn btn-secondary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">
+                ⭐ Conhecer os Planos
               </button>
             </div>
             <p class="hero-audience">☆ Ideal para autônomos, salões, barbearias, clínicas, restaurantes e negócios locais.</p>
@@ -326,54 +326,88 @@
 
     <!-- Pricing Section -->
     <div class="pricing-section" id="pricing" style="padding:var(--space-3xl) 0;background:var(--bg-card);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);">
-      <div class="container" style="max-width:800px;text-align:center;">
+      <div class="container" style="max-width:960px;text-align:center;">
         <div class="section-header" style="margin-bottom:var(--space-2xl);">
-          <div class="hero-badge" style="margin:0 auto var(--space-md);width:fit-content;display:inline-flex;">💵 Transparente & Acessível</div>
-          <h2>Plano <span class="text-gradient">Único & Completo</span></h2>
-          <p style="color:var(--text-secondary);">Os principais recursos do CardLink estão incluídos na assinatura.</p>
+          <div class="hero-badge" style="margin:0 auto var(--space-md);width:fit-content;display:inline-flex;">💵 Transparente & Sem Pegadinhas</div>
+          <h2>Escolha o Plano Ideal para o <span class="text-gradient">Seu Negócio</span></h2>
+          <p style="color:var(--text-secondary);">Comece 100% grátis e faça upgrade para o Pro quando precisar de catálogo em PDF e mais fotos.</p>
         </div>
 
-        <div style="background:var(--bg-surface);border:1.5px solid rgba(139,92,246,0.3);border-radius:var(--radius-xl);padding:var(--space-xl);max-width:440px;margin:0 auto;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-          <h3 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:8px;">Assinatura CardLink</h3>
-          <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:20px;">Ideal para autônomos, profissionais e comércios locais.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:24px;max-width:880px;margin:0 auto;text-align:left;">
+          <!-- Card Plano Gratuito -->
+          <div style="background:var(--bg-surface);border:1.5px solid var(--border-subtle);border-radius:var(--radius-xl);padding:var(--space-xl);box-shadow:var(--shadow-md);display:flex;flex-direction:column;justify-content:space-between;transition:transform 0.3s ease;">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Plano Gratuito</h3>
+                <span style="background:rgba(34,197,94,0.15);color:#22c55e;font-size:0.75rem;font-weight:800;padding:4px 8px;border-radius:6px;">PERMANENTE</span>
+              </div>
+              <p style="color:var(--text-secondary);font-size:0.86rem;margin-bottom:20px;">Sua apresentação profissional ativa para sempre, sem custos.</p>
+              
+              <div style="margin-bottom:24px;">
+                <div style="font-size:2.4rem;font-weight:900;color:var(--text-primary);line-height:1;">R$ 0<span style="font-size:0.9rem;font-weight:400;color:var(--text-secondary);"> /para sempre</span></div>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Sem cartão de crédito • Sem cobrança surpresa</div>
+              </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
-            <div style="border:2px solid var(--accent);border-radius:12px;padding:14px 10px;background:rgba(139,92,246,0.12);transition:all 0.2s;">
-              <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Mensal</div>
-              <div style="font-size:1.2rem;font-weight:800;color:var(--text-primary);line-height:1.1;">R$ 12,90<span style="font-size:0.7rem;font-weight:400;">/mês</span></div>
+              <ul style="list-style:none;padding:0;margin:0 0 28px 0;display:flex;flex-direction:column;gap:12px;font-size:0.9rem;color:var(--text-secondary);">
+                <li style="display:flex;align-items:center;gap:10px;">✅ <span>Página profissional 100% online</span></li>
+                <li style="display:flex;align-items:center;gap:10px;">✅ <span>Link próprio & QR Code de balcão</span></li>
+                <li style="display:flex;align-items:center;gap:10px;">✅ <span>WhatsApp, redes sociais e localização</span></li>
+                <li style="display:flex;align-items:center;gap:10px;">✅ <span>Vitrine de produtos & serviços</span></li>
+                <li style="display:flex;align-items:center;gap:10px;">🎨 <span><strong>3 cores de fundo</strong> (Midnight, Mel Claro e Rosa)</span></li>
+                <li style="display:flex;align-items:center;gap:10px;">🖼️ <span>Galeria de fotos (<strong>até 4 fotos</strong>)</span></li>
+                <li style="display:flex;align-items:center;gap:10px;opacity:0.55;">❌ <span style="text-decoration:line-through;">Catálogo ou cardápio em PDF</span></li>
+              </ul>
             </div>
-            <div style="border:1.5px solid var(--border-subtle);border-radius:12px;padding:14px 10px;background:var(--bg-surface);position:relative;transition:all 0.2s;">
-              <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
-              <div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Anual</div>
-              <div style="font-size:1.2rem;font-weight:800;color:var(--text-primary);line-height:1.1;">R$ 99,00<span style="font-size:0.7rem;font-weight:400;">/ano</span></div>
-            </div>
+
+            <button class="btn btn-secondary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="width:100%;font-weight:700;">
+              🚀 Começar Grátis
+            </button>
           </div>
-          <p style="color:var(--text-secondary);font-size:0.82rem;margin:-16px 0 24px;">Assine mensal por R$ 12,90/mês ou anual por R$ 99,00 (equivalente a R$ 8,25/mês, economize R$ 55,80 por ano).</p>
 
-          <ul style="list-style:none;padding:0;margin:0 0 32px 0;text-align:left;display:flex;flex-direction:column;gap:12px;font-size:0.92rem;color:var(--text-secondary);">
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Página profissional 100% online</span></li>
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Vitrine de Produtos & Serviços</span></li>
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Depoimentos & Avaliações</span></li>
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>Galeria de Fotos / Portfólio</span></li>
-            <li style="display:flex;align-items:center;gap:10px;">✅ <span>QR Code de Balcão e Métricas</span></li>
-          </ul>
+          <!-- Card Plano Pro -->
+          <div style="background:var(--bg-surface);border:2px solid var(--accent);border-radius:var(--radius-xl);padding:var(--space-xl);box-shadow:0 10px 30px rgba(124,58,237,0.25);position:relative;display:flex;flex-direction:column;justify-content:space-between;transition:transform 0.3s ease;">
+            <div style="position:absolute;top:-12px;right:20px;background:linear-gradient(135deg,var(--accent),#9333ea);color:#fff;font-size:0.75rem;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:0.5px;">MAIS COMPLETO ⭐</div>
+            <div>
+              <div style="margin-bottom:12px;">
+                <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Plano Pro</h3>
+              </div>
+              <p style="color:var(--text-secondary);font-size:0.86rem;margin-bottom:20px;">Tudo do Grátis + Catálogo em PDF e galeria ampliada.</p>
+              
+              <div style="margin-bottom:24px;">
+                <div style="font-size:2.4rem;font-weight:900;color:var(--text-primary);line-height:1;">R$ 12,90<span style="font-size:0.9rem;font-weight:400;color:var(--text-secondary);"> /mês</span></div>
+                <div style="font-size:0.8rem;color:var(--accent);font-weight:600;margin-top:4px;">Ou R$ 99,00/ano (-36% OFF)</div>
+              </div>
+
+              <ul style="list-style:none;padding:0;margin:0 0 28px 0;display:flex;flex-direction:column;gap:12px;font-size:0.9rem;color:var(--text-secondary);">
+                <li style="display:flex;align-items:center;gap:10px;">✅ <span><strong>Tudo o que está incluído no Grátis</strong></span></li>
+                <li style="display:flex;align-items:center;gap:10px;">📑 <span><strong>Upload de Catálogo ou Cardápio em PDF</strong></span></li>
+                <li style="display:flex;align-items:center;gap:10px;">🔒 <span>Leitor de PDF embutido e protegido</span></li>
+                <li style="display:flex;align-items:center;gap:10px;">🖼️ <span>Galeria ampliada: <strong>até 10 fotos</strong></span></li>
+                <li style="display:flex;align-items:center;gap:10px;">🎨 <span><strong>5 cores de fundo</strong> (inclui <em>Executivo Premium</em>)</span></li>
+                <li style="display:flex;align-items:center;gap:10px;">💬 <span>Suporte prioritário via WhatsApp</span></li>
+              </ul>
+            </div>
+
+            <button class="btn btn-primary btn-lg" onclick="redirectToCheckout('monthly')" style="width:100%;font-weight:800;background:linear-gradient(135deg,var(--accent),#9333ea);box-shadow:0 6px 20px rgba(124,58,237,0.4);">
+              💳 Assinar Plano Pro (R$ 12,90)
+            </button>
+          </div>
         </div>
       </div>
     </div>
-
 
     <!-- CTA -->
     <div class="cta-section">
       <div class="container">
         <div class="cta-box">
           <h2>Pronto para reunir tudo em <span class="text-gradient">um único lugar</span>?</h2>
-          <p>Experimente grátis por 30 dias sem compromisso e sem precisar de cartão de crédito. Crie sua página profissional em minutos e compartilhe por link ou QR Code.</p>
+          <p>Crie sua página profissional em minutos, compartilhe por link ou QR Code e conquiste mais clientes.</p>
           <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
             <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
-              🚀 Criar CardLink Grátis (30 Dias)
+              🚀 Criar CardLink Grátis
             </button>
-            <button class="btn btn-secondary btn-lg" onclick="openProPaymentModal()">
-              Ver Planos Pagos
+            <button class="btn btn-secondary btn-lg" onclick="redirectToCheckout('monthly')" style="font-weight:700;">
+              💳 Assinar Pro (R$ 12,90)
             </button>
           </div>
         </div>
@@ -920,20 +954,18 @@
                 <div class="theme-label">Mel Claro</div>
               </div>
               <div>
+                <div class="theme-swatch" data-theme="rose" onclick="selectTheme('rose')"></div>
+                <div class="theme-label">Rosa</div>
+              </div>
+              <div style="position:relative;">
+                <span style="position:absolute;top:-6px;right:4px;background:linear-gradient(135deg,var(--accent),#9333ea);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 5px;border-radius:6px;z-index:2;">PRO</span>
                 <div class="theme-swatch" data-theme="sunset" onclick="selectTheme('sunset')"></div>
                 <div class="theme-label">Sunset</div>
               </div>
-              <div>
+              <div style="position:relative;">
+                <span style="position:absolute;top:-6px;right:4px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 5px;border-radius:6px;z-index:2;">PRO ⭐</span>
                 <div class="theme-swatch" data-theme="forest" onclick="selectTheme('forest')"></div>
-                <div class="theme-label">Executivo Premium</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="rose" onclick="selectTheme('rose')"></div>
-                <div class="theme-label">Rose</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="monochrome" onclick="selectTheme('monochrome')"></div>
-                <div class="theme-label">Mono</div>
+                <div class="theme-label">Executivo</div>
               </div>
             </div>
           </div>
@@ -1447,11 +1479,11 @@
   <script>
     // Links de checkout da Cakto (formato real: https://pay.cakto.com.br/{id_da_oferta})
     window.CARD_LINK = {
-      monthlyCheckoutUrl: 'https://pay.cakto.com.br/kawb7xd',
+      monthlyCheckoutUrl: 'https://pay.cakto.com.br/kawb7xd_1032085',
       annualCheckoutUrl: 'https://pay.cakto.com.br/5g7f23g'
     };
   </script>
-  <script src="app.js?v=39"></script>
+  <script src="app.js?v=40"></script>
   <script src="landing-carousel.js?v=1"></script>
   <script>
 
