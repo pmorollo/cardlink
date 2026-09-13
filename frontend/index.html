@@ -457,57 +457,59 @@
         <div id="login-form" style="display:none;">
           <h1 class="auth-title">Entrar no <span class="text-gradient">CardLink</span></h1>
           <p class="auth-subtitle">Acesse seu CardLink e gerencie sua página profissional</p>
+          <div id="login-alert" class="auth-alert"></div>
           <div class="form-group">
             <label class="form-label" for="login-email">E-mail</label>
-            <input class="form-input" type="email" id="login-email" placeholder="seu@email.com">
+            <input class="form-input" type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
           </div>
           <div class="form-group">
             <label class="form-label" for="login-password">Senha</label>
-            <input class="form-input" type="password" id="login-password" placeholder="Sua senha">
-            <div style="text-align:right;margin-top:4px;">
-              <a href="#" onclick="toggleAuthForm('forgot');return false;" style="color:var(--accent);font-size:0.8rem;text-decoration:none;">Esqueceu a senha?</a>
+            <input class="form-input" type="password" id="login-password" placeholder="Sua senha" autocomplete="current-password">
+            <div style="text-align:right;margin-top:6px;">
+              <a href="#" onclick="toggleAuthForm('forgot');return false;" style="color:var(--accent);font-size:0.85rem;font-weight:600;text-decoration:none;">Esqueceu a senha?</a>
             </div>
           </div>
-          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleLogin()">
-            Entrar
+          <button class="btn btn-primary btn-lg" id="btn-login" style="width:100%;margin-top:var(--space-md);font-weight:700;" onclick="handleLogin()">
+            🔑 Entrar
           </button>
           <p class="auth-toggle">
             Ainda não tem conta? <a href="#" onclick="toggleAuthForm('register');return false;">Criar conta grátis</a>
           </p>
         </div>
 
-        <!-- Register Form: Criar conta grátis com confirmação de e-mail -->
+        <!-- Register Form: Criar conta grátis instantânea -->
         <div id="register-form">
           <h1 class="auth-title">Criar Conta no <span class="text-gradient">CardLink</span></h1>
           <p class="auth-subtitle">🎁 Crie seu CardLink grátis. Sem cartão de crédito.</p>
+          <div id="register-alert" class="auth-alert"></div>
 
           <!-- Passo 1: Informações Cadastrais -->
           <div id="register-step-1">
             <div class="form-group">
               <label class="form-label" for="register-name">Seu Nome ou Nome do Negócio</label>
-              <input class="form-input" type="text" id="register-name" placeholder="Ex: Studio Bella / Dr. Ricardo Silva">
+              <input class="form-input" type="text" id="register-name" placeholder="Ex: Studio Bella / Dr. Ricardo Silva" autocomplete="name">
             </div>
             <div class="form-group">
               <label class="form-label" for="register-email">Seu Melhor E-mail</label>
-              <input class="form-input" type="email" id="register-email" placeholder="seu@email.com">
+              <input class="form-input" type="email" id="register-email" placeholder="seu@email.com" autocomplete="email">
             </div>
             <div class="form-group">
               <label class="form-label" for="register-whatsapp">WhatsApp (opcional)</label>
-              <input class="form-input" type="tel" id="register-whatsapp" placeholder="(11) 99999-9999">
+              <input class="form-input" type="tel" id="register-whatsapp" placeholder="(11) 99999-9999" autocomplete="tel">
             </div>
             <div class="form-group">
               <label class="form-label" for="register-password">Crie uma Senha</label>
-              <input class="form-input" type="password" id="register-password" minlength="8" placeholder="Mínimo 8 caracteres">
+              <input class="form-input" type="password" id="register-password" minlength="8" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
             </div>
             <button class="btn btn-primary btn-lg" id="btn-register-send-code" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleSendRegisterCode()">
-              ✉️ Enviar Código de Confirmação
+              🚀 Criar Conta Grátis
             </button>
             <p class="auth-toggle">
               Já tem uma conta? <a href="#" onclick="toggleAuthForm('login');return false;">Entrar na minha conta</a>
             </p>
           </div>
 
-          <!-- Passo 2: Digitar código de 6 dígitos recebido por e-mail -->
+          <!-- Passo 2: Fallback com código caso necessário -->
           <div id="register-step-2" style="display:none;">
             <div style="background:rgba(124,58,237,0.1);border:1px solid var(--accent);border-radius:8px;padding:12px;margin-bottom:16px;text-align:center;">
               <p style="font-size:0.9rem;margin:0 0 4px;color:var(--text-primary);font-weight:600;">Confirme seu endereço de e-mail</p>
@@ -524,7 +526,7 @@
             </div>
 
             <button class="btn btn-primary btn-lg" id="btn-register-verify" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleVerifyAndRegister()">
-              🚀 Confirmar E-mail e Começar Grátis
+              🚀 Confirmar e Começar Grátis
             </button>
 
             <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:0.85rem;">
@@ -538,6 +540,7 @@
         <div id="activation-form" style="display:none;">
           <h1 class="auth-title">Ativar <span class="text-gradient">CardLink</span></h1>
           <p class="auth-subtitle">Pagamento confirmado. Defina sua senha para começar.</p>
+          <div id="activation-alert" class="auth-alert"></div>
           <div class="form-group">
             <label class="form-label" for="activation-email">E-mail da assinatura</label>
             <input class="form-input" type="email" id="activation-email" readonly>
@@ -576,31 +579,44 @@
         <!-- Forgot Password Form -->
         <div id="forgot-form" style="display:none;">
           <h1 class="auth-title">Recuperar <span class="text-gradient">Senha</span></h1>
-          <p class="auth-subtitle">Digite seu e-mail para redefinir sua senha</p>
+          <p class="auth-subtitle">Digite seu e-mail para receber as instruções de recuperação</p>
+          <div id="forgot-alert" class="auth-alert"></div>
 
+          <!-- Passo 1: Informar e-mail para receber código -->
           <div id="forgot-step-1">
             <div class="form-group">
-              <label class="form-label" for="forgot-email">E-mail Cadastrado</label>
-              <input class="form-input" type="email" id="forgot-email" placeholder="seu@email.com">
+              <label class="form-label" for="forgot-email">Seu E-mail Cadastrado</label>
+              <input class="form-input" type="email" id="forgot-email" placeholder="seu@email.com" autocomplete="email">
             </div>
-            <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleForgotPassword()">
-              Gerar Código de Recuperação
+            <button class="btn btn-primary btn-lg" id="btn-forgot-send" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleForgotPassword()">
+              ✉️ Enviar Código de Recuperação
             </button>
           </div>
 
+          <!-- Passo 2: Digitar código e cadastrar nova senha -->
           <div id="forgot-step-2" style="display:none;margin-top:12px;">
-            <div id="forgot-code-banner" style="background:rgba(139,92,246,0.15);border:1px solid var(--accent);border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.85rem;color:var(--text-primary);text-align:center;"></div>
+            <div style="background:rgba(124,58,237,0.12);border:1px solid var(--accent);border-radius:10px;padding:12px 14px;margin-bottom:16px;text-align:center;">
+              <p style="margin:0 0 4px;font-size:0.88rem;color:var(--text-primary);font-weight:600;">Código de recuperação enviado para:</p>
+              <p style="margin:0 0 8px;font-size:0.95rem;font-weight:700;color:var(--accent);" id="forgot-target-email">seu@email.com</p>
+              <a href="#" onclick="backToForgotStep1();return false;" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:underline;">✏️ Digitar outro e-mail</a>
+            </div>
+
+            <div id="forgot-code-banner" style="display:none;background:rgba(16,185,129,0.15);border:1px solid #10b981;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.85rem;color:var(--text-primary);text-align:center;"></div>
+
             <div class="form-group">
               <label class="form-label" for="forgot-code">Código de 6 Dígitos</label>
-              <input class="form-input" type="text" id="forgot-code" placeholder="Ex: 123456" style="letter-spacing:4px;font-weight:700;text-align:center;">
+              <input class="form-input" type="text" id="forgot-code" maxlength="6" placeholder="Ex: 123456" style="letter-spacing:6px;font-size:1.2rem;font-weight:700;text-align:center;" autocomplete="one-time-code">
             </div>
             <div class="form-group">
-              <label class="form-label" for="forgot-new-password">Nova Senha</label>
-              <input class="form-input" type="password" id="forgot-new-password" placeholder="Mínimo 8 caracteres">
+              <label class="form-label" for="forgot-new-password">Nova Senha (mínimo 8 caracteres)</label>
+              <input class="form-input" type="password" id="forgot-new-password" minlength="8" placeholder="Digite sua nova senha" autocomplete="new-password">
             </div>
-            <button class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--space-md);" onclick="handleResetPassword()">
-              Redefinir Senha
+            <button class="btn btn-primary btn-lg" id="btn-forgot-reset" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleResetPassword()">
+              🔑 Salvar Nova Senha e Entrar
             </button>
+            <div style="text-align:center;margin-top:14px;">
+              <a href="#" onclick="handleForgotPassword();return false;" style="color:var(--accent);font-size:0.85rem;text-decoration:none;">🔄 Não recebeu? Reenviar código</a>
+            </div>
           </div>
 
           <p class="auth-toggle">

@@ -137,7 +137,7 @@ router.post('/register', async (req, res) => {
 
     const existing = await users.findByEmail(payload.email);
     if (existing) {
-      return res.status(409).json({ error: 'Já existe uma conta com este e-mail' });
+      return res.status(409).json({ error: 'Este e-mail já está cadastrado. Faça login ou recupere sua senha.' });
     }
 
     const now = new Date();
@@ -425,7 +425,7 @@ router.post('/forgot-password', async (req, res) => {
   // Não revela se o e-mail existe: resposta idêntica em ambos os casos
   const genericMessage = 'Se o e-mail estiver cadastrado, um código de recuperação foi gerado.';
 
-  if (!user || (!user.is_admin && !user.email_verified_at)) {
+  if (!user) {
     return res.json({ message: genericMessage });
   }
 

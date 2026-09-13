@@ -139,6 +139,7 @@ function handleRoute() {
     if (bgAnimated) bgAnimated.style.display = 'none';
   }
 
+  const isCustomerActive = currentUser && !currentUser.is_admin && (currentUser.account_status || 'active') === 'active' && (currentUser.subscription_status || 'active') === 'active';
   const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' && currentUser.subscription_status === 'active' && currentUser.account_status === 'active';
 
   // Confirmação de novo e-mail pode ser aberta mesmo com outra sessão ativa.
@@ -159,8 +160,8 @@ function handleRoute() {
     return;
   }
 
-  // Usuários comuns sem PRO ficam limitados à tela de ativação e páginas legais.
-  if (authToken && currentUser && !currentUser.is_admin && !isProUser && hash !== '#/terms' && hash !== '#/privacy') {
+  // Usuários com conta inativa ou suspensa ficam limitados à tela de reativação e páginas legais.
+  if (authToken && currentUser && !currentUser.is_admin && !isCustomerActive && hash !== '#/terms' && hash !== '#/privacy') {
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
     document.getElementById('dashboard-view').classList.add('active');
     if (navbar) navbar.style.display = '';
@@ -174,7 +175,7 @@ function handleRoute() {
           Assinatura <span class="text-gradient">CardLink</span>
         </h1>
         <p style="color:var(--text-secondary);font-size:0.95rem;line-height:1.6;margin-bottom:24px;">
-          Olá, <strong>${escapeHtml(currentUser.name)}</strong>! Para acessar o painel de criação e publicar seu site profissional, é necessário manter uma assinatura CardLink ativa.
+          Olá, <strong>${escapeHtml(currentUser.name)}</strong>! Seu acesso está inativo no momento. Regularize ou ative sua assinatura para continuar usando todos os recursos.
         </p>
 
         <div style="background:rgba(139,92,246,0.08);border:1px dashed var(--accent);border-radius:var(--radius-md);padding:16px;margin-bottom:24px;text-align:left;">
@@ -188,7 +189,7 @@ function handleRoute() {
         </div>
 
         <a href="/checkout/cardlink-pro" class="btn btn-primary btn-lg" onclick="openProPaymentModal(); return false;" style="display:inline-block;width:100%;font-weight:bold;font-size:1rem;padding:14px;box-shadow:0 6px 20px rgba(124,58,237,0.3);margin-bottom:12px;text-decoration:none;">
-          💳 Assinar CardLink
+          💳 Reativar Assinatura CardLink
         </a>
 
         <div style="display:flex;justify-content:center;gap:16px;margin-top:16px;font-size:0.85rem;">
@@ -459,11 +460,31 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================
-// Auth Forms
+// Auth Forms & Alerts Helper
 // ============================================
 let currentRegisterTicket = null;
 
+function showAuthAlert(formId, type, message) {
+  const alertEl = document.getElementById(`${formId}-alert`);
+  if (alertEl) {
+    alertEl.className = `auth-alert ${type}`;
+    const icon = type === 'error' ? '❌' : (type === 'success' ? '✅' : 'ℹ️');
+    alertEl.innerHTML = `<span>${icon}</span><div>${escapeHtml(message)}</div>`;
+    alertEl.style.display = 'flex';
+  }
+  showToast(type === 'error' ? '❌' : (type === 'success' ? '✅' : 'ℹ️'), message);
+}
+
+function clearAuthAlerts() {
+  document.querySelectorAll('.auth-alert').forEach(el => {
+    el.style.display = 'none';
+    el.innerHTML = '';
+    el.className = 'auth-alert';
+  });
+}
+
 function toggleAuthForm(form) {
+  clearAuthAlerts();
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
   const activationForm = document.getElementById('activation-form');
@@ -518,12 +539,11 @@ function toggleAuthForm(form) {
       if (step1) step1.style.display = 'block';
       if (step2) step2.style.display = 'none';
       
-      // Preenche o e-mail já digitado no login, quando houver
       const existingEmail = (document.getElementById('login-email')?.value || document.getElementById('register-email')?.value || '').trim();
       const emailInput = document.getElementById('forgot-email');
       const codeInput = document.getElementById('forgot-code');
       const passInput = document.getElementById('forgot-new-password');
-      if (emailInput) emailInput.value = existingEmail;
+      if (emailInput && existingEmail) emailInput.value = existingEmail;
       if (codeInput) codeInput.value = '';
       if (passInput) passInput.value = '';
     }
@@ -531,6 +551,7 @@ function toggleAuthForm(form) {
 }
 
 function backToRegisterStep1() {
+  clearAuthAlerts();
   const step1 = document.getElementById('register-step-1');
   const step2 = document.getElementById('register-step-2');
   if (step1) step1.style.display = 'block';
@@ -539,15 +560,24 @@ function backToRegisterStep1() {
   if (codeEl) codeEl.value = '';
 }
 
-async function handleSendRegisterCode() {
+function backToForgotStep1() {
+  clearAuthAlerts();
+  const step1 = document.getElementById('forgot-step-1');
+  const step2 = document.getElementById('forgot-step-2');
+  if (step1) step1.style.display = 'block';
+  if (step2) step2.style.display = 'none';
+}
+
+async function handleDirectRegister() {
+  clearAuthAlerts();
   const nameEl = document.getElementById('register-name');
   const emailEl = document.getElementById('register-email');
   const passwordEl = document.getElementById('register-password');
   const whatsappEl = document.getElementById('register-whatsapp');
-  const btnEl = document.getElementById('btn-register-send-code');
+  const btnEl = document.getElementById('btn-register-direct');
 
   if (!nameEl || !emailEl || !passwordEl) {
-    showToast('❌', 'Formulário de cadastro não encontrado');
+    showAuthAlert('register', 'error', 'Formulário de cadastro não encontrado.');
     return;
   }
 
@@ -557,18 +587,84 @@ async function handleSendRegisterCode() {
   const whatsapp = whatsappEl ? whatsappEl.value.trim() : '';
 
   if (!name) {
-    showToast('⚠️', 'Informe seu nome ou o nome do seu negócio!');
+    showAuthAlert('register', 'error', 'Informe seu nome ou o nome do seu negócio.');
     nameEl.focus();
     return;
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email || !emailRegex.test(email) || email.includes('..')) {
-    showToast('⚠️', 'Preencha um e-mail válido!');
+    showAuthAlert('register', 'error', 'Informe um endereço de e-mail válido.');
     emailEl.focus();
     return;
   }
   if (!password || password.length < 8) {
-    showToast('⚠️', 'A senha deve ter no mínimo 8 caracteres!');
+    showAuthAlert('register', 'error', 'A senha deve ter no mínimo 8 caracteres.');
+    passwordEl.focus();
+    return;
+  }
+
+  const originalBtnText = btnEl ? btnEl.innerHTML : '';
+  if (btnEl) {
+    btnEl.disabled = true;
+    btnEl.innerHTML = '⏳ Criando sua conta grátis...';
+  }
+
+  try {
+    const data = await api('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, whatsapp })
+    });
+
+    authToken = data.token;
+    currentUser = data.user;
+    currentRegisterTicket = null;
+    localStorage.setItem('cardlink_token', data.token);
+    updateNavAuth();
+    showToast('🎉', 'Conta criada com sucesso! Bem-vindo ao CardLink.');
+
+    currentUserCardId = null;
+    createNewCard();
+  } catch (err) {
+    showAuthAlert('register', 'error', err.message || 'Erro ao criar conta. Tente novamente.');
+  } finally {
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.innerHTML = originalBtnText;
+    }
+  }
+}
+
+async function handleSendRegisterCode() {
+  clearAuthAlerts();
+  const nameEl = document.getElementById('register-name');
+  const emailEl = document.getElementById('register-email');
+  const passwordEl = document.getElementById('register-password');
+  const whatsappEl = document.getElementById('register-whatsapp');
+  const btnEl = document.getElementById('btn-register-send-code');
+
+  if (!nameEl || !emailEl || !passwordEl) {
+    showAuthAlert('register', 'error', 'Formulário de cadastro não encontrado.');
+    return;
+  }
+
+  const name = nameEl.value.trim();
+  const email = emailEl.value.trim().toLowerCase();
+  const password = passwordEl.value;
+  const whatsapp = whatsappEl ? whatsappEl.value.trim() : '';
+
+  if (!name) {
+    showAuthAlert('register', 'error', 'Informe seu nome ou o nome do seu negócio.');
+    nameEl.focus();
+    return;
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email) || email.includes('..')) {
+    showAuthAlert('register', 'error', 'Informe um endereço de e-mail válido.');
+    emailEl.focus();
+    return;
+  }
+  if (!password || password.length < 8) {
+    showAuthAlert('register', 'error', 'A senha deve ter no mínimo 8 caracteres.');
     passwordEl.focus();
     return;
   }
@@ -612,9 +708,9 @@ async function handleSendRegisterCode() {
       codeEl.focus();
     }
 
-    showToast('✉️', 'Código enviado! Verifique sua caixa de entrada.');
+    showAuthAlert('register', 'info', 'Código enviado! Verifique sua caixa de entrada.');
   } catch (err) {
-    showToast('❌', err.message);
+    showAuthAlert('register', 'error', err.message);
   } finally {
     if (btnEl) {
       btnEl.disabled = false;
@@ -624,8 +720,9 @@ async function handleSendRegisterCode() {
 }
 
 async function handleVerifyAndRegister() {
+  clearAuthAlerts();
   if (!currentRegisterTicket) {
-    showToast('⚠️', 'Solicite o código de confirmação primeiro.');
+    showAuthAlert('register', 'error', 'Solicite o código de confirmação primeiro.');
     backToRegisterStep1();
     return;
   }
@@ -635,7 +732,7 @@ async function handleVerifyAndRegister() {
   const btnEl = document.getElementById('btn-register-verify');
 
   if (!code || code.length < 6) {
-    showToast('⚠️', 'Digite o código de 6 dígitos enviado para seu e-mail!');
+    showAuthAlert('register', 'error', 'Digite o código de 6 dígitos enviado para seu e-mail.');
     if (codeEl) codeEl.focus();
     return;
   }
@@ -662,7 +759,7 @@ async function handleVerifyAndRegister() {
     currentUserCardId = null;
     createNewCard();
   } catch (err) {
-    showToast('❌', err.message);
+    showAuthAlert('register', 'error', err.message);
   } finally {
     if (btnEl) {
       btnEl.disabled = false;
@@ -672,16 +769,36 @@ async function handleVerifyAndRegister() {
 }
 
 async function handleLogin() {
+  clearAuthAlerts();
   const emailEl = document.getElementById('login-email');
   const passwordEl = document.getElementById('login-password');
-  if (!emailEl || !passwordEl) { showToast('❌', 'Formulário não encontrado'); return; }
+  const btnEl = document.getElementById('btn-login') || document.querySelector('#login-form .btn-primary');
+
+  if (!emailEl || !passwordEl) {
+    showAuthAlert('login', 'error', 'Formulário de login não encontrado.');
+    return;
+  }
 
   const email = emailEl.value.trim().toLowerCase();
   const password = passwordEl.value;
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email || !emailRegex.test(email) || email.includes('..')) { showToast('⚠️', 'Preencha um e-mail válido!'); return; }
-  if (!password) { showToast('⚠️', 'Preencha a sua senha!'); return; }
+  if (!email || !emailRegex.test(email) || email.includes('..')) {
+    showAuthAlert('login', 'error', 'Preencha um endereço de e-mail válido.');
+    emailEl.focus();
+    return;
+  }
+  if (!password) {
+    showAuthAlert('login', 'error', 'Digite a sua senha.');
+    passwordEl.focus();
+    return;
+  }
+
+  const originalBtnText = btnEl ? btnEl.innerHTML : '';
+  if (btnEl) {
+    btnEl.disabled = true;
+    btnEl.innerHTML = '⏳ Entrando...';
+  }
 
   try {
     const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
@@ -689,7 +806,7 @@ async function handleLogin() {
     currentUser = data.user;
     localStorage.setItem('cardlink_token', data.token);
     updateNavAuth();
-    showToast('✅', 'Login realizado!');
+    showToast('✅', 'Login realizado com sucesso!');
 
     if (currentUser.is_admin) {
       currentUserCardId = null;
@@ -706,7 +823,17 @@ async function handleLogin() {
       createNewCard();
     }
   } catch (err) {
-    showToast('❌', err.message);
+    const errorMsg = err.message || (err.status === 401 ? 'E-mail ou senha incorretos' : 'Erro ao realizar login');
+    showAuthAlert('login', 'error', errorMsg);
+    if (passwordEl) {
+      passwordEl.value = '';
+      passwordEl.focus();
+    }
+  } finally {
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.innerHTML = originalBtnText;
+    }
   }
 }
 
@@ -718,14 +845,15 @@ function loadActivationFromHash() {
 }
 
 async function handleActivateAccount() {
+  clearAuthAlerts();
   const email = document.getElementById('activation-email')?.value.trim().toLowerCase();
   const token = document.getElementById('activation-token')?.value.trim();
   const password = document.getElementById('activation-password')?.value || '';
   const confirmPassword = document.getElementById('activation-password-confirm')?.value || '';
 
-  if (!email || !token) { showToast('❌', 'Link de ativação inválido.'); return; }
-  if (password.length < 8) { showToast('⚠️', 'A senha deve ter pelo menos 8 caracteres.'); return; }
-  if (password !== confirmPassword) { showToast('⚠️', 'As senhas não coincidem.'); return; }
+  if (!email || !token) { showAuthAlert('activation', 'error', 'Link de ativação inválido.'); return; }
+  if (password.length < 8) { showAuthAlert('activation', 'error', 'A senha deve ter pelo menos 8 caracteres.'); return; }
+  if (password !== confirmPassword) { showAuthAlert('activation', 'error', 'As senhas não coincidem.'); return; }
 
   try {
     const data = await api('/auth/activate', { method: 'POST', body: JSON.stringify({ email, token, password }) });
@@ -736,7 +864,7 @@ async function handleActivateAccount() {
     showToast('✅', 'Conta ativada. Bem-vindo ao CardLink!');
     navigateTo('dashboard');
   } catch (err) {
-    showToast('❌', err.message);
+    showAuthAlert('activation', 'error', err.message);
   }
 }
 
@@ -748,6 +876,7 @@ function loadEmailVerificationFromHash() {
 }
 
 async function handleConfirmEmailChange() {
+  clearAuthAlerts();
   const email = document.getElementById('verify-email-address')?.value.trim().toLowerCase();
   const token = document.getElementById('verify-email-token')?.value.trim();
   if (!email || !token) { showToast('❌', 'Link de confirmação inválido.'); return; }
@@ -780,60 +909,107 @@ async function handleConfirmEmailChange() {
 }
 
 async function handleForgotPassword() {
-  const email = document.getElementById('forgot-email')?.value.trim().toLowerCase();
+  clearAuthAlerts();
+  const emailInput = document.getElementById('forgot-email');
+  const email = emailInput?.value.trim().toLowerCase();
+  const btnEl = document.getElementById('btn-forgot-send');
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email || !emailRegex.test(email) || email.includes('..')) {
-    showToast('⚠️', 'Informe um e-mail válido!');
+    showAuthAlert('forgot', 'error', 'Informe um endereço de e-mail válido.');
+    if (emailInput) emailInput.focus();
     return;
   }
 
-  showToast('⏳', 'Gerando código de recuperação...');
+  const originalBtnText = btnEl ? btnEl.innerHTML : '';
+  if (btnEl) {
+    btnEl.disabled = true;
+    btnEl.innerHTML = '⏳ Enviando código...';
+  }
+
   try {
     const res = await api('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
     if (!res) return;
     const step1 = document.getElementById('forgot-step-1');
     const step2 = document.getElementById('forgot-step-2');
     const banner = document.getElementById('forgot-code-banner');
+    const targetEmailEl = document.getElementById('forgot-target-email');
 
-    // O código é devolvido somente em desenvolvimento; em produção ele é
-    // entregue por e-mail/SMS e aparece apenas no console do servidor.
+    if (targetEmailEl) targetEmailEl.textContent = email;
     if (step1) step1.style.display = 'none';
     if (step2) step2.style.display = 'block';
-    if (banner && res.code) {
-      banner.innerHTML = `🔑 Código de Recuperação Gerado:<br><strong style="font-size:1.4rem;letter-spacing:4px;color:var(--accent);">${res.code}</strong>`;
-    } else if (banner) {
-      banner.innerHTML = `📩 ${res.message || 'Verifique seu e-mail / console do administrador para obter o código.'}`;
+
+    if (banner) {
+      if (res.code) {
+        banner.style.display = 'block';
+        banner.innerHTML = `🔑 Código para teste:<br><strong style="font-size:1.3rem;letter-spacing:4px;color:var(--accent);">${res.code}</strong>`;
+      } else {
+        banner.style.display = 'none';
+        banner.innerHTML = '';
+      }
     }
-    showToast('✅', res.message || 'Código gerado! Digite o código e a nova senha.');
+
+    showAuthAlert('forgot', 'info', res.message || 'Código enviado! Verifique seu e-mail e cadastre sua nova senha.');
+    const codeEl = document.getElementById('forgot-code');
+    if (codeEl) {
+      codeEl.value = '';
+      codeEl.focus();
+    }
   } catch (err) {
-    showToast('❌', err.message);
+    showAuthAlert('forgot', 'error', err.message || 'Erro ao enviar código de recuperação.');
+  } finally {
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.innerHTML = originalBtnText;
+    }
   }
 }
 
 async function handleResetPassword() {
-  const email = document.getElementById('forgot-email')?.value.trim().toLowerCase();
-  const code = document.getElementById('forgot-code')?.value.trim();
-  const newPassword = document.getElementById('forgot-new-password')?.value;
+  clearAuthAlerts();
+  const email = (document.getElementById('forgot-email')?.value || document.getElementById('forgot-target-email')?.textContent || '').trim().toLowerCase();
+  const codeEl = document.getElementById('forgot-code');
+  const code = (codeEl?.value || '').trim();
+  const passEl = document.getElementById('forgot-new-password');
+  const newPassword = passEl?.value || '';
+  const btnEl = document.getElementById('btn-forgot-reset');
 
-  if (!email || !code || !newPassword) {
-    showToast('⚠️', 'Preencha o e-mail, código e a nova senha!');
+  if (!email) {
+    showAuthAlert('forgot', 'error', 'E-mail não identificado. Volte e informe seu e-mail.');
+    return;
+  }
+
+  if (!code || code.length < 6) {
+    showAuthAlert('forgot', 'error', 'Digite o código de 6 dígitos recebido.');
+    if (codeEl) codeEl.focus();
     return;
   }
 
   if (newPassword.length < 8) {
-    showToast('⚠️', 'Nova senha deve ter pelo menos 8 caracteres!');
+    showAuthAlert('forgot', 'error', 'A nova senha deve ter no mínimo 8 caracteres.');
+    if (passEl) passEl.focus();
     return;
   }
 
-  showToast('⏳', 'Redefinindo senha...');
+  const originalBtnText = btnEl ? btnEl.innerHTML : '';
+  if (btnEl) {
+    btnEl.disabled = true;
+    btnEl.innerHTML = '⏳ Salvando nova senha...';
+  }
+
   try {
     const res = await api('/auth/reset-password', { method: 'POST', body: JSON.stringify({ email, code, newPassword }) });
-    showToast('✅', res.message || 'Senha redefinida!');
+    toggleAuthForm('login');
     const loginEmail = document.getElementById('login-email');
     if (loginEmail) loginEmail.value = email;
-    toggleAuthForm('login');
+    showAuthAlert('login', 'success', res.message || 'Senha alterada com sucesso! Digite sua nova senha para entrar.');
   } catch (err) {
-    showToast('❌', err.message);
+    showAuthAlert('forgot', 'error', err.message || 'Código inválido ou expirado. Tente novamente.');
+  } finally {
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.innerHTML = originalBtnText;
+    }
   }
 }
 
@@ -1144,9 +1320,12 @@ async function loadDashboard() {
     const cardLink = window.location.origin + '/site/' + card.slug;
     const recentContacts = stats.recentContacts || [];
     const completion = getPageCompletion(card);
-    const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' && currentUser.subscription_status === 'active' && currentUser.account_status === 'active';
+    const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' && (currentUser.subscription_status || 'active') === 'active' && (currentUser.account_status || 'active') === 'active';
+    const isFreeUser = currentUser && !currentUser.is_admin && currentUser.plan === 'free' && (currentUser.account_status || 'active') === 'active';
+    const isInactiveSubscription = currentUser && !currentUser.is_admin && !isFreeUser && (!currentUser.subscription_status || currentUser.subscription_status !== 'active' || currentUser.account_status !== 'active');
+    
     let paywallBannerHtml = '';
-    if (!isProUser) {
+    if (isInactiveSubscription) {
       paywallBannerHtml = `
         <div class="form-section" style="display:flex;background:linear-gradient(135deg, rgba(239,68,68,0.06), rgba(220,38,38,0.1));border:1.5px solid rgba(239,68,68,0.25);border-radius:var(--radius-lg);padding:16px;margin-bottom:var(--space-lg);text-align:left;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%;">
           <div style="flex:1;min-width:250px;">
@@ -1159,6 +1338,22 @@ async function loadDashboard() {
           </div>
           <button type="button" class="btn btn-primary btn-sm" onclick="openProPaymentModal()" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;background:#ef4444;border:none;color:#ffffff;box-shadow: 0 4px 12px rgba(239,68,68,0.2);">
             💳 Reativar assinatura
+          </button>
+        </div>
+      `;
+    } else if (isFreeUser) {
+      paywallBannerHtml = `
+        <div class="form-section" style="display:flex;background:linear-gradient(135deg, rgba(124,58,237,0.08), rgba(147,51,234,0.12));border:1.5px solid var(--accent);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:var(--space-lg);text-align:left;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%;">
+          <div style="flex:1;min-width:250px;">
+            <div style="font-weight:700;color:var(--accent);font-size:0.95rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+              <span>🎁</span> Você está usando o Plano Gratuito
+            </div>
+            <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.4;margin:0;">
+              Sua página está 100% online! Para liberar upload de Catálogo em PDF e galeria de até 10 fotos, assine o Plano Pro por apenas R$ 12,90/mês.
+            </p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="openProPaymentModal()" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;background:linear-gradient(135deg,var(--accent),#9333ea);border:none;color:#ffffff;box-shadow:0 4px 12px rgba(124,58,237,0.3);">
+            ⭐ Assinar Pro (R$ 12,90)
           </button>
         </div>
       `;
