@@ -37,7 +37,6 @@
         <a href="#como-funciona" class="navbar-link hide-mobile">Como funciona</a>
         <a href="#demonstracao" class="navbar-link hide-mobile">Demonstração</a>
         <button class="navbar-login" onclick="navigateTo('auth'); toggleAuthForm('login');">Entrar na conta</button>
-        <button class="btn btn-primary btn-sm navbar-subscribe" onclick="navigateTo('auth'); toggleAuthForm('register');">Criar Conta Grátis</button>
       </div>
     </div>
   </nav>
@@ -72,8 +71,8 @@
             </div>
 
             <div class="hero-buttons">
-              <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
-                Criar CardLink Grátis
+              <button class="btn btn-primary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
+                Criar Conta
               </button>
               <button class="btn btn-secondary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">
                 ⭐ Conhecer os Planos
@@ -158,8 +157,8 @@
 
           <!-- Botão de Ação Direta após o Carrossel -->
           <div style="margin-top:28px;text-align:center;">
-            <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="font-size:1.05rem;padding:14px 32px;box-shadow:0 8px 24px rgba(124,58,237,0.35);">
-              Criar Meu CardLink Grátis
+            <button class="btn btn-primary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" style="font-size:1.05rem;padding:14px 32px;box-shadow:0 8px 24px rgba(124,58,237,0.35);">
+              Criar Conta
             </button>
             <p style="color:var(--text-muted);font-size:0.84rem;margin-top:8px;">Acesso liberado imediatamente • Sem compromisso</p>
           </div>
@@ -363,8 +362,8 @@
               </ul>
             </div>
 
-            <button class="btn btn-secondary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="width:100%;font-weight:700;">
-              Começar Grátis
+            <button class="btn btn-secondary btn-lg" onclick="beginFreeRegistration()" style="width:100%;font-weight:700;">
+              Escolher Plano Free
             </button>
           </div>
 
@@ -409,8 +408,8 @@
           <h2>Pronto para reunir tudo em <span class="text-gradient">um único lugar</span>?</h2>
           <p>Crie sua página profissional em minutos e compartilhe pelo link. Quando precisar, o Pro adiciona QR Code integrado, mensagens/leads e outros recursos premium.</p>
           <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
-            <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
-              Criar CardLink Grátis
+            <button class="btn btn-primary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
+              Criar Conta
             </button>
             <button class="btn btn-secondary btn-lg" onclick="redirectToCheckout('monthly')" style="font-weight:700;">
               💳 Assinar Pro (R$ 12,90)
@@ -1508,7 +1507,7 @@
 
   <script src="bootstrap.js?v=2"></script>
   <script src="app-core.js?v=46"></script>
-  <script src="app-auth.js?v=50"></script>
+  <script src="app-auth.js?v=51"></script>
   <script src="app-dashboard.js?v=45"></script>
   <script src="app-builder.js?v=45"></script>
   <script src="app-extras.js?v=45"></script>

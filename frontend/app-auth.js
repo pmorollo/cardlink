@@ -141,6 +141,23 @@ function toggleAuthForm(form) {
   }
 }
 
+function beginFreeRegistration() {
+  clearRegisterVerification();
+  const step1 = document.getElementById('register-step-1');
+  const step2 = document.getElementById('register-step-2');
+  if (step1) step1.style.display = 'block';
+  if (step2) step2.style.display = 'none';
+
+  const codeEl = document.getElementById('register-code');
+  if (codeEl) codeEl.value = '';
+
+  navigateTo('auth');
+  toggleAuthForm('register');
+
+  const emailEl = document.getElementById('register-email');
+  if (emailEl) window.setTimeout(() => emailEl.focus(), 50);
+}
+
 function backToRegisterStep1() {
   clearAuthAlerts();
   clearRegisterVerification();
