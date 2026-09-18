@@ -103,7 +103,9 @@ function toggleAuthForm(form) {
         if (step1) step1.style.display = 'none';
         if (step2) step2.style.display = 'block';
         const sentEmailEl = document.getElementById('register-sent-email');
+        const confirmEmailEl = document.getElementById('register-confirm-email');
         if (sentEmailEl && storedVerification.email) sentEmailEl.textContent = storedVerification.email;
+        if (confirmEmailEl && storedVerification.email) confirmEmailEl.value = storedVerification.email;
       } else {
         currentRegisterTicket = null;
         if (step1) step1.style.display = 'block';
@@ -144,6 +146,8 @@ function backToRegisterStep1() {
   if (step2) step2.style.display = 'none';
   const codeEl = document.getElementById('register-code');
   if (codeEl) codeEl.value = '';
+  const emailEl = document.getElementById('register-email');
+  if (emailEl) emailEl.focus();
 }
 
 function backToForgotStep1() {
@@ -269,7 +273,9 @@ async function handleSendRegisterCode() {
     storeRegisterVerification(data.verificationTicket, email);
 
     const sentEmailEl = document.getElementById('register-sent-email');
+    const confirmEmailEl = document.getElementById('register-confirm-email');
     if (sentEmailEl) sentEmailEl.textContent = email;
+    if (confirmEmailEl) confirmEmailEl.value = email;
 
     const devBanner = document.getElementById('register-dev-banner');
     if (devBanner) {
@@ -302,6 +308,23 @@ async function handleSendRegisterCode() {
       btnEl.innerHTML = originalBtnText;
     }
   }
+}
+
+function resendRegisterCodeToVisibleEmail() {
+  const visibleEmailEl = document.getElementById('register-confirm-email');
+  const sourceEmailEl = document.getElementById('register-email');
+  const email = String(visibleEmailEl?.value || '').trim().toLowerCase();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!email || !emailRegex.test(email) || email.includes('..')) {
+    showAuthAlert('register', 'error', 'Informe um endereço de e-mail válido.');
+    visibleEmailEl?.focus();
+    return;
+  }
+
+  if (sourceEmailEl) sourceEmailEl.value = email;
+  clearRegisterVerification();
+  handleSendRegisterCode();
 }
 
 async function handleVerifyAndRegister() {
@@ -340,7 +363,7 @@ async function handleVerifyAndRegister() {
 
     authToken = 'session';
     currentUser = data.user;
-    currentRegisterTicket = null;
+    clearRegisterVerification();
     updateNavAuth();
     showToast('🎉', 'E-mail confirmado com sucesso! Aproveite sua conta gratuita.');
 

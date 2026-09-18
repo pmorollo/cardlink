@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles-base.css?v=46">
   <link rel="stylesheet" href="styles-builder.css?v=45">
   <link rel="stylesheet" href="styles-dashboard.css?v=45">
-  <link rel="stylesheet" href="styles-public.css?v=46">
+  <link rel="stylesheet" href="styles-public.css?v=47">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#f8b900">
@@ -42,14 +42,6 @@
     </div>
   </nav>
 
-  <button
-    type="button"
-    class="landing-register-fixed"
-    onclick="navigateTo('auth'); toggleAuthForm('register');"
-    aria-label="Criar conta grátis no CardLink">
-    🚀 Criar conta grátis
-  </button>
-
   <!-- ============================================
        VIEW 1: LANDING PAGE
        ============================================ -->
@@ -81,7 +73,7 @@
 
             <div class="hero-buttons">
               <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
-                🚀 Criar CardLink Grátis
+                Criar CardLink Grátis
               </button>
               <button class="btn btn-secondary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">
                 ⭐ Conhecer os Planos
@@ -167,7 +159,7 @@
           <!-- Botão de Ação Direta após o Carrossel -->
           <div style="margin-top:28px;text-align:center;">
             <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="font-size:1.05rem;padding:14px 32px;box-shadow:0 8px 24px rgba(124,58,237,0.35);">
-              🚀 Criar Meu CardLink Grátis →
+              Criar Meu CardLink Grátis
             </button>
             <p style="color:var(--text-muted);font-size:0.84rem;margin-top:8px;">Acesso liberado imediatamente • Sem compromisso</p>
           </div>
@@ -372,7 +364,7 @@
             </div>
 
             <button class="btn btn-secondary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="width:100%;font-weight:700;">
-              🚀 Começar Grátis
+              Começar Grátis
             </button>
           </div>
 
@@ -418,7 +410,7 @@
           <p>Crie sua página profissional em minutos e compartilhe pelo link. Quando precisar, o Pro adiciona QR Code integrado, mensagens/leads e outros recursos premium.</p>
           <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
             <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
-              🚀 Criar CardLink Grátis
+              Criar CardLink Grátis
             </button>
             <button class="btn btn-secondary btn-lg" onclick="redirectToCheckout('monthly')" style="font-weight:700;">
               💳 Assinar Pro (R$ 12,90)
@@ -517,7 +509,7 @@
               <input class="form-input" type="password" id="register-password" minlength="8" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
             </div>
             <button class="btn btn-primary btn-lg" id="btn-register-send-code" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleSendRegisterCode()">
-              🚀 Criar Conta Grátis
+              Criar Conta Grátis
             </button>
             <p class="auth-toggle">
               Já tem uma conta? <a href="#" onclick="toggleAuthForm('login');return false;">Entrar na minha conta</a>
@@ -526,11 +518,19 @@
 
           <!-- Passo 2: confirmação obrigatória do e-mail -->
           <div id="register-step-2" style="display:none;">
-            <div style="background:rgba(124,58,237,0.1);border:1px solid var(--accent);border-radius:8px;padding:12px;margin-bottom:16px;text-align:center;">
-              <p style="font-size:0.9rem;margin:0 0 4px;color:var(--text-primary);font-weight:600;">Confirme seu endereço de e-mail</p>
-              <p style="font-size:0.85rem;margin:0;color:var(--text-secondary);">
-                Enviamos um código de 6 dígitos para <strong id="register-sent-email" style="color:var(--accent);">seu@email.com</strong>.
+            <div style="background:rgba(124,58,237,0.08);border:1px solid var(--border-subtle);border-radius:10px;padding:14px;margin-bottom:16px;">
+              <p style="font-size:0.95rem;margin:0 0 10px;color:var(--text-primary);font-weight:700;text-align:center;">Confirme seu e-mail</p>
+              <div class="form-group" style="margin-bottom:10px;">
+                <label class="form-label" for="register-confirm-email">E-mail para receber o código</label>
+                <input class="form-input" type="email" id="register-confirm-email" placeholder="seu@email.com" autocomplete="email">
+              </div>
+              <button type="button" class="btn btn-secondary" onclick="resendRegisterCodeToVisibleEmail()" style="width:100%;">
+                Enviar novo código para este e-mail
+              </button>
+              <p style="font-size:0.8rem;margin:10px 0 0;color:var(--text-secondary);text-align:center;">
+                O código tem 6 dígitos e vale por 15 minutos.
               </p>
+              <span id="register-sent-email" style="display:none;"></span>
             </div>
 
             <div id="register-dev-banner" style="display:none;background:rgba(16,185,129,0.15);border:1px solid #10b981;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.85rem;color:var(--text-primary);text-align:center;"></div>
@@ -541,12 +541,11 @@
             </div>
 
             <button class="btn btn-primary btn-lg" id="btn-register-verify" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleVerifyAndRegister()">
-              🚀 Confirmar e Começar Grátis
+              Confirmar e Criar Conta
             </button>
 
-            <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:0.85rem;">
-              <a href="#" onclick="handleSendRegisterCode();return false;" style="color:var(--accent);text-decoration:none;">Reenviar código</a>
-              <a href="#" onclick="backToRegisterStep1();return false;" style="color:var(--text-secondary);text-decoration:none;">Alterar e-mail</a>
+            <div style="display:flex;justify-content:flex-end;margin-top:14px;font-size:0.85rem;">
+              <a href="#" onclick="backToRegisterStep1();return false;" style="color:var(--text-secondary);text-decoration:none;">Voltar e alterar meus dados</a>
             </div>
           </div>
         </div>
@@ -1497,7 +1496,7 @@
 
   <script src="bootstrap.js?v=2"></script>
   <script src="app-core.js?v=46"></script>
-  <script src="app-auth.js?v=47"></script>
+  <script src="app-auth.js?v=48"></script>
   <script src="app-dashboard.js?v=45"></script>
   <script src="app-builder.js?v=45"></script>
   <script src="app-extras.js?v=45"></script>
