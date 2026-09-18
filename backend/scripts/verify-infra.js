@@ -12,6 +12,7 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 const { S3Client, ListObjectsV2Command } = require('@aws-sdk/client-s3');
+const { validateProductionEnv } = require('../utils/env-security');
 
 console.log('\n========================================================');
 console.log('🔍 CARDLINK — DIAGNÓSTICO DE INFRAESTRUTURA');
@@ -27,6 +28,13 @@ let errors = 0;
 async function checkSecurity() {
   totalChecks++;
   console.log('1️⃣  VERIFICAÇÃO DE SEGURANÇA & SEGREDOS');
+
+  const envValidation = validateProductionEnv({ strict: false });
+  if (process.env.NODE_ENV === 'production' && envValidation.errors.length) {
+    envValidation.errors.forEach(message => console.log(`   ❌ Produção: ${message}`));
+    errors += envValidation.errors.length;
+  }
+  envValidation.warnings.forEach(message => console.log(`   ⚠️  ${message}`));
   
   const jwt = process.env.JWT_SECRET;
   if (!jwt || jwt === 'dev-only-insecure-secret') {

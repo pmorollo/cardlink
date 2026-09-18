@@ -135,3 +135,14 @@ A `master` é a referência da versão corrente. Antes de abrir vendas ao públi
 5. executar a auditoria final comercial conforme as premissas do **PLANO MESTRE DE OFERTAS E PUBLICIDADE**.
 
 Mais detalhes: `docs/README.md`, `docs/DIRETRIZES-PRODUTO-MARKETING.md` e `docs/PLANO-TESTE-SEMANA-1.md`.
+
+## Segurança de ambiente
+
+Antes de publicar ou gerar um pacote de entrega, execute:
+
+```bash
+npm run security:check
+npm run export:zip
+```
+
+Em `NODE_ENV=production`, o servidor recusa inicialização quando `JWT_SECRET`, `DATABASE_URL` PostgreSQL ou `CAKTO_SECRET` estão ausentes/inseguros. Credenciais reais devem existir apenas nas variáveis do provedor de hospedagem (ex.: Railway), nunca em `.env` distribuído.

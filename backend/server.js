@@ -1,4 +1,16 @@
 try { require('dotenv').config({ path: require('path').join(__dirname, '.env') }); } catch(e) {}
+const { validateProductionEnv } = require('./utils/env-security');
+
+try {
+  const envValidation = validateProductionEnv();
+  if (process.env.NODE_ENV !== 'test') {
+    envValidation.warnings.forEach(message => console.warn(`⚠️ Configuração: ${message}`));
+  }
+} catch (error) {
+  console.error(`❌ ${error.message}`);
+  process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');

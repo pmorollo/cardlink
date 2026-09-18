@@ -9,7 +9,8 @@
     "infra:check": "node backend/scripts/verify-infra.js",
     "admin:set": "node backend/scripts/set-admin.js",
     "test-user:create": "node backend/scripts/create-test-user.js",
-    "export:zip": "node backend/scripts/make-zip.js"
+    "export:zip": "node backend/scripts/make-zip.js",
+    "security:check": "node backend/scripts/check-secrets.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1101.0",
