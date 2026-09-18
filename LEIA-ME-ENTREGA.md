@@ -1,6 +1,6 @@
 # CardLink — Pacote de transferência
 
-Este pacote contém o código-fonte completo do CardLink na versão de referência de 7 de setembro de 2026, incluindo frontend, backend, testes, documentação, imagens, criativos e arquivos de configuração versionados.
+Este pacote contém o código-fonte completo do CardLink na versão de referência de **18 de setembro de 2026**, incluindo frontend, backend, testes, documentação, imagens, criativos e arquivos de configuração versionados. Esta referência já incorpora a unificação Free/Pro, exportação segura e validação central de ambiente de produção.
 
 Comece por:
 
@@ -44,3 +44,18 @@ O exportador `backend/scripts/make-zip.js` bloqueia automaticamente, entre outro
 - uploads locais, logs e arquivos compactados anteriores.
 
 Antes de gerar o ZIP, o script executa uma auditoria do diretório temporário. Se detectar um arquivo proibido, a exportação é interrompida em vez de criar um pacote inseguro.
+
+
+## Estado homologado em 18/09/2026
+
+- Produção Railway: **SUCCESS**.
+- Domínio oficial: `https://cardlink.digitalnexoapp.com`.
+- Landing `/`: HTTP 200.
+- Health `/api/health`: HTTP 200.
+- PostgreSQL: inicializado e ativo.
+- Cakto: checkouts sincronizados e webhook vinculado.
+- Webhook sem segredo: rejeitado com HTTP 401, conforme esperado.
+- Plano Free: página pública e link permanecem ativos.
+- Plano Pro: QR integrado/rastreado, leads/mensagens, PDF e demais recursos premium.
+- Cancelamento Pro: downgrade para Free, sem retirar a página pública.
+- Armazenamento atual de uploads: volume persistente Railway; R2 ainda não configurado.
