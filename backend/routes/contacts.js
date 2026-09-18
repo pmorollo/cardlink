@@ -3,9 +3,19 @@ const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('../
 const authMiddleware = require('../middleware/auth');
 const { requireCustomer } = require('../middleware/roles');
 const { sendEmail } = require('../utils/email');
-const { hasActiveCustomerAccess } = require('../utils/subscription');
+const { isProCustomer } = require('../utils/subscription');
 
 const router = express.Router();
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 
 router.get('/public/:slug', async (req, res) => {
   const card = await cardRepo.findBySlug(req.params.slug);
@@ -14,7 +24,7 @@ router.get('/public/:slug', async (req, res) => {
   }
 
   const owner = await userRepo.findById(card.user_id);
-  const isOwnerPro = hasActiveCustomerAccess(owner);
+  const isOwnerPro = isProCustomer(owner);
 
   if (!isOwnerPro) {
     return res.status(402).json({ error: 'subscription_required', message: 'Assinatura pendente para este cartão' });
@@ -35,7 +45,7 @@ router.post('/public/:slug/contact', async (req, res) => {
 
   // Apenas clientes PRO mantêm o cartão público ativo
   const owner = await userRepo.findById(card.user_id);
-  const isOwnerPro = hasActiveCustomerAccess(owner);
+  const isOwnerPro = isProCustomer(owner);
   if (!isOwnerPro) {
     return res.status(402).json({ error: 'subscription_required', message: 'Assinatura pendente para este cartão' });
   }
@@ -70,6 +80,11 @@ router.post('/public/:slug/contact', async (req, res) => {
 
   // Envia e-mail de notificação para o proprietário do cartão (owner já carregado acima)
   if (owner && owner.email) {
+    const safeOwnerName = escapeHtml(owner.name);
+    const safeName = escapeHtml(name);
+    const safePhone = escapeHtml(phone);
+    const safeEmail = escapeHtml(email);
+    const safeMessage = escapeHtml(message).replace(/\n/g, '<br>');
     sendEmail({
       to: owner.email,
       subject: '🎉 Novo contato recebido no CardLink!',
@@ -77,14 +92,14 @@ router.post('/public/:slug/contact', async (req, res) => {
       html: `
         <div style="font-family: sans-serif; max-width: 500px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <h2 style="color: #7c3aed; margin-bottom: 10px;">🎉 Novo Contato Recebido!</h2>
-          <p>Olá, <strong>${owner.name}</strong>.</p>
+          <p>Olá, <strong>${safeOwnerName}</strong>.</p>
           <p>Um visitante enviou uma mensagem através da sua página digital do CardLink:</p>
           
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 16px; margin: 15px 0;">
-            <div style="margin-bottom: 8px;"><strong>Nome:</strong> ${name}</div>
-            ${phone ? `<div style="margin-bottom: 8px;"><strong>Telefone:</strong> ${phone}</div>` : ''}
-            ${email ? `<div style="margin-bottom: 8px;"><strong>E-mail:</strong> ${email}</div>` : ''}
-            ${message ? `<div style="margin-top: 12px; border-top: 1px solid #e2e8f0; padding-top: 8px;"><strong>Mensagem:</strong><br>${message.replace(/\n/g, '<br>')}</div>` : ''}
+            <div style="margin-bottom: 8px;"><strong>Nome:</strong> ${safeName}</div>
+            ${phone ? `<div style="margin-bottom: 8px;"><strong>Telefone:</strong> ${safePhone}</div>` : ''}
+            ${email ? `<div style="margin-bottom: 8px;"><strong>E-mail:</strong> ${safeEmail}</div>` : ''}
+            ${message ? `<div style="margin-top: 12px; border-top: 1px solid #e2e8f0; padding-top: 8px;"><strong>Mensagem:</strong><br>${safeMessage}</div>` : ''}
           </div>
           
           <p style="font-size: 0.85rem; color: #64748b;">Acesse seu painel do CardLink para ver a lista de contatos e retornar diretamente via WhatsApp.</p>

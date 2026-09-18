@@ -1,6 +1,8 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const crypto = require('crypto');
+const fs = require('fs');
 const authMiddleware = require('../middleware/auth');
 const { requireCustomer } = require('../middleware/roles');
 
@@ -46,15 +48,20 @@ function safeUploadExtension(file) {
   return null;
 }
 
+function buildUploadFilename(file) {
+  const ext = safeUploadExtension(file);
+  if (!ext) return null;
+  return `${Date.now()}-${crypto.randomUUID()}${ext}`;
+}
+
 // Multer storage: memory if R2, disk if local
 const storage = isR2Configured() && S3Client
   ? multer.memoryStorage()
   : multer.diskStorage({
       destination: path.join(__dirname, '..', 'uploads'),
       filename: (req, file, cb) => {
-        const ext = safeUploadExtension(file);
-        if (!ext) return cb(new Error('Tipo de arquivo inválido'));
-        const name = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
+        const name = buildUploadFilename(file);
+        if (!name) return cb(new Error('Tipo de arquivo inválido'));
         cb(null, name);
       }
     });
@@ -79,9 +86,15 @@ router.post('/', authMiddleware, requireCustomer, upload.single('photo'), async 
     const ext = safeUploadExtension(req.file);
     if (!ext) return res.status(400).json({ error: 'Tipo de arquivo inválido' });
     const isPdf = ext === '.pdf';
-    if (isPdf && req.user?.plan !== 'pro') {
+    if (isPdf && req.currentUser?.plan !== 'pro') {
+      // Multer em modo local já gravou o arquivo: remova-o antes de recusar para não deixar órfãos.
+      if (req.file.path) {
+        try { fs.unlinkSync(req.file.path); } catch (error) { console.warn('Falha ao remover PDF recusado:', error.message); }
+      }
       return res.status(403).json({ error: 'O upload de catálogo em PDF está disponível exclusivamente no Plano Pro.' });
     }
+
+    const filename = buildUploadFilename(req.file);
 
     if (isR2Configured() && S3Client) {
       const s3 = new S3Client({
@@ -109,7 +122,7 @@ router.post('/', authMiddleware, requireCustomer, upload.single('photo'), async 
       return res.json({ url, isPdf, originalName: req.file.originalname });
     } else {
       // Local file fallback
-      const url = '/uploads/' + (req.file.filename || filename);
+      const url = '/uploads/' + req.file.filename;
       return res.json({ url, isPdf, originalName: req.file.originalname });
     }
   } catch (err) {
@@ -119,3 +132,4 @@ router.post('/', authMiddleware, requireCustomer, upload.single('photo'), async 
 });
 
 module.exports = router;
+module.exports._test = { safeUploadExtension, buildUploadFilename };

@@ -5,6 +5,8 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
+const logger = require('./utils/logger');
 
 if (!process.env.JWT_SECRET) {
   if (process.env.NODE_ENV === 'production') {
@@ -30,36 +32,61 @@ const paymentRoutes = require('./routes/payments');
 const { syncCaktoCatalog } = require('./services/cakto');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('./db/repository');
 const { sendEmail } = require('./utils/email');
-const { hasActiveCustomerAccess } = require('./utils/subscription');
+const { isProCustomer } = require('./utils/subscription');
 
 const app = express();
 app.set('trust proxy', 1);
+app.use((req, res, next) => {
+  req.requestId = req.headers['x-request-id'] || crypto.randomUUID();
+  res.setHeader('X-Request-Id', req.requestId);
+  next();
+});
 const PORT = process.env.PORT || 3000;
 
 // ─── Security Headers (Helmet) ───────────────────────────────────
 app.use(helmet({
-  contentSecurityPolicy: false, // disabled to allow inline scripts in SPA
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      scriptSrcAttr: ["'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+      connectSrc: ["'self'", 'https:'],
+      fontSrc: ["'self'", 'data:', 'https:'],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'self'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'", 'https://pay.cakto.com.br']
+    }
+  },
   crossOriginEmbedderPolicy: false
 }));
 
 // ─── CORS ────────────────────────────────────────────────────────
 app.use(cors({
   origin: (origin, cb) => {
-    const isSameOrigin = !origin;
-    const corsEnv = process.env.CORS_ORIGIN;
-    if (corsEnv === '*') {
+    if (!origin) return cb(null, true);
+
+    const configured = String(process.env.CORS_ORIGIN || '')
+      .split(',')
+      .map(value => value.trim())
+      .filter(Boolean);
+    const canonicalOrigins = new Set(['https://cardlink.digitalnexoapp.com', ...configured.filter(value => value !== '*')]);
+
+    if (canonicalOrigins.has(origin)) return cb(null, true);
+
+    // Em desenvolvimento local, libera apenas localhost/127.0.0.1 com porta opcional.
+    if (process.env.NODE_ENV !== 'production' && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
       return cb(null, true);
     }
-    if (isSameOrigin) {
-      return cb(null, true);
-    }
-    const allowed = (corsEnv || '').split(',').map(o => o.trim()).filter(Boolean);
-    const canonicalOrigins = ['https://cardlink.digitalnexoapp.com'];
-    const ok = allowed.includes(origin) || canonicalOrigins.includes(origin) || origin.endsWith('.railway.app') || origin.includes('localhost');
-    if (ok) {
-      return cb(null, true);
-    }
-    return cb(new Error('Origem não permitida pelo CORS'));
+
+    // CORS_ORIGIN=* não amplia produção; é aceito apenas em desenvolvimento explícito.
+    if (process.env.NODE_ENV !== 'production' && configured.includes('*')) return cb(null, true);
+
+    const err = new Error('Origem não permitida pelo CORS');
+    err.status = 403;
+    return cb(err);
   },
   credentials: true
 }));
@@ -85,6 +112,10 @@ const apiLimiter = rateLimit({
 });
 
 // ─── Routes ───────────────────────────────────────────────────────
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), uptimeSeconds: Math.round(process.uptime()) });
+});
+
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/cards', apiLimiter, cardRoutes);
 app.use('/api', apiLimiter, contactRoutes);
@@ -153,7 +184,7 @@ app.get(['/site/:slug/qr', '/site/:slug/qr-whatsapp'], async (req, res) => {
 
     // Apenas cartões pertencentes a clientes PRO ficam ativos.
     const owner = await userRepo.findById(card.user_id);
-    const isOwnerPro = hasActiveCustomerAccess(owner);
+    const isOwnerPro = isProCustomer(owner);
     if (!isOwnerPro) {
       return res.redirect(`/site/${card.slug}`);
     }
@@ -167,9 +198,35 @@ app.get(['/site/:slug/qr', '/site/:slug/qr-whatsapp'], async (req, res) => {
   }
 });
 
-// Landing page route
-app.get('/site/:slug', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'landing.html'));
+// Landing page route: somente Pro e com metadados SEO por cliente.
+app.get('/site/:slug', async (req, res, next) => {
+  try {
+    const card = await cardRepo.findBySlug(req.params.slug);
+    if (!card) return res.status(404).send('Cartão não encontrado');
+    const owner = await userRepo.findById(card.user_id);
+    if (!isProCustomer(owner)) return res.status(402).send('Página temporariamente indisponível');
+
+    const escapeAttr = value => String(value || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    const title = `${card.name || card.business || 'CardLink'} — ${card.business || 'Página profissional'}`;
+    const description = String(card.description || card.message || `Página profissional de ${card.name || card.business || 'cliente CardLink'}`)
+      .replace(/\s+/g, ' ').trim().slice(0, 160);
+    const canonical = `${req.protocol}://${req.get('host')}/site/${encodeURIComponent(card.slug)}`;
+    const templatePath = path.join(__dirname, '..', 'frontend', 'landing.html');
+    let html = await fs.promises.readFile(templatePath, 'utf8');
+    html = html
+      .replace('<title>Carregando...</title>', `<title>${escapeAttr(title)}</title>`)
+      .replace('<meta name="description" content="Landing page profissional criada com CardLink">', `<meta name="description" content="${escapeAttr(description)}">
+  <meta property="og:title" content="${escapeAttr(title)}">
+  <meta property="og:description" content="${escapeAttr(description)}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${escapeAttr(canonical)}">
+  <link rel="canonical" href="${escapeAttr(canonical)}">`);
+    res.type('html').send(html);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Kit público de divulgação para afiliados aprovados.
@@ -187,9 +244,16 @@ app.get('*', (req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack || err);
   const status = err.status || err.statusCode || 500;
-  res.status(status).json({ error: err.message || 'Erro no servidor' });
+  logger.error('request_failed', {
+    requestId: req.requestId,
+    method: req.method,
+    path: req.originalUrl,
+    status,
+    message: err.message || 'Erro no servidor',
+    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack
+  });
+  res.status(status).json({ error: err.message || 'Erro no servidor', requestId: req.requestId });
 });
 
 module.exports = app;

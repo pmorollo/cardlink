@@ -8,6 +8,10 @@ Mensagem comercial atual:
 
 O CardLink reúne serviços, fotos, avaliações, localização, redes sociais e WhatsApp e pode ser compartilhado por link ou QR Code.
 
+## Dependências
+
+Há apenas um `package.json` canônico na raiz. Não instale dependências separadamente dentro de `backend/`.
+
 ## Execução local
 
 ```bash
@@ -19,9 +23,10 @@ Abra `http://localhost:3000`.
 
 ## Arquitetura atual
 
-- `frontend/` — SPA estática da landing, autenticação, painel, editor e página pública.
+- `frontend/` — SPA estática dividida em módulos de aplicação/CSS, além da página pública.
 - `backend/server.js` — servidor Express e rotas da API.
-- `backend/db/repository.js` — acesso a dados; PostgreSQL é o armazenamento indicado para produção.
+- `backend/db/repository.js` — acesso a dados; PostgreSQL é o armazenamento de produção.
+- `backend/db/migrations/` — esquema PostgreSQL versionado e aplicado automaticamente no bootstrap.
 - `backend/routes/payments.js` — integração e eventos da Cakto.
 - `backend/routes/upload.js` — uploads autenticados com validação de extensão + MIME e limites anti-DoS.
 - `backend/utils/email.js` — e-mail transacional via Resend, com SMTP opcional.
@@ -104,6 +109,12 @@ R2_BUCKET=<bucket>
 ```
 
 O `JWT_SECRET` é obrigatório em produção. `PUBLIC_APP_URL`/`APP_URL` define a base usada nos links de ativação enviados por e-mail.
+
+## Sessão e segurança
+
+O navegador autentica por cookie de sessão `HttpOnly`, `SameSite=Lax` e `Secure` em produção. O suporte a `Authorization: Bearer` é mantido para clientes de API e testes, mas o frontend não persiste JWT em `localStorage`.
+
+A CSP está ativa. Scripts inline foram removidos; atributos legados de evento ainda são tolerados temporariamente para compatibilidade e devem ser eliminados gradualmente.
 
 ## Segurança de uploads
 

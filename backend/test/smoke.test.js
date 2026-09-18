@@ -46,12 +46,18 @@ test.after(() => {
 
 async function api(method, urlPath, body, token) {
   const headers = {};
+  let payload = body;
   if (body) headers['Content-Type'] = 'application/json';
   if (token) headers.Authorization = `Bearer ${token}`;
+  if (urlPath === '/api/payments/cakto-webhook' && body && Object.prototype.hasOwnProperty.call(body, 'secret')) {
+    headers['x-cakto-secret'] = body.secret;
+    payload = { ...body };
+    delete payload.secret;
+  }
   const res = await fetch(base + urlPath, {
     method,
     headers,
-    body: body ? JSON.stringify(body) : undefined
+    body: payload ? JSON.stringify(payload) : undefined
   });
   let data = null;
   try { data = await res.json(); } catch (e) {}
@@ -148,7 +154,10 @@ test('GET / serve o frontend (SPA)', async () => {
 
 test('frontend mantem a IA somente como assistente textual para copia manual', async () => {
   const html = fs.readFileSync(path.join(__dirname, '..', '..', 'frontend', 'index.html'), 'utf-8');
-  const js = fs.readFileSync(path.join(__dirname, '..', '..', 'frontend', 'app.js'), 'utf-8');
+  const frontendDir = path.join(__dirname, '..', '..', 'frontend');
+  const js = ['app-core.js', 'app-auth.js', 'app-dashboard.js', 'app-builder.js', 'app-extras.js', 'app-assistant.js']
+    .map(name => fs.readFileSync(path.join(frontendDir, name), 'utf-8'))
+    .join('\n');
   assert.equal(html.includes('id="ai-request"'), true);
   assert.equal(html.includes('id="ai-response"'), true);
   assert.equal(html.includes('Copiar texto'), true);
@@ -860,3 +869,119 @@ test('suporte a catalogo PDF e galeria com PDF no cartao e na pagina publica', a
   assert.equal(rPublic.data.gallery[1], '/uploads/documento-tecnico.pdf');
 });
 
+
+
+test('CSP fica ativa e scripts inline foram removidos do index', async () => {
+  const res = await fetch(base + '/');
+  const csp = res.headers.get('content-security-policy') || '';
+  const html = await res.text();
+  assert.match(csp, /default-src 'self'/);
+  assert.match(csp, /script-src 'self'/);
+  assert.equal(/<script>/.test(html), false);
+});
+
+test('login cria cookie HttpOnly e frontend nao persiste JWT em localStorage', async () => {
+  await createActiveUser({ email: 'cookie-session@example.com' });
+  const res = await fetch(base + '/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'cookie-session@example.com', password: 'SenhaValida123!' })
+  });
+  assert.equal(res.status, 200);
+  const cookie = res.headers.get('set-cookie') || '';
+  assert.match(cookie, /cardlink_session=/);
+  assert.match(cookie, /HttpOnly/i);
+  assert.match(cookie, /SameSite=Lax/i);
+
+  const frontendDir = path.join(__dirname, '..', '..', 'frontend');
+  const frontendJs = fs.readdirSync(frontendDir)
+    .filter(name => /^app-.*\.js$/.test(name) || name === 'landing.js')
+    .map(name => fs.readFileSync(path.join(frontendDir, name), 'utf8'))
+    .join('\n');
+  assert.equal(frontendJs.includes("localStorage.setItem('cardlink_token'"), false);
+  assert.equal(frontendJs.includes("localStorage.getItem('cardlink_token'"), false);
+});
+
+test('pagina publica, contato e QR exigem plano Pro', async () => {
+  const free = await users.insert({
+    name: 'Cliente Free', email: 'free-public@example.com', whatsapp: null,
+    password_hash: await bcrypt.hash('SenhaFree123!', 10), is_admin: false, plan: 'free',
+    account_status: 'active', subscription_status: 'active', subscription_source: 'free_tier',
+    subscription_plan: 'free', subscription_amount: '0', subscription_reference: null,
+    is_test_account: false, email_verified_at: new Date().toISOString(), subscription_updated_at: new Date().toISOString()
+  });
+  const freeLogin = await login(free.email, 'SenhaFree123!');
+  const freeCard = await api('POST', '/api/cards', { name: 'Cartao Free' }, freeLogin.data.token);
+  assert.equal(freeCard.status, 201);
+  assert.equal((await api('GET', `/api/public/${freeCard.data.slug}`)).status, 402);
+  assert.equal((await api('POST', `/api/public/${freeCard.data.slug}/contact`, { name: 'Visitante', message: 'Oi' })).status, 402);
+  const siteRes = await fetch(base + `/site/${freeCard.data.slug}`, { redirect: 'manual' });
+  assert.equal(siteRes.status, 402);
+
+  await createActiveUser({ email: 'pro-public@example.com', isTest: false, source: 'cakto', plan: 'monthly' });
+  const proLogin = await login('pro-public@example.com', 'SenhaValida123!');
+  const proCard = await api('POST', '/api/cards', { name: 'Cartao Pro' }, proLogin.data.token);
+  assert.equal((await api('GET', `/api/public/${proCard.data.slug}`)).status, 200);
+  assert.equal((await fetch(base + `/site/${proCard.data.slug}`)).status, 200);
+});
+
+test('upload de PDF bloqueia Free e aceita Pro; nome de upload e seguro', async () => {
+  const { _test } = require('../routes/upload');
+  const generated = _test.buildUploadFilename({ originalname: 'catalogo.pdf', mimetype: 'application/pdf' });
+  assert.match(generated, /^\d+-[0-9a-f-]{36}\.pdf$/i);
+
+  const free = await users.insert({
+    name: 'PDF Free', email: 'pdf-free@example.com', whatsapp: null,
+    password_hash: await bcrypt.hash('SenhaPdf123!', 10), is_admin: false, plan: 'free',
+    account_status: 'active', subscription_status: 'active', subscription_source: 'free_tier',
+    subscription_plan: 'free', subscription_amount: '0', subscription_reference: null,
+    is_test_account: false, email_verified_at: new Date().toISOString(), subscription_updated_at: new Date().toISOString()
+  });
+  const freeLogin = await login(free.email, 'SenhaPdf123!');
+  const freeForm = new FormData();
+  freeForm.append('photo', new Blob(['%PDF-1.4\n'], { type: 'application/pdf' }), 'catalogo.pdf');
+  const freeUpload = await fetch(base + '/api/upload', { method: 'POST', headers: { Authorization: `Bearer ${freeLogin.data.token}` }, body: freeForm });
+  assert.equal(freeUpload.status, 403);
+
+  await createActiveUser({ email: 'pdf-pro@example.com' });
+  const proLogin = await login('pdf-pro@example.com', 'SenhaValida123!');
+  const proForm = new FormData();
+  proForm.append('photo', new Blob(['%PDF-1.4\n'], { type: 'application/pdf' }), 'catalogo.pdf');
+  const proUpload = await fetch(base + '/api/upload', { method: 'POST', headers: { Authorization: `Bearer ${proLogin.data.token}` }, body: proForm });
+  const data = await proUpload.json();
+  assert.equal(proUpload.status, 200);
+  assert.equal(data.isPdf, true);
+  const uploaded = path.join(__dirname, '..', data.url.replace(/^\/uploads\//, 'uploads/'));
+  fs.rmSync(uploaded, { force: true });
+});
+
+test('codigo de recuperacao e invalidado apos cinco erros', async () => {
+  const email = 'reset-limit@example.com';
+  await createActiveUser({ email });
+  const forgot = await api('POST', '/api/auth/forgot-password', { email });
+  assert.equal(forgot.status, 200);
+  for (let i = 0; i < 4; i += 1) {
+    const attempt = await api('POST', '/api/auth/reset-password', { email, code: '000000', newPassword: 'NovaSenha123!' });
+    assert.equal(attempt.status, 400);
+  }
+  const fifth = await api('POST', '/api/auth/reset-password', { email, code: '000000', newPassword: 'NovaSenha123!' });
+  assert.equal(fifth.status, 429);
+  const user = await users.findByEmail(email);
+  assert.equal(user.reset_code, null);
+});
+
+test('webhook nao aceita segredo enviado apenas no corpo', async () => {
+  const res = await fetch(base + '/api/payments/cakto-webhook', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ secret: process.env.CAKTO_SECRET, event: 'purchase_approved', data: { customerEmail: 'body-secret@example.com' } })
+  });
+  assert.equal(res.status, 401);
+});
+
+test('health endpoint fornece sinal simples para monitoramento', async () => {
+  const r = await api('GET', '/api/health');
+  assert.equal(r.status, 200);
+  assert.equal(r.data.status, 'ok');
+  assert.equal(typeof r.data.uptimeSeconds, 'number');
+});

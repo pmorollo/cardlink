@@ -7,8 +7,8 @@ const API = window.location.origin + '/api';
 // Slug from URL path: /site/:slug
 const slug = window.location.pathname.split('/site/')[1]?.split('/')[0] || '';
 
-// Check if owner is viewing (has session token)
-const ownerToken = localStorage.getItem('cardlink_token') || null;
+// A sessão é HttpOnly; a propriedade é confirmada pelo backend.
+let ownerSession = false;
 
 let cardData = null;
 let galleryAutoPlay = null;
@@ -138,7 +138,7 @@ function dismissHomeScreenGuide() {
 }
 
 function makePlaceholderHint(containerId, label = 'Personalizar') {
-  if (!ownerToken) return;
+  if (!ownerSession) return;
   const el = document.getElementById(containerId);
   if (!el) return;
   el.innerHTML = `<a class="placeholder-hint" href="${window.location.origin}/#builder" title="Editar no painel">✏️ ${label} no painel</a>`;
@@ -156,7 +156,11 @@ async function init() {
   }
 
   try {
-    cardData = await fetch(`${API}/public/${slug}`).then(r => {
+    ownerSession = await fetch(`${API}/auth/me`, { credentials: 'same-origin' })
+      .then(r => r.ok)
+      .catch(() => false);
+
+    cardData = await fetch(`${API}/public/${slug}`, { credentials: 'same-origin' }).then(r => {
       if (r.status === 402) throw new Error('payment_required');
       if (!r.ok) throw new Error('not_found');
       return r.json();
@@ -201,10 +205,10 @@ async function init() {
   document.title = `${cardData.name} — ${cardData.business || 'Site Profissional'}`;
 
   // Check if logged in user owns this landing page
-  if (ownerToken) {
+  if (ownerSession) {
     try {
       const cardSummary = await fetch(`${API}/cards/stats/summary`, {
-        headers: { 'Authorization': `Bearer ${ownerToken}` }
+        credentials: 'same-origin'
       }).then(r => r.ok ? r.json() : null);
 
       if (cardSummary && cardSummary.card && cardSummary.card.slug === slug) {
@@ -293,7 +297,7 @@ function renderAbout(d) {
   const description = typeof d.description === 'string' ? d.description.trim() : '';
   const isPlaceholder = !description;
 
-  if (isPlaceholder && !ownerToken) {
+  if (isPlaceholder && !ownerSession) {
     removePublicSection('sobre');
     return;
   }
@@ -314,7 +318,7 @@ function renderAbout(d) {
     : (d.logo_url || d.photo_url || '');
   if (imgWrap && aboutImg) {
     imgWrap.innerHTML = `<img src="${esc(aboutImg)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<div class=lp-about-image-placeholder><span style=font-size:5rem>👤</span></div>'">`;
-  } else if (imgWrap && ownerToken) {
+  } else if (imgWrap && ownerSession) {
     imgWrap.innerHTML = '<div class="lp-about-image-placeholder"><span style="font-size:5rem">👤</span></div>';
   } else if (imageColumn) {
     imageColumn.style.display = 'none';
@@ -328,7 +332,7 @@ function renderAbout(d) {
   }
 
   // Placeholder hint for owner
-  if (isPlaceholder && ownerToken) makePlaceholderHint('about-placeholder-hint', 'Adicionar descrição');
+  if (isPlaceholder && ownerSession) makePlaceholderHint('about-placeholder-hint', 'Adicionar descrição');
 }
 
 // ============================================
@@ -439,7 +443,7 @@ function renderGallery(d) {
   if (!grid) return;
 
   const hasRealGallery = d.gallery && d.gallery.length > 0;
-  if (!hasRealGallery && !ownerToken) {
+  if (!hasRealGallery && !ownerSession) {
     removePublicSection('galeria');
     return;
   }
@@ -464,7 +468,7 @@ function renderGallery(d) {
           }
           return `
             <button class="lp-gallery-slide" type="button" data-image-src="${esc(url)}" onclick="openGalleryLightbox(this.dataset.imageSrc, 'Foto ${i + 1}')" aria-label="Ampliar foto ${i + 1}">
-              <img src="${esc(url)}" alt="Foto ${i + 1}" loading="lazy" onerror="this.closest('.lp-gallery-slide').remove(); refreshGalleryCarousel()">
+              <img src="${esc(url)}" alt="${esc(d.name || d.business || 'Negócio')} — foto ${i + 1}" loading="lazy" onerror="this.closest('.lp-gallery-slide').remove(); refreshGalleryCarousel()">
             </button>`;
         }).join('')}
       </div>
@@ -685,6 +689,7 @@ function renderContact(d) {
   if (contactPhoto) {
     if (d.photo_url) {
       contactPhoto.src = d.photo_url;
+      contactPhoto.alt = `Foto de ${d.name || d.business || 'profissional'}`;
       contactPhoto.hidden = false;
     } else {
       contactPhoto.hidden = true;

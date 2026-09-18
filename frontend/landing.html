@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/landing.css?v=42">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
 </head>
-<body>
+<body itemscope itemtype="https://schema.org/ProfessionalService">
 
   <!-- Logged in Admin/Owner top bar -->
   <div id="card-owner-bar" style="display:none;background:#2e1065;color:#ffffff;padding:10px 16px;font-size:0.85rem;text-align:center;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);z-index:9999;position:sticky;top:0;font-family:sans-serif;width:100%;">
@@ -26,9 +26,9 @@
        ============================================ -->
   <nav class="lp-nav" id="lp-nav">
     <div class="container">
-      <div class="lp-nav-brand" onclick="scrollToTop()" style="display:inline-flex;align-items:center;gap:8px;">
+      <div class="lp-nav-brand" role="button" tabindex="0" aria-label="Voltar ao início" onclick="scrollToTop()" style="display:inline-flex;align-items:center;gap:8px;">
         <div class="logo-icon" id="nav-brand-mark">C</div>
-        <span id="nav-business-name">CardLink</span>
+        <span id="nav-business-name" itemprop="name">CardLink</span>
       </div>
       <ul class="lp-nav-links" id="lp-nav-links">
         <li><a href="#sobre">Sobre</a></li>
@@ -54,7 +54,7 @@
           <h1 class="lp-hero-title" id="hero-title">
             <span class="lp-business-name">Seu negócio</span>
           </h1>
-          <p class="lp-business-complement" id="hero-business-complement" hidden></p>
+          <p class="lp-business-complement" id="hero-business-complement" itemprop="description" hidden></p>
           <a href="#servicos" class="lp-hero-services-link">Conhecer serviços ↓</a>
         </div>
 

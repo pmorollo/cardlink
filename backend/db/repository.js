@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { runMigrations } = require('./migrate');
 
 const DB_PATH = path.join(__dirname, 'data.json');
 
@@ -85,6 +86,9 @@ function castUserRow(row) {
     email_verification_token_hash: row.email_verification_token_hash || null,
     email_verification_expires: row.email_verification_expires || null,
     subscription_updated_at: row.subscription_updated_at || null,
+    reset_code: row.reset_code || null,
+    reset_expires: row.reset_expires || null,
+    reset_attempts: Number(row.reset_attempts || 0),
   };
 }
 
@@ -99,131 +103,8 @@ let pgReady = false;
 let pgBootstrap = null;
 
 async function initPostgres(pool) {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) UNIQUE,
-      whatsapp VARCHAR(255),
-      password_hash VARCHAR(255) NOT NULL,
-      is_admin BOOLEAN DEFAULT FALSE,
-      plan VARCHAR(50) DEFAULT 'inactive',
-      account_status VARCHAR(50) DEFAULT 'inactive',
-      subscription_status VARCHAR(50) DEFAULT 'inactive',
-      subscription_source VARCHAR(50) DEFAULT 'none',
-      subscription_plan VARCHAR(50),
-      subscription_amount VARCHAR(50),
-      subscription_reference VARCHAR(255),
-      is_test_account BOOLEAN DEFAULT FALSE,
-      activation_token_hash VARCHAR(128),
-      activation_expires TIMESTAMP,
-      trial_ends_at TIMESTAMP,
-      email_verified_at TIMESTAMP,
-      pending_email VARCHAR(255),
-      email_verification_token_hash VARCHAR(128),
-      email_verification_expires TIMESTAMP,
-      subscription_updated_at TIMESTAMP,
-      reset_code VARCHAR(6),
-      reset_expires TIMESTAMP,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS cards (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-      slug VARCHAR(255) UNIQUE NOT NULL,
-      name VARCHAR(255) NOT NULL,
-      business VARCHAR(255),
-      business_complement VARCHAR(180),
-      title VARCHAR(255),
-      photo_url TEXT,
-      logo_url TEXT,
-      description TEXT,
-      message TEXT,
-      phone VARCHAR(100),
-      email VARCHAR(255),
-      address TEXT,
-      whatsapp VARCHAR(100),
-      whatsapp_group TEXT,
-      instagram VARCHAR(255),
-      facebook VARCHAR(255),
-      linkedin VARCHAR(255),
-      tiktok VARCHAR(255),
-      youtube VARCHAR(255),
-      twitter VARCHAR(255),
-      theme VARCHAR(50) DEFAULT 'midnight',
-      site_button_text VARCHAR(255),
-      services_mode VARCHAR(20) DEFAULT 'image',
-      services_title VARCHAR(255),
-      services_image_url TEXT,
-      products JSONB DEFAULT '[]'::jsonb,
-      gallery JSONB DEFAULT '[]'::jsonb,
-      testimonials JSONB DEFAULT '[]'::jsonb,
-      views_count INTEGER DEFAULT 0,
-      qr_scans_count INTEGER DEFAULT 0,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS contacts (
-      id SERIAL PRIMARY KEY,
-      card_id INTEGER REFERENCES cards(id) ON DELETE CASCADE,
-      name VARCHAR(255) NOT NULL,
-      email VARCHAR(255),
-      phone VARCHAR(100),
-      message TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS support_tickets (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-      subject VARCHAR(255),
-      message TEXT NOT NULL,
-      status VARCHAR(50) DEFAULT 'open',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS admin_messages (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-      subject VARCHAR(255),
-      message TEXT NOT NULL,
-      read_at TIMESTAMP,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
-
-  await pool.query(`
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS plan VARCHAR(50) DEFAULT 'inactive';
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS account_status VARCHAR(50) DEFAULT 'inactive';
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(50) DEFAULT 'inactive';
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_source VARCHAR(50) DEFAULT 'none';
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_plan VARCHAR(50);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_amount VARCHAR(50);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_reference VARCHAR(255);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS is_test_account BOOLEAN DEFAULT FALSE;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS activation_token_hash VARCHAR(128);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS activation_expires TIMESTAMP;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMP;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS pending_email VARCHAR(255);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_token_hash VARCHAR(128);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expires TIMESTAMP;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_updated_at TIMESTAMP;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_code VARCHAR(6);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMP;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by VARCHAR(100);
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS logo_url TEXT;
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS business_complement VARCHAR(180);
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS services_mode VARCHAR(20) DEFAULT 'image';
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS services_title VARCHAR(255);
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS services_image_url TEXT;
-    ALTER TABLE cards ADD COLUMN IF NOT EXISTS qr_scans_count INTEGER DEFAULT 0;
-  `).catch(() => {});
-
-  console.log('✅ PostgreSQL inicializado (repositório)');
+  await runMigrations(pool);
+  console.log('✅ PostgreSQL inicializado (migrações versionadas)');
 }
 
 function ensurePg() {
@@ -387,7 +268,7 @@ const users = {
       const fields = [];
       const values = [];
       let i = 1;
-      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_expires', 'referred_by', 'account_status', 'subscription_status', 'subscription_source', 'subscription_plan', 'subscription_amount', 'subscription_reference', 'is_test_account', 'activation_token_hash', 'activation_expires', 'trial_ends_at', 'email_verified_at', 'pending_email', 'email_verification_token_hash', 'email_verification_expires', 'subscription_updated_at']) {
+      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_expires', 'reset_attempts', 'referred_by', 'account_status', 'subscription_status', 'subscription_source', 'subscription_plan', 'subscription_amount', 'subscription_reference', 'is_test_account', 'activation_token_hash', 'activation_expires', 'trial_ends_at', 'email_verified_at', 'pending_email', 'email_verification_token_hash', 'email_verification_expires', 'subscription_updated_at']) {
         if (key in updates && updates[key] !== undefined) {
           fields.push(`${key} = $${i++}`);
           values.push(updates[key]);

@@ -2,8 +2,10 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 const { users } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
+const { SESSION_COOKIE } = require('../middleware/auth');
 const { JWT_SECRET } = require('../config');
 const { sendEmail } = require('../utils/email');
 const { hasActiveCustomerAccess } = require('../utils/subscription');
@@ -17,6 +19,34 @@ const router = express.Router();
 function signToken(userId) {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
 }
+
+function setSessionCookie(res, token) {
+  const secure = process.env.NODE_ENV === 'production';
+  res.cookie(SESSION_COOKIE, token, {
+    httpOnly: true,
+    secure,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+}
+
+function clearSessionCookie(res) {
+  res.clearCookie(SESSION_COOKIE, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/'
+  });
+}
+
+const passwordRecoveryLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'test' ? 1000 : 10,
+  message: { error: 'Muitas tentativas de recuperação. Tente novamente em 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
 // Em produção o código de recuperação não é devolvido na resposta da API.
 // Para testes em desenvolvimento (NODE_ENV !== 'production') ele ainda é retornado.
@@ -159,6 +189,7 @@ router.post('/register', async (req, res) => {
     });
 
     const token = signToken(user.id);
+    setSessionCookie(res, token);
 
     return res.status(201).json({
       message: 'E-mail confirmado e conta gratuita criada com sucesso!',
@@ -227,6 +258,7 @@ router.post('/activate', async (req, res) => {
   }
 
   const signed = signToken(updated.id);
+  setSessionCookie(res, signed);
   return res.json({
     token: signed,
     user: {
@@ -264,11 +296,17 @@ router.post('/login', async (req, res) => {
   // Nunca promove uma conta com base apenas no endereço de e-mail.
 
   const token = signToken(user.id);
+  setSessionCookie(res, token);
 
   res.json({
     token,
     user: { id: user.id, name: user.name, email: user.email || user.whatsapp, is_admin: user.is_admin || false, plan: user.plan, account_status: user.account_status, subscription_status: user.subscription_status, subscription_source: user.subscription_source, trial_ends_at: user.trial_ends_at || null, is_test_account: user.is_test_account || false, email_verified_at: user.email_verified_at }
   });
+});
+
+router.post('/logout', (req, res) => {
+  clearSessionCookie(res);
+  res.json({ message: 'Sessão encerrada com sucesso' });
 });
 
 router.get('/me', authMiddleware, async (req, res) => {
@@ -385,7 +423,8 @@ router.post('/confirm-email-change', async (req, res) => {
     email_verification_token_hash: null,
     email_verification_expires: null,
     reset_code: null,
-    reset_expires: null
+    reset_expires: null,
+    reset_attempts: 0
   });
 
   await sendEmailChangeAlert({ user: { ...user, email: oldEmail }, requestedEmail: newEmail, completed: true }).catch(err => {
@@ -413,7 +452,7 @@ router.put('/change-password', authMiddleware, async (req, res) => {
 });
 
 // ─── Password Reset ──────────────────────────────────────────────────
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', passwordRecoveryLimiter, async (req, res) => {
   const { email } = req.body;
   const userEmail = (email || '').trim().toLowerCase();
 
@@ -434,7 +473,8 @@ router.post('/forgot-password', async (req, res) => {
 
   await users.update(user.id, {
     reset_code: code,
-    reset_expires: expiresAt
+    reset_expires: expiresAt,
+    reset_attempts: 0
   });
 
   // Envia e-mail de verdade (ou loga no console caso não configurado)
@@ -463,7 +503,7 @@ router.post('/forgot-password', async (req, res) => {
   return res.json(payload);
 });
 
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', passwordRecoveryLimiter, async (req, res) => {
   const { email, code, newPassword } = req.body;
   const userEmail = (email || '').trim().toLowerCase();
 
@@ -485,6 +525,7 @@ router.post('/reset-password', async (req, res) => {
   }
 
   if (new Date() > new Date(user.reset_expires)) {
+    await users.update(user.id, { reset_code: null, reset_expires: null, reset_attempts: 0 });
     return res.status(400).json({ error: 'Código de recuperação expirado. Gere um novo.' });
   }
 
@@ -493,13 +534,20 @@ router.post('/reset-password', async (req, res) => {
   const b = Buffer.from(String(code).trim());
   const codesMatch = a.length === b.length && crypto.timingSafeEqual(a, b);
   if (!codesMatch) {
+    const attempts = Number(user.reset_attempts || 0) + 1;
+    if (attempts >= 5) {
+      await users.update(user.id, { reset_code: null, reset_expires: null, reset_attempts: 0 });
+      return res.status(429).json({ error: 'Código invalidado após muitas tentativas. Solicite um novo código.' });
+    }
+    await users.update(user.id, { reset_attempts: attempts });
     return res.status(400).json({ error: 'Código de recuperação inválido' });
   }
 
   await users.update(user.id, {
     password_hash: await bcrypt.hash(newPassword, 10),
     reset_code: null,
-    reset_expires: null
+    reset_expires: null,
+    reset_attempts: 0
   });
 
   return res.json({ message: 'Senha redefinida com sucesso! Você já pode fazer login.' });

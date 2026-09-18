@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="CardLink — Reúna serviços, fotos, avaliações, localização, redes sociais e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.">
   <title>CardLink — Tudo o que seu cliente precisa ver antes de chamar você</title>
-  <link rel="stylesheet" href="styles.css?v=42">
+  <link rel="stylesheet" href="styles-base.css?v=43">
+  <link rel="stylesheet" href="styles-builder.css?v=43">
+  <link rel="stylesheet" href="styles-dashboard.css?v=43">
+  <link rel="stylesheet" href="styles-public.css?v=43">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#f8b900">
@@ -1480,73 +1483,13 @@
     <span id="toast-message"></span>
   </div>
 
-  <script>
-    // Unregister all service workers and clear caches before loading app
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(regs => {
-        regs.forEach(reg => reg.unregister());
-      });
-      if (window.caches) {
-        caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-      }
-    }
-  </script>
-  <script>
-    // Links de checkout da Cakto (formato real: https://pay.cakto.com.br/{id_da_oferta})
-    window.CARD_LINK = {
-      monthlyCheckoutUrl: 'https://pay.cakto.com.br/kawb7xd_1032085',
-      annualCheckoutUrl: 'https://pay.cakto.com.br/5g7f23g'
-    };
-  </script>
-  <script src="app.js?v=43"></script>
+  <script src="bootstrap.js?v=1"></script>
+  <script src="app-core.js?v=44"></script>
+  <script src="app-auth.js?v=44"></script>
+  <script src="app-dashboard.js?v=44"></script>
+  <script src="app-builder.js?v=44"></script>
+  <script src="app-extras.js?v=44"></script>
+  <script src="app-assistant.js?v=44"></script>
   <script src="landing-carousel.js?v=1"></script>
-  <script>
-
-    let deferredPrompt = null;
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      if (!isStandalone) {
-        const btn = document.getElementById('install-card-btn');
-        if (btn) btn.style.display = '';
-        const banner = document.getElementById('pwa-install-banner');
-        if (banner) banner.style.display = 'flex';
-      }
-    });
-
-    window.triggerPwaInstall = function() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            deferredPrompt = null;
-            const btn = document.getElementById('install-card-btn');
-            if (btn) btn.style.display = 'none';
-            const banner = document.getElementById('pwa-install-banner');
-            if (banner) banner.style.display = 'none';
-          }
-        });
-      } else if (isIOS) {
-        showToast('📲', 'iPhone: Toque em "Compartilhar" no Safari e escolha "Adicionar à Tela de Início"');
-      } else {
-        showToast('📲', 'Instalação: Toque no menu do navegador e escolha "Instalar App" ou "Adicionar à Tela Inicial"');
-      }
-    };
-
-    function installFromCard() {
-      window.triggerPwaInstall();
-    }
-
-    window.addEventListener('appinstalled', () => {
-      deferredPrompt = null;
-      const btn = document.getElementById('install-card-btn');
-      if (btn) btn.style.display = 'none';
-      const banner = document.getElementById('pwa-install-banner');
-      if (banner) banner.style.display = 'none';
-    });
-  </script>
 </body>
 </html>

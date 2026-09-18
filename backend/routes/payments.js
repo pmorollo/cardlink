@@ -141,8 +141,11 @@ router.post('/cakto-webhook', async (req, res) => {
     }
 
     if (caktoSecret) {
-      const provided = payload.secret || req.headers['x-cakto-secret'] || (req.headers['authorization'] || '').replace('Bearer ', '').trim();
-      if (!provided || String(provided).trim() !== String(caktoSecret).trim()) {
+      const provided = req.headers['x-cakto-secret'] || (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '').trim();
+      const expectedBuffer = Buffer.from(String(caktoSecret).trim());
+      const providedBuffer = Buffer.from(String(provided || '').trim());
+      const secretMatches = expectedBuffer.length === providedBuffer.length && crypto.timingSafeEqual(expectedBuffer, providedBuffer);
+      if (!secretMatches) {
         console.warn('⚠️ Tentativa de webhook não autorizada: Secret inválido ou ausente.');
         return res.status(401).json({ error: 'Secret de autenticação inválido ou ausente.' });
       }
