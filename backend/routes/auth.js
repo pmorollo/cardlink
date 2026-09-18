@@ -100,23 +100,31 @@ router.post('/register/send-code', async (req, res) => {
       { expiresIn: '15m' }
     );
 
-    await sendEmail({
-      to: email,
-      subject: 'Código de confirmação do seu CardLink (30 dias grátis)',
-      text: `Olá, ${name}. Seu código de verificação para criar sua conta gratuita no CardLink é: ${code}. Ele é válido por 15 minutos.`,
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:540px;margin:auto;padding:24px;color:#111827;">
-          <h2 style="color:#7c3aed;">Confirmação de E-mail • CardLink</h2>
-          <p>Olá, <strong>${escapeHtml(name)}</strong>!</p>
-          <p>Falta apenas confirmar este endereço de e-mail para ativar sua <strong>conta gratuita permanente</strong> no CardLink.</p>
-          <p>Digite o código de 6 dígitos abaixo no formulário:</p>
-          <div style="font-size:28px;font-weight:bold;letter-spacing:4px;color:#7c3aed;background:#f5f3ff;border:1px solid #ddd6fe;padding:16px;border-radius:8px;text-align:center;margin:20px 0;">
-            ${code}
+    try {
+      await sendEmail({
+        to: email,
+        subject: 'Código de confirmação da sua conta CardLink',
+        text: `Olá, ${name}. Seu código de verificação para criar sua conta gratuita no CardLink é: ${code}. Ele é válido por 15 minutos.`,
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:540px;margin:auto;padding:24px;color:#111827;">
+            <h2 style="color:#7c3aed;">Confirmação de E-mail • CardLink</h2>
+            <p>Olá, <strong>${escapeHtml(name)}</strong>!</p>
+            <p>Falta apenas confirmar este endereço de e-mail para ativar sua <strong>conta gratuita permanente</strong> no CardLink.</p>
+            <p>Digite o código de 6 dígitos abaixo no formulário:</p>
+            <div style="font-size:28px;font-weight:bold;letter-spacing:4px;color:#7c3aed;background:#f5f3ff;border:1px solid #ddd6fe;padding:16px;border-radius:8px;text-align:center;margin:20px 0;">
+              ${code}
+            </div>
+            <p style="font-size:12px;color:#6b7280;">Este código expira em 15 minutos. Se você não solicitou este cadastro, desconsidere esta mensagem.</p>
           </div>
-          <p style="font-size:12px;color:#6b7280;">Este código expira em 15 minutos. Se você não solicitou este cadastro, desconsidere esta mensagem.</p>
-        </div>
-      `
-    }).catch(err => console.error('Erro ao enviar e-mail com código de confirmação:', err.message));
+        `
+      });
+    } catch (err) {
+      console.error('Erro ao enviar e-mail com código de confirmação:', err.message);
+      return res.status(503).json({
+        error: 'email_delivery_failed',
+        message: 'Não foi possível enviar o código de confirmação agora. Tente novamente em alguns instantes.'
+      });
+    }
 
     const payload = {
       message: 'Código de confirmação enviado para o seu e-mail!',

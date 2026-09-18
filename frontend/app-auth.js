@@ -1,7 +1,43 @@
 // ============================================
 // Auth Forms & Alerts Helper
 // ============================================
+const REGISTER_VERIFICATION_STORAGE_KEY = 'cardlink.registerVerification.v1';
 let currentRegisterTicket = null;
+
+function getStoredRegisterVerification() {
+  try {
+    const raw = sessionStorage.getItem(REGISTER_VERIFICATION_STORAGE_KEY);
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    if (!stored?.ticket || !stored?.expiresAt || Date.now() >= stored.expiresAt) {
+      sessionStorage.removeItem(REGISTER_VERIFICATION_STORAGE_KEY);
+      return null;
+    }
+    return stored;
+  } catch (_) {
+    return null;
+  }
+}
+
+function storeRegisterVerification(ticket, email) {
+  currentRegisterTicket = ticket || null;
+  if (!ticket) return;
+  try {
+    sessionStorage.setItem(REGISTER_VERIFICATION_STORAGE_KEY, JSON.stringify({
+      ticket,
+      email: String(email || '').trim().toLowerCase(),
+      expiresAt: Date.now() + (15 * 60 * 1000)
+    }));
+  } catch (_) {
+    // O cadastro continua funcionando mesmo se sessionStorage estiver indisponível.
+  }
+}
+
+function clearRegisterVerification() {
+  currentRegisterTicket = null;
+  try { sessionStorage.removeItem(REGISTER_VERIFICATION_STORAGE_KEY); } catch (_) {}
+}
+
 
 function showAuthAlert(formId, type, message) {
   const alertEl = document.getElementById(`${formId}-alert`);
@@ -61,11 +97,21 @@ function toggleAuthForm(form) {
     if (form === 'register') {
       const step1 = document.getElementById('register-step-1');
       const step2 = document.getElementById('register-step-2');
-      if (step1) step1.style.display = 'block';
-      if (step2) step2.style.display = 'none';
-      const existingEmail = (document.getElementById('login-email')?.value || '').trim();
-      const regEmail = document.getElementById('register-email');
-      if (regEmail && !regEmail.value && existingEmail) regEmail.value = existingEmail;
+      const storedVerification = getStoredRegisterVerification();
+      if (storedVerification) {
+        currentRegisterTicket = storedVerification.ticket;
+        if (step1) step1.style.display = 'none';
+        if (step2) step2.style.display = 'block';
+        const sentEmailEl = document.getElementById('register-sent-email');
+        if (sentEmailEl && storedVerification.email) sentEmailEl.textContent = storedVerification.email;
+      } else {
+        currentRegisterTicket = null;
+        if (step1) step1.style.display = 'block';
+        if (step2) step2.style.display = 'none';
+        const existingEmail = (document.getElementById('login-email')?.value || '').trim();
+        const regEmail = document.getElementById('register-email');
+        if (regEmail && !regEmail.value && existingEmail) regEmail.value = existingEmail;
+      }
     }
   }
   if (activationForm) activationForm.style.display = form === 'activate' ? '' : 'none';
@@ -91,6 +137,7 @@ function toggleAuthForm(form) {
 
 function backToRegisterStep1() {
   clearAuthAlerts();
+  clearRegisterVerification();
   const step1 = document.getElementById('register-step-1');
   const step2 = document.getElementById('register-step-2');
   if (step1) step1.style.display = 'block';
@@ -156,7 +203,7 @@ async function handleDirectRegister() {
 
     authToken = 'session';
     currentUser = data.user;
-    currentRegisterTicket = null;
+    clearRegisterVerification();
     updateNavAuth();
     showToast('🎉', 'Conta criada com sucesso! Bem-vindo ao CardLink.');
 
@@ -219,7 +266,7 @@ async function handleSendRegisterCode() {
       body: JSON.stringify({ name, email, password, whatsapp })
     });
 
-    currentRegisterTicket = data.verificationTicket;
+    storeRegisterVerification(data.verificationTicket, email);
 
     const sentEmailEl = document.getElementById('register-sent-email');
     if (sentEmailEl) sentEmailEl.textContent = email;
@@ -260,7 +307,11 @@ async function handleSendRegisterCode() {
 async function handleVerifyAndRegister() {
   clearAuthAlerts();
   if (!currentRegisterTicket) {
-    showAuthAlert('register', 'error', 'Solicite o código de confirmação primeiro.');
+    const storedVerification = getStoredRegisterVerification();
+    if (storedVerification) currentRegisterTicket = storedVerification.ticket;
+  }
+  if (!currentRegisterTicket) {
+    showAuthAlert('register', 'error', 'A confirmação expirou ou foi perdida. Solicite um novo código.');
     backToRegisterStep1();
     return;
   }

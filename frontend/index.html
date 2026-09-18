@@ -516,7 +516,7 @@
             </p>
           </div>
 
-          <!-- Passo 2: Fallback com código caso necessário -->
+          <!-- Passo 2: confirmação obrigatória do e-mail -->
           <div id="register-step-2" style="display:none;">
             <div style="background:rgba(124,58,237,0.1);border:1px solid var(--accent);border-radius:8px;padding:12px;margin-bottom:16px;text-align:center;">
               <p style="font-size:0.9rem;margin:0 0 4px;color:var(--text-primary);font-weight:600;">Confirme seu endereço de e-mail</p>
@@ -529,7 +529,7 @@
 
             <div class="form-group">
               <label class="form-label" for="register-code">Código de Verificação (6 Dígitos)</label>
-              <input class="form-input" type="text" id="register-code" maxlength="6" placeholder="Ex: 123456" style="letter-spacing:6px;font-size:1.2rem;font-weight:700;text-align:center;" autocomplete="one-time-code">
+              <input class="form-input" type="text" id="register-code" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="Ex: 123456" style="letter-spacing:6px;font-size:1.2rem;font-weight:700;text-align:center;" autocomplete="one-time-code">
             </div>
 
             <button class="btn btn-primary btn-lg" id="btn-register-verify" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleVerifyAndRegister()">
@@ -1489,7 +1489,7 @@
 
   <script src="bootstrap.js?v=2"></script>
   <script src="app-core.js?v=45"></script>
-  <script src="app-auth.js?v=45"></script>
+  <script src="app-auth.js?v=46"></script>
   <script src="app-dashboard.js?v=45"></script>
   <script src="app-builder.js?v=45"></script>
   <script src="app-extras.js?v=45"></script>
