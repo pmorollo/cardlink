@@ -750,3 +750,49 @@ body:has(#landing-view.active) .footer {
   border-top-color: rgba(226, 190, 88, 0.18);
   color: #d9d1bf;
 }
+
+/* CTA permanente de cadastro — garante visibilidade do Plano Free */
+.landing-register-fixed {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 120;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0.8rem 1.15rem;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffd331, var(--yellow));
+  color: #062b28;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(8, 47, 45, 0.28);
+}
+
+body:has(#landing-view.active) .landing-register-fixed {
+  display: inline-flex;
+}
+
+.landing-register-fixed:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(8, 47, 45, 0.34);
+}
+
+@media (max-width: 600px) {
+  .landing-register-fixed {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: calc(100% - 24px);
+    border-radius: 14px;
+    min-height: 54px;
+    font-size: 1rem;
+  }
+
+  body:has(#landing-view.active) {
+    padding-bottom: 78px;
+  }
+}

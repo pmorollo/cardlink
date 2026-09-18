@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="CardLink — Reúna serviços, fotos, avaliações, localização, redes sociais e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.">
   <title>CardLink — Tudo o que seu cliente precisa ver antes de chamar você</title>
-  <link rel="stylesheet" href="styles-base.css?v=45">
+  <link rel="stylesheet" href="styles-base.css?v=46">
   <link rel="stylesheet" href="styles-builder.css?v=45">
   <link rel="stylesheet" href="styles-dashboard.css?v=45">
-  <link rel="stylesheet" href="styles-public.css?v=45">
+  <link rel="stylesheet" href="styles-public.css?v=46">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#f8b900">
@@ -37,10 +37,18 @@
         <a href="#como-funciona" class="navbar-link hide-mobile">Como funciona</a>
         <a href="#demonstracao" class="navbar-link hide-mobile">Demonstração</a>
         <button class="navbar-login" onclick="navigateTo('auth'); toggleAuthForm('login');">Entrar na conta</button>
-        <button class="btn btn-primary btn-sm navbar-subscribe" onclick="navigateTo('auth'); toggleAuthForm('register');">Criar Grátis</button>
+        <button class="btn btn-primary btn-sm navbar-subscribe" onclick="navigateTo('auth'); toggleAuthForm('register');">Criar Conta Grátis</button>
       </div>
     </div>
   </nav>
+
+  <button
+    type="button"
+    class="landing-register-fixed"
+    onclick="navigateTo('auth'); toggleAuthForm('register');"
+    aria-label="Criar conta grátis no CardLink">
+    🚀 Criar conta grátis
+  </button>
 
   <!-- ============================================
        VIEW 1: LANDING PAGE
@@ -219,8 +227,8 @@
         <div class="steps">
           <div class="step animate-in">
             <div class="step-number">1</div>
-            <h3>Assine o CardLink</h3>
-            <p>Escolha o plano mensal ou anual e conclua o pagamento com segurança pela Cakto.</p>
+            <h3>Crie sua conta grátis</h3>
+            <p>Cadastre seu e-mail, confirme o código recebido e comece no Plano Free sem cartão de crédito.</p>
           </div>
           <div class="step animate-in">
             <div class="step-number">2</div>
@@ -1488,8 +1496,8 @@
   </div>
 
   <script src="bootstrap.js?v=2"></script>
-  <script src="app-core.js?v=45"></script>
-  <script src="app-auth.js?v=46"></script>
+  <script src="app-core.js?v=46"></script>
+  <script src="app-auth.js?v=47"></script>
   <script src="app-dashboard.js?v=45"></script>
   <script src="app-builder.js?v=45"></script>
   <script src="app-extras.js?v=45"></script>
