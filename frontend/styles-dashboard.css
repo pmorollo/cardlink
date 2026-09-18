@@ -776,9 +776,12 @@
 /* Auth UX — ações críticas sempre legíveis */
 .auth-card .auth-action-button,
 .auth-card .btn-primary {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
-  font-weight: 700;
+  font-weight: 800;
+  text-shadow: none !important;
+  opacity: 1;
 }
 
 .auth-card .btn-secondary {
@@ -787,9 +790,16 @@
 }
 
 .auth-card button:disabled {
-  opacity: 0.58;
   cursor: not-allowed;
   transform: none !important;
+}
+
+.auth-card .auth-action-button:disabled,
+.auth-card .btn-primary:disabled {
+  background: #6d28d9 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 0.72 !important;
 }
 
 .auth-code-status {
