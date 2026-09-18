@@ -33,12 +33,13 @@ Abra `http://localhost:3000`.
 
 ## Modelo de acesso
 
-- Não existe cadastro público gratuito antes da compra.
-- A conta comercial nasce após evento de pagamento aprovado da Cakto.
-- O comprador recebe um link de ativação, confirma o e-mail e define a própria senha.
-- Existe somente uma conta administrativa, sem assinatura e sem site público.
-- Contas internas de teste usam `subscription_source=internal_test`, não são vendas e também precisam ser ativadas pelo próprio usuário.
-- Cancelamento/estorno/chargeback pode suspender o acesso do cliente e a página pública sem exigir exclusão imediata dos dados.
+- Existe cadastro público gratuito.
+- O plano **Free** permite criar, editar, publicar e compartilhar a página pública do CardLink.
+- O plano **Pro** adiciona recursos premium, incluindo QR integrado/rastreado, leads/mensagens, PDF e limites ampliados.
+- A Cakto é a fonte de verdade para ativação e manutenção dos privilégios Pro.
+- Cancelamento/estorno/chargeback do Pro rebaixa a conta para **Free**; a página pública e o link permanecem ativos.
+- Existe uma conta administrativa separada, sem assinatura e sem site público.
+- Contas internas de teste usam `subscription_source=internal_test` e não são contabilizadas como vendas.
 
 ## Manutenção administrativa
 
@@ -64,7 +65,7 @@ Suite padrão:
 npm test
 ```
 
-Na homologação de fechamento de agosto de 2026, a suite descobriu 28 testes: 27 aprovados e 1 integração PostgreSQL ignorada quando `TEST_PG_URL` não é informada.
+Na homologação de 18 de setembro de 2026, a suíte local executou **35 testes automatizados com 100% de aprovação**. A integração PostgreSQL destrutiva continua devendo usar banco exclusivo de teste quando aplicável.
 
 Para executar também a integração destrutiva contra PostgreSQL, use **somente um banco exclusivo de teste**:
 
@@ -74,7 +75,7 @@ TEST_PG_URL=postgres://usuario:senha@127.0.0.1:5432/cardlink_test npm test
 
 O workflow `.github/workflows/tests.yml` cria um PostgreSQL temporário e executa a suite completa em pull requests e por acionamento manual.
 
-Coberturas relevantes incluem: cadastro público bloqueado, isolamento admin/cliente, ativação pós-pagamento, conta interna de teste, cancelamento, verificação e troca de e-mail, recuperação de senha, CORS, proteção de segredos, contatos, mensagens administrativas, métricas e QR Code.
+Coberturas relevantes incluem: cadastro Free, isolamento admin/cliente, upgrade e downgrade Free/Pro, conta interna de teste, cancelamento, verificação e troca de e-mail, recuperação de senha, CORS, proteção de segredos, contatos/leads Pro, mensagens administrativas, métricas e QR Code.
 
 Auditoria de dependências usada no fechamento:
 
@@ -126,13 +127,15 @@ O código experimental de IA foi preservado, mas o Assistente está oculto da ve
 
 ## Produção e abertura comercial
 
-A `master` é a referência da versão corrente. Antes de abrir vendas ao público:
+A `master` é a referência da versão corrente. Em **18/09/2026**, o serviço de produção foi homologado tecnicamente no Railway com deploy `SUCCESS`, landing e health respondendo 200, PostgreSQL ativo e Cakto sincronizada.
 
-1. confirmar o domínio/deploy ativo no Railway e testar a landing publicada;
-2. concluir os testes reais pendentes do plano de homologação;
-3. realizar uma compra real separada pela Cakto e validar compra → webhook → e-mail → ativação;
-4. imediatamente antes da abertura pública, rotacionar o `CAKTO_SECRET`, atualizar Railway e Cakto e validar novamente o webhook;
-5. executar a auditoria final comercial conforme as premissas do **PLANO MESTRE DE OFERTAS E PUBLICIDADE**.
+Antes de abrir mídia paga:
+
+1. concluir um teste funcional real de cadastro Free → edição → publicação → link público;
+2. validar upgrade Pro com compra controlada na Cakto;
+3. confirmar webhook → privilégios Pro e depois downgrade Pro → Free sem derrubar a página;
+4. validar QR, leads/mensagens e PDF no Pro;
+5. manter monitoramento do volume persistente de uploads enquanto R2 não estiver configurado.
 
 Mais detalhes: `docs/README.md`, `docs/DIRETRIZES-PRODUTO-MARKETING.md` e `docs/PLANO-TESTE-SEMANA-1.md`.
 
