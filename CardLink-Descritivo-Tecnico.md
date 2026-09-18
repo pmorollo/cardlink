@@ -1,7 +1,7 @@
 # CardLink — Descritivo Técnico, Operação e Manutenção
 
-**Versão do documento:** 1.0  
-**Data de referência:** 7 de setembro de 2026  
+**Versão do documento:** 1.1  
+**Data de referência:** 18 de setembro de 2026  
 **Finalidade:** transferência técnica, acompanhamento do desenvolvimento, manutenção e continuidade operacional por desenvolvedores designados pelo proprietário.
 
 ---
@@ -185,31 +185,34 @@ O projeto possui manifesto e service worker. A ação de fixar na tela inicial d
 
 ## 6. Modelo de acesso e assinatura
 
-Não há cadastro gratuito público. A conta comercial nasce após pagamento aprovado.
+O CardLink opera com dois níveis comerciais: **Free** e **Pro**.
 
 ```mermaid
 sequenceDiagram
     participant C as Cliente
-    participant K as Cakto
     participant API as CardLink
-    participant E as E-mail
-    C->>K: Conclui pagamento
-    K->>API: purchase_approved assinado
-    API->>API: Cria ou atualiza conta pendente
-    API->>E: Envia link de ativação
-    C->>API: Define senha e confirma e-mail
-    API->>C: Libera painel e página pública
+    participant K as Cakto
+    C->>API: Cria conta Free
+    C->>API: Edita e publica página
+    API-->>C: Página pública + link ativos
+    C->>K: Opcionalmente contrata Pro
+    K->>API: Evento de pagamento assinado
+    API->>API: Libera privilégios Pro
 ```
 
 Estados conceituais:
 
 - **ADMIN:** operação interna; sem assinatura e sem site público.
-- **PENDING:** pagamento reconhecido, aguardando ativação.
-- **ACTIVE:** assinatura válida e acesso liberado.
-- **CANCELLED/INACTIVE:** acesso e página pública suspensos, sem exclusão automática imediata dos dados.
-- **INTERNAL_TEST:** conta de teste interno, fora das métricas comerciais, ativada pelo próprio usuário.
+- **FREE:** conta ativa com editor, publicação e link público.
+- **PRO/ACTIVE:** conta Free com privilégios premium liberados por assinatura válida.
+- **PENDING:** estado transitório de pagamento/ativação quando aplicável.
+- **INTERNAL_TEST:** conta operacional de teste, fora das métricas comerciais.
 
-Eventos de cancelamento, estorno ou chargeback encerram os privilégios Pro e rebaixam a conta para o plano Free. A página pública e o link permanecem ativos; QR integrado/rastreado, leads/mensagens, PDF e demais recursos premium são bloqueados. O webhook é a fonte de verdade para ativação comercial; retorno do navegador não deve liberar acesso por si só.
+Recursos Free: criação e edição do CardLink, publicação da página pública e compartilhamento do link.
+
+Recursos Pro: QR integrado/rastreado, leads/mensagens, PDF e demais limites/recursos premium definidos na oferta vigente.
+
+Eventos de cancelamento, estorno ou chargeback encerram os privilégios Pro e rebaixam a conta para o plano Free. A página pública e o link permanecem ativos. O webhook da Cakto é a fonte de verdade para privilégios Pro; retorno do navegador não deve liberar o plano por si só.
 
 ## 7. Banco de dados
 
@@ -264,7 +267,7 @@ Prefixo padrão: `/api`.
 
 ### 8.1 Autenticação — `/api/auth`
 
-- `POST /register` — bloqueado no modelo comercial público atual.
+- `POST /register` — cria conta Free após as validações de cadastro.
 - `POST /activate` — ativa conta e define senha a partir de token válido.
 - `POST /login` — autentica e retorna token.
 - `GET /me` — retorna usuário autenticado.
@@ -287,8 +290,8 @@ As rotas devem sempre validar propriedade do recurso; um cliente não pode acess
 
 ### 8.3 Página pública e contatos
 
-- `GET /api/public/:slug` — retorna dados públicos, respeitando assinatura ativa.
-- `POST /api/public/:slug/contact` — registra mensagem de visitante e envia aviso.
+- `GET /api/public/:slug` — retorna dados públicos para páginas Free ou Pro publicadas.
+- `POST /api/public/:slug/contact` — registra lead/mensagem quando o proprietário possui acesso Pro.
 - `GET /api/cards/:cardId/contacts` — lista contatos do cartão para o proprietário.
 - `GET /site/:slug/qr` — contabiliza QR e redireciona à página pública.
 - `GET /site/:slug/qr-whatsapp` — rota antiga mantida por compatibilidade.
@@ -328,11 +331,11 @@ O código suporta NVIDIA e Gemini, mas o Assistente está oculto e fora da ofert
 
 Responsabilidades:
 
-- fornecer checkout mensal e anual;
+- fornecer checkout mensal e anual do plano Pro;
 - enviar webhook de eventos financeiros;
 - permitir consulta/sincronização de catálogo;
-- criar ou atualizar a conta após aprovação;
-- suspender acesso em cancelamento, estorno ou chargeback.
+- promover a conta Free para Pro após aprovação;
+- rebaixar Pro para Free em cancelamento, estorno ou chargeback, preservando página pública e link.
 
 Oferta atual documentada:
 
@@ -470,7 +473,7 @@ O GitHub Actions cria PostgreSQL 16 temporário em pull requests para `master` e
 
 Cobertura documentada:
 
-- bloqueio de cadastro público;
+- cadastro público Free;
 - login, ativação, recuperação e troca de e-mail;
 - isolamento administrador/cliente;
 - criação e atualização de cartão;
@@ -617,10 +620,11 @@ O volume Railway atual não possui backup automático documentado. Esta é uma p
 ### 17.1 Portões antes de mídia paga
 
 1. Confirmar que Railway entrega o commit atual de `master` pelo domínio oficial.
-2. Concluir teste real de contato em que o visitante informa somente WhatsApp.
-3. Rotacionar `CAKTO_SECRET` imediatamente antes da abertura.
-4. Executar compra real separada e validar checkout → webhook → conta pendente → e-mail → senha → login → publicação.
-5. Configurar e validar mensuração do funil antes de investir em anúncios.
+2. Executar cadastro Free real e validar edição → publicação → link público.
+3. Validar que recursos Pro permanecem bloqueados no Free.
+4. Executar compra controlada do Pro e validar checkout → webhook → privilégios Pro.
+5. Validar downgrade Pro → Free sem retirar a página pública.
+6. Configurar e validar mensuração do funil antes de investir em anúncios.
 
 ### 17.2 Backlog técnico recomendado
 
@@ -654,7 +658,7 @@ Evoluções de produto, somente após estabilidade:
 ## 18. Regras para futuros desenvolvedores
 
 1. Preservar a definição do produto como site profissional.
-2. Não criar cadastro gratuito sem decisão expressa do proprietário.
+2. Preservar o modelo Free/Pro vigente; mudanças de limites ou recursos exigem decisão expressa do proprietário.
 3. Não liberar acesso por retorno do checkout; usar webhook validado.
 4. Não expor segredos em código, logs, commits, screenshots ou documentos.
 5. Não alterar pagamento, banco, domínio e frontend no mesmo deployment sem necessidade.
@@ -675,7 +679,7 @@ Evoluções de produto, somente após estabilidade:
 - [ ] Receber somente os acessos necessários ao PostgreSQL, Cakto, Resend e R2.
 - [ ] Configurar autenticação em dois fatores nas plataformas.
 - [ ] Clonar o repositório e executar a suíte local.
-- [ ] Compreender o modelo pago antes do cadastro.
+- [ ] Compreender o modelo Free/Pro e a separação entre publicação pública e recursos premium.
 - [ ] Ler `README.md`, este documento e os arquivos de `docs/` relevantes.
 - [ ] Localizar variáveis sem copiar valores para arquivos inseguros.
 - [ ] Identificar o domínio e o deployment correntes.
@@ -732,8 +736,9 @@ O responsável pela mudança técnica deve atualizar a documentação no mesmo p
 
 - **Card:** registro técnico que representa a página pública de um usuário.
 - **Slug:** parte única da URL pública do assinante.
-- **PRO/ACTIVE:** cliente com acesso comercial válido.
-- **PENDING:** conta criada após pagamento e ainda não ativada.
+- **FREE:** conta com editor, página pública e link ativos.
+- **PRO/ACTIVE:** conta com assinatura válida e recursos premium.
+- **PENDING:** estado transitório de pagamento/ativação quando aplicável.
 - **Internal test:** conta operacional sem venda, excluída das métricas comerciais.
 - **QR scan:** abertura pela rota de QR; métrica separada de visualização.
 - **Webhook:** notificação servidor a servidor usada como fonte de verdade do pagamento.
