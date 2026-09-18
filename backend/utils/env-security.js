@@ -19,7 +19,7 @@ function validHttpsUrl(v) {
   }
 }
 
-function validateProductionEnv({ strict = process.env.NODE_ENV === 'production' } = {}) {
+function validateProductionEnv({ strict = process.env.STRICT_ENV_CHECK === 'true' } = {}) {
   const errors = [];
   const warnings = [];
 

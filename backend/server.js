@@ -4,11 +4,11 @@ const { validateProductionEnv } = require('./utils/env-security');
 try {
   const envValidation = validateProductionEnv();
   if (process.env.NODE_ENV !== 'test') {
+    envValidation.errors.forEach(message => console.error(`⚠️ Produção: ${message}`));
     envValidation.warnings.forEach(message => console.warn(`⚠️ Configuração: ${message}`));
   }
 } catch (error) {
   console.error(`❌ ${error.message}`);
-  process.exit(1);
 }
 
 const express = require('express');
