@@ -270,7 +270,7 @@ function affiliateConfigurationMatches(product) {
     Boolean(product?.affiliateMarketplace) &&
     String(product?.affiliateClick || '').trim().toLowerCase() === 'last' &&
     Number(product?.cookieTime) === -1 &&
-    String(product?.affiliateSupportEmail || '').trim().toLowerCase() === 'cardlink@yahoo.com' &&
+    String(product?.affiliateSupportEmail || '').trim().toLowerCase() === 'pedro.morollo@gmail.com' &&
     String(product?.affiliateSalesPage || '').trim() === CARDLINK_PUBLIC_URL &&
     String(product?.affiliateDescription || '').includes(CARDLINK_AFFILIATE_MATERIALS_URL);
 }
@@ -290,7 +290,7 @@ async function configureAffiliateProgram(product) {
       affiliateCommission: '30.00',
       affiliateContact: false,
       affiliateDescription: CARDLINK_AFFILIATE_DESCRIPTION,
-      affiliateSupportEmail: 'cardlink@yahoo.com',
+      affiliateSupportEmail: 'pedro.morollo@gmail.com',
       affiliateMarketplace: true,
       affiliateClick: 'last',
       cookieTime: -1,
