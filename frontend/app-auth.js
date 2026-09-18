@@ -246,17 +246,19 @@ async function handleSendRegisterCode() {
   clearAuthAlerts();
   const nameEl = document.getElementById('register-name');
   const emailEl = document.getElementById('register-email');
+  const emailConfirmEl = document.getElementById('register-email-confirm');
   const passwordEl = document.getElementById('register-password');
   const whatsappEl = document.getElementById('register-whatsapp');
   const btnEl = document.getElementById('btn-register-send-code');
 
-  if (!nameEl || !emailEl || !passwordEl) {
+  if (!nameEl || !emailEl || !emailConfirmEl || !passwordEl) {
     showAuthAlert('register', 'error', 'Formulário de cadastro não encontrado.');
     return;
   }
 
   const name = nameEl.value.trim();
   const email = emailEl.value.trim().toLowerCase();
+  const emailConfirm = emailConfirmEl.value.trim().toLowerCase();
   const password = passwordEl.value;
   const whatsapp = whatsappEl ? whatsappEl.value.trim() : '';
 
@@ -269,6 +271,11 @@ async function handleSendRegisterCode() {
   if (!email || !emailRegex.test(email) || email.includes('..')) {
     showAuthAlert('register', 'error', 'Informe um endereço de e-mail válido.');
     emailEl.focus();
+    return;
+  }
+  if (!emailConfirm || emailConfirm !== email) {
+    showAuthAlert('register', 'error', 'Os dois campos de e-mail precisam ser iguais.');
+    emailConfirmEl.focus();
     return;
   }
   if (!password || password.length < 8) {
