@@ -3,6 +3,69 @@
 // ============================================
 const REGISTER_VERIFICATION_STORAGE_KEY = 'cardlink.registerVerification.v1';
 let currentRegisterTicket = null;
+const AUTH_CODE_COOLDOWN_MS = 30 * 1000;
+const AUTH_CODE_COOLDOWN_KEYS = {
+  register: 'cardlink.registerResendAt.v1',
+  forgot: 'cardlink.forgotResendAt.v1'
+};
+const authCooldownTimers = {};
+
+function getAuthCooldownRemaining(kind) {
+  try {
+    const until = Number(sessionStorage.getItem(AUTH_CODE_COOLDOWN_KEYS[kind]) || 0);
+    return Math.max(0, Math.ceil((until - Date.now()) / 1000));
+  } catch (_) {
+    return 0;
+  }
+}
+
+function setAuthCooldown(kind, seconds = 30) {
+  try {
+    sessionStorage.setItem(AUTH_CODE_COOLDOWN_KEYS[kind], String(Date.now() + (seconds * 1000)));
+  } catch (_) {}
+}
+
+function updateAuthResendButton(kind) {
+  const buttonId = kind === 'register' ? 'btn-register-resend' : 'btn-forgot-resend';
+  const btn = document.getElementById(buttonId);
+  if (!btn) return;
+
+  const render = () => {
+    const remaining = getAuthCooldownRemaining(kind);
+    if (remaining > 0) {
+      btn.disabled = true;
+      btn.textContent = `Reenviar em ${remaining}s`;
+      return true;
+    }
+    btn.disabled = false;
+    btn.textContent = 'Reenviar código';
+    return false;
+  };
+
+  if (authCooldownTimers[kind]) clearInterval(authCooldownTimers[kind]);
+  if (render()) {
+    authCooldownTimers[kind] = setInterval(() => {
+      if (!render()) {
+        clearInterval(authCooldownTimers[kind]);
+        authCooldownTimers[kind] = null;
+      }
+    }, 1000);
+  }
+}
+
+function enforceAuthCooldown(kind, formId) {
+  const remaining = getAuthCooldownRemaining(kind);
+  if (remaining <= 0) return false;
+  showAuthAlert(formId, 'info', `Aguarde ${remaining} segundo(s) para solicitar outro código.`);
+  updateAuthResendButton(kind);
+  return true;
+}
+
+function setAuthButtonLabel(button, label) {
+  if (!button) return;
+  button.textContent = label;
+}
+
 
 function getStoredRegisterVerification() {
   try {
@@ -103,18 +166,15 @@ function toggleAuthForm(form) {
         if (step1) step1.style.display = 'none';
         if (step2) step2.style.display = 'block';
         const sentEmailEl = document.getElementById('register-sent-email');
-        const confirmEmailEl = document.getElementById('register-confirm-email');
         if (sentEmailEl && storedVerification.email) sentEmailEl.textContent = storedVerification.email;
-        if (confirmEmailEl && storedVerification.email) confirmEmailEl.value = storedVerification.email;
+        updateAuthResendButton('register');
       } else {
         currentRegisterTicket = null;
         if (step1) step1.style.display = 'block';
         if (step2) step2.style.display = 'none';
         const existingEmail = (document.getElementById('login-email')?.value || '').trim();
         const regEmail = document.getElementById('register-email');
-        const regEmailConfirm = document.getElementById('register-email-confirm');
         if (regEmail && !regEmail.value && existingEmail) regEmail.value = existingEmail;
-        if (regEmailConfirm && !regEmailConfirm.value && existingEmail) regEmailConfirm.value = existingEmail;
       }
     }
   }
@@ -130,11 +190,9 @@ function toggleAuthForm(form) {
       
       const existingEmail = (document.getElementById('login-email')?.value || document.getElementById('register-email')?.value || '').trim();
       const emailInput = document.getElementById('forgot-email');
-      const emailConfirmInput = document.getElementById('forgot-email-confirm');
       const codeInput = document.getElementById('forgot-code');
       const passInput = document.getElementById('forgot-new-password');
       if (emailInput && existingEmail) emailInput.value = existingEmail;
-      if (emailConfirmInput && existingEmail) emailConfirmInput.value = existingEmail;
       if (codeInput) codeInput.value = '';
       if (passInput) passInput.value = '';
     }
@@ -181,10 +239,6 @@ function backToForgotStep1() {
   const codeEl = document.getElementById('forgot-code');
   if (codeEl) codeEl.value = '';
   const emailEl = document.getElementById('forgot-email');
-  const emailConfirmEl = document.getElementById('forgot-email-confirm');
-  if (emailEl && emailConfirmEl && emailEl.value && !emailConfirmEl.value) {
-    emailConfirmEl.value = emailEl.value;
-  }
   emailEl?.focus();
 }
 
@@ -260,23 +314,24 @@ async function handleDirectRegister() {
   }
 }
 
-async function handleSendRegisterCode() {
+async function handleSendRegisterCode(options = {}) {
   clearAuthAlerts();
+  const isResend = Boolean(options.resend);
+  if (enforceAuthCooldown('register', 'register')) return;
+
   const nameEl = document.getElementById('register-name');
   const emailEl = document.getElementById('register-email');
-  const emailConfirmEl = document.getElementById('register-email-confirm');
   const passwordEl = document.getElementById('register-password');
   const whatsappEl = document.getElementById('register-whatsapp');
-  const btnEl = document.getElementById('btn-register-send-code');
+  const btnEl = document.getElementById(isResend ? 'btn-register-resend' : 'btn-register-send-code');
 
-  if (!nameEl || !emailEl || !emailConfirmEl || !passwordEl) {
+  if (!nameEl || !emailEl || !passwordEl) {
     showAuthAlert('register', 'error', 'Formulário de cadastro não encontrado.');
     return;
   }
 
   const name = nameEl.value.trim();
   const email = emailEl.value.trim().toLowerCase();
-  const emailConfirm = emailConfirmEl.value.trim().toLowerCase();
   const password = passwordEl.value;
   const whatsapp = whatsappEl ? whatsappEl.value.trim() : '';
 
@@ -285,27 +340,23 @@ async function handleSendRegisterCode() {
     nameEl.focus();
     return;
   }
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email || !emailRegex.test(email) || email.includes('..')) {
     showAuthAlert('register', 'error', 'Informe um endereço de e-mail válido.');
     emailEl.focus();
     return;
   }
-  if (!emailConfirm || emailConfirm !== email) {
-    showAuthAlert('register', 'error', 'Os dois campos de e-mail precisam ser iguais.');
-    emailConfirmEl.focus();
-    return;
-  }
+
   if (!password || password.length < 8) {
     showAuthAlert('register', 'error', 'A senha deve ter no mínimo 8 caracteres.');
     passwordEl.focus();
     return;
   }
 
-  const originalBtnText = btnEl ? btnEl.innerHTML : '';
   if (btnEl) {
     btnEl.disabled = true;
-    btnEl.innerHTML = '⏳ Enviando código de confirmação...';
+    setAuthButtonLabel(btnEl, 'Enviando código...');
   }
 
   try {
@@ -315,11 +366,20 @@ async function handleSendRegisterCode() {
     });
 
     storeRegisterVerification(data.verificationTicket, email);
+    setAuthCooldown('register', Number(data.resendAfterSeconds || 30));
 
     const sentEmailEl = document.getElementById('register-sent-email');
-    const confirmEmailEl = document.getElementById('register-confirm-email');
     if (sentEmailEl) sentEmailEl.textContent = email;
-    if (confirmEmailEl) confirmEmailEl.value = email;
+
+    const statusEl = document.getElementById('register-code-status');
+    if (statusEl) {
+      statusEl.className = 'auth-code-status auth-code-status-success';
+      statusEl.innerHTML = `
+        <strong>${isResend ? 'Novo código enviado.' : 'Código enviado.'}</strong>
+        <span>Enviamos 6 dígitos para <strong>${escapeHtml(email)}</strong>.</span>
+        <span>${isResend ? 'Use somente o código mais recente. ' : ''}O código vale por 15 minutos.</span>
+      `;
+    }
 
     const devBanner = document.getElementById('register-dev-banner');
     if (devBanner) {
@@ -337,40 +397,26 @@ async function handleSendRegisterCode() {
     if (step1) step1.style.display = 'none';
     if (step2) step2.style.display = 'block';
 
+    updateAuthResendButton('register');
+    showAuthAlert('register', 'success', isResend
+      ? 'Novo código enviado. Use apenas o código mais recente.'
+      : 'Código enviado. Verifique seu e-mail.');
+
     const codeEl = document.getElementById('register-code');
     if (codeEl) {
       codeEl.value = '';
       codeEl.focus();
     }
-
-    showAuthAlert('register', 'info', 'Código enviado! Verifique sua caixa de entrada.');
   } catch (err) {
-    showAuthAlert('register', 'error', err.message);
+    showAuthAlert('register', 'error', err.message || 'Não foi possível enviar o código.');
   } finally {
-    if (btnEl) {
-      btnEl.disabled = false;
-      btnEl.innerHTML = originalBtnText;
+    const sendBtn = document.getElementById('btn-register-send-code');
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      setAuthButtonLabel(sendBtn, 'Enviar código de confirmação');
     }
+    if (isResend) updateAuthResendButton('register');
   }
-}
-
-function resendRegisterCodeToVisibleEmail() {
-  const visibleEmailEl = document.getElementById('register-confirm-email');
-  const sourceEmailEl = document.getElementById('register-email');
-  const sourceEmailConfirmEl = document.getElementById('register-email-confirm');
-  const email = String(visibleEmailEl?.value || '').trim().toLowerCase();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!email || !emailRegex.test(email) || email.includes('..')) {
-    showAuthAlert('register', 'error', 'Informe um endereço de e-mail válido.');
-    visibleEmailEl?.focus();
-    return;
-  }
-
-  if (sourceEmailEl) sourceEmailEl.value = email;
-  if (sourceEmailConfirmEl) sourceEmailConfirmEl.value = email;
-  clearRegisterVerification();
-  handleSendRegisterCode();
 }
 
 async function handleVerifyAndRegister() {
@@ -395,10 +441,9 @@ async function handleVerifyAndRegister() {
     return;
   }
 
-  const originalBtnText = btnEl ? btnEl.innerHTML : '';
   if (btnEl) {
     btnEl.disabled = true;
-    btnEl.innerHTML = '⏳ Confirmando e criando conta...';
+    setAuthButtonLabel(btnEl, 'Confirmando...');
   }
 
   try {
@@ -420,7 +465,7 @@ async function handleVerifyAndRegister() {
   } finally {
     if (btnEl) {
       btnEl.disabled = false;
-      btnEl.innerHTML = originalBtnText;
+      setAuthButtonLabel(btnEl, 'Confirmar e criar conta');
     }
   }
 }
@@ -563,73 +608,87 @@ async function handleConfirmEmailChange() {
   }
 }
 
-async function handleForgotPassword() {
+async function handleForgotPassword(options = {}) {
   clearAuthAlerts();
+  const isResend = Boolean(options.resend);
+  if (enforceAuthCooldown('forgot', 'forgot')) return;
+
   const emailInput = document.getElementById('forgot-email');
-  const emailConfirmInput = document.getElementById('forgot-email-confirm');
   const email = emailInput?.value.trim().toLowerCase();
-  const emailConfirm = emailConfirmInput?.value.trim().toLowerCase();
-  const btnEl = document.getElementById('btn-forgot-send');
+  const btnEl = document.getElementById(isResend ? 'btn-forgot-resend' : 'btn-forgot-send');
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email || !emailRegex.test(email) || email.includes('..')) {
     showAuthAlert('forgot', 'error', 'Informe um endereço de e-mail válido.');
-    if (emailInput) emailInput.focus();
-    return;
-  }
-  if (!emailConfirm || emailConfirm !== email) {
-    showAuthAlert('forgot', 'error', 'Os dois campos de e-mail precisam ser iguais.');
-    if (emailConfirmInput) emailConfirmInput.focus();
+    emailInput?.focus();
     return;
   }
 
-  const originalBtnText = btnEl ? btnEl.innerHTML : '';
   if (btnEl) {
     btnEl.disabled = true;
-    btnEl.innerHTML = '⏳ Enviando código...';
+    setAuthButtonLabel(btnEl, 'Enviando código...');
   }
 
   try {
-    const res = await api('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
-    if (!res) return;
+    const res = await api('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+
+    setAuthCooldown('forgot', Number(res.resendAfterSeconds || 30));
+
     const step1 = document.getElementById('forgot-step-1');
     const step2 = document.getElementById('forgot-step-2');
     const banner = document.getElementById('forgot-code-banner');
     const targetEmailEl = document.getElementById('forgot-target-email');
+    const statusEl = document.getElementById('forgot-code-status');
 
-    if (targetEmailEl) targetEmailEl.value = email;
+    if (targetEmailEl) targetEmailEl.textContent = email;
     if (step1) step1.style.display = 'none';
     if (step2) step2.style.display = 'block';
+
+    if (statusEl) {
+      statusEl.className = 'auth-code-status auth-code-status-success';
+      statusEl.innerHTML = `
+        <strong>${isResend ? 'Nova solicitação enviada.' : 'Solicitação recebida.'}</strong>
+        <span>Se <strong>${escapeHtml(email)}</strong> estiver cadastrado, enviaremos um código de 6 dígitos.</span>
+        <span>${isResend ? 'Use somente o código mais recente. ' : ''}O código vale por 15 minutos.</span>
+      `;
+    }
 
     if (banner) {
       if (res.code) {
         banner.style.display = 'block';
-        banner.innerHTML = `🔑 Código para teste:<br><strong style="font-size:1.3rem;letter-spacing:4px;color:var(--accent);">${res.code}</strong>`;
+        banner.innerHTML = `<strong>Código para teste:</strong><br><strong style="font-size:1.3rem;letter-spacing:4px;color:var(--accent);">${res.code}</strong>`;
       } else {
         banner.style.display = 'none';
         banner.innerHTML = '';
       }
     }
 
-    showAuthAlert('forgot', 'info', res.message || 'Código enviado! Verifique seu e-mail e cadastre sua nova senha.');
+    updateAuthResendButton('forgot');
+    showAuthAlert('forgot', 'success', 'Se o e-mail estiver cadastrado, o código foi enviado.');
+
     const codeEl = document.getElementById('forgot-code');
     if (codeEl) {
       codeEl.value = '';
       codeEl.focus();
     }
   } catch (err) {
-    showAuthAlert('forgot', 'error', err.message || 'Erro ao enviar código de recuperação.');
+    showAuthAlert('forgot', 'error', err.message || 'Não foi possível solicitar o código agora.');
   } finally {
-    if (btnEl) {
-      btnEl.disabled = false;
-      btnEl.innerHTML = originalBtnText;
+    const sendBtn = document.getElementById('btn-forgot-send');
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      setAuthButtonLabel(sendBtn, 'Enviar código de recuperação');
     }
+    if (isResend) updateAuthResendButton('forgot');
   }
 }
 
 async function handleResetPassword() {
   clearAuthAlerts();
-  const email = (document.getElementById('forgot-target-email')?.value || document.getElementById('forgot-email')?.value || '').trim().toLowerCase();
+  const email = (document.getElementById('forgot-target-email')?.textContent || document.getElementById('forgot-email')?.value || '').trim().toLowerCase();
   const codeEl = document.getElementById('forgot-code');
   const code = (codeEl?.value || '').trim();
   const passEl = document.getElementById('forgot-new-password');
@@ -653,10 +712,9 @@ async function handleResetPassword() {
     return;
   }
 
-  const originalBtnText = btnEl ? btnEl.innerHTML : '';
   if (btnEl) {
     btnEl.disabled = true;
-    btnEl.innerHTML = '⏳ Salvando nova senha...';
+    setAuthButtonLabel(btnEl, 'Salvando...');
   }
 
   try {
@@ -670,7 +728,7 @@ async function handleResetPassword() {
   } finally {
     if (btnEl) {
       btnEl.disabled = false;
-      btnEl.innerHTML = originalBtnText;
+      setAuthButtonLabel(btnEl, 'Salvar nova senha');
     }
   }
 }

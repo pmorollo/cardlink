@@ -771,3 +771,71 @@
     padding: 22px 18px;
   }
 }
+
+
+/* Auth UX — ações críticas sempre legíveis */
+.auth-card .auth-action-button,
+.auth-card .btn-primary {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 700;
+}
+
+.auth-card .btn-secondary {
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+}
+
+.auth-card button:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.auth-code-status {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+  padding: 13px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.auth-code-status-success {
+  background: rgba(16,185,129,0.10);
+  border: 1px solid rgba(16,185,129,0.42);
+  color: var(--text-primary);
+}
+
+.auth-code-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.auth-link-button {
+  padding: 0;
+  color: var(--accent);
+  -webkit-text-fill-color: var(--accent);
+  font-size: 0.84rem;
+  font-weight: 650;
+  text-decoration: underline;
+  background: transparent;
+}
+
+.auth-link-button:disabled {
+  color: var(--text-muted);
+  -webkit-text-fill-color: var(--text-muted);
+  text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .auth-code-actions {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+}

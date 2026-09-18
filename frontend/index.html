@@ -7,7 +7,7 @@
   <title>CardLink — Tudo o que seu cliente precisa ver antes de chamar você</title>
   <link rel="stylesheet" href="styles-base.css?v=47">
   <link rel="stylesheet" href="styles-builder.css?v=45">
-  <link rel="stylesheet" href="styles-dashboard.css?v=46">
+  <link rel="stylesheet" href="styles-dashboard.css?v=47">
   <link rel="stylesheet" href="styles-public.css?v=48">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
@@ -452,10 +452,10 @@
         <!-- Auth Mode Tabs (Alternar entre Cadastro e Login) -->
         <div class="auth-tabs" style="display:flex;background:rgba(255,255,255,0.06);padding:4px;border-radius:12px;margin-bottom:24px;gap:4px;">
           <button type="button" id="tab-auth-register" onclick="toggleAuthForm('register')" style="flex:1;padding:10px 14px;border:none;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;background:linear-gradient(135deg,var(--accent),#9333ea);color:#fff;transition:all 0.2s;">
-            🎁 Criar Conta Grátis
+            Criar Conta
           </button>
           <button type="button" id="tab-auth-login" onclick="toggleAuthForm('login')" style="flex:1;padding:10px 14px;border:none;border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;background:transparent;color:var(--text-secondary);transition:all 0.2s;">
-            🔑 Entrar na Conta
+            Entrar
           </button>
         </div>
 
@@ -476,7 +476,7 @@
             </div>
           </div>
           <button class="btn btn-primary btn-lg" id="btn-login" style="width:100%;margin-top:var(--space-md);font-weight:700;" onclick="handleLogin()">
-            🔑 Entrar
+            Entrar
           </button>
           <p class="auth-toggle">
             Ainda não tem conta? <a href="#" onclick="toggleAuthForm('register');return false;">Criar conta grátis</a>
@@ -486,7 +486,7 @@
         <!-- Register Form: Criar conta grátis instantânea -->
         <div id="register-form">
           <h1 class="auth-title">Criar Conta no <span class="text-gradient">CardLink</span></h1>
-          <p class="auth-subtitle">🎁 Crie seu CardLink grátis. Sem cartão de crédito.</p>
+          <p class="auth-subtitle">Crie seu CardLink grátis. Sem cartão de crédito.</p>
           <div id="register-alert" class="auth-alert"></div>
 
           <!-- Passo 1: Informações Cadastrais -->
@@ -500,10 +500,6 @@
               <input class="form-input" type="email" id="register-email" placeholder="seu@email.com" autocomplete="email">
             </div>
             <div class="form-group">
-              <label class="form-label" for="register-email-confirm">Confirme seu E-mail</label>
-              <input class="form-input" type="email" id="register-email-confirm" placeholder="Digite novamente seu e-mail" autocomplete="email">
-            </div>
-            <div class="form-group">
               <label class="form-label" for="register-whatsapp">WhatsApp (opcional)</label>
               <input class="form-input" type="tel" id="register-whatsapp" placeholder="(11) 99999-9999" autocomplete="tel">
             </div>
@@ -511,7 +507,7 @@
               <label class="form-label" for="register-password">Crie uma Senha</label>
               <input class="form-input" type="password" id="register-password" minlength="8" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
             </div>
-            <button class="btn btn-primary btn-lg" id="btn-register-send-code" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleSendRegisterCode()">
+            <button class="btn btn-primary btn-lg auth-action-button" id="btn-register-send-code" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleSendRegisterCode()">
               Enviar código de confirmação
             </button>
             <p class="auth-toggle">
@@ -519,36 +515,28 @@
             </p>
           </div>
 
-          <!-- Passo 2: confirmação obrigatória do e-mail -->
+          <!-- Passo 2: confirmar o código recebido -->
           <div id="register-step-2" style="display:none;">
-            <div style="background:rgba(124,58,237,0.08);border:1px solid var(--border-subtle);border-radius:10px;padding:14px;margin-bottom:16px;">
-              <p style="font-size:0.95rem;margin:0 0 10px;color:var(--text-primary);font-weight:700;text-align:center;">Confirme seu e-mail</p>
-              <div class="form-group" style="margin-bottom:10px;">
-                <label class="form-label" for="register-confirm-email">E-mail para receber o código</label>
-                <input class="form-input" type="email" id="register-confirm-email" placeholder="seu@email.com" autocomplete="email">
-              </div>
-              <button type="button" class="btn btn-secondary" onclick="resendRegisterCodeToVisibleEmail()" style="width:100%;">
-                Enviar novo código para este e-mail
-              </button>
-              <p style="font-size:0.8rem;margin:10px 0 0;color:var(--text-secondary);text-align:center;">
-                O código tem 6 dígitos e vale por 15 minutos.
-              </p>
-              <span id="register-sent-email" style="display:none;"></span>
+            <div class="auth-code-status auth-code-status-success" id="register-code-status">
+              <strong>Código enviado.</strong>
+              <span>Enviamos 6 dígitos para <strong id="register-sent-email">seu@email.com</strong>.</span>
+              <span>O código vale por 15 minutos.</span>
             </div>
 
             <div id="register-dev-banner" style="display:none;background:rgba(16,185,129,0.15);border:1px solid #10b981;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.85rem;color:var(--text-primary);text-align:center;"></div>
 
             <div class="form-group">
-              <label class="form-label" for="register-code">Código de Verificação (6 Dígitos)</label>
-              <input class="form-input" type="text" id="register-code" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="Ex: 123456" style="letter-spacing:6px;font-size:1.2rem;font-weight:700;text-align:center;" autocomplete="one-time-code">
+              <label class="form-label" for="register-code">Código de verificação</label>
+              <input class="form-input" type="text" id="register-code" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="123456" style="letter-spacing:6px;font-size:1.2rem;font-weight:700;text-align:center;" autocomplete="one-time-code">
             </div>
 
-            <button class="btn btn-primary btn-lg" id="btn-register-verify" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleVerifyAndRegister()">
-              Confirmar e Criar Conta
+            <button class="btn btn-primary btn-lg auth-action-button" id="btn-register-verify" style="width:100%;margin-top:var(--space-md);" onclick="handleVerifyAndRegister()">
+              Confirmar e criar conta
             </button>
 
-            <div style="display:flex;justify-content:flex-end;margin-top:14px;font-size:0.85rem;">
-              <a href="#" onclick="backToRegisterStep1();return false;" style="color:var(--text-secondary);text-decoration:none;">Voltar e alterar meus dados</a>
+            <div class="auth-code-actions">
+              <button type="button" class="auth-link-button" id="btn-register-resend" onclick="handleSendRegisterCode({resend:true})" disabled>Reenviar em 30s</button>
+              <button type="button" class="auth-link-button" onclick="backToRegisterStep1()">Alterar e-mail</button>
             </div>
           </div>
         </div>
@@ -605,42 +593,36 @@
               <label class="form-label" for="forgot-email">Seu E-mail Cadastrado</label>
               <input class="form-input" type="email" id="forgot-email" placeholder="seu@email.com" autocomplete="email">
             </div>
-            <div class="form-group">
-              <label class="form-label" for="forgot-email-confirm">Confirme seu E-mail</label>
-              <input class="form-input" type="email" id="forgot-email-confirm" placeholder="Digite novamente seu e-mail" autocomplete="email">
-            </div>
-            <button class="btn btn-primary btn-lg" id="btn-forgot-send" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleForgotPassword()">
+            <button class="btn btn-primary btn-lg auth-action-button" id="btn-forgot-send" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleForgotPassword()">
               Enviar código de recuperação
             </button>
           </div>
 
-          <!-- Passo 2: Digitar código e cadastrar nova senha -->
+          <!-- Passo 2: código e nova senha -->
           <div id="forgot-step-2" style="display:none;margin-top:12px;">
-            <div style="background:rgba(124,58,237,0.08);border:1px solid var(--border-subtle);border-radius:10px;padding:14px;margin-bottom:16px;">
-              <div class="form-group" style="margin-bottom:10px;">
-                <label class="form-label" for="forgot-target-email">E-mail usado para receber o código</label>
-                <input class="form-input" type="email" id="forgot-target-email" readonly>
-              </div>
-              <button type="button" class="btn btn-secondary" onclick="backToForgotStep1()" style="width:100%;">
-                Alterar e-mail
-              </button>
+            <div class="auth-code-status auth-code-status-success" id="forgot-code-status">
+              <strong>Solicitação recebida.</strong>
+              <span>Se <strong id="forgot-target-email">seu@email.com</strong> estiver cadastrado, enviaremos um código de 6 dígitos.</span>
+              <span>O código vale por 15 minutos.</span>
             </div>
 
             <div id="forgot-code-banner" style="display:none;background:rgba(16,185,129,0.15);border:1px solid #10b981;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.85rem;color:var(--text-primary);text-align:center;"></div>
 
             <div class="form-group">
-              <label class="form-label" for="forgot-code">Código de 6 Dígitos</label>
-              <input class="form-input" type="text" id="forgot-code" maxlength="6" placeholder="Ex: 123456" style="letter-spacing:6px;font-size:1.2rem;font-weight:700;text-align:center;" autocomplete="one-time-code">
+              <label class="form-label" for="forgot-code">Código de recuperação</label>
+              <input class="form-input" type="text" id="forgot-code" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="123456" style="letter-spacing:6px;font-size:1.2rem;font-weight:700;text-align:center;" autocomplete="one-time-code">
             </div>
             <div class="form-group">
-              <label class="form-label" for="forgot-new-password">Nova Senha (mínimo 8 caracteres)</label>
-              <input class="form-input" type="password" id="forgot-new-password" minlength="8" placeholder="Digite sua nova senha" autocomplete="new-password">
+              <label class="form-label" for="forgot-new-password">Nova senha</label>
+              <input class="form-input" type="password" id="forgot-new-password" minlength="8" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
             </div>
-            <button class="btn btn-primary btn-lg" id="btn-forgot-reset" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleResetPassword()">
+            <button class="btn btn-primary btn-lg auth-action-button" id="btn-forgot-reset" style="width:100%;margin-top:var(--space-md);" onclick="handleResetPassword()">
               Salvar nova senha
             </button>
-            <div style="text-align:center;margin-top:14px;">
-              <a href="#" onclick="handleForgotPassword();return false;" style="color:var(--accent);font-size:0.85rem;text-decoration:none;">Não recebeu? Reenviar código</a>
+
+            <div class="auth-code-actions">
+              <button type="button" class="auth-link-button" id="btn-forgot-resend" onclick="handleForgotPassword({resend:true})" disabled>Reenviar em 30s</button>
+              <button type="button" class="auth-link-button" onclick="backToForgotStep1()">Alterar e-mail</button>
             </div>
           </div>
 
@@ -1507,7 +1489,7 @@
 
   <script src="bootstrap.js?v=2"></script>
   <script src="app-core.js?v=47"></script>
-  <script src="app-auth.js?v=52"></script>
+  <script src="app-auth.js?v=53"></script>
   <script src="app-dashboard.js?v=45"></script>
   <script src="app-builder.js?v=45"></script>
   <script src="app-extras.js?v=45"></script>

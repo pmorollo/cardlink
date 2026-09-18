@@ -48,6 +48,22 @@ const passwordRecoveryLimiter = rateLimit({
   legacyHeaders: false
 });
 
+const registrationCodeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'test' ? 1000 : 10,
+  message: { error: 'Muitas solicitações de código. Aguarde alguns minutos e tente novamente.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const registrationVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'test' ? 1000 : 10,
+  message: { error: 'Muitas tentativas de verificação. Solicite um novo código mais tarde.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 // Em produção o código de recuperação não é devolvido na resposta da API.
 // Para testes em desenvolvimento (NODE_ENV !== 'production') ele ainda é retornado.
 const isProduction = process.env.NODE_ENV === 'production';
@@ -61,7 +77,7 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
-router.post('/register/send-code', async (req, res) => {
+router.post('/register/send-code', registrationCodeLimiter, async (req, res) => {
   try {
     const name = String(req.body.name || '').trim();
     const email = String(req.body.email || '').trim().toLowerCase();
@@ -129,7 +145,9 @@ router.post('/register/send-code', async (req, res) => {
     const payload = {
       message: 'Código de confirmação enviado para o seu e-mail!',
       verificationTicket,
-      email
+      email,
+      resendAfterSeconds: 30,
+      expiresInSeconds: 15 * 60
     };
     if (!isProduction) {
       payload.code = code;
@@ -141,7 +159,7 @@ router.post('/register/send-code', async (req, res) => {
   }
 });
 
-router.post('/register', async (req, res) => {
+router.post('/register', registrationVerifyLimiter, async (req, res) => {
   try {
     const { verificationTicket, code } = req.body;
 
@@ -470,10 +488,10 @@ router.post('/forgot-password', passwordRecoveryLimiter, async (req, res) => {
 
   const user = await users.findByEmail(userEmail);
   // Não revela se o e-mail existe: resposta idêntica em ambos os casos
-  const genericMessage = 'Se o e-mail estiver cadastrado, um código de recuperação foi gerado.';
+  const genericMessage = 'Se o e-mail estiver cadastrado, enviaremos um código de recuperação.';
 
   if (!user) {
-    return res.json({ message: genericMessage });
+    return res.json({ message: genericMessage, resendAfterSeconds: 30, expiresInSeconds: 15 * 60 });
   }
 
   const code = crypto.randomInt(100000, 1000000).toString();
@@ -503,7 +521,7 @@ router.post('/forgot-password', passwordRecoveryLimiter, async (req, res) => {
     `
   }).catch(err => console.error('Falha ao enviar e-mail de recuperação:', err.message));
 
-  const payload = { message: genericMessage };
+  const payload = { message: genericMessage, resendAfterSeconds: 30, expiresInSeconds: 15 * 60 };
   if (!isProduction) {
     payload.code = code;
     payload.message = 'Código de recuperação gerado com sucesso!';
