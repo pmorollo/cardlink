@@ -112,7 +112,9 @@ function toggleAuthForm(form) {
         if (step2) step2.style.display = 'none';
         const existingEmail = (document.getElementById('login-email')?.value || '').trim();
         const regEmail = document.getElementById('register-email');
+        const regEmailConfirm = document.getElementById('register-email-confirm');
         if (regEmail && !regEmail.value && existingEmail) regEmail.value = existingEmail;
+        if (regEmailConfirm && !regEmailConfirm.value && existingEmail) regEmailConfirm.value = existingEmail;
       }
     }
   }
@@ -128,9 +130,11 @@ function toggleAuthForm(form) {
       
       const existingEmail = (document.getElementById('login-email')?.value || document.getElementById('register-email')?.value || '').trim();
       const emailInput = document.getElementById('forgot-email');
+      const emailConfirmInput = document.getElementById('forgot-email-confirm');
       const codeInput = document.getElementById('forgot-code');
       const passInput = document.getElementById('forgot-new-password');
       if (emailInput && existingEmail) emailInput.value = existingEmail;
+      if (emailConfirmInput && existingEmail) emailConfirmInput.value = existingEmail;
       if (codeInput) codeInput.value = '';
       if (passInput) passInput.value = '';
     }
@@ -156,12 +160,21 @@ function backToForgotStep1() {
   const step2 = document.getElementById('forgot-step-2');
   if (step1) step1.style.display = 'block';
   if (step2) step2.style.display = 'none';
+  const codeEl = document.getElementById('forgot-code');
+  if (codeEl) codeEl.value = '';
+  const emailEl = document.getElementById('forgot-email');
+  const emailConfirmEl = document.getElementById('forgot-email-confirm');
+  if (emailEl && emailConfirmEl && emailEl.value && !emailConfirmEl.value) {
+    emailConfirmEl.value = emailEl.value;
+  }
+  emailEl?.focus();
 }
 
 async function handleDirectRegister() {
   clearAuthAlerts();
   const nameEl = document.getElementById('register-name');
   const emailEl = document.getElementById('register-email');
+  const emailConfirmEl = document.getElementById('register-email-confirm');
   const passwordEl = document.getElementById('register-password');
   const whatsappEl = document.getElementById('register-whatsapp');
   const btnEl = document.getElementById('btn-register-direct');
@@ -173,6 +186,7 @@ async function handleDirectRegister() {
 
   const name = nameEl.value.trim();
   const email = emailEl.value.trim().toLowerCase();
+  const emailConfirm = emailConfirmEl ? emailConfirmEl.value.trim().toLowerCase() : '';
   const password = passwordEl.value;
   const whatsapp = whatsappEl ? whatsappEl.value.trim() : '';
 
@@ -185,6 +199,11 @@ async function handleDirectRegister() {
   if (!email || !emailRegex.test(email) || email.includes('..')) {
     showAuthAlert('register', 'error', 'Informe um endereço de e-mail válido.');
     emailEl.focus();
+    return;
+  }
+  if (!emailConfirm || emailConfirm !== email) {
+    showAuthAlert('register', 'error', 'Os dois campos de e-mail precisam ser iguais.');
+    emailConfirmEl?.focus();
     return;
   }
   if (!password || password.length < 8) {
@@ -313,6 +332,7 @@ async function handleSendRegisterCode() {
 function resendRegisterCodeToVisibleEmail() {
   const visibleEmailEl = document.getElementById('register-confirm-email');
   const sourceEmailEl = document.getElementById('register-email');
+  const sourceEmailConfirmEl = document.getElementById('register-email-confirm');
   const email = String(visibleEmailEl?.value || '').trim().toLowerCase();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -323,6 +343,7 @@ function resendRegisterCodeToVisibleEmail() {
   }
 
   if (sourceEmailEl) sourceEmailEl.value = email;
+  if (sourceEmailConfirmEl) sourceEmailConfirmEl.value = email;
   clearRegisterVerification();
   handleSendRegisterCode();
 }
@@ -520,13 +541,20 @@ async function handleConfirmEmailChange() {
 async function handleForgotPassword() {
   clearAuthAlerts();
   const emailInput = document.getElementById('forgot-email');
+  const emailConfirmInput = document.getElementById('forgot-email-confirm');
   const email = emailInput?.value.trim().toLowerCase();
+  const emailConfirm = emailConfirmInput?.value.trim().toLowerCase();
   const btnEl = document.getElementById('btn-forgot-send');
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email || !emailRegex.test(email) || email.includes('..')) {
     showAuthAlert('forgot', 'error', 'Informe um endereço de e-mail válido.');
     if (emailInput) emailInput.focus();
+    return;
+  }
+  if (!emailConfirm || emailConfirm !== email) {
+    showAuthAlert('forgot', 'error', 'Os dois campos de e-mail precisam ser iguais.');
+    if (emailConfirmInput) emailConfirmInput.focus();
     return;
   }
 
@@ -544,7 +572,7 @@ async function handleForgotPassword() {
     const banner = document.getElementById('forgot-code-banner');
     const targetEmailEl = document.getElementById('forgot-target-email');
 
-    if (targetEmailEl) targetEmailEl.textContent = email;
+    if (targetEmailEl) targetEmailEl.value = email;
     if (step1) step1.style.display = 'none';
     if (step2) step2.style.display = 'block';
 
@@ -576,7 +604,7 @@ async function handleForgotPassword() {
 
 async function handleResetPassword() {
   clearAuthAlerts();
-  const email = (document.getElementById('forgot-email')?.value || document.getElementById('forgot-target-email')?.textContent || '').trim().toLowerCase();
+  const email = (document.getElementById('forgot-target-email')?.value || document.getElementById('forgot-email')?.value || '').trim().toLowerCase();
   const codeEl = document.getElementById('forgot-code');
   const code = (codeEl?.value || '').trim();
   const passEl = document.getElementById('forgot-new-password');

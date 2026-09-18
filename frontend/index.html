@@ -501,6 +501,10 @@
               <input class="form-input" type="email" id="register-email" placeholder="seu@email.com" autocomplete="email">
             </div>
             <div class="form-group">
+              <label class="form-label" for="register-email-confirm">Confirme seu E-mail</label>
+              <input class="form-input" type="email" id="register-email-confirm" placeholder="Digite novamente seu e-mail" autocomplete="email">
+            </div>
+            <div class="form-group">
               <label class="form-label" for="register-whatsapp">WhatsApp (opcional)</label>
               <input class="form-input" type="tel" id="register-whatsapp" placeholder="(11) 99999-9999" autocomplete="tel">
             </div>
@@ -602,17 +606,25 @@
               <label class="form-label" for="forgot-email">Seu E-mail Cadastrado</label>
               <input class="form-input" type="email" id="forgot-email" placeholder="seu@email.com" autocomplete="email">
             </div>
+            <div class="form-group">
+              <label class="form-label" for="forgot-email-confirm">Confirme seu E-mail</label>
+              <input class="form-input" type="email" id="forgot-email-confirm" placeholder="Digite novamente seu e-mail" autocomplete="email">
+            </div>
             <button class="btn btn-primary btn-lg" id="btn-forgot-send" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleForgotPassword()">
-              ✉️ Enviar Código de Recuperação
+              Enviar código de recuperação
             </button>
           </div>
 
           <!-- Passo 2: Digitar código e cadastrar nova senha -->
           <div id="forgot-step-2" style="display:none;margin-top:12px;">
-            <div style="background:rgba(124,58,237,0.12);border:1px solid var(--accent);border-radius:10px;padding:12px 14px;margin-bottom:16px;text-align:center;">
-              <p style="margin:0 0 4px;font-size:0.88rem;color:var(--text-primary);font-weight:600;">Código de recuperação enviado para:</p>
-              <p style="margin:0 0 8px;font-size:0.95rem;font-weight:700;color:var(--accent);" id="forgot-target-email">seu@email.com</p>
-              <a href="#" onclick="backToForgotStep1();return false;" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:underline;">✏️ Digitar outro e-mail</a>
+            <div style="background:rgba(124,58,237,0.08);border:1px solid var(--border-subtle);border-radius:10px;padding:14px;margin-bottom:16px;">
+              <div class="form-group" style="margin-bottom:10px;">
+                <label class="form-label" for="forgot-target-email">E-mail usado para receber o código</label>
+                <input class="form-input" type="email" id="forgot-target-email" readonly>
+              </div>
+              <button type="button" class="btn btn-secondary" onclick="backToForgotStep1()" style="width:100%;">
+                Alterar e-mail
+              </button>
             </div>
 
             <div id="forgot-code-banner" style="display:none;background:rgba(16,185,129,0.15);border:1px solid #10b981;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.85rem;color:var(--text-primary);text-align:center;"></div>
@@ -626,10 +638,10 @@
               <input class="form-input" type="password" id="forgot-new-password" minlength="8" placeholder="Digite sua nova senha" autocomplete="new-password">
             </div>
             <button class="btn btn-primary btn-lg" id="btn-forgot-reset" style="width:100%;margin-top:var(--space-md);background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;" onclick="handleResetPassword()">
-              🔑 Salvar Nova Senha e Entrar
+              Salvar nova senha
             </button>
             <div style="text-align:center;margin-top:14px;">
-              <a href="#" onclick="handleForgotPassword();return false;" style="color:var(--accent);font-size:0.85rem;text-decoration:none;">🔄 Não recebeu? Reenviar código</a>
+              <a href="#" onclick="handleForgotPassword();return false;" style="color:var(--accent);font-size:0.85rem;text-decoration:none;">Não recebeu? Reenviar código</a>
             </div>
           </div>
 
@@ -1496,7 +1508,7 @@
 
   <script src="bootstrap.js?v=2"></script>
   <script src="app-core.js?v=46"></script>
-  <script src="app-auth.js?v=49"></script>
+  <script src="app-auth.js?v=50"></script>
   <script src="app-dashboard.js?v=45"></script>
   <script src="app-builder.js?v=45"></script>
   <script src="app-extras.js?v=45"></script>
