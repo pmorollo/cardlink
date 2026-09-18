@@ -153,9 +153,10 @@ function beginFreeRegistration() {
 
   navigateTo('auth');
   toggleAuthForm('register');
+  window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
 
-  const emailEl = document.getElementById('register-email');
-  if (emailEl) window.setTimeout(() => emailEl.focus(), 50);
+  const nameEl = document.getElementById('register-name');
+  if (nameEl) window.setTimeout(() => nameEl.focus(), 80);
 }
 
 function backToRegisterStep1() {

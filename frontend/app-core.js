@@ -216,6 +216,7 @@ function handleRoute() {
   } else if (hash.startsWith('#auth') || hash.startsWith('#register')) {
     if (!authToken) {
       document.getElementById('auth-view').classList.add('active');
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       if (hash.includes('login')) {
         toggleAuthForm('login');
       } else {
@@ -405,7 +406,6 @@ function updateNavAuth() {
       <a href="#como-funciona" class="navbar-link hide-mobile">Como funciona</a>
       <a href="#demonstracao" class="navbar-link hide-mobile">Demonstração</a>
       <button class="navbar-login" onclick="navigateTo('auth'); toggleAuthForm('login');">Entrar na conta</button>
-      <button class="btn btn-primary btn-sm navbar-subscribe" onclick="redirectToCheckout('monthly')">Assinar Pro — R$ 12,90</button>
     `;
   }
 }

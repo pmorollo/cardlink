@@ -369,9 +369,10 @@
 .auth-container {
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: var(--space-xl);
+  padding: calc(88px + var(--space-xl)) var(--space-xl) var(--space-2xl);
+  scroll-margin-top: 88px;
 }
 
 .auth-card {
@@ -760,3 +761,13 @@
   color: var(--text-secondary);
 }
 
+
+@media (max-width: 600px) {
+  .auth-container {
+    padding: 92px 14px 32px;
+  }
+
+  .auth-card {
+    padding: 22px 18px;
+  }
+}
