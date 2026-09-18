@@ -26,3 +26,21 @@ npm start
 ```
 
 Não use o armazenamento JSON local como substituto do PostgreSQL em produção.
+
+## Exportação segura do projeto
+
+Para gerar um pacote de entrega/backup sem credenciais e sem dados locais, use:
+
+```bash
+npm run export:zip
+```
+
+O exportador `backend/scripts/make-zip.js` bloqueia automaticamente, entre outros:
+
+- `.env` e variantes reais de ambiente (preserva somente `.env.example`);
+- `backend/db/data.json`, SQLite e bancos locais;
+- `node_modules`, `.git`, caches e pastas de IDE;
+- chaves/certificados (`.pem`, `.key`, `.p12`, `.pfx`, etc.);
+- uploads locais, logs e arquivos compactados anteriores.
+
+Antes de gerar o ZIP, o script executa uma auditoria do diretório temporário. Se detectar um arquivo proibido, a exportação é interrompida em vez de criar um pacote inseguro.
