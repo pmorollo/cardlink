@@ -32,7 +32,7 @@ const paymentRoutes = require('./routes/payments');
 const { syncCaktoCatalog } = require('./services/cakto');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('./db/repository');
 const { sendEmail } = require('./utils/email');
-const { isProCustomer } = require('./utils/subscription');
+const { hasActiveCustomerAccess, isProCustomer } = require('./utils/subscription');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -182,7 +182,7 @@ app.get(['/site/:slug/qr', '/site/:slug/qr-whatsapp'], async (req, res) => {
       return res.status(404).send('Cartão não encontrado');
     }
 
-    // Apenas cartões pertencentes a clientes PRO ficam ativos.
+    // O QR integrado/rastreável é um recurso Pro. Contas Free continuam com a página pública ativa.
     const owner = await userRepo.findById(card.user_id);
     const isOwnerPro = isProCustomer(owner);
     if (!isOwnerPro) {
@@ -198,13 +198,13 @@ app.get(['/site/:slug/qr', '/site/:slug/qr-whatsapp'], async (req, res) => {
   }
 });
 
-// Landing page route: somente Pro e com metadados SEO por cliente.
+// Landing page route: disponível para Free e Pro ativos, com metadados SEO por cliente.
 app.get('/site/:slug', async (req, res, next) => {
   try {
     const card = await cardRepo.findBySlug(req.params.slug);
     if (!card) return res.status(404).send('Cartão não encontrado');
     const owner = await userRepo.findById(card.user_id);
-    if (!isProCustomer(owner)) return res.status(402).send('Página temporariamente indisponível');
+    if (!hasActiveCustomerAccess(owner)) return res.status(402).send('Página temporariamente indisponível');
 
     const escapeAttr = value => String(value || '')
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')

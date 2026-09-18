@@ -3,6 +3,7 @@ const slugify = require('slugify');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
 const { requireCustomer } = require('../middleware/roles');
+const { isProCustomer } = require('../utils/subscription');
 
 const router = express.Router();
 
@@ -75,7 +76,8 @@ router.get('/stats/summary', authMiddleware, requireCustomer, async (req, res) =
     return res.json({ hasCard: false, card: null, stats: { views: 0, contacts: 0, qrScans: 0 } });
   }
 
-  const contactList = await contactRepo.findByCardId(card.id);
+  const isPro = isProCustomer(req.currentUser);
+  const contactList = isPro ? await contactRepo.findByCardId(card.id) : [];
   contactList.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   res.json({
@@ -83,9 +85,14 @@ router.get('/stats/summary', authMiddleware, requireCustomer, async (req, res) =
     card,
     stats: {
       views: card.views_count || 0,
-      contacts: contactList.length,
-      qrScans: card.qr_scans_count || 0,
-      recentContacts: contactList.slice(0, 5)
+      contacts: isPro ? contactList.length : 0,
+      qrScans: isPro ? (card.qr_scans_count || 0) : 0,
+      recentContacts: isPro ? contactList.slice(0, 5) : []
+    },
+    features: {
+      contacts: isPro,
+      qr: isPro,
+      catalog_pdf: isPro
     }
   });
 });

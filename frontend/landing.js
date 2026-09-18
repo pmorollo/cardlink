@@ -684,6 +684,11 @@ function renderContact(d) {
   const links = document.getElementById('contact-links');
   if (!links) return;
 
+  const contactForm = document.querySelector('.lp-contact-form');
+  if (contactForm && d.features?.contact_form === false) {
+    contactForm.remove();
+  }
+
   const contactTitle = document.getElementById('contact-title');
   const contactPhoto = document.getElementById('contact-user-photo');
   if (contactPhoto) {

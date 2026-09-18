@@ -123,7 +123,7 @@ async function loadDashboard() {
               <span>🎁</span> Você está usando o Plano Gratuito
             </div>
             <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.4;margin:0;">
-              Sua página está 100% online! Para liberar upload de Catálogo em PDF e galeria de até 10 fotos, assine o Plano Pro por apenas R$ 12,90/mês.
+              Sua página está 100% online e pode ser compartilhada por link. O Pro libera QR Code integrado, mensagens/leads, Catálogo em PDF e galeria ampliada.
             </p>
           </div>
           <button type="button" class="btn btn-primary btn-sm" onclick="openProPaymentModal()" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;background:linear-gradient(135deg,var(--accent),#9333ea);border:none;color:#ffffff;box-shadow:0 4px 12px rgba(124,58,237,0.3);">
@@ -182,16 +182,24 @@ async function loadDashboard() {
           <div class="stat-value">${stats.views}</div>
           <div class="stat-label">Visualizações</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon">📩</div>
-          <div class="stat-value">${stats.contacts}</div>
-          <div class="stat-label">Mensagens Recebidas</div>
-        </div>
-        <div class="stat-card" onclick="openQrCodeModal('${escapeHtml(card.slug)}')" style="cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor=''">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin + '/site/' + card.slug + '/qr')}&bgcolor=ffffff&color=000000" style="width:48px;height:48px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border-subtle);" alt="QR Code">
-          <div class="stat-value" style="font-size:1.05rem;line-height:1;margin-bottom:3px;">${stats.qrScans || 0}</div>
-          <div class="stat-label" style="font-size:0.72rem;font-weight:bold;color:var(--text-secondary);">QR escaneados · abrir código</div>
-        </div>
+        ${isProUser ? `
+          <div class="stat-card">
+            <div class="stat-icon">📩</div>
+            <div class="stat-value">${stats.contacts}</div>
+            <div class="stat-label">Mensagens Recebidas</div>
+          </div>
+          <div class="stat-card" onclick="openQrCodeModal('${escapeHtml(card.slug)}')" style="cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor=''">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin + '/site/' + card.slug + '/qr')}&bgcolor=ffffff&color=000000" style="width:48px;height:48px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border-subtle);" alt="QR Code">
+            <div class="stat-value" style="font-size:1.05rem;line-height:1;margin-bottom:3px;">${stats.qrScans || 0}</div>
+            <div class="stat-label" style="font-size:0.72rem;font-weight:bold;color:var(--text-secondary);">QR escaneados · abrir código</div>
+          </div>
+        ` : `
+          <div class="stat-card" onclick="openProPaymentModal()" style="cursor:pointer;">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value" style="font-size:0.95rem;">PRO</div>
+            <div class="stat-label">Mensagens e QR Code</div>
+          </div>
+        `}
       </div>
 
       <div class="dash-card-full">
@@ -211,11 +219,11 @@ async function loadDashboard() {
 
         <div class="dash-card-actions-bar">
           <button class="btn btn-secondary btn-sm" onclick="shareCard('${escapeHtml(card.slug)}')">Compartilhar</button>
-          <button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">Mensagens recebidas (${stats.contacts})</button>
+          ${isProUser ? `<button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">Mensagens recebidas (${stats.contacts})</button>` : `<button class="btn btn-secondary btn-sm" onclick="openProPaymentModal()">⭐ Mensagens e leads — Pro</button>`}
         </div>
       </div>
 
-      ${recentContacts.length > 0 ? `
+      ${isProUser && recentContacts.length > 0 ? `
         <div style="margin-top:var(--space-xl);">
           <h3 style="font-family:var(--font-display);font-weight:700;margin-bottom:var(--space-md);">📩 Últimas Mensagens</h3>
           <div class="contacts-list">

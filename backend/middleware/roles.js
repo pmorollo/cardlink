@@ -1,5 +1,5 @@
 const { users } = require('../db/repository');
-const { hasActiveCustomerAccess } = require('../utils/subscription');
+const { hasActiveCustomerAccess, isProCustomer } = require('../utils/subscription');
 
 async function requireAdmin(req, res, next) {
   try {
@@ -39,4 +39,23 @@ async function requireCustomer(req, res, next) {
   }
 }
 
-module.exports = { requireAdmin, requireCustomer };
+async function requirePro(req, res, next) {
+  try {
+    const user = req.currentUser || await users.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+    if (!isProCustomer(user)) {
+      return res.status(403).json({
+        error: 'pro_required',
+        message: 'Este recurso está disponível exclusivamente no Plano Pro.'
+      });
+    }
+    req.currentUser = user;
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { requireAdmin, requireCustomer, requirePro };

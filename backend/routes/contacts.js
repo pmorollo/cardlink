@@ -1,9 +1,9 @@
 const express = require('express');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
-const { requireCustomer } = require('../middleware/roles');
+const { requireCustomer, requirePro } = require('../middleware/roles');
 const { sendEmail } = require('../utils/email');
-const { isProCustomer } = require('../utils/subscription');
+const { hasActiveCustomerAccess, isProCustomer } = require('../utils/subscription');
 
 const router = express.Router();
 
@@ -24,16 +24,28 @@ router.get('/public/:slug', async (req, res) => {
   }
 
   const owner = await userRepo.findById(card.user_id);
-  const isOwnerPro = isProCustomer(owner);
-
-  if (!isOwnerPro) {
-    return res.status(402).json({ error: 'subscription_required', message: 'Assinatura pendente para este cartão' });
+  if (!hasActiveCustomerAccess(owner)) {
+    return res.status(402).json({ error: 'account_inactive', message: 'Página temporariamente indisponível' });
   }
 
+  const isOwnerPro = isProCustomer(owner);
   await cardRepo.update(card.id, { views_count: (card.views_count || 0) + 1 });
 
-  // Only expose fields needed for public display — never expose user_id or internals
+  // Only expose fields needed for public display — never expose user_id or internals.
+  // Free pages remain public, but premium content/capabilities are projected out.
   const { user_id, views_count, created_at, updated_at, ...publicCard } = card;
+  if (!isOwnerPro) {
+    publicCard.catalog_pdf_url = '';
+    publicCard.catalog_pdf_title = '';
+    publicCard.gallery = Array.isArray(publicCard.gallery) ? publicCard.gallery.slice(0, 4) : [];
+    if (!['midnight', 'ocean', 'rose'].includes(publicCard.theme)) publicCard.theme = 'midnight';
+  }
+  publicCard.features = {
+    contact_form: isOwnerPro,
+    qr_tracking: isOwnerPro,
+    catalog_pdf: isOwnerPro,
+    gallery_limit: isOwnerPro ? 10 : 4
+  };
   res.json(publicCard);
 });
 
@@ -43,11 +55,13 @@ router.post('/public/:slug/contact', async (req, res) => {
     return res.status(404).json({ error: 'Cartão não encontrado' });
   }
 
-  // Apenas clientes PRO mantêm o cartão público ativo
+  // A página pública existe no Free, mas a captura de leads pelo formulário é exclusiva do Pro.
   const owner = await userRepo.findById(card.user_id);
-  const isOwnerPro = isProCustomer(owner);
-  if (!isOwnerPro) {
-    return res.status(402).json({ error: 'subscription_required', message: 'Assinatura pendente para este cartão' });
+  if (!hasActiveCustomerAccess(owner)) {
+    return res.status(402).json({ error: 'account_inactive', message: 'Página temporariamente indisponível' });
+  }
+  if (!isProCustomer(owner)) {
+    return res.status(403).json({ error: 'pro_required', message: 'O formulário de mensagens está disponível exclusivamente no Plano Pro.' });
   }
 
   // Honeypot anti-spam check
@@ -111,7 +125,7 @@ router.post('/public/:slug/contact', async (req, res) => {
   res.status(201).json({ message: 'Contato enviado com sucesso!' });
 });
 
-router.get('/cards/:cardId/contacts', authMiddleware, requireCustomer, async (req, res) => {
+router.get('/cards/:cardId/contacts', authMiddleware, requireCustomer, requirePro, async (req, res) => {
   const cardId = Number(req.params.cardId);
   const card = await cardRepo.findByIdAndUser(cardId, req.userId);
   if (!card) {

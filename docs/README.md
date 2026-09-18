@@ -8,11 +8,12 @@
 **Público:** pequenos negócios, lojas, profissionais liberais, autônomos e prestadores de serviços que precisam organizar sua presença comercial e facilitar o contato com clientes.
 
 **Oferta:**
-- Mensal: **R$ 12,90/mês**
-- Anual: **R$ 99,00/ano** (equivalente a R$ 8,25/mês)
-- Pagamento via **Cakto**
+- **Free:** R$ 0, página pública ativa e link compartilhável
+- **Pro mensal:** R$ 12,90/mês
+- **Pro anual:** R$ 99,00/ano (equivalente a R$ 8,25/mês)
+- Upgrade Pro via **Cakto**
 
-**Diferenciais comerciais:** serviços/produtos, fotos e portfólio, avaliações, localização, WhatsApp, redes sociais, link compartilhável, QR Code de balcão, métricas e edição pelo próprio assinante.
+**Diferenciais comerciais:** serviços/produtos, fotos e portfólio, avaliações, localização, WhatsApp, redes sociais e link compartilhável no Free; QR Code integrado/rastreado, leads/mensagens, PDF e recursos premium no Pro.
 
 **Mecanismo comercial:**
 > Instagram · Facebook · QR Code → CardLink → WhatsApp
@@ -33,7 +34,8 @@ O **PLANO MESTRE DE OFERTAS E PUBLICIDADE** é uma referência geral/transversal
 
 ## Fluxo de acesso atual
 
-- **Conta de cliente:** nasce somente após pagamento confirmado pela Cakto; recebe link de ativação por e-mail e o próprio comprador define a senha.
+- **Conta Free:** pode ser criada diretamente na landing page, sem cartão, com página pública e link ativos.
+- **Conta Pro:** é uma conta Free promovida após pagamento confirmado pela Cakto, ou uma conta Pro criada a partir de uma compra iniciada antes do cadastro. Cancelamento do Pro rebaixa para Free sem derrubar a página.
 - **Conta administrativa:** única, exclusiva da operação da plataforma, sem site público e sem assinatura.
 - **Conta interna de teste:** criada sem cobrança, marcada como `internal_test`, excluída das métricas comerciais e ativada pelo próprio usuário por link recebido por e-mail.
 

@@ -209,7 +209,7 @@ Estados conceituais:
 - **CANCELLED/INACTIVE:** acesso e página pública suspensos, sem exclusão automática imediata dos dados.
 - **INTERNAL_TEST:** conta de teste interno, fora das métricas comerciais, ativada pelo próprio usuário.
 
-Eventos de cancelamento, estorno ou chargeback podem suspender o acesso. O webhook é a fonte de verdade para ativação comercial; retorno do navegador não deve liberar acesso por si só.
+Eventos de cancelamento, estorno ou chargeback encerram os privilégios Pro e rebaixam a conta para o plano Free. A página pública e o link permanecem ativos; QR integrado/rastreado, leads/mensagens, PDF e demais recursos premium são bloqueados. O webhook é a fonte de verdade para ativação comercial; retorno do navegador não deve liberar acesso por si só.
 
 ## 7. Banco de dados
 

@@ -201,7 +201,7 @@ Avançar para o segundo usuário interno somente se:
 - Landing alinhada à oferta aprovada: **“Tudo o que seu cliente precisa ver antes de chamar você.”**
 - Mecanismo comercial destacado: **Instagram · Facebook · QR Code → CardLink → WhatsApp**.
 - Assistente de conteúdo mantido oculto e retirado da oferta comercial da versão inicial.
-- Manual, modal de assinatura, Termos de Uso e Política de Privacidade revisados para o modelo pago atual, sem plano grátis/PRO legado.
+- Manual, modal de planos, Termos de Uso e Política de Privacidade revisados para o modelo atual Free/Pro: página pública e link no Free; QR integrado, leads, PDF e recursos premium no Pro.
 - `PLANO MESTRE DE OFERTAS E PUBLICIDADE` registrado como referência transversal obrigatória para a auditoria comercial final.
 - Multer atualizado para 2.3.0 e uploads endurecidos com limites de tamanho, arquivo, campos e profundidade.
 - Homologação automatizada após a atualização de segurança: **27 testes aprovados, 0 falhas e 1 teste PostgreSQL ignorado quando `TEST_PG_URL` não é informado**; `npm audit --omit=dev --audit-level=high` retornou **0 vulnerabilidades**.

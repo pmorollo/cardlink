@@ -1,3 +1,5 @@
+> **SUPERADO EM 18/09/2026:** a regra “página pública somente Pro” foi substituída pelo modelo Free/Pro. A página pública e o link funcionam no Free; leads, QR integrado/rastreado e demais recursos premium exigem Pro.
+
 # CardLink — Relatório de correções 2026-09-17
 
 Base: pacote limpo recebido nesta sessão.

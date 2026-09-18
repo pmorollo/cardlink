@@ -391,7 +391,7 @@ function updateNavAuth() {
               ${!isPro ? `<button type="button" onclick="openProPaymentModal();closeUserMenu()" style="font-weight:bold;color:var(--accent);"><span>⭐ Fazer Upgrade para o Pro</span></button>` : ''}
               <button type="button" onclick="navigateTo('dashboard');closeUserMenu()"><span>Visão geral</span></button>
               <button type="button" onclick="openPageSettings();closeUserMenu()"><span>Configurações da página</span></button>
-              ${currentUserCardId ? `<button type="button" onclick="viewContacts(${currentUserCardId}, 'Minha página');closeUserMenu()"><span>Contatos recebidos</span></button>` : ''}
+              ${currentUserCardId && isPro ? `<button type="button" onclick="viewContacts(${currentUserCardId}, 'Minha página');closeUserMenu()"><span>Contatos recebidos</span></button>` : ''}
               <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Minha conta</span></button>
             `}
             <div class="user-menu-divider"></div>

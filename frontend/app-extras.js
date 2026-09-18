@@ -2,6 +2,13 @@
 // Contacts View
 // ============================================
 async function viewContacts(cardId, cardName) {
+  const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' &&
+    (currentUser.subscription_status || 'active') === 'active' && (currentUser.account_status || 'active') === 'active';
+  if (!isProUser) {
+    showToast('⭐', 'Mensagens e captura de leads estão disponíveis no Plano Pro.');
+    openProPaymentModal();
+    return;
+  }
   const nameEl = document.getElementById('contacts-card-name');
   const list   = document.getElementById('contacts-list');
   const count  = document.getElementById('contacts-count');

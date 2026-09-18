@@ -581,7 +581,7 @@ test('assistente usa NVIDIA como redundancia quando Gemini falha', async () => {
   }
 });
 
-test('cancelamento Cakto suspende cartao e corta APIs mesmo com token antigo', async () => {
+test('cancelamento Cakto rebaixa Pro para Free e mantém a página pública ativa', async () => {
   const email = 'cancelado@example.com';
   const { token } = await payAndActivate(email, 'Cliente Cancelado');
 
@@ -594,16 +594,21 @@ test('cancelamento Cakto suspende cartao e corta APIs mesmo com token antigo', a
     data: { customerEmail: email }
   });
   assert.equal(cancel.status, 200);
-  assert.equal(cancel.data.plan, 'inactive');
+  assert.equal(cancel.data.plan, 'free');
+  assert.equal(cancel.data.subscription_status, 'active');
 
   const oldTokenAccess = await api('GET', '/api/cards/stats/summary', null, token);
-  assert.equal(oldTokenAccess.status, 402);
+  assert.equal(oldTokenAccess.status, 200);
+  assert.equal(oldTokenAccess.data.features.contacts, false);
+  assert.equal(oldTokenAccess.data.features.qr, false);
 
   const publicAfterCancel = await api('GET', `/api/public/${card.data.slug}`);
-  assert.equal(publicAfterCancel.status, 402);
+  assert.equal(publicAfterCancel.status, 200);
+  assert.equal(publicAfterCancel.data.features.contact_form, false);
 
   const relogin = await login(email, 'SenhaCliente123!');
-  assert.equal(relogin.status, 403);
+  assert.equal(relogin.status, 200);
+  assert.equal(relogin.data.user.plan, 'free');
 });
 
 test('conta ativa sem e-mail confirmado nao consegue fazer login', async () => {
@@ -902,7 +907,7 @@ test('login cria cookie HttpOnly e frontend nao persiste JWT em localStorage', a
   assert.equal(frontendJs.includes("localStorage.getItem('cardlink_token'"), false);
 });
 
-test('pagina publica, contato e QR exigem plano Pro', async () => {
+test('pagina publica e link funcionam no Free; leads e QR rastreado são Pro', async () => {
   const free = await users.insert({
     name: 'Cliente Free', email: 'free-public@example.com', whatsapp: null,
     password_hash: await bcrypt.hash('SenhaFree123!', 10), is_admin: false, plan: 'free',
@@ -913,15 +918,22 @@ test('pagina publica, contato e QR exigem plano Pro', async () => {
   const freeLogin = await login(free.email, 'SenhaFree123!');
   const freeCard = await api('POST', '/api/cards', { name: 'Cartao Free' }, freeLogin.data.token);
   assert.equal(freeCard.status, 201);
-  assert.equal((await api('GET', `/api/public/${freeCard.data.slug}`)).status, 402);
-  assert.equal((await api('POST', `/api/public/${freeCard.data.slug}/contact`, { name: 'Visitante', message: 'Oi' })).status, 402);
+
+  const freePublic = await api('GET', `/api/public/${freeCard.data.slug}`);
+  assert.equal(freePublic.status, 200);
+  assert.equal(freePublic.data.features.contact_form, false);
+  assert.equal(freePublic.data.features.qr_tracking, false);
+  assert.equal((await api('POST', `/api/public/${freeCard.data.slug}/contact`, { name: 'Visitante', message: 'Oi' })).status, 403);
+  assert.equal((await api('GET', `/api/cards/${freeCard.data.id}/contacts`, null, freeLogin.data.token)).status, 403);
   const siteRes = await fetch(base + `/site/${freeCard.data.slug}`, { redirect: 'manual' });
-  assert.equal(siteRes.status, 402);
+  assert.equal(siteRes.status, 200);
 
   await createActiveUser({ email: 'pro-public@example.com', isTest: false, source: 'cakto', plan: 'monthly' });
   const proLogin = await login('pro-public@example.com', 'SenhaValida123!');
   const proCard = await api('POST', '/api/cards', { name: 'Cartao Pro' }, proLogin.data.token);
-  assert.equal((await api('GET', `/api/public/${proCard.data.slug}`)).status, 200);
+  const proPublic = await api('GET', `/api/public/${proCard.data.slug}`);
+  assert.equal(proPublic.status, 200);
+  assert.equal(proPublic.data.features.contact_form, true);
   assert.equal((await fetch(base + `/site/${proCard.data.slug}`)).status, 200);
 });
 

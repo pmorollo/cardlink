@@ -262,14 +262,17 @@ router.post('/cakto-webhook', async (req, res) => {
         return res.json({ received: true, ignored: 'user_not_found' });
       }
       user = await users.update(user.id, {
-        plan: 'inactive',
-        account_status: 'inactive',
-        subscription_status: 'cancelled',
-        subscription_source: user.subscription_source || 'cakto',
+        plan: 'free',
+        account_status: 'active',
+        subscription_status: 'active',
+        subscription_source: 'free_tier',
+        subscription_plan: 'free',
+        subscription_amount: '0',
+        subscription_reference: null,
         subscription_updated_at: new Date().toISOString()
       });
-      console.log(`🔴 Cakto: assinatura desativada para userId=${user.id}.`);
-      return res.json({ success: true, user: user.email, plan: 'inactive', subscription_status: 'cancelled' });
+      console.log(`🔻 Cakto: assinatura Pro encerrada; conta rebaixada para Free userId=${user.id}.`);
+      return res.json({ success: true, user: user.email, plan: 'free', subscription_status: 'active', downgraded_from_pro: true });
     }
 
     return res.json({ received: true, event });

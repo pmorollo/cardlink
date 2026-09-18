@@ -1,6 +1,6 @@
 # CardLink — Diretrizes Oficiais de Produto e Marketing
 
-**Atualizado em:** 28/08/2026
+**Atualizado em:** 18/09/2026
 
 Este documento registra decisões estruturais do CardLink que devem orientar desenvolvimento, vendas, comunicação e marketing.
 
@@ -41,20 +41,41 @@ O produto atende à necessidade de colocar uma loja, negócio ou atividade profi
 
 ## 3. Modelo de negócio
 
-O CardLink é **um único SaaS centralizado**. O aplicativo não é copiado para cada cliente; são comercializadas assinaturas para uso da plataforma.
+O CardLink é **um único SaaS centralizado** com dois níveis de uso: **Free** e **Pro**. O aplicativo não é copiado para cada cliente.
 
-Não haverá plano gratuito sem utilidade nem conta gratuita usada apenas como etapa intermediária de venda.
+### Plano Free — base funcional permanente
+
+O usuário pode criar uma conta gratuitamente, sem cartão de crédito, e utilizar o núcleo do produto:
+
+- criar e editar sua página profissional;
+- manter a página pública online;
+- compartilhar o link público;
+- exibir WhatsApp, telefone, e-mail, endereço e redes sociais;
+- publicar produtos/serviços e até 4 fotos na galeria;
+- usar os temas gratuitos disponíveis.
+
+O Free **não inclui** captura de leads pelo formulário CardLink, painel de mensagens recebidas, QR Code integrado/rastreado, catálogo PDF, galeria ampliada, temas premium nem outros recursos identificados como Pro.
+
+### Plano Pro — R$ 12,90/mês ou plano anual vigente
+
+O Pro inclui tudo do Free e libera, entre outros recursos premium:
+
+- QR Code integrado com rastreamento;
+- formulário público de mensagens/leads e painel de contatos;
+- catálogo/cardápio em PDF;
+- galeria ampliada;
+- temas premium;
+- assistente de conteúdo e demais funcionalidades identificadas como Pro.
 
 Fluxo comercial definido:
 
-1. Visitante conhece o produto pela landing page e demonstrações reais.
-2. Escolhe a assinatura.
-3. Realiza o pagamento pela Cakto.
-4. A Cakto confirma o pagamento ao cliente e envia webhook ao CardLink.
-5. O CardLink registra a assinatura e cria a conta em estado **aguardando ativação**.
-6. O cliente recebe um link de ativação por e-mail, define sua senha e somente então entra no painel, cria sua página e publica.
-7. Enquanto a assinatura estiver ativa, o CardLink público permanece disponível.
-8. Em cancelamento/inadimplência, a página pública é suspensa sem apagar imediatamente os dados do cliente.
+1. Visitante pode criar conta Free diretamente na landing page.
+2. O usuário cria, edita, publica e compartilha seu CardLink pelo link público.
+3. Quando desejar recursos premium, escolhe o Pro e realiza o pagamento pela Cakto.
+4. A Cakto confirma o pagamento e envia webhook ao CardLink.
+5. O CardLink promove a conta existente para Pro ou cria a conta Pro quando a compra ocorrer antes do cadastro.
+6. Enquanto o pagamento Pro estiver válido, os recursos premium ficam liberados.
+7. Em cancelamento, estorno ou chargeback do Pro, a conta **volta para o Free**; a página pública e o link permanecem ativos, enquanto os recursos premium são desabilitados.
 
 ## 4. Papéis da plataforma
 
@@ -67,11 +88,12 @@ Fluxo comercial definido:
 - Gerencia usuários, assinaturas, pagamentos, mensagens/suporte e indicadores do negócio.
 - Se o proprietário da plataforma quiser publicar um site para um negócio próprio, deverá usar uma segunda conta comum de cliente.
 
-### Cliente assinante
+### Cliente Free ou Pro
 
-- Conta comum vinculada a uma assinatura válida.
-- Cria, edita, publica e compartilha seu site CardLink.
-- Não possui acesso administrativo.
+- Conta comum de usuário, sem acesso administrativo.
+- No Free, cria, edita, publica e compartilha a página pelo link público.
+- No Pro, mantém os recursos do Free e recebe as funcionalidades premium contratadas.
+- Cancelar o Pro não apaga nem derruba a página: a conta retorna ao Free.
 
 
 ## 4.1. Contas internas de teste

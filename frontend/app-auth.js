@@ -650,6 +650,13 @@ function redirectToCheckout(planOverride) {
 let currentQrCodeSlug = '';
 
 function openQrCodeModal(slug) {
+  const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' &&
+    (currentUser.subscription_status || 'active') === 'active' && (currentUser.account_status || 'active') === 'active';
+  if (!isProUser) {
+    showToast('⭐', 'QR Code integrado e rastreamento estão disponíveis no Plano Pro.');
+    openProPaymentModal();
+    return;
+  }
   currentQrCodeSlug = slug;
   const modal = document.getElementById('qr-code-modal');
   const modalImg = document.getElementById('qr-code-modal-img');
