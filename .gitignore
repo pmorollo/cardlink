@@ -3,8 +3,16 @@ node_modules/
 
 # Variáveis de ambiente — NUNCA commitar
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Arquivos de backup e distribuição
+*.zip
+*.tar
+*.tar.gz
+*.rar
 
 # Banco de dados local
 backend/db/data.json
