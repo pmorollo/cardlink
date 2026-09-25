@@ -1,6 +1,9 @@
 name: Testes do CardLink
 
 on:
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
@@ -48,6 +51,9 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
+
+      - name: Verificar segredos e arquivos proibidos
+        run: npm run security:check
 
       - name: Executar testes completos
         run: npm test
