@@ -301,10 +301,77 @@ function handleRoute() {
     document.getElementById('landing-view').classList.add('active');
     if (navbar) navbar.style.display = '';
     if (bgAnimated) bgAnimated.style.display = '';
-    document.title = 'CardLink — Tudo o que seu cliente precisa ver antes de chamar você';
+    applyLandingAudience();
     updateNavAuth();
   }
 
+}
+
+function applyLandingAudience() {
+  const path = (window.location.pathname || '').toLowerCase();
+  const hash = (window.location.hash || '').toLowerCase();
+  const search = new URLSearchParams(window.location.search || '');
+  const audienceParam = (search.get('audience') || search.get('utm_campaign') || '').toLowerCase();
+
+  const badgeEl = document.getElementById('landing-hero-badge');
+  const titleEl = document.getElementById('landing-hero-title');
+  const descEl = document.getElementById('landing-hero-desc');
+  const benefitsEl = document.getElementById('landing-hero-benefits');
+  const audienceEl = document.getElementById('landing-hero-audience');
+
+  if (!badgeEl || !titleEl || !descEl) return;
+
+  if (path === '/jovem' || hash === '#jovem' || audienceParam.includes('jovem')) {
+    document.title = 'CardLink — Conectado do meu jeito | Sua página grátis';
+    badgeEl.innerHTML = '<span class="dot" style="background:#22c55e;"></span> 🎁 Plano 100% Grátis • Sem Cartão de Crédito';
+    titleEl.innerHTML = 'Conectado<br>do meu jeito.<br><span class="text-gradient">Sua página, seu estilo.</span>';
+    descEl.textContent = 'Sua página. Seus links. Suas fotos. Seu estilo. Reúna TikTok, Instagram, Spotify e seus projetos favoritos em um link único para a sua bio.';
+    if (benefitsEl) {
+      benefitsEl.innerHTML = `
+        <span>✨ 100% Gratuito</span>
+        <span>🎨 Temas e fotos com o seu estilo</span>
+        <span>📱 Link único para TikTok, Insta e redes</span>
+        <span>⚡ Crie em 1 minuto direto pelo celular</span>
+      `;
+    }
+    if (audienceEl) {
+      audienceEl.textContent = '☆ Feito para você que quer uma bio estilosa com todos os seus links e fotos reunidos.';
+    }
+  } else if (path === '/minhapagina' || hash === '#minhapagina' || audienceParam.includes('minhapagina') || audienceParam.includes('iniciante')) {
+    document.title = 'CardLink — Sua página na internet em poucos minutos | Grátis';
+    badgeEl.innerHTML = '<span class="dot" style="background:#22c55e;"></span> 🎁 Plano Gratuito • Sem Cartão de Crédito';
+    titleEl.innerHTML = 'Sua página na internet<br><span class="hero-word-yellow">em poucos minutos.</span>';
+    descEl.textContent = 'Preencha seus dados. Publique. Pronto. É grátis e você não precisa entender nada de informática ou programação para ter seu endereço na web hoje mesmo.';
+    if (benefitsEl) {
+      benefitsEl.innerHTML = `
+        <span>💡 Totalmente gratuito</span>
+        <span>⚡ Muito fácil: basta preencher e salvar</span>
+        <span>📱 Funciona direto no celular de qualquer pessoa</span>
+        <span>☁ Hospedagem rápida já inclusa</span>
+      `;
+    }
+    if (audienceEl) {
+      audienceEl.textContent = '☆ Ideal para páginas pessoais, currículo, contatos, projetos e hobbies.';
+    }
+  } else {
+    // Profissional / Padrão
+    document.title = 'CardLink — Tudo sobre seu trabalho em um único link';
+    badgeEl.innerHTML = '<span class="dot" style="background:#22c55e;"></span> 🎁 Plano Gratuito • Sem Cartão de Crédito';
+    titleEl.innerHTML = 'Preencha seus dados.<br>O <span class="hero-word-yellow">CardLink</span><br><span class="text-gradient">cria sua página.</span>';
+    descEl.textContent = 'Você informa seus dados, serviços, fotos e contatos, e o CardLink organiza tudo automaticamente em uma página pronta na web para compartilhar.';
+    if (benefitsEl) {
+      benefitsEl.innerHTML = `
+        <span>🔗 Link próprio • QR Code integrado</span>
+        <span>📄 Suporte a Catálogo em PDF</span>
+        <span>✎ Fácil de editar</span>
+        <span>☁ Hospedagem inclusa</span>
+        <span>⚡ Configuração simples e rápida</span>
+      `;
+    }
+    if (audienceEl) {
+      audienceEl.textContent = '☆ Ideal para autônomos, salões, barbearias, clínicas, restaurantes e negócios locais.';
+    }
+  }
 }
 
 async function checkSubscriptionStatus() {

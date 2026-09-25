@@ -3,10 +3,18 @@ const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
+const rateLimit = require('express-rate-limit');
 const authMiddleware = require('../middleware/auth');
 const { requireCustomer } = require('../middleware/roles');
 
 const router = express.Router();
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'test' ? 1000 : 30,
+  message: { error: 'Limite de uploads atingido. Tente novamente mais tarde.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
 const isR2Configured = () => {
   return (
@@ -54,6 +62,39 @@ function buildUploadFilename(file) {
   return `${Date.now()}-${crypto.randomUUID()}${ext}`;
 }
 
+function detectedMime(buffer) {
+  if (!Buffer.isBuffer(buffer)) return null;
+  if (buffer.length >= 5 && buffer.subarray(0, 5).toString('ascii') === '%PDF-') return 'application/pdf';
+  if (buffer.length < 12) return null;
+  if (buffer.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]))) return 'image/jpeg';
+  if (buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'image/png';
+  if (buffer.subarray(0, 6).toString('ascii') === 'GIF87a' || buffer.subarray(0, 6).toString('ascii') === 'GIF89a') return 'image/gif';
+  if (buffer.subarray(0, 4).toString('ascii') === 'RIFF' && buffer.subarray(8, 12).toString('ascii') === 'WEBP') return 'image/webp';
+  return null;
+}
+
+function readUploadBytes(file) {
+  if (file.buffer) return file.buffer;
+  if (file.path) {
+    const fd = fs.openSync(file.path, 'r');
+    try {
+      const buffer = Buffer.alloc(16);
+      const length = fs.readSync(fd, buffer, 0, buffer.length, 0);
+      return buffer.subarray(0, length);
+    } finally {
+      fs.closeSync(fd);
+    }
+  }
+  return Buffer.alloc(0);
+}
+
+function removeLocalUpload(file) {
+  if (!file?.path) return;
+  try { fs.unlinkSync(file.path); } catch (error) {
+    if (error.code !== 'ENOENT') console.warn('Falha ao remover upload recusado:', error.message);
+  }
+}
+
 // Multer storage: memory if R2, disk if local
 const storage = isR2Configured() && S3Client
   ? multer.memoryStorage()
@@ -77,7 +118,7 @@ const upload = multer({
   }
 });
 
-router.post('/', authMiddleware, requireCustomer, upload.single('photo'), async (req, res) => {
+router.post('/', authMiddleware, requireCustomer, uploadLimiter, upload.single('photo'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'Nenhum arquivo enviado' });
   }
@@ -87,13 +128,14 @@ router.post('/', authMiddleware, requireCustomer, upload.single('photo'), async 
     if (!ext) return res.status(400).json({ error: 'Tipo de arquivo inválido' });
     const isPdf = ext === '.pdf';
     if (isPdf && req.currentUser?.plan !== 'pro') {
-      // Multer em modo local já gravou o arquivo: remova-o antes de recusar para não deixar órfãos.
-      if (req.file.path) {
-        try { fs.unlinkSync(req.file.path); } catch (error) { console.warn('Falha ao remover PDF recusado:', error.message); }
-      }
+      removeLocalUpload(req.file);
       return res.status(403).json({ error: 'O upload de catálogo em PDF está disponível exclusivamente no Plano Pro.' });
     }
-
+    const realMime = detectedMime(readUploadBytes(req.file));
+    if (realMime !== req.file.mimetype) {
+      removeLocalUpload(req.file);
+      return res.status(400).json({ error: 'O conteúdo do arquivo não corresponde ao tipo informado.' });
+    }
     const filename = buildUploadFilename(req.file);
 
     if (isR2Configured() && S3Client) {
@@ -132,4 +174,4 @@ router.post('/', authMiddleware, requireCustomer, upload.single('photo'), async 
 });
 
 module.exports = router;
-module.exports._test = { safeUploadExtension, buildUploadFilename };
+module.exports._test = { safeUploadExtension, buildUploadFilename, detectedMime };

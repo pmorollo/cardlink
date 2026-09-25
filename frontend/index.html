@@ -51,19 +51,19 @@
       <div class="hero-content container">
         <div class="hero-grid">
           <div class="hero-copy">
-            <div class="hero-badge" style="background:rgba(124,58,237,0.15);border-color:var(--purple);color:#c4b5fd;">
+            <div class="hero-badge" id="landing-hero-badge" style="background:rgba(124,58,237,0.15);border-color:var(--purple);color:#c4b5fd;">
               <span class="dot" style="background:#22c55e;"></span>
               🎁 Plano Gratuito • Sem Cartão de Crédito
             </div>
-            <h1>
+            <h1 id="landing-hero-title">
               Preencha seus dados.<br>O <span class="hero-word-yellow">CardLink</span><br><span class="text-gradient">cria sua página.</span>
             </h1>
-            <p>
+            <p id="landing-hero-desc">
               Você informa seus dados, serviços, fotos e contatos, e o CardLink organiza tudo automaticamente em uma página pronta na web para compartilhar.
             </p>
 
-            <div class="hero-benefits" aria-label="Principais benefícios">
-              <span>🔗 Link próprio • QR Code integrado no Pro</span>
+            <div class="hero-benefits" id="landing-hero-benefits" aria-label="Principais benefícios">
+              <span>🔗 Link próprio • QR Code integrado</span>
               <span>📄 Suporte a Catálogo em PDF</span>
               <span>✎ Fácil de editar</span>
               <span>☁ Hospedagem inclusa</span>
@@ -71,14 +71,14 @@
             </div>
 
             <div class="hero-buttons">
-              <button class="btn btn-primary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
-                <span style="color:#062b28 !important;-webkit-text-fill-color:#062b28 !important;font-weight:800;">Criar Conta</span>
+              <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
+                <span style="color:#062b28 !important;-webkit-text-fill-color:#062b28 !important;font-weight:800;">Criar Minha Página Grátis</span>
               </button>
               <button class="btn btn-secondary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">
                 ⭐ Conhecer os Planos
               </button>
             </div>
-            <p class="hero-audience">☆ Ideal para autônomos, salões, barbearias, clínicas, restaurantes e negócios locais.</p>
+            <p class="hero-audience" id="landing-hero-audience">☆ Ideal para autônomos, salões, barbearias, clínicas, restaurantes e negócios locais.</p>
           </div>
 
           <div class="hero-visual" aria-label="Exemplo de uma página profissional criada com o CardLink">
@@ -1120,6 +1120,19 @@
             <input class="form-input" type="password" id="account-new-password" minlength="8" autocomplete="new-password" placeholder="Mínimo de 8 caracteres">
           </div>
           <button class="btn btn-secondary" type="button" onclick="changeAccountPassword()">Atualizar senha</button>
+        </div>
+        <div class="account-card" style="border-color:var(--danger);">
+          <h2>Excluir conta</h2>
+          <p style="color:var(--text-secondary);margin-bottom:16px;">Esta ação apaga definitivamente sua página, contatos e dados da conta.</p>
+          <div class="form-group">
+            <label class="form-label" for="account-delete-password">Senha atual</label>
+            <input class="form-input" type="password" id="account-delete-password" autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="account-delete-confirmation">Digite EXCLUIR para confirmar</label>
+            <input class="form-input" type="text" id="account-delete-confirmation" autocomplete="off">
+          </div>
+          <button class="btn btn-secondary" type="button" onclick="deleteAccount()">Excluir minha conta</button>
         </div>
       </div>
     </div>

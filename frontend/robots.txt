@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /site/
+Disallow: /admin
+Disallow: /api/
+Sitemap: https://cardlink.digitalnexoapp.com/sitemap.xml

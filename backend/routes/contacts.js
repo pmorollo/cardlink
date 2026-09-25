@@ -29,7 +29,7 @@ router.get('/public/:slug', async (req, res) => {
   }
 
   const isOwnerPro = isProCustomer(owner);
-  await cardRepo.update(card.id, { views_count: (card.views_count || 0) + 1 });
+  await cardRepo.incrementViews(card.id);
 
   // Only expose fields needed for public display — never expose user_id or internals.
   // Free pages remain public, but premium content/capabilities are projected out.

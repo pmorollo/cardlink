@@ -86,13 +86,13 @@ router.get('/stats/summary', authMiddleware, requireCustomer, async (req, res) =
     stats: {
       views: card.views_count || 0,
       contacts: isPro ? contactList.length : 0,
-      qrScans: isPro ? (card.qr_scans_count || 0) : 0,
+      qrScans: card.qr_scans_count || 0,
       recentContacts: isPro ? contactList.slice(0, 5) : []
     },
     features: {
       contacts: isPro,
-      qr: isPro,
-      catalog_pdf: isPro
+      qr: true,
+      catalog_pdf: true
     }
   });
 });
@@ -126,10 +126,6 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
 
   let catalogPdfUrlToSave = req.body.catalog_pdf_url;
   let catalogPdfTitleToSave = req.body.catalog_pdf_title;
-  if (!isPro) {
-    catalogPdfUrlToSave = '';
-    catalogPdfTitleToSave = '';
-  }
 
   let testimonialsToSave = req.body.testimonials !== undefined ? sanitizeTestimonials(req.body.testimonials) : undefined;
 
@@ -255,10 +251,6 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
 
   let catalogPdfUrlToSave = req.body.catalog_pdf_url !== undefined ? req.body.catalog_pdf_url : card.catalog_pdf_url;
   let catalogPdfTitleToSave = req.body.catalog_pdf_title !== undefined ? req.body.catalog_pdf_title : card.catalog_pdf_title;
-  if (!isPro) {
-    catalogPdfUrlToSave = '';
-    catalogPdfTitleToSave = '';
-  }
 
   const updated = await cardRepo.update(card.id, {
     slug,

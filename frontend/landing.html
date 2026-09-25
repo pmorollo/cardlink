@@ -37,7 +37,9 @@
         <li><a href="#depoimentos">Avaliações</a></li>
         <li><a href="#contato">Contato</a></li>
       </ul>
-
+      <button type="button" class="lp-nav-toggle" id="lp-nav-toggle" aria-expanded="false" aria-controls="lp-nav-links" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
@@ -182,26 +184,26 @@
         <div class="lp-contact-form animate-in" style="transition-delay:0.15s;">
           <h3>Envie uma mensagem</h3>
           <div class="form-group">
-            <label class="form-label">Seu nome *</label>
-            <input class="form-input" type="text" id="cf-name" placeholder="João Silva">
+            <label class="form-label" for="cf-name">Seu nome *</label>
+            <input class="form-input" type="text" id="cf-name" name="name" placeholder="João Silva" required aria-required="true" autocomplete="name">
           </div>
           <div class="form-group">
-            <label class="form-label">E-mail</label>
-            <input class="form-input" type="email" id="cf-email" placeholder="joao@email.com">
+            <label class="form-label" for="cf-email">E-mail</label>
+            <input class="form-input" type="email" id="cf-email" name="email" placeholder="joao@email.com" autocomplete="email">
           </div>
           <div class="form-group">
-            <label class="form-label">WhatsApp / Telefone</label>
-            <input class="form-input" type="tel" id="cf-phone" placeholder="(11) 99999-9999">
+            <label class="form-label" for="cf-phone">WhatsApp / Telefone</label>
+            <input class="form-input" type="tel" id="cf-phone" name="phone" placeholder="(11) 99999-9999" autocomplete="tel">
           </div>
           <div class="form-group">
-            <label class="form-label">Mensagem</label>
-            <textarea class="form-input" id="cf-message" rows="4" placeholder="Como posso te ajudar?"></textarea>
+            <label class="form-label" for="cf-message">Mensagem</label>
+            <textarea class="form-input" id="cf-message" name="message" rows="4" placeholder="Como posso te ajudar?"></textarea>
           </div>
           <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="submitForm()">
             Enviar mensagem <span aria-hidden="true">→</span>
           </button>
-          <div id="form-success" style="display:none;text-align:center;padding:32px 0;">
-            <div style="font-size:3rem;margin-bottom:12px;">✅</div>
+          <div id="form-success" role="status" aria-live="polite" style="display:none;text-align:center;padding:32px 0;">
+            <div aria-hidden="true" style="font-size:3rem;margin-bottom:12px;">✅</div>
             <h4 style="font-weight:700;margin-bottom:8px;">Mensagem enviada!</h4>
             <p style="color:var(--text-secondary);font-size:0.9rem;">Em breve entraremos em contato.</p>
           </div>

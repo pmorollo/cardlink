@@ -77,6 +77,16 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
+function hashResetCode(code) {
+  return crypto.createHash('sha256').update(String(code || '')).digest('hex');
+}
+
+function resetCodeMatches(code, expectedHash) {
+  const actual = Buffer.from(hashResetCode(code), 'hex');
+  const expected = Buffer.from(String(expectedHash || ''), 'hex');
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
+}
+
 router.post('/register/send-code', registrationCodeLimiter, async (req, res) => {
   try {
     const name = String(req.body.name || '').trim();
@@ -340,7 +350,7 @@ router.get('/me', authMiddleware, async (req, res) => {
   if (!user) {
     return res.status(404).json({ error: 'Usuário não encontrado' });
   }
-  const { password_hash, reset_code, reset_expires, activation_token_hash, activation_expires, email_verification_token_hash, email_verification_expires, ...safe } = user;
+  const { password_hash, reset_code, reset_code_hash, reset_expires, activation_token_hash, activation_expires, email_verification_token_hash, email_verification_expires, ...safe } = user;
   res.json(safe);
 });
 
@@ -477,6 +487,22 @@ router.put('/change-password', authMiddleware, async (req, res) => {
   res.json({ message: 'Senha atualizada com sucesso' });
 });
 
+router.delete('/account', authMiddleware, async (req, res) => {
+  const user = await users.findById(req.userId);
+  if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+  if (user.is_admin) return res.status(403).json({ error: 'A conta administrativa não pode ser excluída por esta opção.' });
+
+  const currentPassword = String(req.body?.currentPassword || '');
+  const confirmation = String(req.body?.confirmation || '').trim().toUpperCase();
+  if (confirmation !== 'EXCLUIR' || !(await bcrypt.compare(currentPassword, user.password_hash))) {
+    return res.status(400).json({ error: 'Confirmação ou senha atual inválida.' });
+  }
+
+  await users.delete(user.id);
+  clearSessionCookie(res);
+  return res.json({ message: 'Conta e dados vinculados excluídos definitivamente.' });
+});
+
 // ─── Password Reset ──────────────────────────────────────────────────
 router.post('/forgot-password', passwordRecoveryLimiter, async (req, res) => {
   const { email } = req.body;
@@ -498,7 +524,8 @@ router.post('/forgot-password', passwordRecoveryLimiter, async (req, res) => {
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
 
   await users.update(user.id, {
-    reset_code: code,
+    reset_code: null,
+    reset_code_hash: hashResetCode(code),
     reset_expires: expiresAt,
     reset_attempts: 0
   });
@@ -546,23 +573,20 @@ router.post('/reset-password', passwordRecoveryLimiter, async (req, res) => {
     return res.status(404).json({ error: 'Usuário não encontrado' });
   }
 
-  if (!user.reset_code) {
+  if (!user.reset_code_hash) {
     return res.status(400).json({ error: 'Nenhum código de recuperação foi solicitado' });
   }
 
   if (new Date() > new Date(user.reset_expires)) {
-    await users.update(user.id, { reset_code: null, reset_expires: null, reset_attempts: 0 });
+    await users.update(user.id, { reset_code: null, reset_code_hash: null, reset_expires: null, reset_attempts: 0 });
     return res.status(400).json({ error: 'Código de recuperação expirado. Gere um novo.' });
   }
 
   // Comparação em tempo constante para evitar timing attacks
-  const a = Buffer.from(String(user.reset_code));
-  const b = Buffer.from(String(code).trim());
-  const codesMatch = a.length === b.length && crypto.timingSafeEqual(a, b);
-  if (!codesMatch) {
+  if (!resetCodeMatches(String(code).trim(), user.reset_code_hash)) {
     const attempts = Number(user.reset_attempts || 0) + 1;
     if (attempts >= 5) {
-      await users.update(user.id, { reset_code: null, reset_expires: null, reset_attempts: 0 });
+      await users.update(user.id, { reset_code: null, reset_code_hash: null, reset_expires: null, reset_attempts: 0 });
       return res.status(429).json({ error: 'Código invalidado após muitas tentativas. Solicite um novo código.' });
     }
     await users.update(user.id, { reset_attempts: attempts });
@@ -572,6 +596,7 @@ router.post('/reset-password', passwordRecoveryLimiter, async (req, res) => {
   await users.update(user.id, {
     password_hash: await bcrypt.hash(newPassword, 10),
     reset_code: null,
+    reset_code_hash: null,
     reset_expires: null,
     reset_attempts: 0
   });

@@ -1,7 +1,8 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const { users } = require('../db/repository');
+const { users, webhookEvents } = require('../db/repository');
 const { sendEmail } = require('../utils/email');
 const { createActivationToken, sendActivationEmail } = require('../utils/accountActivation');
 const authMiddleware = require('../middleware/auth');
@@ -12,6 +13,13 @@ const router = express.Router();
 
 const ACTIVATE_EVENTS = ['purchase_approved', 'subscription_renewed'];
 const CANCEL_EVENTS = ['subscription_canceled', 'refund', 'chargeback'];
+const caktoWebhookLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'test' ? 1000 : 120,
+  message: { error: 'Muitas notificações recebidas. Tente novamente mais tarde.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
 // Expõe somente links públicos de checkout e indicadores não sensíveis.
 // As credenciais da Cakto nunca são enviadas ao navegador.
@@ -95,6 +103,22 @@ function extractPurchaseInfo(payload) {
   return { buyerEmail, buyerName, subscriptionPlan, subscriptionAmount, subscriptionReference, externalId };
 }
 
+function extractEventIdentity(payload, event, purchase) {
+  const data = payload.data || {};
+  const sourceId = firstDefined(payload.eventId, payload.event_id, payload.id, data.eventId, data.event_id, purchase.subscriptionReference);
+  const occurredRaw = firstDefined(payload.createdAt, payload.created_at, data.createdAt, data.created_at, data.updatedAt, data.updated_at);
+  const occurredDate = occurredRaw ? new Date(occurredRaw) : new Date();
+  const occurredAt = Number.isNaN(occurredDate.getTime()) ? new Date().toISOString() : occurredDate.toISOString();
+  const fallback = JSON.stringify({ event, status: payload.status || data.status || '', reference: purchase.subscriptionReference, occurredAt, email: purchase.buyerEmail });
+  const eventId = String(sourceId || crypto.createHash('sha256').update(fallback).digest('hex')).substring(0, 255);
+  return { eventId, occurredAt };
+}
+
+function extractProductId(payload) {
+  const data = payload.data || {};
+  return String(firstDefined(data.productId, data.product_id, data.product?.id, payload.productId, payload.product_id, payload.product?.id) || '').trim();
+}
+
 async function notifyAdminOfSale(user) {
   try {
     const allUsers = await users.all();
@@ -130,7 +154,8 @@ function escapeHtml(value) {
     .replace(/'/g, '&#039;');
 }
 
-router.post('/cakto-webhook', async (req, res) => {
+router.post('/cakto-webhook', caktoWebhookLimiter, async (req, res) => {
+  let claimedEventId = null;
   try {
     const caktoSecret = process.env.CAKTO_SECRET;
     const payload = req.body || {};
@@ -163,6 +188,17 @@ router.post('/cakto-webhook', async (req, res) => {
       return res.status(400).json({ error: 'Comprador não identificado na requisição' });
     }
 
+    const catalog = getPublicCatalogState();
+    const productId = extractProductId(payload);
+    if (catalog.configured && catalog.productId && productId && productId !== catalog.productId) {
+      return res.status(400).json({ error: 'Produto não reconhecido para o CardLink.' });
+    }
+
+    const { eventId, occurredAt } = extractEventIdentity(payload, event, purchase);
+    const recorded = await webhookEvents.recordIfNew({ event_id: eventId, event_type: event || 'unknown', occurred_at: occurredAt, payload });
+    if (!recorded) return res.json({ received: true, duplicate: true });
+    claimedEventId = eventId;
+
     // Eventos explícitos da Cakto têm precedência sobre textos genéricos de status.
     // 'subscription_created' apenas indica que a assinatura foi criada; não prova pagamento aprovado.
     const isSuccess = ACTIVATE_EVENTS.includes(event) ||
@@ -176,16 +212,27 @@ router.post('/cakto-webhook', async (req, res) => {
     }
     if (!user && purchase.buyerEmail) user = await users.findByEmail(purchase.buyerEmail);
 
+    if (user?.subscription_event_at && new Date(occurredAt) < new Date(user.subscription_event_at)) {
+      await webhookEvents.complete(eventId, 'ignored_stale', user.id);
+      return res.json({ received: true, ignored: 'stale_event' });
+    }
+
     if (user && user.is_admin) {
       console.warn(`⚠️ Webhook Cakto ignorado para conta administrativa userId=${user.id}.`);
+      await webhookEvents.complete(eventId, 'ignored_administrative', user.id);
       return res.json({ received: true, ignored: 'administrative_account' });
     }
     if (user && user.is_test_account) {
       console.warn(`⚠️ Webhook Cakto ignorado para conta interna de teste userId=${user.id}.`);
+      await webhookEvents.complete(eventId, 'ignored_test', user.id);
       return res.json({ received: true, ignored: 'internal_test_account' });
     }
 
     if (isSuccess) {
+      if (!user && !purchase.buyerEmail) {
+        await webhookEvents.complete(eventId, 'rejected_missing_email');
+        return res.status(400).json({ error: 'E-mail do comprador é obrigatório para criar a conta.' });
+      }
       const now = new Date().toISOString();
       let activationToken = null;
       let activationSent = false;
@@ -210,6 +257,7 @@ router.post('/cakto-webhook', async (req, res) => {
           activation_token_hash: activation.tokenHash,
           activation_expires: activation.expiresAt,
           subscription_updated_at: now,
+          subscription_event_at: occurredAt,
           referred_by: null
         });
         activationToken = activation.token;
@@ -226,6 +274,7 @@ router.post('/cakto-webhook', async (req, res) => {
           subscription_amount: purchase.subscriptionAmount || user.subscription_amount,
           subscription_reference: purchase.subscriptionReference || user.subscription_reference,
           subscription_updated_at: now,
+          subscription_event_at: occurredAt,
           account_status: needsActivation ? 'pending_activation' : 'active'
         };
 
@@ -245,6 +294,7 @@ router.post('/cakto-webhook', async (req, res) => {
       }
 
       await notifyAdminOfSale(user);
+      await webhookEvents.complete(eventId, 'processed', user.id);
       const response = {
         success: true,
         user: user.email,
@@ -259,6 +309,7 @@ router.post('/cakto-webhook', async (req, res) => {
     if (isCancellation) {
       if (!user) {
         console.warn('⚠️ Cakto: cancelamento recebido para usuário ainda não localizado.');
+        await webhookEvents.complete(eventId, 'ignored_user_not_found');
         return res.json({ received: true, ignored: 'user_not_found' });
       }
       user = await users.update(user.id, {
@@ -270,13 +321,17 @@ router.post('/cakto-webhook', async (req, res) => {
         subscription_amount: '0',
         subscription_reference: null,
         subscription_updated_at: new Date().toISOString()
+        ,subscription_event_at: occurredAt
       });
+      await webhookEvents.complete(eventId, 'processed', user.id);
       console.log(`🔻 Cakto: assinatura Pro encerrada; conta rebaixada para Free userId=${user.id}.`);
       return res.json({ success: true, user: user.email, plan: 'free', subscription_status: 'active', downgraded_from_pro: true });
     }
 
+    await webhookEvents.complete(eventId, 'ignored_event', user?.id || null);
     return res.json({ received: true, event });
   } catch (err) {
+    if (claimedEventId) await webhookEvents.complete(claimedEventId, 'failed').catch(() => {});
     console.error('Erro ao processar webhook da Cakto:', err.message);
     return res.status(500).json({ error: 'Erro interno do servidor' });
   }

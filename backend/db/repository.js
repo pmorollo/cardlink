@@ -6,7 +6,7 @@ const DB_PATH = path.join(__dirname, 'data.json');
 
 // ─── Local store (memória/JSON) ──────────────────────────────────────────
 function loadLocalDB() {
-  let data = { users: [], cards: [], contacts: [], support_tickets: [], admin_messages: [], _counters: { users: 0, cards: 0, contacts: 0, support_tickets: 0, admin_messages: 0 } };
+  let data = { users: [], cards: [], contacts: [], support_tickets: [], admin_messages: [], webhook_events: [], _counters: { users: 0, cards: 0, contacts: 0, support_tickets: 0, admin_messages: 0, webhook_events: 0 } };
   try {
     if (fs.existsSync(DB_PATH)) {
       const parsed = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
@@ -20,12 +20,14 @@ function loadLocalDB() {
   if (!data.contacts) data.contacts = [];
   if (!data.support_tickets) data.support_tickets = [];
   if (!data.admin_messages) data.admin_messages = [];
+  if (!data.webhook_events) data.webhook_events = [];
   if (!data._counters) data._counters = {};
   if (!data._counters.users) data._counters.users = 0;
   if (!data._counters.cards) data._counters.cards = 0;
   if (!data._counters.contacts) data._counters.contacts = 0;
   if (!data._counters.support_tickets) data._counters.support_tickets = 0;
   if (!data._counters.admin_messages) data._counters.admin_messages = 0;
+  if (!data._counters.webhook_events) data._counters.webhook_events = 0;
   return data;
 }
 
@@ -87,6 +89,8 @@ function castUserRow(row) {
     email_verification_expires: row.email_verification_expires || null,
     subscription_updated_at: row.subscription_updated_at || null,
     reset_code: row.reset_code || null,
+    reset_code_hash: row.reset_code_hash || null,
+    subscription_event_at: row.subscription_event_at || null,
     reset_expires: row.reset_expires || null,
     reset_attempts: Number(row.reset_attempts || 0),
   };
@@ -214,7 +218,7 @@ const users = {
     account_status = 'inactive', subscription_status = 'inactive', subscription_source = 'none',
     subscription_plan = null, subscription_amount = null, subscription_reference = null, is_test_account = false, activation_token_hash = null,
     activation_expires = null, trial_ends_at = null, email_verified_at = null, pending_email = null, email_verification_token_hash = null,
-    email_verification_expires = null, subscription_updated_at = null
+    email_verification_expires = null, subscription_updated_at = null, subscription_event_at = null
   }) {
     const pool = await resolvePool();
     if (pool) {
@@ -222,12 +226,12 @@ const users = {
         `INSERT INTO users (
            name, email, whatsapp, password_hash, is_admin, plan, referred_by, account_status,
            subscription_status, subscription_source, subscription_plan, subscription_amount, subscription_reference, is_test_account,
-           activation_token_hash, activation_expires, trial_ends_at, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at
-         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22) RETURNING *`,
+           activation_token_hash, activation_expires, trial_ends_at, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at, subscription_event_at
+         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23) RETURNING *`,
         [
           name, email, whatsapp || null, password_hash, !!is_admin, plan, referred_by || null, account_status,
           subscription_status, subscription_source, subscription_plan, subscription_amount, subscription_reference, !!is_test_account,
-          activation_token_hash, activation_expires, trial_ends_at, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at
+          activation_token_hash, activation_expires, trial_ends_at, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at, subscription_event_at
         ]
       );
       return castUserRow(r.rows[0]);
@@ -255,6 +259,7 @@ const users = {
       email_verification_token_hash,
       email_verification_expires,
       subscription_updated_at,
+      subscription_event_at,
       id: nextId('users'),
       created_at: new Date().toISOString(),
     };
@@ -268,7 +273,7 @@ const users = {
       const fields = [];
       const values = [];
       let i = 1;
-      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_expires', 'reset_attempts', 'referred_by', 'account_status', 'subscription_status', 'subscription_source', 'subscription_plan', 'subscription_amount', 'subscription_reference', 'is_test_account', 'activation_token_hash', 'activation_expires', 'trial_ends_at', 'email_verified_at', 'pending_email', 'email_verification_token_hash', 'email_verification_expires', 'subscription_updated_at']) {
+      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_code_hash', 'reset_expires', 'reset_attempts', 'referred_by', 'account_status', 'subscription_status', 'subscription_source', 'subscription_plan', 'subscription_amount', 'subscription_reference', 'is_test_account', 'activation_token_hash', 'activation_expires', 'trial_ends_at', 'email_verified_at', 'pending_email', 'email_verification_token_hash', 'email_verification_expires', 'subscription_updated_at', 'subscription_event_at']) {
         if (key in updates && updates[key] !== undefined) {
           fields.push(`${key} = $${i++}`);
           values.push(updates[key]);
@@ -286,6 +291,22 @@ const users = {
     Object.assign(db.users[idx], updates);
     saveLocalDB(db);
     return castUserRow(db.users[idx]);
+  },
+  async delete(id) {
+    const pool = await resolvePool();
+    if (pool) {
+      const r = await pool.query('DELETE FROM users WHERE id = $1', [id]);
+      return (r.rowCount || 0) > 0;
+    }
+    const cardIds = (db.cards || []).filter(card => card.user_id === id).map(card => card.id);
+    db.contacts = (db.contacts || []).filter(contact => !cardIds.includes(contact.card_id));
+    db.cards = (db.cards || []).filter(card => card.user_id !== id);
+    db.support_tickets = (db.support_tickets || []).filter(ticket => ticket.user_id !== id);
+    db.admin_messages = (db.admin_messages || []).filter(message => message.user_id !== id);
+    const before = db.users.length;
+    db.users = db.users.filter(user => user.id !== id);
+    saveLocalDB(db);
+    return db.users.length < before;
   },
 };
 
@@ -419,6 +440,30 @@ const cards = {
     saveLocalDB(db);
     return db.cards[idx];
   },
+  async incrementViews(id) {
+    const pool = await resolvePool();
+    if (pool) {
+      const r = await pool.query('UPDATE cards SET views_count = COALESCE(views_count, 0) + 1 WHERE id = $1 RETURNING views_count', [id]);
+      return r.rows[0]?.views_count ?? null;
+    }
+    const card = (db.cards || []).find(item => item.id === id);
+    if (!card) return null;
+    card.views_count = Number(card.views_count || 0) + 1;
+    saveLocalDB(db);
+    return card.views_count;
+  },
+  async incrementQrScans(id) {
+    const pool = await resolvePool();
+    if (pool) {
+      const r = await pool.query('UPDATE cards SET qr_scans_count = COALESCE(qr_scans_count, 0) + 1 WHERE id = $1 RETURNING qr_scans_count', [id]);
+      return r.rows[0]?.qr_scans_count ?? null;
+    }
+    const card = (db.cards || []).find(item => item.id === id);
+    if (!card) return null;
+    card.qr_scans_count = Number(card.qr_scans_count || 0) + 1;
+    saveLocalDB(db);
+    return card.qr_scans_count;
+  },
   async delete(id) {
     const pool = await resolvePool();
     if (pool) {
@@ -430,6 +475,47 @@ const cards = {
     db.cards.splice(idx, 1);
     saveLocalDB(db);
     return true;
+  },
+};
+
+const webhookEvents = {
+  async recordIfNew({ event_id, provider = 'cakto', event_type, occurred_at, payload }) {
+    const pool = await resolvePool();
+    if (pool) {
+      const r = await pool.query(
+        `INSERT INTO webhook_events (provider, event_id, event_type, occurred_at, payload, status)
+         VALUES ($1, $2, $3, $4, $5::jsonb, 'received')
+         ON CONFLICT (provider, event_id) DO UPDATE
+         SET event_type = EXCLUDED.event_type, occurred_at = EXCLUDED.occurred_at,
+             payload = EXCLUDED.payload, status = 'received', received_at = CURRENT_TIMESTAMP,
+             processed_at = NULL
+         WHERE webhook_events.status = 'failed'
+         RETURNING *`,
+        [provider, event_id, event_type, occurred_at, JSON.stringify(payload)]
+      );
+      return r.rows[0] || null;
+    }
+    const existing = (db.webhook_events || []).find(item => item.provider === provider && item.event_id === event_id);
+    if (existing && existing.status !== 'failed') return null;
+    if (existing) {
+      Object.assign(existing, { event_type, occurred_at, payload, status: 'received', received_at: new Date().toISOString(), processed_at: null });
+      saveLocalDB(db);
+      return existing;
+    }
+    const row = { id: nextId('webhook_events'), provider, event_id, event_type, occurred_at, payload, status: 'received', received_at: new Date().toISOString(), processed_at: null };
+    db.webhook_events.push(row);
+    saveLocalDB(db);
+    return row;
+  },
+  async complete(eventId, status, userId = null) {
+    const pool = await resolvePool();
+    if (pool) {
+      await pool.query("UPDATE webhook_events SET status = $1, user_id = $2, processed_at = CURRENT_TIMESTAMP WHERE provider = 'cakto' AND event_id = $3", [status, userId, eventId]);
+      return;
+    }
+    const row = (db.webhook_events || []).find(item => item.provider === 'cakto' && item.event_id === eventId);
+    if (row) Object.assign(row, { status, user_id: userId, processed_at: new Date().toISOString() });
+    saveLocalDB(db);
   },
 };
 
@@ -574,6 +660,7 @@ module.exports = {
   contacts,
   supportTickets,
   adminMessages,
+  webhookEvents,
   db,
   isPgConfigured,
   pgIsReady: () => pgReady,

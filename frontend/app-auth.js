@@ -835,13 +835,7 @@ function redirectToCheckout(planOverride) {
 let currentQrCodeSlug = '';
 
 function openQrCodeModal(slug) {
-  const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' &&
-    (currentUser.subscription_status || 'active') === 'active' && (currentUser.account_status || 'active') === 'active';
-  if (!isProUser) {
-    showToast('⭐', 'QR Code integrado e rastreamento estão disponíveis no Plano Pro.');
-    openProPaymentModal();
-    return;
-  }
+  if (!slug) return;
   currentQrCodeSlug = slug;
   const modal = document.getElementById('qr-code-modal');
   const modalImg = document.getElementById('qr-code-modal-img');
@@ -885,6 +879,8 @@ function loadAccountView() {
   setFieldValue('account-email-password', '');
   setFieldValue('account-current-password', '');
   setFieldValue('account-new-password', '');
+  setFieldValue('account-delete-password', '');
+  setFieldValue('account-delete-confirmation', '');
   const status = document.getElementById('account-email-status');
   if (status) {
     if (currentUser.pending_email) {
@@ -894,6 +890,24 @@ function loadAccountView() {
     } else {
       status.textContent = 'E-mail ainda não confirmado';
     }
+  }
+}
+
+async function deleteAccount() {
+  const currentPassword = document.getElementById('account-delete-password')?.value || '';
+  const confirmation = document.getElementById('account-delete-confirmation')?.value || '';
+  if (!currentPassword || confirmation.trim().toUpperCase() !== 'EXCLUIR') {
+    showToast('⚠️', 'Informe sua senha e digite EXCLUIR para confirmar');
+    return;
+  }
+  if (!window.confirm('Excluir definitivamente a conta, a página e todos os contatos? Esta ação não pode ser desfeita.')) return;
+  try {
+    await api('/auth/account', { method: 'DELETE', body: JSON.stringify({ currentPassword, confirmation }) });
+    currentUser = null;
+    showToast('✅', 'Conta excluída definitivamente');
+    setTimeout(() => navigateTo('home'), 500);
+  } catch (err) {
+    showToast('❌', err.message);
   }
 }
 

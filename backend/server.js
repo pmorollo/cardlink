@@ -9,6 +9,7 @@ try {
   }
 } catch (error) {
   console.error(`❌ ${error.message}`);
+  if (process.env.NODE_ENV === 'production') process.exit(1);
 }
 
 const express = require('express');
@@ -62,10 +63,10 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
       connectSrc: ["'self'", 'https:'],
-      fontSrc: ["'self'", 'data:', 'https:'],
+      fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
       objectSrc: ["'none'"],
       frameAncestors: ["'self'"],
       baseUri: ["'self'"],
@@ -124,8 +125,21 @@ const apiLimiter = rateLimit({
 });
 
 // ─── Routes ───────────────────────────────────────────────────────
-app.get('/api/health', (req, res) => {
+app.get('/api/health/live', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), uptimeSeconds: Math.round(process.uptime()) });
+});
+
+app.get(['/api/health', '/api/health/ready'], (req, res) => {
+  const database = require('./db/repository').isPgConfigured()
+    ? (require('./db/repository').pgIsReady() ? 'ok' : 'down')
+    : 'local';
+  const ready = database !== 'down';
+  res.status(ready ? 200 : 503).json({
+    status: ready ? 'ok' : 'degraded',
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.round(process.uptime()),
+    checks: { database, email: process.env.RESEND_API_KEY || process.env.SMTP_HOST ? 'configured' : 'not_configured' }
+  });
 });
 
 app.use('/api/auth', authLimiter, authRoutes);
@@ -185,6 +199,19 @@ app.get('/uploads/:filename', async (req, res, next) => {
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
+app.get('/sitemap.xml', async (req, res, next) => {
+  try {
+    const [cards, allUsers] = await Promise.all([cardRepo.all(), userRepo.all()]);
+    const usersById = new Map(allUsers.map(user => [user.id, user]));
+    const origin = `${req.protocol}://${req.get('host')}`;
+    const escapeXml = value => String(value).replace(/[<>&'\"]/g, char => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[char]));
+    const urls = [`${origin}/`, ...cards
+      .filter(card => hasActiveCustomerAccess(usersById.get(card.user_id)))
+      .map(card => `${origin}/site/${encodeURIComponent(card.slug)}`)];
+    res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(url => `  <url><loc>${escapeXml(url)}</loc></url>`).join('\n')}\n</urlset>`);
+  } catch (error) { next(error); }
+});
+
 // QR Code de balcão: contabiliza o scan e abre a página pública do CardLink.
 // A rota antiga é mantida para que QRs já impressos continuem funcionando.
 app.get(['/site/:slug/qr', '/site/:slug/qr-whatsapp'], async (req, res) => {
@@ -194,20 +221,23 @@ app.get(['/site/:slug/qr', '/site/:slug/qr-whatsapp'], async (req, res) => {
       return res.status(404).send('Cartão não encontrado');
     }
 
-    // O QR integrado/rastreável é um recurso Pro. Contas Free continuam com a página pública ativa.
     const owner = await userRepo.findById(card.user_id);
-    const isOwnerPro = isProCustomer(owner);
-    if (!isOwnerPro) {
+    if (!hasActiveCustomerAccess(owner)) {
       return res.redirect(`/site/${card.slug}`);
     }
 
     // O scan é uma métrica própria; a página pública contabiliza a visualização separadamente.
-    await cardRepo.update(card.id, { qr_scans_count: (card.qr_scans_count || 0) + 1 });
+    await cardRepo.incrementQrScans(card.id);
     return res.redirect(`/site/${card.slug}`);
   } catch (err) {
     console.error('Error on QR redirect:', err);
     res.redirect('/');
   }
+});
+
+// Rotas de entrada de campanhas segmentadas por público
+app.get(['/jovem', '/minhapagina', '/profissional'], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
 // Landing page route: disponível para Free e Pro ativos, com metadados SEO por cliente.
@@ -225,6 +255,8 @@ app.get('/site/:slug', async (req, res, next) => {
     const description = String(card.description || card.message || `Página profissional de ${card.name || card.business || 'cliente CardLink'}`)
       .replace(/\s+/g, ' ').trim().slice(0, 160);
     const canonical = `${req.protocol}://${req.get('host')}/site/${encodeURIComponent(card.slug)}`;
+    const shareImage = card.logo_url || card.photo_url || '';
+    const absoluteShareImage = shareImage ? new URL(shareImage, canonical).href : '';
     const templatePath = path.join(__dirname, '..', 'frontend', 'landing.html');
     let html = await fs.promises.readFile(templatePath, 'utf8');
     html = html
@@ -234,6 +266,7 @@ app.get('/site/:slug', async (req, res, next) => {
   <meta property="og:description" content="${escapeAttr(description)}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="${escapeAttr(canonical)}">
+  ${absoluteShareImage ? `<meta property="og:image" content="${escapeAttr(absoluteShareImage)}">\n  <meta name="twitter:card" content="summary_large_image">\n  <meta name="twitter:image" content="${escapeAttr(absoluteShareImage)}">` : '<meta name="twitter:card" content="summary">'}
   <link rel="canonical" href="${escapeAttr(canonical)}">`);
     res.type('html').send(html);
   } catch (error) {

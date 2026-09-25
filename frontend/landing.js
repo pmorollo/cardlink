@@ -751,6 +751,13 @@ function renderWhatsAppFab(d) {
   fab.setAttribute('aria-label', 'Conversar pelo WhatsApp');
   fab.innerHTML = `${WHATSAPP_ICON}<span>WhatsApp</span>`;
   document.body.appendChild(fab);
+  const contact = document.getElementById('contato');
+  if (contact && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      fab.classList.toggle('is-hidden', entries.some(entry => entry.isIntersecting));
+    }, { threshold: 0.1 });
+    observer.observe(contact);
+  }
 }
 
 // ============================================
@@ -823,7 +830,24 @@ function initScrollAnimations() {
 // ============================================
 // Boot
 // ============================================
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('lp-nav-toggle');
+  const menu = document.getElementById('lp-nav-links');
+  const closeMenu = () => {
+    menu?.classList.remove('is-open');
+    toggle?.setAttribute('aria-expanded', 'false');
+    toggle?.setAttribute('aria-label', 'Abrir menu');
+  };
+  toggle?.addEventListener('click', () => {
+    const open = !menu?.classList.contains('is-open');
+    menu?.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+  });
+  menu?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
+  init();
+});
 
 // ============================================
 // Visualizador de PDF (Somente Leitura - Sem Opção de Download)

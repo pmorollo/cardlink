@@ -238,14 +238,6 @@ async function handleCatalogPdfUpload(input) {
   const file = input.files?.[0];
   if (!file) return;
 
-  const isPro = currentUser && !currentUser.is_admin && currentUser.plan === 'pro';
-  if (!isPro) {
-    showToast('⭐', 'O upload de catálogo em PDF é exclusivo do Plano Pro. Assine por R$ 12,90/mês!');
-    openProPaymentModal();
-    input.value = '';
-    return;
-  }
-
   const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
   if (!isPdf) {
     showToast('⚠️', 'Por favor, selecione um arquivo em formato PDF.');

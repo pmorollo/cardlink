@@ -176,8 +176,43 @@ body.has-owner-bar .lp-nav {
   align-items: center;
 }
 
+.lp-nav-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+.lp-nav-toggle span { width: 20px; height: 2px; background: currentColor; border-radius: 2px; }
+
 @media (max-width: 768px) {
-  .lp-nav-links { display: none; }
+  .lp-nav-toggle { display: flex; }
+  .lp-nav-links {
+    display: flex;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 20px;
+    right: 20px;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+  }
+  .lp-nav-links.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+  .lp-nav-links a { display: block; padding: 12px; }
 }
 
 /* ============================================
@@ -1200,6 +1235,7 @@ body.has-owner-bar .lp-nav {
   transform: scale(1.12);
   box-shadow: 0 12px 36px rgba(37,211,102,0.5);
 }
+.fab-whatsapp.is-hidden { opacity: 0; pointer-events: none; transform: translateY(20px); }
 @keyframes fabEntry {
   from { transform: scale(0) rotate(-180deg); opacity: 0; }
   to { transform: scale(1) rotate(0); opacity: 1; }

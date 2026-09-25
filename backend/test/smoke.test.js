@@ -27,7 +27,8 @@ function snapshotDb() {
   db.contacts = [];
   db.support_tickets = [];
   db.admin_messages = [];
-  db._counters = { users: 0, cards: 0, contacts: 0, support_tickets: 0, admin_messages: 0 };
+  db.webhook_events = [];
+  db._counters = { users: 0, cards: 0, contacts: 0, support_tickets: 0, admin_messages: 0, webhook_events: 0 };
 }
 
 test.before(async () => {
@@ -600,7 +601,7 @@ test('cancelamento Cakto rebaixa Pro para Free e mantém a página pública ativ
   const oldTokenAccess = await api('GET', '/api/cards/stats/summary', null, token);
   assert.equal(oldTokenAccess.status, 200);
   assert.equal(oldTokenAccess.data.features.contacts, false);
-  assert.equal(oldTokenAccess.data.features.qr, false);
+  assert.equal(oldTokenAccess.data.features.qr, true);
 
   const publicAfterCancel = await api('GET', `/api/public/${card.data.slug}`);
   assert.equal(publicAfterCancel.status, 200);
@@ -979,7 +980,24 @@ test('codigo de recuperacao e invalidado apos cinco erros', async () => {
   const fifth = await api('POST', '/api/auth/reset-password', { email, code: '000000', newPassword: 'NovaSenha123!' });
   assert.equal(fifth.status, 429);
   const user = await users.findByEmail(email);
-  assert.equal(user.reset_code, null);
+  assert.equal(user.reset_code_hash, null);
+});
+
+test('upload rejeita conteúdo disfarçado com extensão de imagem', () => {
+  const { _test } = require('../routes/upload');
+  assert.equal(_test.detectedMime(Buffer.from('conteudo malicioso qualquer')), null);
+  assert.equal(_test.detectedMime(Buffer.from('GIF89a000000')), 'image/gif');
+});
+
+test('cliente pode excluir definitivamente sua conta e dados vinculados', async () => {
+  await createActiveUser({ email: 'excluir@example.com', isTest: false, source: 'cakto', plan: 'monthly' });
+  const logged = await login('excluir@example.com', 'SenhaValida123!');
+  const card = await api('POST', '/api/cards', { name: 'Página a excluir' }, logged.data.token);
+  assert.equal(card.status, 201);
+  const deleted = await api('DELETE', '/api/auth/account', { currentPassword: 'SenhaValida123!', confirmation: 'EXCLUIR' }, logged.data.token);
+  assert.equal(deleted.status, 200);
+  assert.equal(await users.findByEmail('excluir@example.com'), null);
+  assert.equal((await api('GET', `/api/public/${card.data.slug}`)).status, 404);
 });
 
 test('webhook nao aceita segredo enviado apenas no corpo', async () => {
