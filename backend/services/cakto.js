@@ -471,5 +471,7 @@ module.exports = {
   getPublicCatalogState,
   getKitFilhotesStatus,
   ensureKitFilhotesImage,
+  caktoRequest,
+  resultsOf,
   _resetForTests: resetForTests
 };
