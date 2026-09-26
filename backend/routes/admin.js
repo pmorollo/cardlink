@@ -3,6 +3,7 @@ const { users: userRepo, cards: cardRepo, contacts: contactRepo, supportTickets:
 const authMiddleware = require('../middleware/auth');
 const { requireAdmin, requireCustomer } = require('../middleware/roles');
 const { sendEmail } = require('../utils/email');
+const { caktoRequest, resultsOf } = require('../services/cakto');
 
 const adminRouter = express.Router();
 const supportRouter = express.Router();
@@ -175,6 +176,88 @@ adminRouter.get('/support', authMiddleware, requireAdmin, async (req, res) => {
   });
 
   res.json(list);
+});
+
+// TEMPORARY: read-only Cakto account verification endpoint.
+// Invoked once from production to audit active products/offers, then removed.
+// Never logs or returns tokens/access_tokens.
+const CAKTO_ACCOUNT_VERIFICATION_PRODUCT_NAMES = [
+  'cardlink',
+  'kit filhotes',
+  'método garimpo de infoprodutos',
+  'radar pro',
+  'língua portuguesa direto ao ponto',
+  'radar creative ai'
+];
+
+adminRouter.get('/cakto-account-verification', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const productsBody = await caktoRequest('/products/?status=active&limit=100');
+    const products = resultsOf(productsBody);
+
+    const allProducts = products.map(product => ({
+      name: String(product?.name || ''),
+      id: String(product?.id || ''),
+      status: String(product?.status || ''),
+      type: String(product?.type || ''),
+      price: product?.price ?? null
+    }));
+
+    const specificProducts = {};
+
+    for (const targetName of CAKTO_ACCOUNT_VERIFICATION_PRODUCT_NAMES) {
+      const match = products.find(product =>
+        String(product?.name || '').trim().toLowerCase() === targetName
+      );
+
+      if (!match) {
+        specificProducts[targetName] = { found: false };
+        continue;
+      }
+
+      let offers = [];
+      try {
+        const offersBody = await caktoRequest(
+          `/offers/?product=${encodeURIComponent(match.id)}&status=active&limit=100`
+        );
+        offers = resultsOf(offersBody).map(offer => ({
+          id: String(offer?.id || ''),
+          name: String(offer?.name || ''),
+          type: String(offer?.type || ''),
+          price: offer?.price ?? null,
+          status: String(offer?.status || '')
+        }));
+      } catch (offerError) {
+        specificProducts[targetName] = {
+          found: true,
+          name: String(match?.name || ''),
+          id: String(match?.id || ''),
+          status: String(match?.status || ''),
+          type: String(match?.type || ''),
+          price: match?.price ?? null,
+          offersError: String(offerError?.message || 'Falha ao buscar ofertas').substring(0, 300)
+        };
+        continue;
+      }
+
+      specificProducts[targetName] = {
+        found: true,
+        name: String(match?.name || ''),
+        id: String(match?.id || ''),
+        status: String(match?.status || ''),
+        type: String(match?.type || ''),
+        price: match?.price ?? null,
+        offers
+      };
+    }
+
+    res.json({ allProducts, specificProducts });
+  } catch (error) {
+    res.status(503).json({
+      error: 'Falha ao verificar a conta Cakto',
+      message: String(error?.message || 'Erro desconhecido').substring(0, 300)
+    });
+  }
 });
 
 // ─── SUPPORT ROUTES ────────────────────────────────────────────────────
