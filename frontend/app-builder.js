@@ -222,16 +222,37 @@ const LANDING_PENDING_NICHE_KEY = 'cardlink_pending_niche';
 // Called from the landing page (pre-signup), before the user has an account.
 // Stores the chosen niche and sends the visitor straight into the register
 // form; the template itself is only applied after the account is created
-// and the first card is initialized (see createNewCard()).
+// and the first card is initialized (see createNewCard()). 'custom' is the
+// explicit "sem modelo" choice: it clears any pending niche so the new card
+// starts blank, same result as not picking anything, but it's a deliberate
+// pick rather than a bypass of the picker.
 function selectLandingNiche(nicheKey) {
-  if (!NICHE_TEMPLATES[nicheKey]) return;
+  if (nicheKey !== 'custom' && !NICHE_TEMPLATES[nicheKey]) return;
   try {
-    localStorage.setItem(LANDING_PENDING_NICHE_KEY, nicheKey);
+    if (nicheKey === 'custom') {
+      localStorage.removeItem(LANDING_PENDING_NICHE_KEY);
+    } else {
+      localStorage.setItem(LANDING_PENDING_NICHE_KEY, nicheKey);
+    }
   } catch (err) {
     console.error('selectLandingNiche: falha ao salvar preferência local', err);
   }
   navigateTo('auth');
   toggleAuthForm('register');
+}
+
+// Every "Criar Conta" entry point on the landing page (hero, plano Free,
+// CTA de rodapé, link dentro do login) chama isto em vez de ir direto pro
+// cadastro — garante que o único caminho até o formulário de registro passe
+// pelos cards de nicho (que incluem a opção "Personalizado", sem modelo).
+function scrollToLandingNichePicker() {
+  navigateTo('home');
+  window.requestAnimationFrame(() => {
+    const el = document.getElementById('landing-niche-picker');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
 }
 
 // Applies a niche template chosen on the landing page (before signup) to a

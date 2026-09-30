@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles-base.css?v=48">
   <link rel="stylesheet" href="styles-builder.css?v=45">
   <link rel="stylesheet" href="styles-dashboard.css?v=48">
-  <link rel="stylesheet" href="styles-public.css?v=49">
+  <link rel="stylesheet" href="styles-public.css?v=50">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#f8b900">
@@ -71,7 +71,7 @@
             </div>
 
             <div class="hero-buttons">
-              <button class="btn btn-primary btn-lg" onclick="navigateTo('auth'); toggleAuthForm('register');" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
+              <button class="btn btn-primary btn-lg" onclick="scrollToLandingNichePicker();" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
                 <span style="color:#062b28 !important;-webkit-text-fill-color:#062b28 !important;font-weight:800;">Criar Minha Página Grátis</span>
               </button>
               <button class="btn btn-secondary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">
@@ -81,7 +81,7 @@
             <p class="hero-audience" id="landing-hero-audience">☆ Ideal para autônomos, salões, barbearias, clínicas, restaurantes e negócios locais.</p>
 
             <!-- Niche Templates Preview Cards (pre-signup) -->
-            <div class="landing-niche-picker">
+            <div class="landing-niche-picker" id="landing-niche-picker">
               <div class="landing-niche-picker-header">
                 <div class="landing-niche-picker-title">
                   <span>✨</span> <span>Escolha seu ramo e comece pronto</span>
@@ -139,6 +139,10 @@
                 <button type="button" class="landing-niche-card" onclick="selectLandingNiche('eletricista')">
                   <div class="landing-niche-preview" data-theme="amber">⚡</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Eletricista</div><div class="landing-niche-tagline">Manutenção Residencial</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('custom')">
+                  <div class="landing-niche-preview" data-theme="monochrome">🧩</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Personalizado</div><div class="landing-niche-tagline">Começar do zero, sem modelo</div></div>
                 </button>
               </div>
             </div>
@@ -425,7 +429,7 @@
               </ul>
             </div>
 
-            <button class="btn btn-secondary btn-lg" onclick="beginFreeRegistration()" style="width:100%;font-weight:700;">
+            <button class="btn btn-secondary btn-lg" onclick="scrollToLandingNichePicker();" style="width:100%;font-weight:700;">
               Escolher Plano Free
             </button>
           </div>
@@ -542,7 +546,7 @@
             Entrar
           </button>
           <p class="auth-toggle">
-            Ainda não tem conta? <a href="#" onclick="toggleAuthForm('register');return false;">Criar conta grátis</a>
+            Ainda não tem conta? <a href="#" onclick="scrollToLandingNichePicker();return false;">Criar conta grátis</a>
           </p>
         </div>
 
@@ -1579,7 +1583,7 @@
   <script src="app-core.js?v=47"></script>
   <script src="app-auth.js?v=53"></script>
   <script src="app-dashboard.js?v=45"></script>
-  <script src="app-builder.js?v=46"></script>
+  <script src="app-builder.js?v=47"></script>
   <script src="app-extras.js?v=45"></script>
   <script src="app-assistant.js?v=45"></script>
   <script src="landing-carousel.js?v=2"></script>
