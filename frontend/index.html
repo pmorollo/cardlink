@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles-base.css?v=48">
   <link rel="stylesheet" href="styles-builder.css?v=45">
   <link rel="stylesheet" href="styles-dashboard.css?v=48">
-  <link rel="stylesheet" href="styles-public.css?v=50">
+  <link rel="stylesheet" href="styles-public.css?v=51">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#f8b900">
@@ -92,51 +92,51 @@
                 Veja o estilo visual sugerido e escolha sua área — sua página já nasce com textos, serviços e tema prontos. Depois é só criar a conta:
               </p>
               <div class="landing-niche-grid">
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('petshop')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('petshop')">
                   <div class="landing-niche-preview" data-theme="emerald">🐾</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Pet Shop</div><div class="landing-niche-tagline">Estética Animal & Clínica</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('mecanica')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('mecanica')">
                   <div class="landing-niche-preview" data-theme="midnight">🔧</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Mecânica</div><div class="landing-niche-tagline">Centro Automotivo Especializado</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('restaurante')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('restaurante')">
                   <div class="landing-niche-preview" data-theme="amber">🍽️</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Restaurante</div><div class="landing-niche-tagline">Gastronomia & Eventos</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('estetica')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('estetica')">
                   <div class="landing-niche-preview" data-theme="rose">💇</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Salão & Estética</div><div class="landing-niche-tagline">Beleza e Bem-Estar</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('moda')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('moda')">
                   <div class="landing-niche-preview" data-theme="ocean">👗</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Loja & Moda</div><div class="landing-niche-tagline">Moda, Tendências & Acessórios</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('consultor')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('consultor')">
                   <div class="landing-niche-preview" data-theme="forest">💼</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Consultoria</div><div class="landing-niche-tagline">Negócios & Finanças</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('autonomo')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('autonomo')">
                   <div class="landing-niche-preview" data-theme="emerald">👔</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Profissional Liberal</div><div class="landing-niche-tagline">Autônomo Especialista</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('estudante')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('estudante')">
                   <div class="landing-niche-preview" data-theme="cyber">📚</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Estudantes</div><div class="landing-niche-tagline">Estudante & Pesquisador</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('criativo')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('criativo')">
                   <div class="landing-niche-preview" data-theme="cyber">🎨</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Design & Criativo</div><div class="landing-niche-tagline">Designer Gráfico & Web</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('professor')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('professor')">
                   <div class="landing-niche-preview" data-theme="midnight">🎓</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Aulas & Cursos</div><div class="landing-niche-tagline">Professor Particular</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('imoveis')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('imoveis')">
                   <div class="landing-niche-preview" data-theme="emerald">🏠</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Imóveis</div><div class="landing-niche-tagline">Corretor Credenciado</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('eletricista')">
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('eletricista')">
                   <div class="landing-niche-preview" data-theme="amber">⚡</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Eletricista</div><div class="landing-niche-tagline">Manutenção Residencial</div></div>
                 </button>
@@ -144,6 +144,27 @@
                   <div class="landing-niche-preview" data-theme="monochrome">🧩</div>
                   <div class="landing-niche-info"><div class="landing-niche-name">Personalizado</div><div class="landing-niche-tagline">Começar do zero, sem modelo</div></div>
                 </button>
+              </div>
+            </div>
+
+            <!-- Niche Preview Modal (pre-signup) -->
+            <div class="landing-niche-modal" id="landing-niche-modal" aria-hidden="true">
+              <div class="landing-niche-modal-backdrop" onclick="closeLandingNichePreview()"></div>
+              <div class="landing-niche-modal-card" role="dialog" aria-modal="true" aria-labelledby="landing-niche-modal-title">
+                <button type="button" class="landing-niche-modal-close" onclick="closeLandingNichePreview()" aria-label="Fechar prévia">✕</button>
+                <div class="landing-niche-modal-banner" id="landing-niche-modal-banner">
+                  <span id="landing-niche-modal-emoji"></span>
+                </div>
+                <div class="landing-niche-modal-body">
+                  <h3 class="landing-niche-modal-title" id="landing-niche-modal-title"></h3>
+                  <p class="landing-niche-modal-business" id="landing-niche-modal-business"></p>
+                  <p class="landing-niche-modal-desc" id="landing-niche-modal-desc"></p>
+                  <div class="landing-niche-modal-products" id="landing-niche-modal-products"></div>
+                  <div class="landing-niche-modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeLandingNichePreview()">Ver outro modelo</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmLandingNichePreview()">✨ Usar este modelo</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1583,7 +1604,7 @@
   <script src="app-core.js?v=47"></script>
   <script src="app-auth.js?v=53"></script>
   <script src="app-dashboard.js?v=45"></script>
-  <script src="app-builder.js?v=47"></script>
+  <script src="app-builder.js?v=48"></script>
   <script src="app-extras.js?v=45"></script>
   <script src="app-assistant.js?v=45"></script>
   <script src="landing-carousel.js?v=2"></script>

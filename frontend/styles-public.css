@@ -711,6 +711,162 @@
   }
 }
 
+/* ============================================
+   Landing — modal de preview do nicho (pré-cadastro)
+   ============================================ */
+.landing-niche-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.landing-niche-modal.active {
+  display: flex;
+}
+
+.landing-niche-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 7, 11, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.landing-niche-modal-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  animation: landingNicheModalIn 0.18s ease-out;
+}
+
+@keyframes landingNicheModalIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.landing-niche-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  color: #0f172a;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-niche-modal-banner {
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.landing-niche-modal-banner[data-theme="midnight"] { background: linear-gradient(135deg, #4c1d95, #1e1b4b); }
+.landing-niche-modal-banner[data-theme="ocean"] { background: linear-gradient(135deg, #fff4c7, #e6aa36); }
+.landing-niche-modal-banner[data-theme="forest"] { background: linear-gradient(135deg, #091525 0 58%, #c6a15b 58% 72%, #f5f0e6 72%); }
+.landing-niche-modal-banner[data-theme="rose"] { background: linear-gradient(135deg, #ff4081, #f43f5e); }
+.landing-niche-modal-banner[data-theme="emerald"] { background: linear-gradient(135deg, #065f46, #10b981); }
+.landing-niche-modal-banner[data-theme="cyber"] { background: linear-gradient(135deg, #7c3aed, #06b6d4); }
+.landing-niche-modal-banner[data-theme="amber"] { background: linear-gradient(135deg, #b45309, #f59e0b); }
+.landing-niche-modal-banner[data-theme="monochrome"] { background: linear-gradient(135deg, #1e293b, #334155); }
+
+.landing-niche-modal-body {
+  padding: 18px 20px 20px;
+}
+
+.landing-niche-modal-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.landing-niche-modal-business {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--purple, #7c3aed);
+  margin: 0 0 10px;
+}
+
+.landing-niche-modal-desc {
+  font-size: 0.85rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+
+.landing-niche-modal-products {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.landing-niche-modal-product {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.78rem;
+}
+
+.landing-niche-modal-product-name {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.landing-niche-modal-product-price {
+  color: #0f172a;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.landing-niche-modal-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.landing-niche-modal-actions .btn {
+  flex: 1;
+  min-width: 140px;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .landing-niche-modal-actions {
+    flex-direction: column;
+  }
+
+  .landing-niche-modal-actions .btn {
+    width: 100%;
+  }
+}
+
 @media print {
   body {
     background: #ffffff !important;

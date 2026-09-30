@@ -255,6 +255,77 @@ function scrollToLandingNichePicker() {
   });
 }
 
+// ============================================
+// Landing Niche Preview Modal (pre-signup)
+// ============================================
+let landingNichePreviewKey = null;
+
+// Clicking a niche card on the landing page opens this preview (instead of
+// going straight to the cadastro) so the visitor can see the theme, texto e
+// serviços sugeridos antes de decidir. Only "Usar este modelo" inside the
+// modal actually advances to selectLandingNiche().
+function openLandingNichePreview(nicheKey) {
+  const tmpl = NICHE_TEMPLATES[nicheKey];
+  if (!tmpl) return;
+  landingNichePreviewKey = nicheKey;
+
+  const modal = document.getElementById('landing-niche-modal');
+  if (!modal) {
+    // Modal ausente por algum motivo: não trava o visitante, segue o fluxo normal.
+    selectLandingNiche(nicheKey);
+    return;
+  }
+
+  const banner = document.getElementById('landing-niche-modal-banner');
+  if (banner) banner.setAttribute('data-theme', tmpl.theme || '');
+
+  const emoji = document.getElementById('landing-niche-modal-emoji');
+  if (emoji) emoji.textContent = tmpl.emoji || '';
+
+  const title = document.getElementById('landing-niche-modal-title');
+  if (title) title.textContent = tmpl.title || tmpl.name || '';
+
+  const business = document.getElementById('landing-niche-modal-business');
+  if (business) business.textContent = tmpl.business || '';
+
+  const desc = document.getElementById('landing-niche-modal-desc');
+  if (desc) desc.textContent = tmpl.description || '';
+
+  const productsEl = document.getElementById('landing-niche-modal-products');
+  if (productsEl) {
+    productsEl.innerHTML = '';
+    (tmpl.products || []).slice(0, 3).forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'landing-niche-modal-product';
+      const priceLabel = /^[\d.,]+$/.test(String(p.price || '').trim()) ? `R$ ${p.price}` : (p.price || '');
+      row.innerHTML = `<span class="landing-niche-modal-product-name">${escapeHtml(p.name)}</span><span class="landing-niche-modal-product-price">${escapeHtml(priceLabel)}</span>`;
+      productsEl.appendChild(row);
+    });
+  }
+
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLandingNichePreview() {
+  const modal = document.getElementById('landing-niche-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+  document.body.style.overflow = '';
+  landingNichePreviewKey = null;
+}
+
+// "Usar este modelo" dentro do preview: só agora de fato segue pro cadastro.
+function confirmLandingNichePreview() {
+  if (!landingNichePreviewKey) return;
+  const key = landingNichePreviewKey;
+  closeLandingNichePreview();
+  selectLandingNiche(key);
+}
+
 // Applies a niche template chosen on the landing page (before signup) to a
 // freshly created card, if there is one pending. Safe to call unconditionally
 // after createNewCard() resets the form to blank.
