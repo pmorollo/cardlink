@@ -202,6 +202,15 @@ textarea.form-input {
 .theme-swatch[data-theme="rose"] {
   background: linear-gradient(135deg, #ff4081, #f43f5e);
 }
+.theme-swatch[data-theme="emerald"] {
+  background: linear-gradient(135deg, #065f46, #10b981);
+}
+.theme-swatch[data-theme="cyber"] {
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+}
+.theme-swatch[data-theme="amber"] {
+  background: linear-gradient(135deg, #b45309, #f59e0b);
+}
 .theme-swatch[data-theme="monochrome"] {
   background: linear-gradient(135deg, #1e293b, #334155);
 }

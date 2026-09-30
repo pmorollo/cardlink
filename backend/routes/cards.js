@@ -111,7 +111,7 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
 
   const user = req.currentUser || await userRepo.findById(req.userId);
   const isPro = user && user.plan === 'pro';
-  const FREE_THEMES = new Set(['midnight', 'ocean', 'rose']);
+  const FREE_THEMES = new Set(['midnight', 'ocean', 'rose', 'emerald', 'cyber', 'amber']);
 
   let productsToSave = req.body.products;
   let galleryToSave = req.body.gallery;
@@ -237,7 +237,7 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
 
   const user = req.currentUser || await userRepo.findById(req.userId);
   const isPro = user && user.plan === 'pro';
-  const FREE_THEMES = new Set(['midnight', 'ocean', 'rose']);
+  const FREE_THEMES = new Set(['midnight', 'ocean', 'rose', 'emerald', 'cyber', 'amber']);
 
   let galleryToSave = req.body.gallery !== undefined ? req.body.gallery : card.gallery;
   if (Array.isArray(galleryToSave) && !isPro && galleryToSave.length > 4) {

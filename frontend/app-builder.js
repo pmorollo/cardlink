@@ -1,4 +1,259 @@
 // ============================================
+// Niche Templates Library (10 Presets)
+// ============================================
+const NICHE_TEMPLATES = {
+  petshop: {
+    name: 'Pet Shop & Veterinária',
+    emoji: '🐾',
+    business: 'Pet Love & Cuidados Veterinários',
+    business_complement: 'Estética Animal, Banho & Tosa e Consultas',
+    title: 'Estética Animal & Clínica',
+    description: 'Oferecemos serviços completos de banho, tosa especializada, consultas veterinárias e atendimento com todo amor que seu pet merece. Agende um horário conosco pelo WhatsApp!',
+    theme: 'emerald',
+    services_title: 'Nossos Serviços para seu Pet',
+    products: [
+      { name: 'Banho & Tosa Especializada', price: '75,00', description: 'Com hidratação, corte de unhas e limpeza de ouvidos.' },
+      { name: 'Consulta Veterinária Geral', price: '120,00', description: 'Avaliação clínica completa e orientação preventiva.' },
+      { name: 'Pacote Mensal de Banhos (4x)', price: '260,00', description: 'Banhos semanais com transporte leva e traz incluso.' }
+    ]
+  },
+  mecanica: {
+    name: 'Mecânica & Auto Center',
+    emoji: '🔧',
+    business: 'Auto Mecânica Express & Diagnóstico',
+    business_complement: 'Manutenção Preventiva, Freios e Suspensão',
+    title: 'Centro Automotivo Especializado',
+    description: 'Manutenção preventiva e corretiva multimarcas com equipamentos computadorizados. Peças originais, garantia de serviço e orçamento transparente.',
+    theme: 'midnight',
+    services_title: 'Serviços Automotivos em Destaque',
+    products: [
+      { name: 'Revisão Preventiva Completa', price: '180,00', description: 'Check-up de 30 itens de segurança, freios e suspensão.' },
+      { name: 'Troca de Óleo + Filtros', price: '190,00', description: 'Óleo sintético homologado com troca dos filtros de óleo e ar.' },
+      { name: 'Alinhamento 3D & Balanceamento', price: '110,00', description: 'Alinhamento a laser das 4 rodas e balanceamento computadorizado.' }
+    ]
+  },
+  restaurante: {
+    name: 'Restaurante & Gastronomia',
+    emoji: '🍽️',
+    business: 'Bistrô & Restaurante Gourmet',
+    business_complement: 'Gastronomia Artesanal & Delivery Especial',
+    title: 'Gastronomia & Eventos',
+    description: 'Culinária artesanal com opções para almoço executivo, jantar especial e delivery rápido. Conheça nosso cardápio completo e faça seu pedido!',
+    theme: 'amber',
+    services_title: 'Destaques do Nosso Cardápio',
+    products: [
+      { name: 'Prato Executivo do Chef', price: '42,00', description: 'Acompanha entrada, prato principal e mini sobremesa.' },
+      { name: 'Combo Família Especial', price: '115,00', description: 'Serve até 4 pessoas com acompanhamentos e bebida inclusa.' },
+      { name: 'Sobremesa Artesanal da Casa', price: '18,00', description: 'Receita exclusiva preparada diariamente por nosso confeiteiro.' }
+    ]
+  },
+  estetica: {
+    name: 'Salão de Beleza & Estética',
+    emoji: '💇',
+    business: 'Studio Beauty & Estética Avançada',
+    business_complement: 'Cabelos, Manicure, Maquiagem e Cuidados Faciais',
+    title: 'Especialista em Beleza e Bem-Estar',
+    description: 'Espaço exclusivo com serviços de corte, coloração, tratamentos capilares, manicure e estética facial. Atendimento personalizado com hora marcada.',
+    theme: 'rose',
+    services_title: 'Procedimentos & Cuidados',
+    products: [
+      { name: 'Corte Personalizado + Escova', price: '95,00', description: 'Visagismo capilar, lavagem terapêutica e finalização.' },
+      { name: 'Manicure & Pedicure Completa', price: '65,00', description: 'Cutilagem, esmaltação tradicional ou em gel com hidratação.' },
+      { name: 'Limpeza de Pele Profunda', price: '130,00', description: 'Remoção de impurezas, extração com hidrosucção e máscara calmante.' }
+    ]
+  },
+  moda: {
+    name: 'Loja de Moda & Acessórios',
+    emoji: '👗',
+    business: 'Boutique Elegance Moda Feminina',
+    business_complement: 'Roupas, Tendências e Acessórios Exclusivos',
+    title: 'Moda, Tendências & Acessórios',
+    description: 'Roupas femininas com caimento perfeito para todas as ocasiões. Enviamos para todo o Brasil com atendimento personalizado pelo WhatsApp.',
+    theme: 'ocean',
+    services_title: 'Coleção em Destaque',
+    products: [
+      { name: 'Vestido Midi Coleção Verão', price: '189,90', description: 'Tecido premium leve com estampa exclusiva e caimento impecável.' },
+      { name: 'Conjunto Alfaiataria Elegance', price: '249,90', description: 'Blazer estruturado com calça reta de corte sofisticado.' },
+      { name: 'Kit Acessórios Folheados', price: '89,90', description: 'Colar e brincos com banho antialérgico e acabamento fino.' }
+    ]
+  },
+  consultor: {
+    name: 'Consultoria Empresarial',
+    emoji: '💼',
+    business: 'Consultoria Estratégica & Gestão',
+    business_complement: 'Planejamento Financeiro, Processos e Resultados',
+    title: 'Consultor de Negócios & Finanças',
+    description: 'Mais de 10 anos de experiência auxiliando empresas a aumentar faturamento, otimizar custos e organizar processos operacionais.',
+    theme: 'forest',
+    services_title: 'Soluções & Consultorias',
+    products: [
+      { name: 'Diagnóstico Empresarial Inicial', price: '350,00', description: 'Análise detalhada de gargalos financeiros e plano de ação em 7 dias.' },
+      { name: 'Mentoria Executiva Mensal (4 sessões)', price: '1200,00', description: 'Acompanhamento semanal individual com foco em metas e resultados.' },
+      { name: 'Palestra ou Workshop In-Company', price: '2500,00', description: 'Treinamento de 4 horas para equipes de vendas e liderança.' }
+    ]
+  },
+  autonomo: {
+    name: 'Profissional Liberal & Autônomo',
+    emoji: '👔',
+    business: 'Serviços Profissionais & Consultoria Autônoma',
+    business_complement: 'Atendimento Personalizado, Consultoria e Soluções Sob Medida',
+    title: 'Profissional Liberal Especialista',
+    description: 'Atuação profissional autônoma com compromisso, ética e foco na solução prática dos seus desafios. Agende seu atendimento ou solicite uma proposta pelo WhatsApp!',
+    theme: 'emerald',
+    services_title: 'Serviços & Atendimentos Especializados',
+    products: [
+      { name: 'Consulta / Atendimento Individual', price: '180,00', description: 'Sessão presencial ou online com análise completa da sua necessidade.' },
+      { name: 'Elaboração de Parecer ou Laudo Técnico', price: '450,00', description: 'Relatório detalhado, fundamentado e assinado com validade técnica.' },
+      { name: 'Assessoria Contínua Mensal', price: '850,00', description: 'Acompanhamento regular com suporte prioritário e consultoria contínua.' }
+    ]
+  },
+  estudante: {
+    name: 'Estudantes & Portfólio Acadêmico',
+    emoji: '📚',
+    business: 'Portfólio Acadêmico & Projetos',
+    business_complement: 'Pesquisa, Monitoria, Trabalhos e Atividades Extracurriculares',
+    title: 'Estudante & Pesquisador',
+    description: 'Espaço dedicado a apresentar meus projetos acadêmicos, produções científicas, habilidades técnicas e experiências. Aberto a parcerias, monitorias e oportunidades de estágio!',
+    theme: 'cyber',
+    services_title: 'Projetos, Monitorias & Serviços Acadêmicos',
+    products: [
+      { name: 'Monitoria & Reforço de Conteúdo (1h)', price: '45,00', description: 'Explicação didática, resolução de exercícios e material de apoio em PDF.' },
+      { name: 'Formatação ABNT & Revisão de Trabalhos', price: '60,00', description: 'Padronização de referências, capa, sumário e citações segundo as normas ABNT.' },
+      { name: 'Participação em Projetos / Pesquisa', price: 'A Combinar', description: 'Disponibilidade para projetos científicos, análise de dados e inovação.' }
+    ]
+  },
+  criativo: {
+    name: 'Freelancer & Criativo',
+    emoji: '🎨',
+    business: 'Design Studio & Social Media',
+    business_complement: 'Identidade Visual, Landing Pages e Branding',
+    title: 'Designer Gráfico & Web',
+    description: 'Criação de identidades visuais memoráveis, sites de alta conversão e materiais gráficos para posicionar o seu negócio no topo.',
+    theme: 'cyber',
+    services_title: 'Serviços de Design & Web',
+    products: [
+      { name: 'Identidade Visual Completa', price: '850,00', description: 'Logotipo, manual de marca, paleta de cores, tipografia e papelaria.' },
+      { name: 'Página de Vendas / Landing Page', price: '650,00', description: 'Design responsivo de alta conversão pronto para anúncios.' },
+      { name: 'Pacote Mensal de Posts (12 artes)', price: '480,00', description: 'Artes exclusivas para feed e stories com legendas estratégicas.' }
+    ]
+  },
+  professor: {
+    name: 'Professor & Aulas Particulares',
+    emoji: '🎓',
+    business: 'Aulas Particulares & Mentoria de Estudos',
+    business_complement: 'Aulas Online e Presenciais com Material Exclusivo',
+    title: 'Professor Particular & Preparatório',
+    description: 'Aulas individuais e personalizadas online ou presenciais. Foco em resultados rápidos, reforço escolar, ENEM e concursos públicos.',
+    theme: 'midnight',
+    services_title: 'Planos & Modalidades de Aulas',
+    products: [
+      { name: 'Aula Individual Avulsa (1 hora)', price: '70,00', description: 'Tire dúvidas e pratique exercícios com material exclusivo.' },
+      { name: 'Pacote Mensal Intensivo (8 horas)', price: '480,00', description: '2 aulas semanais com acompanhamento de tarefas e simulados.' },
+      { name: 'Correção Detalhada de Redação', price: '35,00', description: 'Feedback linha a linha nos critérios oficiais de avaliação.' }
+    ]
+  },
+  imoveis: {
+    name: 'Corretor de Imóveis & Imobiliária',
+    emoji: '🏠',
+    business: 'Imóveis Prime & Consultoria Imobiliária',
+    business_complement: 'Venda, Locação e Avaliação de Imóveis',
+    title: 'Corretor de Imóveis Credenciado',
+    description: 'Assessoria completa na compra, venda e locação de imóveis residenciais e comerciais. Atendimento transparente do primeiro contato até a escritura.',
+    theme: 'emerald',
+    services_title: 'Serviços & Consultoria Imobiliária',
+    products: [
+      { name: 'Avaliação Mercadológica de Imóvel', price: '250,00', description: 'Laudo técnico de valor com análise comparativa de mercado.' },
+      { name: 'Consultoria para Compra e Financiamento', price: 'Gratuito', description: 'Simulação bancária nas melhores taxas e busca sob medida.' },
+      { name: 'Assessoria Jurídica Imobiliária', price: 'Sob Consulta', description: 'Verificação de certidões, contratos e regularização documental.' }
+    ]
+  },
+  eletricista: {
+    name: 'Eletricista & Manutenção Residencial',
+    emoji: '⚡',
+    business: 'Serviços Elétricos & Manutenção 24h',
+    business_complement: 'Instalações, Padrão de Entrada e Reparos de Emergência',
+    title: 'Eletricista Profissional Certificado',
+    description: 'Instalações elétricas residenciais e comerciais, troca de fiação, disjuntores, chuveiros, iluminação LED e atendimento de emergência.',
+    theme: 'amber',
+    services_title: 'Serviços Elétricos Mais Solicitados',
+    products: [
+      { name: 'Instalação de Chuveiro / Luminária', price: '80,00', description: 'Com fiação reforçada e teste de aterramento de segurança.' },
+      { name: 'Troca de Quadro de Distribuição', price: '320,00', description: 'Organização de circuitos com disjuntores DR e DPS contra raios.' },
+      { name: 'Visita Técnica de Diagnóstico', price: '60,00', description: 'Identificação de curtos, fuga de corrente e superaquecimento.' }
+    ]
+  }
+};
+
+function applyNicheTemplate(nicheKey) {
+  const tmpl = NICHE_TEMPLATES[nicheKey];
+  if (!tmpl) return;
+
+  const currentDesc = document.getElementById('field-description')?.value || '';
+  if (currentDesc.trim().length > 15) {
+    if (!confirm(`Deseja aplicar o modelo "${tmpl.name}"? Isso substituirá as informações de apresentação e serviços por sugestões desse nicho.`)) {
+      return;
+    }
+  }
+
+  setFieldValue('field-business', tmpl.business);
+  setFieldValue('field-business-complement', tmpl.business_complement || '');
+  setFieldValue('field-title', tmpl.title);
+  setFieldValue('field-description', tmpl.description);
+  setFieldValue('field-services-title', tmpl.services_title || 'Serviços em Destaque');
+  setFieldValue('field-services-mode', 'list');
+  toggleServicesMode();
+
+  const container = document.getElementById('builder-products-container');
+  if (container) {
+    container.innerHTML = '';
+    tmpl.products.forEach(p => addProductRow(p));
+  }
+
+  if (tmpl.theme) {
+    selectTheme(tmpl.theme);
+  }
+
+  updatePreview();
+  showToast(tmpl.emoji, `Modelo "${tmpl.name}" aplicado com sucesso!`);
+}
+
+const LANDING_PENDING_NICHE_KEY = 'cardlink_pending_niche';
+
+// Called from the landing page (pre-signup), before the user has an account.
+// Stores the chosen niche and sends the visitor straight into the register
+// form; the template itself is only applied after the account is created
+// and the first card is initialized (see createNewCard()).
+function selectLandingNiche(nicheKey) {
+  if (!NICHE_TEMPLATES[nicheKey]) return;
+  try {
+    localStorage.setItem(LANDING_PENDING_NICHE_KEY, nicheKey);
+  } catch (err) {
+    console.error('selectLandingNiche: falha ao salvar preferência local', err);
+  }
+  navigateTo('auth');
+  toggleAuthForm('register');
+}
+
+// Applies a niche template chosen on the landing page (before signup) to a
+// freshly created card, if there is one pending. Safe to call unconditionally
+// after createNewCard() resets the form to blank.
+function applyPendingLandingNiche() {
+  let nicheKey = null;
+  try {
+    nicheKey = localStorage.getItem(LANDING_PENDING_NICHE_KEY);
+  } catch (err) {
+    return;
+  }
+  if (!nicheKey || !NICHE_TEMPLATES[nicheKey]) return;
+  try {
+    localStorage.removeItem(LANDING_PENDING_NICHE_KEY);
+  } catch (err) {
+    // não bloqueia a aplicação do modelo por isso
+  }
+  applyNicheTemplate(nicheKey);
+}
+
+// ============================================
 // Card CRUD
 // ============================================
 function createNewCard() {
@@ -38,6 +293,7 @@ function createNewCard() {
     activeSettingsSection = 'profile';
     navigateTo('settings');
     showSettingsSection('profile');
+    applyPendingLandingNiche();
   }
 }
 
