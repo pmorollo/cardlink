@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="CardLink — Reúna serviços, fotos, avaliações, localização, redes sociais e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.">
   <title>CardLink — Tudo o que seu cliente precisa ver antes de chamar você</title>
-  <link rel="stylesheet" href="styles-base.css?v=49">
-  <link rel="stylesheet" href="styles-builder.css?v=46">
+  <link rel="stylesheet" href="styles-base.css?v=50">
+  <link rel="stylesheet" href="styles-builder.css?v=47">
   <link rel="stylesheet" href="styles-dashboard.css?v=48">
-  <link rel="stylesheet" href="styles-public.css?v=53">
+  <link rel="stylesheet" href="styles-public.css?v=54">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#f8b900">
@@ -89,56 +89,24 @@
                 <span class="landing-niche-picker-badge">1 Clique</span>
               </div>
               <p class="landing-niche-picker-desc">
-                Veja o estilo visual sugerido e escolha sua área — sua página já nasce com textos, serviços e tema prontos. Depois é só criar a conta:
+                Escolha o estilo visual da sua página — o conteúdo (nome, descrição, serviços) você preenche depois, no menu do cartão:
               </p>
               <div class="landing-niche-grid">
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('petshop')">
-                  <div class="landing-niche-preview" data-theme="emerald">🐾</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Pet Shop</div><div class="landing-niche-tagline">Estética Animal & Clínica</div></div>
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('institucional')">
+                  <div class="landing-niche-preview" data-theme="institucional">🏛️</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Institucional</div><div class="landing-niche-tagline">Sóbrio, para empresas e instituições</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('mecanica')">
-                  <div class="landing-niche-preview" data-theme="midnight">🔧</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Mecânica</div><div class="landing-niche-tagline">Centro Automotivo Especializado</div></div>
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('pessoal')">
+                  <div class="landing-niche-preview" data-theme="pessoal">👤</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Pessoal</div><div class="landing-niche-tagline">Acolhedor, para uso individual</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('restaurante')">
-                  <div class="landing-niche-preview" data-theme="amber">🍽️</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Restaurante</div><div class="landing-niche-tagline">Gastronomia & Eventos</div></div>
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('profissional')">
+                  <div class="landing-niche-preview" data-theme="profissional">💼</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Profissional</div><div class="landing-niche-tagline">Moderno, para autônomos e consultorias</div></div>
                 </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('estetica')">
-                  <div class="landing-niche-preview" data-theme="rose">💇</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Salão & Estética</div><div class="landing-niche-tagline">Beleza e Bem-Estar</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('moda')">
-                  <div class="landing-niche-preview" data-theme="ocean">👗</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Loja & Moda</div><div class="landing-niche-tagline">Moda, Tendências & Acessórios</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('consultor')">
-                  <div class="landing-niche-preview" data-theme="forest">💼</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Consultoria</div><div class="landing-niche-tagline">Negócios & Finanças</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('autonomo')">
-                  <div class="landing-niche-preview" data-theme="slate">👔</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Profissional Liberal</div><div class="landing-niche-tagline">Autônomo Especialista</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('estudante')">
-                  <div class="landing-niche-preview" data-theme="cyber">📚</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Estudantes</div><div class="landing-niche-tagline">Estudante & Pesquisador</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('criativo')">
-                  <div class="landing-niche-preview" data-theme="violet">🎨</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Design & Criativo</div><div class="landing-niche-tagline">Designer Gráfico & Web</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('professor')">
-                  <div class="landing-niche-preview" data-theme="wine">🎓</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Aulas & Cursos</div><div class="landing-niche-tagline">Professor Particular</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('imoveis')">
-                  <div class="landing-niche-preview" data-theme="teal">🏠</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Imóveis</div><div class="landing-niche-tagline">Corretor Credenciado</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('eletricista')">
-                  <div class="landing-niche-preview" data-theme="volt">⚡</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Eletricista</div><div class="landing-niche-tagline">Manutenção Residencial</div></div>
+                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('comercial')">
+                  <div class="landing-niche-preview" data-theme="comercial">🛍️</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Comercial</div><div class="landing-niche-tagline">Direto, para lojas e vendas</div></div>
                 </button>
                 <button type="button" class="landing-niche-card" onclick="selectLandingNiche('custom')">
                   <div class="landing-niche-preview" data-theme="monochrome">🧩</div>
@@ -1051,58 +1019,20 @@
             <div class="form-section-title"><span class="icon">🎨</span> Aparência do site</div>
             <div class="theme-grid" id="themeGrid">
               <div>
-                <div class="theme-swatch active" data-theme="midnight" onclick="selectTheme('midnight')"></div>
-                <div class="theme-label">Midnight</div>
+                <div class="theme-swatch active" data-theme="institucional" onclick="selectTheme('institucional')"></div>
+                <div class="theme-label">Institucional</div>
               </div>
               <div>
-                <div class="theme-swatch" data-theme="ocean" onclick="selectTheme('ocean')"></div>
-                <div class="theme-label">Mel Claro</div>
+                <div class="theme-swatch" data-theme="pessoal" onclick="selectTheme('pessoal')"></div>
+                <div class="theme-label">Pessoal</div>
               </div>
               <div>
-                <div class="theme-swatch" data-theme="rose" onclick="selectTheme('rose')"></div>
-                <div class="theme-label">Rosa</div>
+                <div class="theme-swatch" data-theme="profissional" onclick="selectTheme('profissional')"></div>
+                <div class="theme-label">Profissional</div>
               </div>
               <div>
-                <div class="theme-swatch" data-theme="emerald" onclick="selectTheme('emerald')"></div>
-                <div class="theme-label">Esmeralda</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="cyber" onclick="selectTheme('cyber')"></div>
-                <div class="theme-label">Cyber Neon</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="amber" onclick="selectTheme('amber')"></div>
-                <div class="theme-label">Âmbar Ouro</div>
-              </div>
-              <div style="position:relative;">
-                <span style="position:absolute;top:-6px;right:4px;background:linear-gradient(135deg,var(--accent),#9333ea);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 5px;border-radius:6px;z-index:2;">PRO</span>
-                <div class="theme-swatch" data-theme="sunset" onclick="selectTheme('sunset')"></div>
-                <div class="theme-label">Sunset</div>
-              </div>
-              <div style="position:relative;">
-                <span style="position:absolute;top:-6px;right:4px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 5px;border-radius:6px;z-index:2;">PRO ⭐</span>
-                <div class="theme-swatch" data-theme="forest" onclick="selectTheme('forest')"></div>
-                <div class="theme-label">Executivo</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="slate" onclick="selectTheme('slate')"></div>
-                <div class="theme-label">Grafite</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="violet" onclick="selectTheme('violet')"></div>
-                <div class="theme-label">Violeta</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="teal" onclick="selectTheme('teal')"></div>
-                <div class="theme-label">Verde-azulado</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="volt" onclick="selectTheme('volt')"></div>
-                <div class="theme-label">Volt</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="wine" onclick="selectTheme('wine')"></div>
-                <div class="theme-label">Vinho</div>
+                <div class="theme-swatch" data-theme="comercial" onclick="selectTheme('comercial')"></div>
+                <div class="theme-label">Comercial</div>
               </div>
             </div>
           </div>
@@ -1616,10 +1546,10 @@
   </div>
 
   <script src="bootstrap.js?v=2"></script>
-  <script src="app-core.js?v=47"></script>
+  <script src="app-core.js?v=48"></script>
   <script src="app-auth.js?v=53"></script>
   <script src="app-dashboard.js?v=45"></script>
-  <script src="app-builder.js?v=50"></script>
+  <script src="app-builder.js?v=51"></script>
   <script src="app-extras.js?v=45"></script>
   <script src="app-assistant.js?v=45"></script>
   <script src="landing-carousel.js?v=2"></script>

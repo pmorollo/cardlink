@@ -2,13 +2,18 @@
 // the frontend exposes (backend/routes/cards.js only enforces this set when
 // the requester is not Pro).
 //
-// Keep this in sync with the free (non-"PRO"-badged) swatches in
-// frontend/index.html and with NICHE_TEMPLATES in frontend/app-builder.js —
-// every niche template's `theme` value must be a Free theme so it applies
-// cleanly for a visitor who signs up straight from the landing page.
-const FREE_THEMES = new Set([
+// "current" is the catalog actually offered today (builder's theme picker,
+// landing niche picker, NICHE_TEMPLATES in frontend/app-builder.js). "legacy"
+// themes are no longer offered anywhere in the UI, but stay in FREE_THEMES so
+// existing customers' already-published cards — created back when those
+// themes were the norm — keep rendering with their original look and don't
+// get silently downgraded to 'institucional' the next time they save.
+const CURRENT_FREE_THEMES = ['institucional', 'pessoal', 'profissional', 'comercial'];
+const LEGACY_FREE_THEMES = [
   'midnight', 'ocean', 'rose', 'emerald', 'cyber', 'amber',
   'slate', 'violet', 'teal', 'volt', 'wine'
-]);
+];
 
-module.exports = { FREE_THEMES };
+const FREE_THEMES = new Set([...CURRENT_FREE_THEMES, ...LEGACY_FREE_THEMES]);
+
+module.exports = { FREE_THEMES, CURRENT_FREE_THEMES, LEGACY_FREE_THEMES };

@@ -187,6 +187,20 @@ textarea.form-input {
   transform: scale(1.05);
 }
 
+.theme-swatch[data-theme="institucional"] {
+  background: linear-gradient(135deg, #0b2545, #4a90d9);
+}
+.theme-swatch[data-theme="pessoal"] {
+  background: linear-gradient(135deg, #2b2622, #d9a066);
+}
+.theme-swatch[data-theme="profissional"] {
+  background: linear-gradient(135deg, #111827, #6366f1);
+}
+.theme-swatch[data-theme="comercial"] {
+  background: linear-gradient(135deg, #064e3b, #10b981);
+}
+
+/* Legado — mantidos só porque cartões antigos ainda usam esses temas */
 .theme-swatch[data-theme="midnight"] {
   background: linear-gradient(135deg, #4c1d95, #1e1b4b);
 }

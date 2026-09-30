@@ -7,7 +7,7 @@ const CARDLINK_SUPPORT_WHATSAPP = '5511994551249';
 
 let authToken = null; // marcador de sessão; o JWT fica apenas no cookie HttpOnly
 let currentUser = null;
-let currentTheme = 'midnight';
+let currentTheme = 'institucional';
 let editingCardId = null;
 let currentUserCardId = null;
 let activeSettingsSection = 'profile';

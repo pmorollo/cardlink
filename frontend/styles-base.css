@@ -77,7 +77,65 @@
   --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Card Themes */
+/* ============================================
+   Card Themes — catálogo atual (4 estilos profissionais)
+   ============================================ */
+[data-theme="institucional"] {
+  --theme-gradient: linear-gradient(135deg, #0b2545, #13315c, #134074);
+  --theme-accent: #4a90d9;
+  --theme-accent-rgb: 74, 144, 217;
+  --theme-bg: #081b30;
+  --text-primary: #f4f8fc;
+  --text-secondary: #c6d8ea;
+  --text-muted: #93aec9;
+  --bg-card: #102a48;
+  --bg-surface: #081b30;
+  --border-subtle: rgba(74, 144, 217, 0.2);
+}
+
+[data-theme="pessoal"] {
+  --theme-gradient: linear-gradient(135deg, #2b2622, #3d352c, #55483a);
+  --theme-accent: #d9a066;
+  --theme-accent-rgb: 217, 160, 102;
+  --theme-bg: #1c1916;
+  --text-primary: #f7f2ea;
+  --text-secondary: #ddd0bd;
+  --text-muted: #b3a08a;
+  --bg-card: #2b2622;
+  --bg-surface: #1c1916;
+  --border-subtle: rgba(217, 160, 102, 0.22);
+}
+
+[data-theme="profissional"] {
+  --theme-gradient: linear-gradient(135deg, #111827, #1f2937, #374151);
+  --theme-accent: #6366f1;
+  --theme-accent-rgb: 99, 102, 241;
+  --theme-bg: #0b0f19;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --bg-card: #1a2130;
+  --bg-surface: #0b0f19;
+  --border-subtle: rgba(99, 102, 241, 0.2);
+}
+
+[data-theme="comercial"] {
+  --theme-gradient: linear-gradient(135deg, #064e3b, #047857, #059669);
+  --theme-accent: #10b981;
+  --theme-accent-rgb: 16, 185, 129;
+  --theme-bg: #032b21;
+  --text-primary: #ecfdf5;
+  --text-secondary: #a7f3d0;
+  --text-muted: #6ee7b7;
+  --bg-card: #06402f;
+  --bg-surface: #032b21;
+  --border-subtle: rgba(16, 185, 129, 0.2);
+}
+
+/* ============================================
+   Card Themes — legado (mantidos só para não quebrar cartões já
+   publicados com esses temas; não aparecem mais em nenhum seletor)
+   ============================================ */
 [data-theme="midnight"] {
   --theme-gradient: linear-gradient(135deg, #4c1d95, #1e1b4b, #0c4a6e);
   --theme-accent: #8b5cf6;

@@ -674,6 +674,11 @@
   font-size: 1.6rem;
 }
 
+.landing-niche-preview[data-theme="institucional"] { background: linear-gradient(135deg, #0b2545, #4a90d9); }
+.landing-niche-preview[data-theme="pessoal"] { background: linear-gradient(135deg, #2b2622, #d9a066); }
+.landing-niche-preview[data-theme="profissional"] { background: linear-gradient(135deg, #111827, #6366f1); }
+.landing-niche-preview[data-theme="comercial"] { background: linear-gradient(135deg, #064e3b, #10b981); }
+
 .landing-niche-preview[data-theme="midnight"] { background: linear-gradient(135deg, #4c1d95, #1e1b4b); }
 .landing-niche-preview[data-theme="ocean"] { background: linear-gradient(135deg, #fff4c7, #e6aa36); }
 .landing-niche-preview[data-theme="forest"] { background: linear-gradient(135deg, #091525 0 58%, #c6a15b 58% 72%, #f5f0e6 72%); }
