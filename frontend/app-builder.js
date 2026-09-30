@@ -276,36 +276,30 @@ function openLandingNichePreview(nicheKey) {
     return;
   }
 
-  const banner = document.getElementById('landing-niche-modal-banner');
-  if (banner) banner.setAttribute('data-theme', tmpl.theme || '');
-
-  const emoji = document.getElementById('landing-niche-modal-emoji');
-  if (emoji) emoji.textContent = tmpl.emoji || '';
-
-  const title = document.getElementById('landing-niche-modal-title');
-  if (title) title.textContent = tmpl.title || tmpl.name || '';
-
-  const business = document.getElementById('landing-niche-modal-business');
-  if (business) business.textContent = tmpl.business || '';
-
-  const desc = document.getElementById('landing-niche-modal-desc');
-  if (desc) desc.textContent = tmpl.description || '';
-
-  const productsEl = document.getElementById('landing-niche-modal-products');
-  if (productsEl) {
-    productsEl.innerHTML = '';
-    (tmpl.products || []).slice(0, 3).forEach(p => {
-      const row = document.createElement('div');
-      row.className = 'landing-niche-modal-product';
-      const priceLabel = /^[\d.,]+$/.test(String(p.price || '').trim()) ? `R$ ${p.price}` : (p.price || '');
-      row.innerHTML = `<span class="landing-niche-modal-product-name">${escapeHtml(p.name)}</span><span class="landing-niche-modal-product-price">${escapeHtml(priceLabel)}</span>`;
-      productsEl.appendChild(row);
-    });
+  // Reaproveita o mesmo renderCard() usado no preview ao vivo do builder
+  // (#preview-card), então o que aparece aqui é exatamente como o cartão
+  // fica de verdade — não é uma imagem ou maquete separada.
+  const previewEl = document.getElementById('landing-niche-modal-preview');
+  if (previewEl) {
+    const previewData = {
+      business: tmpl.business,
+      title: tmpl.title,
+      description: tmpl.description,
+      theme: tmpl.theme,
+      services_title: tmpl.services_title,
+      services_mode: 'list',
+      products: tmpl.products
+    };
+    previewEl.innerHTML = renderCard(previewData, true);
+    previewEl.setAttribute('data-theme', tmpl.theme || '');
   }
 
   modal.classList.add('active');
   modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+  // Garante que o topo (com o X de fechar) fique visível ao abrir.
+  const card = modal.querySelector('.landing-niche-modal-card');
+  if (card) card.scrollTop = 0;
 }
 
 function closeLandingNichePreview() {

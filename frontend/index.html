@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles-base.css?v=48">
   <link rel="stylesheet" href="styles-builder.css?v=45">
   <link rel="stylesheet" href="styles-dashboard.css?v=48">
-  <link rel="stylesheet" href="styles-public.css?v=51">
+  <link rel="stylesheet" href="styles-public.css?v=52">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#f8b900">
@@ -151,19 +151,14 @@
             <div class="landing-niche-modal" id="landing-niche-modal" aria-hidden="true">
               <div class="landing-niche-modal-backdrop" onclick="closeLandingNichePreview()"></div>
               <div class="landing-niche-modal-card" role="dialog" aria-modal="true" aria-labelledby="landing-niche-modal-title">
-                <button type="button" class="landing-niche-modal-close" onclick="closeLandingNichePreview()" aria-label="Fechar prévia">✕</button>
-                <div class="landing-niche-modal-banner" id="landing-niche-modal-banner">
-                  <span id="landing-niche-modal-emoji"></span>
+                <div class="landing-niche-modal-header">
+                  <span class="landing-niche-modal-header-title" id="landing-niche-modal-title">Prévia do modelo</span>
+                  <button type="button" class="landing-niche-modal-close" onclick="closeLandingNichePreview()" aria-label="Fechar prévia">✕</button>
                 </div>
-                <div class="landing-niche-modal-body">
-                  <h3 class="landing-niche-modal-title" id="landing-niche-modal-title"></h3>
-                  <p class="landing-niche-modal-business" id="landing-niche-modal-business"></p>
-                  <p class="landing-niche-modal-desc" id="landing-niche-modal-desc"></p>
-                  <div class="landing-niche-modal-products" id="landing-niche-modal-products"></div>
-                  <div class="landing-niche-modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeLandingNichePreview()">Ver outro modelo</button>
-                    <button type="button" class="btn btn-primary" onclick="confirmLandingNichePreview()">✨ Usar este modelo</button>
-                  </div>
+                <div class="landing-niche-modal-preview" id="landing-niche-modal-preview"></div>
+                <div class="landing-niche-modal-actions">
+                  <button type="button" class="btn btn-secondary" onclick="closeLandingNichePreview()">Ver outro modelo</button>
+                  <button type="button" class="btn btn-primary" onclick="confirmLandingNichePreview()">✨ Usar este modelo</button>
                 </div>
               </div>
             </div>
@@ -1604,7 +1599,7 @@
   <script src="app-core.js?v=47"></script>
   <script src="app-auth.js?v=53"></script>
   <script src="app-dashboard.js?v=45"></script>
-  <script src="app-builder.js?v=48"></script>
+  <script src="app-builder.js?v=49"></script>
   <script src="app-extras.js?v=45"></script>
   <script src="app-assistant.js?v=45"></script>
   <script src="landing-carousel.js?v=2"></script>

@@ -746,6 +746,8 @@
   border-radius: var(--radius-lg);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
   animation: landingNicheModalIn 0.18s ease-out;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes landingNicheModalIn {
@@ -753,16 +755,38 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* Cabeçalho e rodapé ficam fixos (sticky) dentro do modal, então o botão de
+   fechar e o de confirmar continuam alcançáveis mesmo quando o preview do
+   cartão (que pode ser bem alto) precisa de scroll interno. */
+.landing-niche-modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  flex-shrink: 0;
+}
+
+.landing-niche-modal-header-title {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
 .landing-niche-modal-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
+  flex-shrink: 0;
   width: 32px;
   height: 32px;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.85);
+  background: #f1f5f9;
   color: #0f172a;
   font-size: 1rem;
   cursor: pointer;
@@ -771,84 +795,28 @@
   justify-content: center;
 }
 
-.landing-niche-modal-banner {
-  height: 110px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.8rem;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+.landing-niche-modal-preview {
+  overflow-x: hidden;
 }
 
-.landing-niche-modal-banner[data-theme="midnight"] { background: linear-gradient(135deg, #4c1d95, #1e1b4b); }
-.landing-niche-modal-banner[data-theme="ocean"] { background: linear-gradient(135deg, #fff4c7, #e6aa36); }
-.landing-niche-modal-banner[data-theme="forest"] { background: linear-gradient(135deg, #091525 0 58%, #c6a15b 58% 72%, #f5f0e6 72%); }
-.landing-niche-modal-banner[data-theme="rose"] { background: linear-gradient(135deg, #ff4081, #f43f5e); }
-.landing-niche-modal-banner[data-theme="emerald"] { background: linear-gradient(135deg, #065f46, #10b981); }
-.landing-niche-modal-banner[data-theme="cyber"] { background: linear-gradient(135deg, #7c3aed, #06b6d4); }
-.landing-niche-modal-banner[data-theme="amber"] { background: linear-gradient(135deg, #b45309, #f59e0b); }
-.landing-niche-modal-banner[data-theme="monochrome"] { background: linear-gradient(135deg, #1e293b, #334155); }
-
-.landing-niche-modal-body {
-  padding: 18px 20px 20px;
-}
-
-.landing-niche-modal-title {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0 0 4px;
-}
-
-.landing-niche-modal-business {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--purple, #7c3aed);
-  margin: 0 0 10px;
-}
-
-.landing-niche-modal-desc {
-  font-size: 0.85rem;
-  color: #475569;
-  line-height: 1.5;
-  margin: 0 0 14px;
-}
-
-.landing-niche-modal-products {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 18px;
-}
-
-.landing-niche-modal-product {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 8px 10px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.78rem;
-}
-
-.landing-niche-modal-product-name {
-  color: #1e293b;
-  font-weight: 600;
-}
-
-.landing-niche-modal-product-price {
-  color: #0f172a;
-  font-weight: 700;
-  white-space: nowrap;
+.landing-niche-modal-preview .card-container {
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
 }
 
 .landing-niche-modal-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  padding: 12px 14px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  flex-shrink: 0;
 }
 
 .landing-niche-modal-actions .btn {
