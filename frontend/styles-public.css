@@ -593,6 +593,123 @@
   }
 }
 
+/* ============================================
+   Landing — seletor de nicho com preview (pré-cadastro)
+   ============================================ */
+.landing-niche-picker {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(6, 182, 212, 0.08));
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.landing-niche-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.landing-niche-picker-title {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.landing-niche-picker-badge {
+  font-size: 0.7rem;
+  background: var(--purple);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.landing-niche-picker-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.landing-niche-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 10px;
+}
+
+.landing-niche-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: var(--bg-glass);
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  font: inherit;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.landing-niche-card:hover,
+.landing-niche-card:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  outline: none;
+}
+
+.landing-niche-preview {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+}
+
+.landing-niche-preview[data-theme="midnight"] { background: linear-gradient(135deg, #4c1d95, #1e1b4b); }
+.landing-niche-preview[data-theme="ocean"] { background: linear-gradient(135deg, #fff4c7, #e6aa36); }
+.landing-niche-preview[data-theme="forest"] { background: linear-gradient(135deg, #091525 0 58%, #c6a15b 58% 72%, #f5f0e6 72%); }
+.landing-niche-preview[data-theme="rose"] { background: linear-gradient(135deg, #ff4081, #f43f5e); }
+.landing-niche-preview[data-theme="emerald"] { background: linear-gradient(135deg, #065f46, #10b981); }
+.landing-niche-preview[data-theme="cyber"] { background: linear-gradient(135deg, #7c3aed, #06b6d4); }
+.landing-niche-preview[data-theme="amber"] { background: linear-gradient(135deg, #b45309, #f59e0b); }
+
+.landing-niche-info {
+  padding: 8px 10px 10px;
+}
+
+.landing-niche-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin-bottom: 2px;
+}
+
+.landing-niche-tagline {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .landing-niche-grid {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  }
+}
+
 @media print {
   body {
     background: #ffffff !important;

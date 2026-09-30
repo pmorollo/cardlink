@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles-base.css?v=48">
   <link rel="stylesheet" href="styles-builder.css?v=45">
   <link rel="stylesheet" href="styles-dashboard.css?v=48">
-  <link rel="stylesheet" href="styles-public.css?v=48">
+  <link rel="stylesheet" href="styles-public.css?v=49">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#f8b900">
@@ -80,30 +80,66 @@
             </div>
             <p class="hero-audience" id="landing-hero-audience">☆ Ideal para autônomos, salões, barbearias, clínicas, restaurantes e negócios locais.</p>
 
-            <!-- Niche Templates Chips (pre-signup) -->
-            <div style="background:linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.08));border:1px solid rgba(124,58,237,0.3);border-radius:var(--radius-lg);padding:14px;margin-top:20px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                <div style="font-weight:700;font-size:0.92rem;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+            <!-- Niche Templates Preview Cards (pre-signup) -->
+            <div class="landing-niche-picker">
+              <div class="landing-niche-picker-header">
+                <div class="landing-niche-picker-title">
                   <span>✨</span> <span>Escolha seu ramo e comece pronto</span>
                 </div>
-                <span style="font-size:0.7rem;background:var(--purple);color:#fff;padding:2px 8px;border-radius:12px;font-weight:700;">1 Clique</span>
+                <span class="landing-niche-picker-badge">1 Clique</span>
               </div>
-              <p style="font-size:0.8rem;color:var(--text-secondary);margin:0 0 10px;line-height:1.4;">
-                Escolha sua área e sua página já nasce com textos, serviços e tema sugeridos. Depois é só criar a conta:
+              <p class="landing-niche-picker-desc">
+                Veja o estilo visual sugerido e escolha sua área — sua página já nasce com textos, serviços e tema prontos. Depois é só criar a conta:
               </p>
-              <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;">
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('petshop')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">🐾 Pet Shop</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('mecanica')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">🔧 Mecânica</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('restaurante')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">🍽️ Restaurante</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('estetica')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">💇 Salão & Estética</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('moda')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">👗 Loja & Moda</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('consultor')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">💼 Consultoria</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('autonomo')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">👔 Profissional Liberal / Autônomo</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('estudante')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">📚 Estudantes</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('criativo')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">🎨 Design & Criativo</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('professor')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">🎓 Aulas & Cursos</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('imoveis')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">🏠 Imóveis</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="selectLandingNiche('eletricista')" style="white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:18px;font-size:0.78rem;">⚡ Eletricista</button>
+              <div class="landing-niche-grid">
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('petshop')">
+                  <div class="landing-niche-preview" data-theme="emerald">🐾</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Pet Shop</div><div class="landing-niche-tagline">Estética Animal & Clínica</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('mecanica')">
+                  <div class="landing-niche-preview" data-theme="midnight">🔧</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Mecânica</div><div class="landing-niche-tagline">Centro Automotivo Especializado</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('restaurante')">
+                  <div class="landing-niche-preview" data-theme="amber">🍽️</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Restaurante</div><div class="landing-niche-tagline">Gastronomia & Eventos</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('estetica')">
+                  <div class="landing-niche-preview" data-theme="rose">💇</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Salão & Estética</div><div class="landing-niche-tagline">Beleza e Bem-Estar</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('moda')">
+                  <div class="landing-niche-preview" data-theme="ocean">👗</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Loja & Moda</div><div class="landing-niche-tagline">Moda, Tendências & Acessórios</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('consultor')">
+                  <div class="landing-niche-preview" data-theme="forest">💼</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Consultoria</div><div class="landing-niche-tagline">Negócios & Finanças</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('autonomo')">
+                  <div class="landing-niche-preview" data-theme="emerald">👔</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Profissional Liberal</div><div class="landing-niche-tagline">Autônomo Especialista</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('estudante')">
+                  <div class="landing-niche-preview" data-theme="cyber">📚</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Estudantes</div><div class="landing-niche-tagline">Estudante & Pesquisador</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('criativo')">
+                  <div class="landing-niche-preview" data-theme="cyber">🎨</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Design & Criativo</div><div class="landing-niche-tagline">Designer Gráfico & Web</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('professor')">
+                  <div class="landing-niche-preview" data-theme="midnight">🎓</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Aulas & Cursos</div><div class="landing-niche-tagline">Professor Particular</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('imoveis')">
+                  <div class="landing-niche-preview" data-theme="emerald">🏠</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Imóveis</div><div class="landing-niche-tagline">Corretor Credenciado</div></div>
+                </button>
+                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('eletricista')">
+                  <div class="landing-niche-preview" data-theme="amber">⚡</div>
+                  <div class="landing-niche-info"><div class="landing-niche-name">Eletricista</div><div class="landing-niche-tagline">Manutenção Residencial</div></div>
+                </button>
               </div>
             </div>
           </div>
