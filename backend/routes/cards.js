@@ -4,6 +4,7 @@ const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('../
 const authMiddleware = require('../middleware/auth');
 const { requireCustomer } = require('../middleware/roles');
 const { isProCustomer } = require('../utils/subscription');
+const { FREE_THEMES } = require('../utils/themes');
 
 const router = express.Router();
 
@@ -111,7 +112,6 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
 
   const user = req.currentUser || await userRepo.findById(req.userId);
   const isPro = user && user.plan === 'pro';
-  const FREE_THEMES = new Set(['midnight', 'ocean', 'rose', 'emerald', 'cyber', 'amber']);
 
   let productsToSave = req.body.products;
   let galleryToSave = req.body.gallery;
@@ -237,7 +237,6 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
 
   const user = req.currentUser || await userRepo.findById(req.userId);
   const isPro = user && user.plan === 'pro';
-  const FREE_THEMES = new Set(['midnight', 'ocean', 'rose', 'emerald', 'cyber', 'amber']);
 
   let galleryToSave = req.body.gallery !== undefined ? req.body.gallery : card.gallery;
   if (Array.isArray(galleryToSave) && !isPro && galleryToSave.length > 4) {

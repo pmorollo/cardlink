@@ -214,6 +214,21 @@ textarea.form-input {
 .theme-swatch[data-theme="monochrome"] {
   background: linear-gradient(135deg, #1e293b, #334155);
 }
+.theme-swatch[data-theme="slate"] {
+  background: linear-gradient(135deg, #1e293b, #38bdf8);
+}
+.theme-swatch[data-theme="violet"] {
+  background: linear-gradient(135deg, #5b21b6, #c084fc);
+}
+.theme-swatch[data-theme="teal"] {
+  background: linear-gradient(135deg, #0f766e, #2dd4bf);
+}
+.theme-swatch[data-theme="volt"] {
+  background: linear-gradient(135deg, #1a1a05, #facc15);
+}
+.theme-swatch[data-theme="wine"] {
+  background: linear-gradient(135deg, #450a0a, #f87171);
+}
 
 .theme-label {
   text-align: center;

@@ -682,6 +682,11 @@
 .landing-niche-preview[data-theme="cyber"] { background: linear-gradient(135deg, #7c3aed, #06b6d4); }
 .landing-niche-preview[data-theme="amber"] { background: linear-gradient(135deg, #b45309, #f59e0b); }
 .landing-niche-preview[data-theme="monochrome"] { background: linear-gradient(135deg, #1e293b, #334155); }
+.landing-niche-preview[data-theme="slate"] { background: linear-gradient(135deg, #1e293b, #38bdf8); }
+.landing-niche-preview[data-theme="violet"] { background: linear-gradient(135deg, #5b21b6, #c084fc); }
+.landing-niche-preview[data-theme="teal"] { background: linear-gradient(135deg, #0f766e, #2dd4bf); }
+.landing-niche-preview[data-theme="volt"] { background: linear-gradient(135deg, #1a1a05, #facc15); }
+.landing-niche-preview[data-theme="wine"] { background: linear-gradient(135deg, #450a0a, #f87171); }
 
 .landing-niche-info {
   padding: 8px 10px 10px;

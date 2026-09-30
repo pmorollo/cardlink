@@ -4,6 +4,7 @@ const authMiddleware = require('../middleware/auth');
 const { requireCustomer, requirePro } = require('../middleware/roles');
 const { sendEmail } = require('../utils/email');
 const { hasActiveCustomerAccess, isProCustomer } = require('../utils/subscription');
+const { FREE_THEMES } = require('../utils/themes');
 
 const router = express.Router();
 
@@ -38,7 +39,7 @@ router.get('/public/:slug', async (req, res) => {
     publicCard.catalog_pdf_url = '';
     publicCard.catalog_pdf_title = '';
     publicCard.gallery = Array.isArray(publicCard.gallery) ? publicCard.gallery.slice(0, 4) : [];
-    if (!['midnight', 'ocean', 'rose'].includes(publicCard.theme)) publicCard.theme = 'midnight';
+    if (!FREE_THEMES.has(publicCard.theme)) publicCard.theme = 'midnight';
   }
   publicCard.features = {
     contact_form: isOwnerPro,

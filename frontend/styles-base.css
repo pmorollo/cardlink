@@ -83,6 +83,12 @@
   --theme-accent: #8b5cf6;
   --theme-accent-rgb: 139, 92, 246;
   --theme-bg: #0f0a2e;
+  --text-primary: #f5f3ff;
+  --text-secondary: #c7c2e8;
+  --text-muted: #9d97c4;
+  --bg-card: #1a1442;
+  --bg-surface: #0f0a2e;
+  --border-subtle: rgba(139, 92, 246, 0.22);
 }
 
 [data-theme="ocean"] {
@@ -103,6 +109,12 @@
   --theme-accent: #f97316;
   --theme-accent-rgb: 249, 115, 22;
   --theme-bg: #1a0d05;
+  --text-primary: #fff7ed;
+  --text-secondary: #fed7aa;
+  --text-muted: #fdba74;
+  --bg-card: #2b1608;
+  --bg-surface: #1a0d05;
+  --border-subtle: rgba(249, 115, 22, 0.22);
 }
 
 [data-theme="forest"] {
@@ -123,6 +135,12 @@
   --theme-accent: #ff2d75;
   --theme-accent-rgb: 255, 45, 117;
   --theme-bg: #1c0813;
+  --text-primary: #fff1f5;
+  --text-secondary: #fecdd3;
+  --text-muted: #fda4af;
+  --bg-card: #2c0e1e;
+  --bg-surface: #1c0813;
+  --border-subtle: rgba(255, 45, 117, 0.22);
 }
 
 [data-theme="emerald"] {
@@ -169,6 +187,77 @@
   --theme-accent: #e2e8f0;
   --theme-accent-rgb: 226, 232, 240;
   --theme-bg: #0f172a;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --bg-card: #1e293b;
+  --bg-surface: #0f172a;
+  --border-subtle: rgba(226, 232, 240, 0.18);
+}
+
+[data-theme="slate"] {
+  --theme-gradient: linear-gradient(135deg, #1e293b, #334155, #475569);
+  --theme-accent: #38bdf8;
+  --theme-accent-rgb: 56, 189, 248;
+  --theme-bg: #0b1220;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --bg-card: #172236;
+  --bg-surface: #0b1220;
+  --border-subtle: rgba(56, 189, 248, 0.18);
+}
+
+[data-theme="violet"] {
+  --theme-gradient: linear-gradient(135deg, #a78bfa, #7c3aed, #5b21b6);
+  --theme-accent: #c084fc;
+  --theme-accent-rgb: 192, 132, 252;
+  --theme-bg: #1e1033;
+  --text-primary: #f5f3ff;
+  --text-secondary: #ddd6fe;
+  --text-muted: #b8a9e0;
+  --bg-card: #2c1b4d;
+  --bg-surface: #1e1033;
+  --border-subtle: rgba(192, 132, 252, 0.22);
+}
+
+[data-theme="teal"] {
+  --theme-gradient: linear-gradient(135deg, #0f766e, #0e7490, #155e75);
+  --theme-accent: #2dd4bf;
+  --theme-accent-rgb: 45, 212, 191;
+  --theme-bg: #042f2e;
+  --text-primary: #f0fdfa;
+  --text-secondary: #99f6e4;
+  --text-muted: #5eead4;
+  --bg-card: #0a3d3a;
+  --bg-surface: #042f2e;
+  --border-subtle: rgba(45, 212, 191, 0.2);
+}
+
+[data-theme="wine"] {
+  --theme-gradient: linear-gradient(135deg, #450a0a, #7f1d1d, #991b1b);
+  --theme-accent: #f87171;
+  --theme-accent-rgb: 248, 113, 113;
+  --theme-bg: #1a0505;
+  --text-primary: #fef2f2;
+  --text-secondary: #fecaca;
+  --text-muted: #fca5a5;
+  --bg-card: #2b0a0a;
+  --bg-surface: #1a0505;
+  --border-subtle: rgba(248, 113, 113, 0.2);
+}
+
+[data-theme="volt"] {
+  --theme-gradient: linear-gradient(135deg, #1a1a05, #3f3f0a, #facc15);
+  --theme-accent: #facc15;
+  --theme-accent-rgb: 250, 204, 21;
+  --theme-bg: #14140a;
+  --text-primary: #fefce8;
+  --text-secondary: #fef08a;
+  --text-muted: #eab308;
+  --bg-card: #23230e;
+  --bg-surface: #14140a;
+  --border-subtle: rgba(250, 204, 21, 0.22);
 }
 
 /* Theme Integration Rules */

@@ -99,7 +99,7 @@ const NICHE_TEMPLATES = {
     business_complement: 'Atendimento Personalizado, Consultoria e Soluções Sob Medida',
     title: 'Profissional Liberal Especialista',
     description: 'Atuação profissional autônoma com compromisso, ética e foco na solução prática dos seus desafios. Agende seu atendimento ou solicite uma proposta pelo WhatsApp!',
-    theme: 'emerald',
+    theme: 'slate',
     services_title: 'Serviços & Atendimentos Especializados',
     products: [
       { name: 'Consulta / Atendimento Individual', price: '180,00', description: 'Sessão presencial ou online com análise completa da sua necessidade.' },
@@ -129,7 +129,7 @@ const NICHE_TEMPLATES = {
     business_complement: 'Identidade Visual, Landing Pages e Branding',
     title: 'Designer Gráfico & Web',
     description: 'Criação de identidades visuais memoráveis, sites de alta conversão e materiais gráficos para posicionar o seu negócio no topo.',
-    theme: 'cyber',
+    theme: 'violet',
     services_title: 'Serviços de Design & Web',
     products: [
       { name: 'Identidade Visual Completa', price: '850,00', description: 'Logotipo, manual de marca, paleta de cores, tipografia e papelaria.' },
@@ -144,7 +144,7 @@ const NICHE_TEMPLATES = {
     business_complement: 'Aulas Online e Presenciais com Material Exclusivo',
     title: 'Professor Particular & Preparatório',
     description: 'Aulas individuais e personalizadas online ou presenciais. Foco em resultados rápidos, reforço escolar, ENEM e concursos públicos.',
-    theme: 'midnight',
+    theme: 'wine',
     services_title: 'Planos & Modalidades de Aulas',
     products: [
       { name: 'Aula Individual Avulsa (1 hora)', price: '70,00', description: 'Tire dúvidas e pratique exercícios com material exclusivo.' },
@@ -159,7 +159,7 @@ const NICHE_TEMPLATES = {
     business_complement: 'Venda, Locação e Avaliação de Imóveis',
     title: 'Corretor de Imóveis Credenciado',
     description: 'Assessoria completa na compra, venda e locação de imóveis residenciais e comerciais. Atendimento transparente do primeiro contato até a escritura.',
-    theme: 'emerald',
+    theme: 'teal',
     services_title: 'Serviços & Consultoria Imobiliária',
     products: [
       { name: 'Avaliação Mercadológica de Imóvel', price: '250,00', description: 'Laudo técnico de valor com análise comparativa de mercado.' },
@@ -174,7 +174,7 @@ const NICHE_TEMPLATES = {
     business_complement: 'Instalações, Padrão de Entrada e Reparos de Emergência',
     title: 'Eletricista Profissional Certificado',
     description: 'Instalações elétricas residenciais e comerciais, troca de fiação, disjuntores, chuveiros, iluminação LED e atendimento de emergência.',
-    theme: 'amber',
+    theme: 'volt',
     services_title: 'Serviços Elétricos Mais Solicitados',
     products: [
       { name: 'Instalação de Chuveiro / Luminária', price: '80,00', description: 'Com fiação reforçada e teste de aterramento de segurança.' },
