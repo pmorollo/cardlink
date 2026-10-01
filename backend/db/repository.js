@@ -58,8 +58,17 @@ function normalizeCard(row) {
     services_image_url: row.services_image_url || '',
     catalog_pdf_url: row.catalog_pdf_url || '',
     catalog_pdf_title: row.catalog_pdf_title || '',
+    template_key: row.template_key || '',
     gallery: typeof row.gallery === 'string' ? JSON.parse(row.gallery) : (row.gallery || []),
     testimonials: typeof row.testimonials === 'string' ? JSON.parse(row.testimonials) : (row.testimonials || []),
+  };
+}
+
+function normalizeTemplate(row) {
+  if (!row) return null;
+  return {
+    ...row,
+    structure_json: typeof row.structure_json === 'string' ? JSON.parse(row.structure_json) : (row.structure_json || {})
   };
 }
 
@@ -377,18 +386,20 @@ const cards = {
         `INSERT INTO cards (
            user_id, slug, name, business, business_complement, title, photo_url, logo_url, description, message,
            phone, email, address, whatsapp, whatsapp_group, instagram, facebook,
-           linkedin, tiktok, youtube, twitter, theme, site_button_text, services_mode,
-           services_title, services_image_url, products, gallery, testimonials, views_count, qr_scans_count
+           linkedin, tiktok, youtube, twitter, theme, template_key, site_button_text, services_mode,
+           services_title, services_image_url, catalog_pdf_url, catalog_pdf_title,
+           products, gallery, testimonials, views_count, qr_scans_count
          ) VALUES (
-           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31
+           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34
          ) RETURNING *`,
         [
           data.user_id, data.slug, data.name, data.business || null, data.business_complement || null, data.title || null, data.photo_url || null,
           data.logo_url || null, data.description || null, data.message || null, data.phone || null, data.email || null,
           data.address || null, data.whatsapp || null, data.whatsapp_group || null, data.instagram || null,
           data.facebook || null, data.linkedin || null, data.tiktok || null, data.youtube || null, data.twitter || null,
-          data.theme || 'midnight', data.site_button_text || null,
+          data.theme || 'midnight', data.template_key || null, data.site_button_text || null,
           data.services_mode || 'image', data.services_title || null, data.services_image_url || null,
+          data.catalog_pdf_url || null, data.catalog_pdf_title || null,
           JSON.stringify(data.products || []), JSON.stringify(data.gallery || []), JSON.stringify(data.testimonials || []),
           data.views_count || 0, data.qr_scans_count || 0
         ]
@@ -419,7 +430,8 @@ const cards = {
       let i = 1;
       for (const k of ['slug', 'name', 'business', 'business_complement', 'title', 'photo_url', 'logo_url', 'description', 'message', 'phone', 'email',
         'address', 'whatsapp', 'whatsapp_group', 'instagram', 'facebook', 'linkedin', 'tiktok', 'youtube', 'twitter',
-        'theme', 'site_button_text', 'services_mode', 'services_title', 'services_image_url',
+        'theme', 'template_key', 'site_button_text', 'services_mode', 'services_title', 'services_image_url',
+        'catalog_pdf_url', 'catalog_pdf_title',
         'products', 'gallery', 'testimonials', 'views_count', 'qr_scans_count']) {
         if (k in updates && updates[k] !== undefined) {
           const val = ['products', 'gallery', 'testimonials'].includes(k) ? JSON.stringify(updates[k] || []) : updates[k];
@@ -654,6 +666,28 @@ const adminMessages = {
   },
 };
 
+// ─── Repositório: templates ────────────────────────────────────────────
+const templates = {
+  async allActive() {
+    const pool = await resolvePool();
+    if (pool) {
+      const r = await pool.query('SELECT * FROM templates WHERE active = TRUE ORDER BY id');
+      return r.rows.map(normalizeTemplate);
+    }
+    const { TEMPLATE_CATALOG } = require('../utils/template-catalog');
+    return TEMPLATE_CATALOG.slice();
+  },
+  async findByKey(key) {
+    const pool = await resolvePool();
+    if (pool) {
+      const r = await pool.query('SELECT * FROM templates WHERE template_key = $1 AND active = TRUE LIMIT 1', [String(key || '')]);
+      return normalizeTemplate(r.rows[0]);
+    }
+    const { getTemplateByKey } = require('../utils/template-catalog');
+    return getTemplateByKey(key);
+  }
+};
+
 module.exports = {
   users,
   cards,
@@ -661,6 +695,7 @@ module.exports = {
   supportTickets,
   adminMessages,
   webhookEvents,
+  templates,
   db,
   isPgConfigured,
   pgIsReady: () => pgReady,
