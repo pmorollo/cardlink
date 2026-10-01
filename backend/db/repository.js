@@ -89,6 +89,8 @@ function castUserRow(row) {
     subscription_amount: row.subscription_amount || null,
     subscription_reference: row.subscription_reference || null,
     is_test_account: !!row.is_test_account,
+    // Contas antigas não têm a coluna/campo: tratam-se como senha já definida.
+    password_defined: row.password_defined !== false,
     activation_token_hash: row.activation_token_hash || null,
     activation_expires: row.activation_expires || null,
     trial_ends_at: row.trial_ends_at || null,
@@ -227,7 +229,7 @@ const users = {
     account_status = 'inactive', subscription_status = 'inactive', subscription_source = 'none',
     subscription_plan = null, subscription_amount = null, subscription_reference = null, is_test_account = false, activation_token_hash = null,
     activation_expires = null, trial_ends_at = null, email_verified_at = null, pending_email = null, email_verification_token_hash = null,
-    email_verification_expires = null, subscription_updated_at = null, subscription_event_at = null
+    email_verification_expires = null, subscription_updated_at = null, subscription_event_at = null, password_defined = true
   }) {
     const pool = await resolvePool();
     if (pool) {
@@ -235,12 +237,12 @@ const users = {
         `INSERT INTO users (
            name, email, whatsapp, password_hash, is_admin, plan, referred_by, account_status,
            subscription_status, subscription_source, subscription_plan, subscription_amount, subscription_reference, is_test_account,
-           activation_token_hash, activation_expires, trial_ends_at, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at, subscription_event_at
-         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23) RETURNING *`,
+           activation_token_hash, activation_expires, trial_ends_at, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at, subscription_event_at, password_defined
+         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24) RETURNING *`,
         [
           name, email, whatsapp || null, password_hash, !!is_admin, plan, referred_by || null, account_status,
           subscription_status, subscription_source, subscription_plan, subscription_amount, subscription_reference, !!is_test_account,
-          activation_token_hash, activation_expires, trial_ends_at, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at, subscription_event_at
+          activation_token_hash, activation_expires, trial_ends_at, email_verified_at, pending_email, email_verification_token_hash, email_verification_expires, subscription_updated_at, subscription_event_at, password_defined !== false
         ]
       );
       return castUserRow(r.rows[0]);
@@ -269,6 +271,7 @@ const users = {
       email_verification_expires,
       subscription_updated_at,
       subscription_event_at,
+      password_defined: password_defined !== false,
       id: nextId('users'),
       created_at: new Date().toISOString(),
     };
@@ -282,7 +285,7 @@ const users = {
       const fields = [];
       const values = [];
       let i = 1;
-      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_code_hash', 'reset_expires', 'reset_attempts', 'referred_by', 'account_status', 'subscription_status', 'subscription_source', 'subscription_plan', 'subscription_amount', 'subscription_reference', 'is_test_account', 'activation_token_hash', 'activation_expires', 'trial_ends_at', 'email_verified_at', 'pending_email', 'email_verification_token_hash', 'email_verification_expires', 'subscription_updated_at', 'subscription_event_at']) {
+      for (const key of ['name', 'email', 'whatsapp', 'password_hash', 'is_admin', 'plan', 'reset_code', 'reset_code_hash', 'reset_expires', 'reset_attempts', 'referred_by', 'account_status', 'subscription_status', 'subscription_source', 'subscription_plan', 'subscription_amount', 'subscription_reference', 'is_test_account', 'activation_token_hash', 'activation_expires', 'trial_ends_at', 'email_verified_at', 'pending_email', 'email_verification_token_hash', 'email_verification_expires', 'subscription_updated_at', 'subscription_event_at', 'password_defined']) {
         if (key in updates && updates[key] !== undefined) {
           fields.push(`${key} = $${i++}`);
           values.push(updates[key]);

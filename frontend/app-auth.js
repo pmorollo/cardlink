@@ -1035,6 +1035,7 @@ function loadAccountView() {
   setFieldValue('account-new-password', '');
   setFieldValue('account-delete-password', '');
   setFieldValue('account-delete-confirmation', '');
+  applyPasswordCardMode();
   const status = document.getElementById('account-email-status');
   if (status) {
     if (currentUser.pending_email) {
@@ -1099,7 +1100,45 @@ async function saveAccountProfile() {
   }
 }
 
+// Contas do cadastro fluido nascem sem senha (password_defined === false):
+// o cartão de senha vira "Definir senha" e não pede a senha atual.
+function needsFirstPassword() {
+  return !!currentUser && currentUser.password_defined === false;
+}
+
+function applyPasswordCardMode() {
+  const first = needsFirstPassword();
+  const title = document.getElementById('account-password-title');
+  const hint = document.getElementById('account-password-hint');
+  const group = document.getElementById('account-current-password-group');
+  const button = document.getElementById('account-password-button');
+  if (title) title.textContent = first ? 'Defina sua senha' : 'Alterar senha';
+  if (hint) hint.style.display = first ? '' : 'none';
+  if (group) group.style.display = first ? 'none' : '';
+  if (button) button.textContent = first ? 'Definir senha' : 'Atualizar senha';
+}
+
 async function changeAccountPassword() {
+  if (needsFirstPassword()) {
+    const newPassword = document.getElementById('account-new-password')?.value || '';
+    if (newPassword.length < 8) {
+      showToast('⚠️', 'A senha deve ter pelo menos 8 caracteres');
+      return;
+    }
+    try {
+      const res = await api('/auth/set-password', {
+        method: 'PUT',
+        body: JSON.stringify({ newPassword })
+      });
+      currentUser = { ...currentUser, password_defined: true };
+      setFieldValue('account-new-password', '');
+      applyPasswordCardMode();
+      showToast('✅', res.message || 'Senha definida com sucesso');
+    } catch (err) {
+      showToast('❌', err.message);
+    }
+    return;
+  }
   const currentPassword = document.getElementById('account-current-password')?.value || '';
   const newPassword = document.getElementById('account-new-password')?.value || '';
   if (!currentPassword || newPassword.length < 8) {

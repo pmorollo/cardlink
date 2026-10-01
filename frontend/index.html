@@ -1013,9 +1013,10 @@
           <button class="btn btn-primary" type="button" onclick="saveAccountProfile()">Salvar dados da conta</button>
         </div>
 
-        <div class="account-card">
-          <h2>Alterar senha</h2>
-          <div class="form-group">
+        <div class="account-card" id="account-password-card">
+          <h2 id="account-password-title">Alterar senha</h2>
+          <p id="account-password-hint" style="display:none;color:var(--text-secondary);margin-bottom:16px;">Sua conta foi criada sem senha. Defina uma agora para conseguir entrar de novo com seu e-mail em outro dispositivo ou quando a sessão expirar.</p>
+          <div class="form-group" id="account-current-password-group">
             <label class="form-label" for="account-current-password">Senha atual</label>
             <input class="form-input" type="password" id="account-current-password" autocomplete="current-password">
           </div>
@@ -1023,7 +1024,7 @@
             <label class="form-label" for="account-new-password">Nova senha</label>
             <input class="form-input" type="password" id="account-new-password" minlength="8" autocomplete="new-password" placeholder="Mínimo de 8 caracteres">
           </div>
-          <button class="btn btn-secondary" type="button" onclick="changeAccountPassword()">Atualizar senha</button>
+          <button class="btn btn-secondary" type="button" id="account-password-button" onclick="changeAccountPassword()">Atualizar senha</button>
         </div>
         <div class="account-card" style="border-color:var(--danger);">
           <h2>Excluir conta</h2>
@@ -1229,6 +1230,7 @@
       <h2 class="builder-title" style="margin-bottom:8px;">Parabéns! Seu site <span class="text-gradient">está criado</span></h2>
       <p class="builder-subtitle" style="margin-bottom:18px;">Seu cartão já está no ar neste endereço:</p>
       <div style="background:rgba(124,58,237,0.08);border:1px dashed rgba(124,58,237,0.35);border-radius:var(--radius-lg);padding:12px;margin-bottom:18px;font-weight:700;color:var(--purple);word-break:break-all;" id="quick-create-success-url"></div>
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:18px;">Importante: para entrar de novo depois, defina sua senha em <strong>Minha conta</strong>.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn btn-secondary" style="flex:1;" onclick="copyQuickCreateSuccessUrl()">Copiar link</button>
         <button class="btn btn-primary" style="flex:1;" onclick="goToDashboardAfterQuickCreate()">Continuar configurações</button>

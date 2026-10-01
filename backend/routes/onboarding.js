@@ -108,7 +108,8 @@ router.post('/criar-cartao', quickCreateLimiter, async (req, res) => {
       subscription_plan: 'free',
       trial_ends_at: null,
       email_verified_at: now,
-      subscription_updated_at: now
+      subscription_updated_at: now,
+      password_defined: false
     });
 
     const slug = await generateUniqueSlug(businessName);
@@ -165,7 +166,8 @@ router.post('/criar-cartao', quickCreateLimiter, async (req, res) => {
         subscription_status: user.subscription_status,
         subscription_source: user.subscription_source,
         subscription_plan: user.subscription_plan,
-        email_verified_at: user.email_verified_at
+        email_verified_at: user.email_verified_at,
+        password_defined: false
       },
       card,
       site_url: `${req.protocol}://${req.get('host')}/site/${card.slug}`

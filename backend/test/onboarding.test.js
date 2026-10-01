@@ -123,3 +123,39 @@ test('POST /api/onboarding/criar-cartao sem template_key cai no template padrão
   assert.equal(res.body.card.theme, 'institucional');
   assert.equal(res.body.card.template_key, null);
 });
+
+// Conta do cadastro fluido nasce sem senha: precisa conseguir definir a
+// primeira senha sem "senha atual", e depois entrar com e-mail + senha.
+test('conta do cadastro fluido define a primeira senha e passa a logar com ela', async () => {
+  const email = `senha-${Date.now()}@teste.com`;
+  const created = await api('POST', '/api/onboarding/criar-cartao', {
+    name: 'João Senha', email, business_name: 'Oficina do João', template_key: 'profissional'
+  });
+  assert.equal(created.status, 201);
+  assert.equal(created.body.user.password_defined, false);
+  const auth = { Authorization: `Bearer ${created.body.token}`, 'Content-Type': 'application/json' };
+
+  const me = await fetch(base + '/api/auth/me', { headers: auth }).then(r => r.json());
+  assert.equal(me.password_defined, false);
+
+  const short = await fetch(base + '/api/auth/set-password', { method: 'PUT', headers: auth, body: JSON.stringify({ newPassword: '123' }) });
+  assert.equal(short.status, 400);
+
+  const ok = await fetch(base + '/api/auth/set-password', { method: 'PUT', headers: auth, body: JSON.stringify({ newPassword: 'SenhaNova123' }) });
+  assert.equal(ok.status, 200);
+
+  // Depois de definida, não dá para redefinir sem a senha atual.
+  const again = await fetch(base + '/api/auth/set-password', { method: 'PUT', headers: auth, body: JSON.stringify({ newPassword: 'OutraSenha456' }) });
+  assert.equal(again.status, 409);
+
+  const meAfter = await fetch(base + '/api/auth/me', { headers: auth }).then(r => r.json());
+  assert.equal(meAfter.password_defined, true);
+
+  const login = await api('POST', '/api/auth/login', { email, password: 'SenhaNova123' });
+  assert.equal(login.status, 200);
+});
+
+test('set-password exige sessão e não vale para contas com senha já definida', async () => {
+  const anon = await api('PUT', '/api/auth/set-password', { newPassword: 'SenhaNova123' });
+  assert.equal(anon.status, 401);
+});

@@ -283,6 +283,7 @@ router.post('/activate', async (req, res) => {
 
   const updated = await users.update(user.id, {
     password_hash: await bcrypt.hash(password, 10),
+    password_defined: true,
     account_status: 'active',
     email_verified_at: new Date().toISOString(),
     activation_token_hash: null,
@@ -483,8 +484,25 @@ router.put('/change-password', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: 'A nova senha deve ter pelo menos 8 caracteres' });
   }
 
-  await users.update(user.id, { password_hash: await bcrypt.hash(newPassword, 10) });
+  await users.update(user.id, { password_hash: await bcrypt.hash(newPassword, 10), password_defined: true });
   res.json({ message: 'Senha atualizada com sucesso' });
+});
+
+// Primeira senha de contas criadas pelo cadastro fluido (que nascem sem
+// senha escolhida pelo usuário). Só funciona enquanto password_defined for
+// false; depois disso, a troca exige a senha atual via /change-password.
+router.put('/set-password', authMiddleware, async (req, res) => {
+  const user = await users.findById(req.userId);
+  if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+  if (user.password_defined !== false) {
+    return res.status(409).json({ error: 'Sua conta já tem senha. Use "Alterar senha" informando a senha atual.' });
+  }
+  const newPassword = String(req.body.newPassword || '');
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: 'A senha deve ter pelo menos 8 caracteres' });
+  }
+  await users.update(user.id, { password_hash: await bcrypt.hash(newPassword, 10), password_defined: true });
+  res.json({ message: 'Senha definida com sucesso. Use seu e-mail e esta senha para entrar.', password_defined: true });
 });
 
 router.delete('/account', authMiddleware, async (req, res) => {
@@ -595,6 +613,7 @@ router.post('/reset-password', passwordRecoveryLimiter, async (req, res) => {
 
   await users.update(user.id, {
     password_hash: await bcrypt.hash(newPassword, 10),
+    password_defined: true,
     reset_code: null,
     reset_code_hash: null,
     reset_expires: null,
