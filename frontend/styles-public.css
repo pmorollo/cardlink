@@ -666,6 +666,11 @@
   outline: none;
 }
 
+.landing-niche-card.is-selected {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 2px var(--purple), 0 10px 24px rgba(124, 58, 237, 0.22);
+}
+
 .landing-niche-preview {
   height: 56px;
   display: flex;

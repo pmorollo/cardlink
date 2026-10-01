@@ -5,8 +5,18 @@ const authMiddleware = require('../middleware/auth');
 const { requireCustomer } = require('../middleware/roles');
 const { isProCustomer } = require('../utils/subscription');
 const { FREE_THEMES } = require('../utils/themes');
+const { getTemplateByKey } = require('../utils/template-catalog');
 
 const router = express.Router();
+
+// Um template define a ORDEM DAS SEÇÕES da página pública (ver
+// template-catalog.js), não só a cor. Escolher um template continua
+// aplicando o tema visual associado a ele, mas nunca sobrescreve texto
+// já preenchido pelo usuário — só decide como organizar o que existe.
+function resolveTemplateInput(value) {
+  const key = String(value || '').trim();
+  return key ? getTemplateByKey(key) : null;
+}
 
 async function generateUniqueSlug(name, excludeId = null) {
   let base = slugify(name, { lower: true, strict: true }) || 'cartao';
@@ -119,7 +129,10 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
     galleryToSave = galleryToSave.slice(0, 4);
   }
 
-  let themeToSave = req.body.theme;
+  const template = resolveTemplateInput(req.body.template_key);
+  const templateKeyToSave = req.body.template_key !== undefined ? (template?.template_key || null) : undefined;
+
+  let themeToSave = template?.theme_key || req.body.theme;
   if (themeToSave && !isPro && !FREE_THEMES.has(themeToSave)) {
     themeToSave = 'midnight';
   }
@@ -158,6 +171,7 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
       youtube: req.body.youtube !== undefined ? sanitizeSocialUrl(req.body.youtube) : existing.youtube,
       twitter: req.body.twitter !== undefined ? sanitizeSocialUrl(req.body.twitter) : existing.twitter,
       theme: themeToSave || existing.theme,
+      template_key: templateKeyToSave !== undefined ? templateKeyToSave : existing.template_key,
       site_button_text: req.body.site_button_text !== undefined ? String(req.body.site_button_text).substring(0, 200) : existing.site_button_text,
       services_mode: req.body.services_mode !== undefined ? sanitizeServicesMode(req.body.services_mode, existing.services_mode || 'image') : existing.services_mode,
       services_title: req.body.services_title !== undefined ? sanitizeServicesTitle(req.body.services_title) : existing.services_title,
@@ -198,6 +212,7 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
     youtube: sanitizeSocialUrl(req.body.youtube),
     twitter: sanitizeSocialUrl(req.body.twitter),
     theme: themeToSave || 'midnight',
+    template_key: templateKeyToSave || null,
     site_button_text: req.body.site_button_text ? String(req.body.site_button_text).substring(0, 200) : null,
     services_mode: sanitizeServicesMode(req.body.services_mode, 'image'),
     services_title: sanitizeServicesTitle(req.body.services_title) || '',
@@ -243,7 +258,10 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
     galleryToSave = galleryToSave.slice(0, 4);
   }
 
-  let themeToSave = req.body.theme !== undefined ? req.body.theme : card.theme;
+  const template = req.body.template_key !== undefined ? resolveTemplateInput(req.body.template_key) : null;
+  const templateKeyToSave = req.body.template_key !== undefined ? (template?.template_key || null) : undefined;
+
+  let themeToSave = template?.theme_key || (req.body.theme !== undefined ? req.body.theme : card.theme);
   if (themeToSave && !isPro && !FREE_THEMES.has(themeToSave)) {
     themeToSave = 'midnight';
   }
@@ -273,6 +291,7 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
     youtube: req.body.youtube !== undefined ? sanitizeSocialUrl(req.body.youtube) : card.youtube,
     twitter: req.body.twitter !== undefined ? sanitizeSocialUrl(req.body.twitter) : card.twitter,
     theme: themeToSave || card.theme,
+    template_key: templateKeyToSave !== undefined ? templateKeyToSave : card.template_key,
     site_button_text: req.body.site_button_text !== undefined ? String(req.body.site_button_text).substring(0, 200) : card.site_button_text,
     services_mode: req.body.services_mode !== undefined ? sanitizeServicesMode(req.body.services_mode, card.services_mode || 'image') : card.services_mode,
     services_title: req.body.services_title !== undefined ? sanitizeServicesTitle(req.body.services_title) : card.services_title,

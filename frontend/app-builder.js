@@ -1,35 +1,55 @@
 // ============================================
 // Card Templates (4 professional styles)
 // ============================================
-// Each template is purely a visual style (theme). It never pre-fills
-// business text, description or products — that content always comes
-// from the user's own fields in the builder menu (field-business,
-// field-description, o painel de produtos, etc.). O preview mostra
-// os placeholders genéricos do próprio renderCard() ("Seu Nome", etc.),
-// então o que se vê na prévia é estruturalmente igual ao que aparece
-// depois de preencher o menu — nunca um texto de exemplo fixo.
+// Each template is a visual style (theme) AND a real section layout: the
+// `sections` array is the order in which the optional blocks of the public
+// page are assembled (see resolveSectionOrder/renderCard below) — not just
+// color. It never pre-fills business text, description or products — that
+// content always comes from the user's own fields in the builder menu
+// (field-business, field-description, o painel de produtos, etc.). O
+// preview mostra os placeholders genéricos do próprio renderCard() ("Seu
+// Nome", etc.), então o que se vê na prévia é estruturalmente igual ao que
+// aparece depois de preencher o menu — nunca um texto de exemplo fixo.
+//
+// Esta lista espelha backend/utils/template-catalog.js (fonte de verdade
+// usada também pela API /api/templates); mudar a ordem aqui sem mudar lá
+// (ou vice-versa) deixa o preview do editor diferente do que a API relata.
 const NICHE_TEMPLATES = {
   institucional: {
     name: 'Institucional',
     emoji: '🏛️',
-    theme: 'institucional'
+    theme: 'institucional',
+    sections: ['description', 'info', 'social', 'products', 'gallery', 'testimonials']
   },
   pessoal: {
     name: 'Pessoal',
     emoji: '👤',
-    theme: 'pessoal'
+    theme: 'pessoal',
+    sections: ['description', 'social', 'testimonials', 'gallery', 'products', 'info']
   },
   profissional: {
     name: 'Profissional',
     emoji: '💼',
-    theme: 'profissional'
+    theme: 'profissional',
+    sections: ['description', 'cta', 'social', 'info', 'products', 'gallery', 'testimonials']
   },
   comercial: {
     name: 'Comercial',
     emoji: '🛍️',
-    theme: 'comercial'
+    theme: 'comercial',
+    sections: ['products', 'gallery', 'description', 'testimonials', 'info', 'social']
   }
 };
+
+// Ordem usada quando o cartão não tem template_key (cartões antigos) ou tem
+// um valor desconhecido — idêntica ao comportamento de antes desta feature,
+// então nada muda para quem nunca escolheu um template.
+const DEFAULT_SECTION_ORDER = ['description', 'cta', 'social', 'info', 'products', 'gallery', 'testimonials'];
+
+function resolveSectionOrder(templateKey) {
+  const tmpl = templateKey ? NICHE_TEMPLATES[templateKey] : null;
+  return (tmpl && Array.isArray(tmpl.sections) && tmpl.sections.length) ? tmpl.sections : DEFAULT_SECTION_ORDER;
+}
 
 
 // Aplica apenas o ESTILO do modelo (tema visual). Nunca sobrescreve nome,
@@ -117,7 +137,7 @@ function openLandingNichePreview(nicheKey) {
   // renderCard(), coerentes com os campos reais do menu do cartão.
   const previewEl = document.getElementById('landing-niche-modal-preview');
   if (previewEl) {
-    const previewData = { theme: tmpl.theme };
+    const previewData = { theme: tmpl.theme, template_key: nicheKey };
     previewEl.innerHTML = renderCard(previewData, true);
     previewEl.setAttribute('data-theme', tmpl.theme || '');
   }
@@ -526,6 +546,11 @@ function getFormData() {
     if (value) data[input.dataset.field] = value;
   });
   data.theme = currentTheme;
+  // O tema atual É a chave do template quando corresponde a um dos 4
+  // modelos (institucional/pessoal/profissional/comercial); para um tema
+  // legado/custom não ligado a nenhum template, fica vazio e a página
+  // pública usa a ordem padrão de sempre (ver DEFAULT_SECTION_ORDER).
+  data.template_key = NICHE_TEMPLATES[currentTheme] ? currentTheme : '';
 
   const products = [];
   document.querySelectorAll('#builder-products-container .builder-item-row').forEach(row => {
@@ -838,9 +863,17 @@ function renderCard(data, isPreview) {
       testimonialsHtml += '</div>';
     }
 
+    // A ordem de produtos/galeria/depoimentos dentro deste bloco varia por
+    // template (ex: Comercial mostra produtos antes de depoimentos; Pessoal
+    // prioriza depoimentos). Catálogo em PDF e imagem de destaque continuam
+    // sempre primeiro, por serem a abertura da vitrine em qualquer modelo.
+    const expandableBlocksByKey = { products: productsHtml, gallery: galleryHtml, testimonials: testimonialsHtml };
+    const expandableOrder = resolveSectionOrder(data.template_key).filter(key => key in expandableBlocksByKey);
+    const orderedExpandableHtml = expandableOrder.map(key => expandableBlocksByKey[key]).join('');
+
     siteExpandedContent = `
       <div class="site-expanded-section" id="site-expanded-section" style="${isPreview ? '' : 'display:none;'}">
-        ${catalogPdfHtml}${servicesImageHtml}${productsHtml}${galleryHtml}${testimonialsHtml}
+        ${catalogPdfHtml}${servicesImageHtml}${orderedExpandableHtml}
       </div>`;
   }
 
@@ -931,6 +964,44 @@ function renderCard(data, isPreview) {
     `;
   }
 
+  // Blocos de topo que variam de ordem por template: description, cta
+  // (WhatsApp/CTA), social (redes) e info (telefone/e-mail/Instagram/mapa).
+  // Cabeçalho, o bloco de produtos/galeria/depoimentos (com seu próprio
+  // toggle) e o formulário de contato são âncoras fixas — não entram nesse
+  // reordenamento, para não quebrar a UX de "mostrar mais" nem o rodapé.
+  const descriptionHtml = (description ? `<p class="card-description" style="text-align:left;margin:10px 0 15px;font-size:0.9rem;line-height:1.6;color:var(--text-secondary);">${escapeHtml(description)}</p>` : '') + messageHtml;
+  const ctaBlockHtml = ctaButtonsHtml + (whatsappGroup ? `<a href="${escapeHtml(whatsappGroup)}" target="_blank" rel="noopener" class="btn btn-whatsapp-group" style="width:100%;margin-bottom:15px;display:flex;align-items:center;justify-content:center;gap:8px;">👥 Grupo do WhatsApp</a>` : '');
+  const socialBlockHtml = socialButtons ? `<div class="card-social-grid" style="margin-bottom:20px;">${socialButtons}</div>` : '';
+  const infoBlockHtml = infoGridHtml + (address ? `<div class="card-map-card" style="margin-top:16px;"><div class="card-map-label">📍 Como chegar</div><a href="https://www.google.com/maps/search/${encodeURIComponent(address)}" target="_blank" rel="noopener" class="card-map-preview">Toque para abrir no Google Maps</a></div>` : '');
+
+  // "vitrine" representa o bloco inteiro de produtos/galeria/depoimentos
+  // (com seu próprio botão de "mostrar mais"), como UMA posição só — ele
+  // entra na ordem geral no lugar da primeira dessas três chaves que
+  // aparecer no template, para que "Comercial" (que lista produtos antes
+  // da descrição) realmente mostre a vitrine antes da descrição, e não
+  // sempre no fim da página.
+  const vitrineHtml = siteToggleButton + siteExpandedContent;
+  const topBlocksByKey = { description: descriptionHtml, cta: ctaBlockHtml, social: socialBlockHtml, info: infoBlockHtml, vitrine: vitrineHtml };
+  const fullOrder = resolveSectionOrder(data.template_key);
+  const vitrineKeys = ['products', 'gallery', 'testimonials'];
+  const collapsedOrder = [];
+  let vitrineInserted = false;
+  fullOrder.forEach(key => {
+    if (vitrineKeys.includes(key)) {
+      if (!vitrineInserted) { collapsedOrder.push('vitrine'); vitrineInserted = true; }
+      return;
+    }
+    if (key in topBlocksByKey) collapsedOrder.push(key);
+  });
+  if (!vitrineInserted) collapsedOrder.push('vitrine');
+  // Garante que todo bloco apareça mesmo se um template novo esquecer de
+  // listar uma das chaves — cai no fim, na ordem padrão.
+  [...DEFAULT_SECTION_ORDER, 'vitrine'].forEach(key => {
+    const normalizedKey = vitrineKeys.includes(key) ? 'vitrine' : key;
+    if (normalizedKey in topBlocksByKey && !collapsedOrder.includes(normalizedKey)) collapsedOrder.push(normalizedKey);
+  });
+  const orderedTopHtml = collapsedOrder.map(key => topBlocksByKey[key]).join('');
+
   return `
     <div class="card-container" data-theme="${theme}">
       <div class="card-cover" style="height:120px;background:linear-gradient(135deg, var(--primary-subtle), var(--primary));position:relative;overflow:hidden;">
@@ -943,7 +1014,7 @@ function renderCard(data, isPreview) {
           </div>
         ` : ''}
       </div>
-      
+
       <!-- Profile Header (Avatar Left, Title Right) -->
       <div style="display:flex;align-items:center;gap:16px;padding:0 20px;margin-top:-40px;position:relative;z-index:10;text-align:left;">
         <div class="card-avatar" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--bg-surface);box-shadow:var(--shadow-md);overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg-card);font-size:1.8rem;font-weight:bold;flex-shrink:0;">
@@ -956,15 +1027,7 @@ function renderCard(data, isPreview) {
       </div>
 
       <div class="card-body" style="padding-top:15px;">
-        ${description ? `<p class="card-description" style="text-align:left;margin:10px 0 15px;font-size:0.9rem;line-height:1.6;color:var(--text-secondary);">${escapeHtml(description)}</p>` : ''}
-        ${messageHtml}
-        ${ctaButtonsHtml}
-        ${whatsappGroup ? `<a href="${escapeHtml(whatsappGroup)}" target="_blank" rel="noopener" class="btn btn-whatsapp-group" style="width:100%;margin-bottom:15px;display:flex;align-items:center;justify-content:center;gap:8px;">👥 Grupo do WhatsApp</a>` : ''}
-        ${socialButtons ? `<div class="card-social-grid" style="margin-bottom:20px;">${socialButtons}</div>` : ''}
-        ${infoGridHtml}
-        ${address ? `<div class="card-map-card" style="margin-top:16px;"><div class="card-map-label">📍 Como chegar</div><a href="https://www.google.com/maps/search/${encodeURIComponent(address)}" target="_blank" rel="noopener" class="card-map-preview">Toque para abrir no Google Maps</a></div>` : ''}
-        ${siteToggleButton}
-        ${siteExpandedContent}
+        ${orderedTopHtml}
         ${contactForm}
       </div>
       <div class="card-footer" style="margin-top:20px;">Feito com 💜 por <a href="${window.location.origin}">CardLink</a></div>
