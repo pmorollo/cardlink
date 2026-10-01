@@ -662,3 +662,22 @@ textarea.form-input {
   font-weight: 600;
 }
 
+
+
+/* Seletor de modelo (Configurações → Modelo do site) */
+.template-picker-intro { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 14px; }
+.template-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .template-picker { grid-template-columns: 1fr; } }
+.template-option {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  padding: 10px; border: 1.5px solid var(--border-subtle); border-radius: var(--radius-md);
+  background: var(--bg-card, #fff); cursor: pointer; font: inherit; color: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.template-option:hover { border-color: var(--purple); }
+.template-option:has(.theme-swatch.active) { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(124,58,237,0.15); }
+.template-option .theme-swatch { width: 56px; height: 56px; flex-shrink: 0; aspect-ratio: auto; transform: none; }
+.template-option .theme-swatch.active { transform: none; }
+.template-option-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.template-option-name { font-weight: 700; font-size: 0.92rem; color: var(--text-primary); }
+.template-option-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.35; }
