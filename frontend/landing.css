@@ -74,6 +74,68 @@
   --text-secondary: #c8c1b3;
   --text-muted: #918b80;
 }
+/* Os 4 modelos atuais (Institucional, Pessoal, Profissional, Comercial).
+   Cores alinhadas às amostras do editor (styles-builder.css .theme-swatch). */
+[data-theme="institucional"] {
+  --hero-from: #071a33;
+  --hero-via: #0b2545;
+  --hero-to: #1d4f86;
+  --accent: #4a90d9;
+  --accent-2: #8cc4ff;
+  --accent-glow: rgba(74,144,217,0.3);
+  --bg: #06111f;
+  --bg-card: #0c1d33;
+  --bg-card-2: #12263f;
+  --border: rgba(140,196,255,0.14);
+  --text-primary: #eef5ff;
+  --text-secondary: #b4c6dc;
+  --text-muted: #7f93ab;
+}
+[data-theme="pessoal"] {
+  --hero-from: #1c1814;
+  --hero-via: #2b2622;
+  --hero-to: #5a4029;
+  --accent: #d9a066;
+  --accent-2: #f2cf9e;
+  --accent-glow: rgba(217,160,102,0.3);
+  --bg: #15120f;
+  --bg-card: #221d18;
+  --bg-card-2: #2b2520;
+  --border: rgba(242,207,158,0.15);
+  --text-primary: #f7efe6;
+  --text-secondary: #d2c3b2;
+  --text-muted: #9c8c7b;
+}
+[data-theme="profissional"] {
+  --hero-from: #0b0f1a;
+  --hero-via: #111827;
+  --hero-to: #2e3170;
+  --accent: #6366f1;
+  --accent-2: #a5b4fc;
+  --accent-glow: rgba(99,102,241,0.3);
+  --bg: #0a0d16;
+  --bg-card: #121827;
+  --bg-card-2: #182033;
+  --border: rgba(165,180,252,0.14);
+  --text-primary: #eef0ff;
+  --text-secondary: #b8bdd8;
+  --text-muted: #8389a8;
+}
+[data-theme="comercial"] {
+  --hero-from: #032b21;
+  --hero-via: #064e3b;
+  --hero-to: #0b7a5a;
+  --accent: #10b981;
+  --accent-2: #6ee7b7;
+  --accent-glow: rgba(16,185,129,0.3);
+  --bg: #04140f;
+  --bg-card: #0a2219;
+  --bg-card-2: #0f2c21;
+  --border: rgba(110,231,183,0.14);
+  --text-primary: #ecfdf5;
+  --text-secondary: #b3d8c9;
+  --text-muted: #7ea596;
+}
 [data-theme="sunset"] {
   --hero-from: #1a0a1e;
   --hero-via: #3d1a3a;

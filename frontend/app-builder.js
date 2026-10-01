@@ -88,8 +88,7 @@ function selectLandingNiche(nicheKey) {
   } catch (err) {
     console.error('selectLandingNiche: falha ao salvar preferência local', err);
   }
-  navigateTo('auth');
-  toggleAuthForm('register');
+  navigateTo('register');
 }
 
 // Every "Criar Conta" entry point on the landing page (hero, plano Free,
