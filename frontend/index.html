@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles-base.css?v=50">
   <link rel="stylesheet" href="styles-builder.css?v=47">
   <link rel="stylesheet" href="styles-dashboard.css?v=48">
-  <link rel="stylesheet" href="styles-public.css?v=54">
+  <link rel="stylesheet" href="styles-public.css?v=55">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#f8b900">
@@ -37,6 +37,7 @@
         <a href="#como-funciona" class="navbar-link hide-mobile">Como funciona</a>
         <a href="#demonstracao" class="navbar-link hide-mobile">Demonstração</a>
         <button class="navbar-login" onclick="navigateTo('auth'); toggleAuthForm('login');">Entrar na conta</button>
+        <button class="btn btn-primary" onclick="openQuickCreateModal()" style="padding:9px 18px;font-size:0.88rem;">Criar Cartão</button>
       </div>
     </div>
   </nav>
@@ -53,7 +54,7 @@
           <div class="hero-copy">
             <div class="hero-badge" id="landing-hero-badge" style="background:rgba(124,58,237,0.15);border-color:var(--purple);color:#c4b5fd;">
               <span class="dot" style="background:#22c55e;"></span>
-              🎁 Plano Gratuito • Sem Cartão de Crédito
+              ✨ Seu site pronto em poucos minutos
             </div>
             <h1 id="landing-hero-title">
               Preencha seus dados.<br>O <span class="hero-word-yellow">CardLink</span><br><span class="text-gradient">cria sua página.</span>
@@ -71,65 +72,11 @@
             </div>
 
             <div class="hero-buttons">
-              <button class="btn btn-primary btn-lg" onclick="scrollToLandingNichePicker();" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
-                <span style="color:#062b28 !important;-webkit-text-fill-color:#062b28 !important;font-weight:800;">Criar Minha Página Grátis</span>
-              </button>
-              <button class="btn btn-secondary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">
-                ⭐ Conhecer os Planos
+              <button class="btn btn-primary btn-lg" onclick="openQuickCreateModal();" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
+                <span style="color:#062b28 !important;-webkit-text-fill-color:#062b28 !important;font-weight:800;">CRIAR CARTÃO</span>
               </button>
             </div>
             <p class="hero-audience" id="landing-hero-audience">☆ Ideal para autônomos, salões, barbearias, clínicas, restaurantes e negócios locais.</p>
-
-            <!-- Niche Templates Preview Cards (pre-signup) -->
-            <div class="landing-niche-picker" id="landing-niche-picker">
-              <div class="landing-niche-picker-header">
-                <div class="landing-niche-picker-title">
-                  <span>✨</span> <span>Escolha seu ramo e comece pronto</span>
-                </div>
-                <span class="landing-niche-picker-badge">1 Clique</span>
-              </div>
-              <p class="landing-niche-picker-desc">
-                Escolha o estilo visual da sua página — o conteúdo (nome, descrição, serviços) você preenche depois, no menu do cartão:
-              </p>
-              <div class="landing-niche-grid">
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('institucional')">
-                  <div class="landing-niche-preview" data-theme="institucional">🏛️</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Institucional</div><div class="landing-niche-tagline">Sóbrio, para empresas e instituições</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('pessoal')">
-                  <div class="landing-niche-preview" data-theme="pessoal">👤</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Pessoal</div><div class="landing-niche-tagline">Acolhedor, para uso individual</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('profissional')">
-                  <div class="landing-niche-preview" data-theme="profissional">💼</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Profissional</div><div class="landing-niche-tagline">Moderno, para autônomos e consultorias</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="openLandingNichePreview('comercial')">
-                  <div class="landing-niche-preview" data-theme="comercial">🛍️</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Comercial</div><div class="landing-niche-tagline">Direto, para lojas e vendas</div></div>
-                </button>
-                <button type="button" class="landing-niche-card" onclick="selectLandingNiche('custom')">
-                  <div class="landing-niche-preview" data-theme="monochrome">🧩</div>
-                  <div class="landing-niche-info"><div class="landing-niche-name">Personalizado</div><div class="landing-niche-tagline">Começar do zero, sem modelo</div></div>
-                </button>
-              </div>
-            </div>
-
-            <!-- Niche Preview Modal (pre-signup) -->
-            <div class="landing-niche-modal" id="landing-niche-modal" aria-hidden="true">
-              <div class="landing-niche-modal-backdrop" onclick="closeLandingNichePreview()"></div>
-              <div class="landing-niche-modal-card" role="dialog" aria-modal="true" aria-labelledby="landing-niche-modal-title">
-                <div class="landing-niche-modal-header">
-                  <span class="landing-niche-modal-header-title" id="landing-niche-modal-title">Prévia do modelo</span>
-                  <button type="button" class="landing-niche-modal-close" onclick="closeLandingNichePreview()" aria-label="Fechar prévia">✕</button>
-                </div>
-                <div class="landing-niche-modal-preview" id="landing-niche-modal-preview"></div>
-                <div class="landing-niche-modal-actions">
-                  <button type="button" class="btn btn-secondary" onclick="closeLandingNichePreview()">Ver outro modelo</button>
-                  <button type="button" class="btn btn-primary" onclick="confirmLandingNichePreview()">✨ Usar este modelo</button>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div class="hero-visual" aria-label="Exemplo de uma página profissional criada com o CardLink">
@@ -208,8 +155,8 @@
 
           <!-- Botão de Ação Direta após o Carrossel -->
           <div style="margin-top:28px;text-align:center;">
-            <button class="btn btn-primary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" style="font-size:1.05rem;padding:14px 32px;box-shadow:0 8px 24px rgba(124,58,237,0.35);">
-                <span style="color:#062b28 !important;-webkit-text-fill-color:#062b28 !important;font-weight:800;">Criar Conta</span>
+            <button class="btn btn-primary btn-lg" onclick="openQuickCreateModal()" style="font-size:1.05rem;padding:14px 32px;box-shadow:0 8px 24px rgba(124,58,237,0.35);">
+                <span style="color:#062b28 !important;-webkit-text-fill-color:#062b28 !important;font-weight:800;">CRIAR CARTÃO</span>
               </button>
             <p style="color:var(--text-muted);font-size:0.84rem;margin-top:8px;">Acesso liberado imediatamente • Sem compromisso</p>
           </div>
@@ -269,18 +216,18 @@
         <div class="steps">
           <div class="step animate-in">
             <div class="step-number">1</div>
-            <h3>Crie sua conta grátis</h3>
-            <p>Cadastre seu e-mail, confirme o código recebido e comece no Plano Free sem cartão de crédito.</p>
+            <h3>Clique em Criar Cartão</h3>
+            <p>Informe seu nome, e-mail, o nome do seu negócio e uma breve descrição, e escolha um estilo visual.</p>
           </div>
           <div class="step animate-in">
             <div class="step-number">2</div>
-            <h3>Ative e personalize</h3>
-            <p>Após a confirmação, defina sua senha e monte sua página com seus dados, imagens e conteúdos.</p>
+            <h3>Pronto na hora</h3>
+            <p>Ao salvar, sua conta e o seu site já estão no ar — sem senha, sem confirmação por e-mail, sem espera.</p>
           </div>
           <div class="step animate-in">
             <div class="step-number">3</div>
-            <h3>Compartilhe e use</h3>
-            <p>Distribua seu link e volte ao painel sempre que quiser atualizar sua página. No Pro, libere também QR Code integrado e recebimento de mensagens/leads.</p>
+            <h3>Personalize e compartilhe</h3>
+            <p>Volte ao painel quando quiser para adicionar fotos, serviços, contatos e redes sociais, e distribua seu link.</p>
           </div>
         </div>
       </div>
@@ -329,7 +276,7 @@
               <span style="font-size:0.8rem;color:var(--purple);">▼</span>
             </summary>
             <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
-              No Plano Pro, você pode gerar o QR Code integrado do CardLink para exibir no balcão. Quando o cliente escaneia o código, o sistema registra a estatística no painel e abre sua página profissional completa. No Free, a página continua acessível normalmente pelo link compartilhável.
+              Você pode gerar o QR Code integrado do CardLink para exibir no balcão. Quando o cliente escaneia o código, o sistema registra a estatística no painel e abre sua página profissional completa.
             </div>
           </details>
 
@@ -339,7 +286,7 @@
               <span style="font-size:0.8rem;color:var(--purple);">▼</span>
             </summary>
             <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
-              Não. O CardLink não exige cartão físico nem NFC. No Free, basta compartilhar o endereço da sua página. No Pro, você também pode usar o QR Code integrado e rastreável do CardLink.
+              Não. O CardLink não exige cartão físico nem NFC. Basta compartilhar o endereço da sua página, e você também pode usar o QR Code integrado e rastreável do CardLink.
             </div>
           </details>
 
@@ -349,7 +296,7 @@
               <span style="font-size:0.8rem;color:var(--purple);">▼</span>
             </summary>
             <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
-              A hospedagem da página está incluída tanto no Free quanto no Pro. Você não precisa comprar um domínio: recebe um link profissional e exclusivo, pronto para colocar na bio do Instagram ou enviar no WhatsApp. O QR Code integrado fica disponível no Pro.
+              A hospedagem da página já está incluída. Você não precisa comprar um domínio: recebe um link profissional e exclusivo, pronto para colocar na bio do Instagram ou enviar no WhatsApp.
             </div>
           </details>
 
@@ -359,95 +306,10 @@
               <span style="font-size:0.8rem;color:var(--purple);">▼</span>
             </summary>
             <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
-              Sim. Free e Pro podem editar a página a qualquer momento. As alterações entram no link público imediatamente; no Pro, o QR Code integrado continua apontando para essa mesma página atualizada.
+              Sim. Você pode editar a página a qualquer momento, e as alterações entram no link público imediatamente — o QR Code continua apontando para essa mesma página atualizada.
             </div>
           </details>
 
-          <details style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:var(--space-md);cursor:pointer;transition:all 0.3s;" ontoggle="this.style.borderColor = this.open ? 'var(--purple)' : 'var(--border-subtle)'">
-            <summary style="font-weight:700;color:var(--text-primary);list-style:none;display:flex;justify-content:space-between;align-items:center;outline:none;">
-              <span>Como funciona a cobrança e cancelamento?</span>
-              <span style="font-size:0.8rem;color:var(--purple);">▼</span>
-            </summary>
-            <div style="color:var(--text-secondary);font-size:0.92rem;line-height:1.6;margin-top:12px;cursor:default;">
-              O CardLink possui um Plano Free de R$ 0 e um Plano Pro. O Pro custa R$ 12,90/mês ou R$ 99,00/ano (equivalente a R$ 8,25/mês, com 36% OFF) e é processado pela Cakto. Se o Pro for cancelado, a conta volta ao Free e a página pública continua online; apenas os recursos premium são desativados.
-            </div>
-          </details>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- Pricing Section -->
-    <div class="pricing-section" id="pricing" style="padding:var(--space-3xl) 0;background:var(--bg-card);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);">
-      <div class="container" style="max-width:960px;text-align:center;">
-        <div class="section-header" style="margin-bottom:var(--space-2xl);">
-          <div class="hero-badge" style="margin:0 auto var(--space-md);width:fit-content;display:inline-flex;">💵 Transparente & Sem Pegadinhas</div>
-          <h2>Escolha o Plano Ideal para o <span class="text-gradient">Seu Negócio</span></h2>
-          <p style="color:var(--text-secondary);">Comece 100% grátis e faça upgrade para o Pro quando precisar de QR Code integrado, mensagens/leads, catálogo em PDF e mais fotos.</p>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:24px;max-width:880px;margin:0 auto;text-align:left;">
-          <!-- Card Plano Gratuito -->
-          <div style="background:var(--bg-surface);border:1.5px solid var(--border-subtle);border-radius:var(--radius-xl);padding:var(--space-xl);box-shadow:var(--shadow-md);display:flex;flex-direction:column;justify-content:space-between;transition:transform 0.3s ease;">
-            <div>
-              <div style="margin-bottom:12px;">
-                <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Plano Gratuito</h3>
-              </div>
-              <p style="color:var(--text-secondary);font-size:0.86rem;margin-bottom:20px;">Sua apresentação profissional ativa, sem custos.</p>
-              
-              <div style="margin-bottom:24px;">
-                <div style="font-size:2.4rem;font-weight:900;color:var(--text-primary);line-height:1;">R$ 0<span style="font-size:0.9rem;font-weight:400;color:var(--text-secondary);"> /mês</span></div>
-                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Sem cartão de crédito • Sem cobrança surpresa</div>
-              </div>
-
-              <ul style="list-style:none;padding:0;margin:0 0 28px 0;display:flex;flex-direction:column;gap:12px;font-size:0.9rem;color:var(--text-secondary);">
-                <li style="display:flex;align-items:center;gap:10px;">✅ <span>Página profissional 100% online</span></li>
-                <li style="display:flex;align-items:center;gap:10px;">✅ <span>Link próprio para compartilhar</span></li>
-                <li style="display:flex;align-items:center;gap:10px;">✅ <span>WhatsApp, redes sociais e localização</span></li>
-                <li style="display:flex;align-items:center;gap:10px;">✅ <span>Vitrine de produtos & serviços</span></li>
-                <li style="display:flex;align-items:center;gap:10px;">🎨 <span><strong>3 cores de fundo</strong> (Midnight, Mel Claro e Rosa)</span></li>
-                <li style="display:flex;align-items:center;gap:10px;">🖼️ <span>Galeria de fotos (<strong>até 4 fotos</strong>)</span></li>
-                <li style="display:flex;align-items:center;gap:10px;opacity:0.55;">❌ <span style="text-decoration:line-through;">QR Code integrado e rastreamento</span></li>
-                <li style="display:flex;align-items:center;gap:10px;opacity:0.55;">❌ <span style="text-decoration:line-through;">Formulário de mensagens e leads</span></li>
-                <li style="display:flex;align-items:center;gap:10px;opacity:0.55;">❌ <span style="text-decoration:line-through;">Catálogo ou cardápio em PDF</span></li>
-              </ul>
-            </div>
-
-            <button class="btn btn-secondary btn-lg" onclick="scrollToLandingNichePicker();" style="width:100%;font-weight:700;">
-              Escolher Plano Free
-            </button>
-          </div>
-
-          <!-- Card Plano Pro -->
-          <div style="background:var(--bg-surface);border:2px solid var(--accent);border-radius:var(--radius-xl);padding:var(--space-xl);box-shadow:0 10px 30px rgba(124,58,237,0.25);position:relative;display:flex;flex-direction:column;justify-content:space-between;transition:transform 0.3s ease;">
-            <div style="position:absolute;top:-12px;right:20px;background:linear-gradient(135deg,var(--accent),#9333ea);color:#fff;font-size:0.75rem;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:0.5px;">MAIS COMPLETO ⭐</div>
-            <div>
-              <div style="margin-bottom:12px;">
-                <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary);margin:0;">Plano Pro</h3>
-              </div>
-              <p style="color:var(--text-secondary);font-size:0.86rem;margin-bottom:20px;">Tudo do Grátis + QR Code, mensagens/leads, Catálogo em PDF e galeria ampliada.</p>
-              
-              <div style="margin-bottom:24px;">
-                <div style="font-size:2.4rem;font-weight:900;color:var(--text-primary);line-height:1;">R$ 12,90<span style="font-size:0.9rem;font-weight:400;color:var(--text-secondary);"> /mês</span></div>
-                <div style="font-size:0.8rem;color:var(--accent);font-weight:600;margin-top:4px;">Ou R$ 99,00/ano (-36% OFF)</div>
-              </div>
-
-              <ul style="list-style:none;padding:0;margin:0 0 28px 0;display:flex;flex-direction:column;gap:12px;font-size:0.9rem;color:var(--text-secondary);">
-                <li style="display:flex;align-items:center;gap:10px;">✅ <span><strong>Tudo o que está incluído no Grátis</strong></span></li>
-                <li style="display:flex;align-items:center;gap:10px;">🔳 <span><strong>QR Code integrado com rastreamento</strong></span></li>
-                <li style="display:flex;align-items:center;gap:10px;">📩 <span><strong>Formulário de mensagens e painel de leads</strong></span></li>
-                <li style="display:flex;align-items:center;gap:10px;">📑 <span><strong>Upload de Catálogo ou Cardápio em PDF</strong></span></li>
-                <li style="display:flex;align-items:center;gap:10px;">🔒 <span>Leitor de PDF embutido e protegido</span></li>
-                <li style="display:flex;align-items:center;gap:10px;">🖼️ <span>Galeria ampliada: <strong>até 10 fotos</strong></span></li>
-                <li style="display:flex;align-items:center;gap:10px;">🎨 <span><strong>5 cores de fundo</strong> (inclui <em>Executivo Premium</em>)</span></li>
-                <li style="display:flex;align-items:center;gap:10px;">💬 <span>Suporte prioritário via WhatsApp</span></li>
-              </ul>
-            </div>
-
-            <button class="btn btn-primary btn-lg" onclick="redirectToCheckout('monthly')" style="width:100%;font-weight:800;background:linear-gradient(135deg,var(--accent),#9333ea);box-shadow:0 6px 20px rgba(124,58,237,0.4);">
-              💳 Assinar Plano Pro (R$ 12,90)
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -457,14 +319,11 @@
       <div class="container">
         <div class="cta-box">
           <h2>Pronto para reunir tudo em <span class="text-gradient">um único lugar</span>?</h2>
-          <p>Crie sua página profissional em minutos e compartilhe pelo link. Quando precisar, o Pro adiciona QR Code integrado, mensagens/leads e outros recursos premium.</p>
+          <p>Clique em Criar Cartão, preencha seus dados e seu site já fica pronto na hora.</p>
           <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
-            <button class="btn btn-primary btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
-                <span style="color:#062b28 !important;-webkit-text-fill-color:#062b28 !important;font-weight:800;">Criar Conta</span>
+            <button class="btn btn-primary btn-lg" onclick="openQuickCreateModal()" style="box-shadow:0 6px 20px rgba(124,58,237,0.4);font-weight:700;">
+                <span style="color:#062b28 !important;-webkit-text-fill-color:#062b28 !important;font-weight:800;">CRIAR CARTÃO</span>
               </button>
-            <button class="btn btn-secondary btn-lg" onclick="redirectToCheckout('monthly')" style="font-weight:700;">
-              💳 Assinar Pro (R$ 12,90)
-            </button>
           </div>
         </div>
       </div>
@@ -530,7 +389,7 @@
             Entrar
           </button>
           <p class="auth-toggle">
-            Ainda não tem conta? <a href="#" onclick="scrollToLandingNichePicker();return false;">Criar conta grátis</a>
+            Ainda não tem conta? <a href="#" onclick="openQuickCreateModal();return false;">Criar Cartão</a>
           </p>
         </div>
 
@@ -1305,6 +1164,74 @@
       <div style="display:flex;gap:12px;margin-top:18px;">
         <button class="btn btn-primary" type="button" onclick="sendAdminMessage()" style="flex:1;">Enviar mensagem</button>
         <button class="btn btn-secondary" type="button" onclick="closeAdminMessageModal()" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Criar Cartão (porta de entrada única — conta + primeiro site num só SALVAR) -->
+  <div class="modal-overlay" id="quick-create-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);z-index:120;align-items:center;justify-content:center;padding:16px;">
+    <div class="builder-form-panel" style="max-width:520px;width:100%;max-height:92vh;overflow-y:auto;margin:0 auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-lg);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <h2 class="builder-title" style="margin-bottom:0;font-size:1.3rem;">✨ Criar meu <span class="text-gradient">Cartão</span></h2>
+        <button type="button" onclick="closeQuickCreateModal()" aria-label="Fechar" style="background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+      <p class="builder-subtitle" style="margin-bottom:16px;">Preencha os dados abaixo. Ao clicar em SALVAR, sua conta e o seu site são criados na hora — sem senha, sem código de confirmação.</p>
+
+      <div id="quick-create-alert" class="auth-alert" style="display:none;margin-bottom:14px;"></div>
+
+      <div class="form-group" style="margin-bottom:var(--space-md);">
+        <label class="form-label" for="qc-name">Seu nome</label>
+        <input class="form-input" type="text" id="qc-name" placeholder="Ex: Maria Silva" autocomplete="name">
+      </div>
+      <div class="form-group" style="margin-bottom:var(--space-md);">
+        <label class="form-label" for="qc-email">Seu e-mail</label>
+        <input class="form-input" type="email" id="qc-email" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group" style="margin-bottom:var(--space-md);">
+        <label class="form-label" for="qc-business">Nome do negócio</label>
+        <input class="form-input" type="text" id="qc-business" placeholder="Ex: Studio Bella" autocomplete="organization">
+      </div>
+      <div class="form-group" style="margin-bottom:var(--space-md);">
+        <label class="form-label" for="qc-description">Descrição do negócio</label>
+        <textarea class="form-input" id="qc-description" rows="3" placeholder="Em poucas palavras, o que o seu negócio faz"></textarea>
+      </div>
+
+      <div class="form-group" style="margin-bottom:var(--space-lg);">
+        <label class="form-label">Estilo do site</label>
+        <div class="landing-niche-grid" id="quick-create-template-grid">
+          <button type="button" class="landing-niche-card" data-template="institucional" onclick="selectQuickCreateTemplate('institucional')">
+            <div class="landing-niche-preview" data-theme="institucional">🏛️</div>
+            <div class="landing-niche-info"><div class="landing-niche-name">Institucional</div><div class="landing-niche-tagline">Sóbrio, para empresas</div></div>
+          </button>
+          <button type="button" class="landing-niche-card" data-template="pessoal" onclick="selectQuickCreateTemplate('pessoal')">
+            <div class="landing-niche-preview" data-theme="pessoal">👤</div>
+            <div class="landing-niche-info"><div class="landing-niche-name">Pessoal</div><div class="landing-niche-tagline">Acolhedor, uso individual</div></div>
+          </button>
+          <button type="button" class="landing-niche-card" data-template="profissional" onclick="selectQuickCreateTemplate('profissional')">
+            <div class="landing-niche-preview" data-theme="profissional">💼</div>
+            <div class="landing-niche-info"><div class="landing-niche-name">Profissional</div><div class="landing-niche-tagline">Autônomos e consultorias</div></div>
+          </button>
+          <button type="button" class="landing-niche-card" data-template="comercial" onclick="selectQuickCreateTemplate('comercial')">
+            <div class="landing-niche-preview" data-theme="comercial">🛍️</div>
+            <div class="landing-niche-info"><div class="landing-niche-name">Comercial</div><div class="landing-niche-tagline">Lojas e vendas</div></div>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-quick-create-save" onclick="submitQuickCreate()" style="width:100%;padding:14px;font-size:1rem;font-weight:800;">SALVAR</button>
+    </div>
+  </div>
+
+  <!-- Modal: Sucesso — site criado -->
+  <div class="modal-overlay" id="quick-create-success-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.55);backdrop-filter:blur(4px);z-index:130;align-items:center;justify-content:center;padding:16px;">
+    <div class="builder-form-panel" style="max-width:480px;width:100%;margin:0 auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-xl);text-align:center;">
+      <div style="font-size:3rem;margin-bottom:8px;">🎉</div>
+      <h2 class="builder-title" style="margin-bottom:8px;">Parabéns! Seu site <span class="text-gradient">está criado</span></h2>
+      <p class="builder-subtitle" style="margin-bottom:18px;">Seu cartão já está no ar neste endereço:</p>
+      <div style="background:rgba(124,58,237,0.08);border:1px dashed rgba(124,58,237,0.35);border-radius:var(--radius-lg);padding:12px;margin-bottom:18px;font-weight:700;color:var(--purple);word-break:break-all;" id="quick-create-success-url"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="copyQuickCreateSuccessUrl()">Copiar link</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="goToDashboardAfterQuickCreate()">Continuar configurações</button>
       </div>
     </div>
   </div>

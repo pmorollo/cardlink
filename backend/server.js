@@ -43,6 +43,7 @@ const aiRoutes = require('./routes/ai');
 const { adminRouter, supportRouter, messageRouter } = require('./routes/admin');
 const paymentRoutes = require('./routes/payments');
 const templateRoutes = require('./routes/templates');
+const onboardingRoutes = require('./routes/onboarding');
 const { syncCaktoCatalog } = require('./services/cakto');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('./db/repository');
 const { sendEmail } = require('./utils/email');
@@ -153,6 +154,7 @@ app.use('/api/support', apiLimiter, supportRouter);
 app.use('/api/messages', apiLimiter, messageRouter);
 app.use('/api/payments', apiLimiter, paymentRoutes);
 app.use('/api/templates', apiLimiter, templateRoutes);
+app.use('/api/onboarding', authLimiter, onboardingRoutes);
 
 // Rotas /api desconhecidas não devem cair no SPA nem expor diagnósticos.
 app.use('/api', (req, res) => {

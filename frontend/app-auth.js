@@ -734,6 +734,160 @@ async function handleResetPassword() {
 }
 
 
+// ============================================
+// Criar Cartão — porta de entrada única (conta + primeiro site)
+// ============================================
+// Único caminho de cadastro anunciado na landing: nome, e-mail, nome do
+// negócio, descrição e template, tudo num único SALVAR. Sem senha e sem
+// confirmação por e-mail — a conta já nasce logada (ver
+// backend/routes/onboarding.js). Mesmo quem for assinar o Pro depois entra
+// por aqui; a conversão acontece com a conta já criada.
+let quickCreateSelectedTemplate = 'institucional';
+let quickCreateLastSiteUrl = '';
+let quickCreateLastCardId = null;
+
+function updateQuickCreateTemplateSelection() {
+  document.querySelectorAll('#quick-create-template-grid .landing-niche-card').forEach(card => {
+    card.classList.toggle('is-selected', card.dataset.template === quickCreateSelectedTemplate);
+  });
+}
+
+function selectQuickCreateTemplate(key) {
+  quickCreateSelectedTemplate = key;
+  updateQuickCreateTemplateSelection();
+}
+
+function openQuickCreateModal() {
+  const modal = document.getElementById('quick-create-modal');
+  if (!modal) return;
+  const alertBox = document.getElementById('quick-create-alert');
+  if (alertBox) { alertBox.style.display = 'none'; alertBox.innerHTML = ''; }
+  quickCreateSelectedTemplate = 'institucional';
+  updateQuickCreateTemplateSelection();
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  window.setTimeout(() => document.getElementById('qc-name')?.focus(), 80);
+}
+
+function closeQuickCreateModal() {
+  const modal = document.getElementById('quick-create-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function showQuickCreateAlert(type, message) {
+  const alertBox = document.getElementById('quick-create-alert');
+  if (!alertBox) {
+    showToast(type === 'error' ? '❌' : 'ℹ️', message);
+    return;
+  }
+  alertBox.className = `auth-alert ${type}`;
+  alertBox.innerHTML = `<span>${type === 'error' ? '❌' : 'ℹ️'}</span><div>${escapeHtml(message)}</div>`;
+  alertBox.style.display = 'flex';
+}
+
+async function submitQuickCreate() {
+  const alertBox = document.getElementById('quick-create-alert');
+  if (alertBox) { alertBox.style.display = 'none'; alertBox.innerHTML = ''; }
+
+  const nameEl = document.getElementById('qc-name');
+  const emailEl = document.getElementById('qc-email');
+  const businessEl = document.getElementById('qc-business');
+  const descriptionEl = document.getElementById('qc-description');
+
+  const name = nameEl ? nameEl.value.trim() : '';
+  const email = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  const businessName = businessEl ? businessEl.value.trim() : '';
+  const businessDescription = descriptionEl ? descriptionEl.value.trim() : '';
+
+  if (!name) {
+    showQuickCreateAlert('error', 'Informe seu nome.');
+    nameEl?.focus();
+    return;
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email) || email.includes('..')) {
+    showQuickCreateAlert('error', 'Informe um e-mail válido.');
+    emailEl?.focus();
+    return;
+  }
+  if (!businessName) {
+    showQuickCreateAlert('error', 'Informe o nome do seu negócio.');
+    businessEl?.focus();
+    return;
+  }
+
+  const btn = document.getElementById('btn-quick-create-save');
+  const originalLabel = btn ? btn.textContent : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Criando seu site...';
+  }
+
+  try {
+    const data = await api('/onboarding/criar-cartao', {
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        email,
+        business_name: businessName,
+        business_description: businessDescription,
+        template_key: quickCreateSelectedTemplate
+      })
+    });
+
+    authToken = 'session';
+    currentUser = data.user;
+    updateNavAuth();
+
+    quickCreateLastCardId = data.card ? data.card.id : null;
+    currentUserCardId = quickCreateLastCardId;
+    quickCreateLastSiteUrl = data.site_url || (data.card ? `${window.location.origin}/site/${data.card.slug}` : '');
+
+    closeQuickCreateModal();
+    openQuickCreateSuccessModal(quickCreateLastSiteUrl);
+  } catch (err) {
+    showQuickCreateAlert('error', err.message || 'Não foi possível criar seu site agora. Tente novamente.');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
+  }
+}
+
+function openQuickCreateSuccessModal(url) {
+  const modal = document.getElementById('quick-create-success-modal');
+  const urlEl = document.getElementById('quick-create-success-url');
+  if (urlEl) urlEl.textContent = url || '';
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeQuickCreateSuccessModal() {
+  const modal = document.getElementById('quick-create-success-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function copyQuickCreateSuccessUrl() {
+  if (!quickCreateLastSiteUrl) return;
+  navigator.clipboard.writeText(quickCreateLastSiteUrl)
+    .then(() => showToast('📋', 'Link copiado!'))
+    .catch(() => showToast('❌', 'Erro ao copiar link'));
+}
+
+function goToDashboardAfterQuickCreate() {
+  closeQuickCreateSuccessModal();
+  if (quickCreateLastCardId) {
+    editCard(quickCreateLastCardId);
+  } else {
+    navigateTo('dashboard');
+  }
+}
+
 function handleLogout() {
   fetch(API + '/auth/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
   authToken = null;

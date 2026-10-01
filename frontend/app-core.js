@@ -323,7 +323,7 @@ function applyLandingAudience() {
 
   if (path === '/jovem' || hash === '#jovem' || audienceParam.includes('jovem')) {
     document.title = 'CardLink — Conectado do meu jeito | Sua página grátis';
-    badgeEl.innerHTML = '<span class="dot" style="background:#22c55e;"></span> 🎁 Plano 100% Grátis • Sem Cartão de Crédito';
+    badgeEl.innerHTML = '<span class="dot" style="background:#22c55e;"></span> ✨ Crie sua página agora mesmo';
     titleEl.innerHTML = 'Conectado<br>do meu jeito.<br><span class="text-gradient">Sua página, seu estilo.</span>';
     descEl.textContent = 'Sua página. Seus links. Suas fotos. Seu estilo. Reúna TikTok, Instagram, Spotify e seus projetos favoritos em um link único para a sua bio.';
     if (benefitsEl) {
@@ -338,8 +338,8 @@ function applyLandingAudience() {
       audienceEl.textContent = '☆ Feito para você que quer uma bio estilosa com todos os seus links e fotos reunidos.';
     }
   } else if (path === '/minhapagina' || hash === '#minhapagina' || audienceParam.includes('minhapagina') || audienceParam.includes('iniciante')) {
-    document.title = 'CardLink — Sua página na internet em poucos minutos | Grátis';
-    badgeEl.innerHTML = '<span class="dot" style="background:#22c55e;"></span> 🎁 Plano Gratuito • Sem Cartão de Crédito';
+    document.title = 'CardLink — Sua página na internet em poucos minutos';
+    badgeEl.innerHTML = '<span class="dot" style="background:#22c55e;"></span> ✨ Seu site pronto em poucos minutos';
     titleEl.innerHTML = 'Sua página na internet<br><span class="hero-word-yellow">em poucos minutos.</span>';
     descEl.textContent = 'Preencha seus dados. Publique. Pronto. É grátis e você não precisa entender nada de informática ou programação para ter seu endereço na web hoje mesmo.';
     if (benefitsEl) {
@@ -356,7 +356,7 @@ function applyLandingAudience() {
   } else {
     // Profissional / Padrão
     document.title = 'CardLink — Tudo sobre seu trabalho em um único link';
-    badgeEl.innerHTML = '<span class="dot" style="background:#22c55e;"></span> 🎁 Plano Gratuito • Sem Cartão de Crédito';
+    badgeEl.innerHTML = '<span class="dot" style="background:#22c55e;"></span> ✨ Seu site pronto em poucos minutos';
     titleEl.innerHTML = 'Preencha seus dados.<br>O <span class="hero-word-yellow">CardLink</span><br><span class="text-gradient">cria sua página.</span>';
     descEl.textContent = 'Você informa seus dados, serviços, fotos e contatos, e o CardLink organiza tudo automaticamente em uma página pronta na web para compartilhar.';
     if (benefitsEl) {
@@ -473,6 +473,7 @@ function updateNavAuth() {
       <a href="#como-funciona" class="navbar-link hide-mobile">Como funciona</a>
       <a href="#demonstracao" class="navbar-link hide-mobile">Demonstração</a>
       <button class="navbar-login" onclick="navigateTo('auth'); toggleAuthForm('login');">Entrar na conta</button>
+      <button class="btn btn-primary" onclick="openQuickCreateModal()" style="padding:9px 18px;font-size:0.88rem;">Criar Cartão</button>
     `;
   }
 }
