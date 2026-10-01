@@ -38,3 +38,21 @@ test('comercial mostra produtos antes da descrição; institucional faz o oposto
   assert.ok(comercial.indexOf('products') < comercial.indexOf('description'));
   assert.ok(institucional.indexOf('description') < institucional.indexOf('products'));
 });
+
+// A página pública real (/site/:slug) é desenhada por frontend/landing.js +
+// landing.css, não pelo editor. Os 4 modelos precisam existir lá também:
+// mesma ordem de seções do catálogo e um tema visual próprio no CSS.
+test('página pública (landing.js/landing.css) acompanha o catálogo de templates', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const vm = require('vm');
+  const js = fs.readFileSync(path.join(__dirname, '..', '..', 'frontend', 'landing.js'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '..', '..', 'frontend', 'landing.css'), 'utf8');
+  const match = js.match(/const TEMPLATE_SECTION_ORDER = (\{[\s\S]*?\n\});/);
+  assert.ok(match, 'landing.js deve declarar TEMPLATE_SECTION_ORDER');
+  const publicOrder = JSON.parse(JSON.stringify(vm.runInNewContext(`(${match[1]})`)));
+  for (const t of TEMPLATE_CATALOG) {
+    assert.deepEqual(publicOrder[t.template_key], t.structure_json.sections, `ordem do modelo ${t.template_key}`);
+    assert.ok(css.includes(`[data-theme="${t.theme_key}"]`), `landing.css deve ter o tema ${t.theme_key}`);
+  }
+});

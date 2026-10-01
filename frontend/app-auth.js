@@ -209,8 +209,7 @@ function beginFreeRegistration() {
   const codeEl = document.getElementById('register-code');
   if (codeEl) codeEl.value = '';
 
-  navigateTo('auth');
-  toggleAuthForm('register');
+  navigateTo('register');
   window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
 
   const nameEl = document.getElementById('register-name');

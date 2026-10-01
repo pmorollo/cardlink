@@ -189,6 +189,7 @@ async function init() {
   }
 
   applyTheme(cardData.theme || 'midnight');
+  applyTemplateLayout(cardData.template_key);
   renderNav(cardData);
   renderHero(cardData);
   renderAbout(cardData);
@@ -231,6 +232,7 @@ async function init() {
     }
   }
 
+  refreshSectionAlternation();
   initScrollAnimations();
   // Atendimento público acontece diretamente pelo WhatsApp.
 }
@@ -242,6 +244,47 @@ async function init() {
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   document.getElementById('hero').setAttribute('data-theme', theme);
+}
+
+// ============================================
+// Template layout (ordem das seções)
+// ============================================
+// Espelha backend/utils/template-catalog.js. Cada modelo define a ORDEM das
+// seções da página pública, não só a cor. Chaves do catálogo → ids das
+// seções desta página. "cta" não tem seção própria aqui (o botão fica no
+// topo) e é ignorado. Cartões sem template_key mantêm a ordem do HTML.
+const TEMPLATE_SECTION_ORDER = {
+  institucional: ['description', 'info', 'social', 'products', 'gallery', 'testimonials'],
+  pessoal: ['description', 'social', 'testimonials', 'gallery', 'products', 'info'],
+  profissional: ['description', 'cta', 'social', 'info', 'products', 'gallery', 'testimonials'],
+  comercial: ['products', 'gallery', 'description', 'testimonials', 'info', 'social']
+};
+const TEMPLATE_SECTION_IDS = {
+  description: 'sobre', products: 'servicos', gallery: 'galeria',
+  testimonials: 'depoimentos', social: 'redes', info: 'contato'
+};
+
+function applyTemplateLayout(templateKey) {
+  const order = TEMPLATE_SECTION_ORDER[templateKey];
+  if (!order) return;
+  document.body.setAttribute('data-template', templateKey);
+  const hero = document.getElementById('hero');
+  if (!hero || !hero.parentNode) return;
+  let anchor = hero;
+  order.forEach(key => {
+    const el = document.getElementById(TEMPLATE_SECTION_IDS[key]);
+    if (el && el.parentNode === hero.parentNode) {
+      anchor.after(el);
+      anchor = el;
+    }
+  });
+  refreshSectionAlternation();
+}
+
+// Mantém o fundo alternado (claro/escuro) depois de reordenar ou remover seções.
+function refreshSectionAlternation() {
+  const sections = Array.from(document.querySelectorAll('section.lp-section'));
+  sections.forEach((el, i) => el.classList.toggle('lp-section-alt', i % 2 === 1));
 }
 
 // ============================================

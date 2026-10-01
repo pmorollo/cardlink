@@ -113,7 +113,7 @@ function copyCardLink() { copyToClipboard(getPrimaryPublicUrl()); }
 // Navigation / Routing
 // ============================================
 function navigateTo(route) {
-  const map = { home: '', auth: '#auth', dashboard: '#dashboard', settings: '#settings', builder: '#settings', contacts: '#contacts', account: '#account', admin: '#admin' };
+  const map = { home: '', auth: '#auth', register: '#register', dashboard: '#dashboard', settings: '#settings', builder: '#settings', contacts: '#contacts', account: '#account', admin: '#admin' };
   const target = map[route] !== undefined ? map[route] : '';
   if (window.location.hash === target || (target === '' && (window.location.hash === '' || window.location.hash === '#'))) {
     handleRoute();
@@ -217,10 +217,12 @@ function handleRoute() {
     if (!authToken) {
       document.getElementById('auth-view').classList.add('active');
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-      if (hash.includes('login')) {
-        toggleAuthForm('login');
-      } else {
+      // #auth abre o login (o cadastro novo é o modal "Criar Cartão");
+      // o formulário antigo de cadastro só aparece em #register.
+      if (hash.startsWith('#register')) {
         toggleAuthForm('register');
+      } else {
+        toggleAuthForm('login');
       }
     } else {
       navigateTo(currentUser?.is_admin ? 'admin' : 'dashboard');
