@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="CardLink — Reúna serviços, fotos, avaliações, localização, redes sociais e WhatsApp em uma apresentação profissional. Compartilhe por um único link ou QR Code.">
   <title>CardLink — Tudo o que seu cliente precisa ver antes de chamar você</title>
-  <link rel="stylesheet" href="styles-base.css?v=50">
-  <link rel="stylesheet" href="styles-builder.css?v=47">
+  <link rel="stylesheet" href="styles-base.css?v=51">
+  <link rel="stylesheet" href="styles-builder.css?v=48">
   <link rel="stylesheet" href="styles-dashboard.css?v=48">
   <link rel="stylesheet" href="styles-public.css?v=56">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
@@ -581,7 +581,7 @@
               <button class="settings-nav-item" type="button" data-settings-target="gallery" onclick="showSettingsSection('gallery')">Galeria de fotos</button>
               <button class="settings-nav-item" type="button" data-settings-target="testimonials" onclick="showSettingsSection('testimonials')">Avaliações de clientes</button>
               <button class="settings-nav-item" type="button" data-settings-target="social" onclick="showSettingsSection('social')">Redes sociais</button>
-              <button class="settings-nav-item" type="button" data-settings-target="appearance" onclick="showSettingsSection('appearance')">Aparência do site</button>
+              <button class="settings-nav-item" type="button" data-settings-target="appearance" onclick="showSettingsSection('appearance')">Modelo do site</button>
               <button class="settings-nav-item" type="button" data-settings-target="assistant" onclick="showSettingsSection('assistant')" hidden aria-hidden="true">Assistente de conteúdo</button>
             </nav>
             <button class="settings-nav-arrow" id="settings-nav-next" type="button" onclick="scrollSettingsNav(1)" aria-label="Ver mais opções">›</button>
@@ -875,24 +875,37 @@
 
           <!-- Theme -->
           <div class="form-section settings-section" data-settings-section="appearance">
-            <div class="form-section-title"><span class="icon">🎨</span> Aparência do site</div>
-            <div class="theme-grid" id="themeGrid">
-              <div>
-                <div class="theme-swatch active" data-theme="institucional" onclick="selectTheme('institucional')"></div>
-                <div class="theme-label">Institucional</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="pessoal" onclick="selectTheme('pessoal')"></div>
-                <div class="theme-label">Pessoal</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="profissional" onclick="selectTheme('profissional')"></div>
-                <div class="theme-label">Profissional</div>
-              </div>
-              <div>
-                <div class="theme-swatch" data-theme="comercial" onclick="selectTheme('comercial')"></div>
-                <div class="theme-label">Comercial</div>
-              </div>
+            <div class="form-section-title"><span class="icon">🎨</span> Modelo do site</div>
+            <p class="template-picker-intro">Cada modelo muda as cores <strong>e a ordem das seções</strong> da sua página. Escolha um e clique em <strong>Salvar alterações</strong>; depois use <strong>Abrir página</strong> no painel para ver o resultado.</p>
+            <div class="template-picker" id="themeGrid">
+              <button type="button" class="template-option" onclick="selectTheme('institucional')">
+                <span class="theme-swatch active" data-theme="institucional"></span>
+                <span class="template-option-text">
+                  <span class="template-option-name">🏛️ Institucional</span>
+                  <span class="template-option-desc">Contato e informações logo após a apresentação; produtos e fotos depois.</span>
+                </span>
+              </button>
+              <button type="button" class="template-option" onclick="selectTheme('pessoal')">
+                <span class="theme-swatch" data-theme="pessoal"></span>
+                <span class="template-option-text">
+                  <span class="template-option-name">👤 Pessoal</span>
+                  <span class="template-option-desc">Redes sociais e depoimentos em destaque — para marca pessoal e portfólio.</span>
+                </span>
+              </button>
+              <button type="button" class="template-option" onclick="selectTheme('profissional')">
+                <span class="theme-swatch" data-theme="profissional"></span>
+                <span class="template-option-text">
+                  <span class="template-option-name">💼 Profissional</span>
+                  <span class="template-option-desc">Equilibrado, com o botão de ação logo após a descrição.</span>
+                </span>
+              </button>
+              <button type="button" class="template-option" onclick="selectTheme('comercial')">
+                <span class="theme-swatch" data-theme="comercial"></span>
+                <span class="template-option-text">
+                  <span class="template-option-name">🛍️ Comercial</span>
+                  <span class="template-option-desc">Vitrine de produtos e fotos logo no topo, antes da descrição.</span>
+                </span>
+              </button>
             </div>
           </div>
 
