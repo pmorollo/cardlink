@@ -49,6 +49,13 @@ O plano `pro` permanece apenas como **selo visual**:
 - Modal do selo reescrito para deixar explícito que todos os recursos já estão liberados.
 - FAQ, manual e termos atualizados para o modelo único.
 
+### Antiabuso mantido
+
+- Cadastro exige verificação de e-mail antes do login.
+- Uma página por conta: o endpoint de criação atualiza a página existente em vez de abrir outra.
+- Rate limits em autenticação, onboarding, API, upload, recuperação de senha e contato público.
+- Honeypot e validação anti-HTML no formulário público.
+
 ## Testes
 
 Suíte local executada em 20/10/2026:
