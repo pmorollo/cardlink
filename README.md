@@ -65,7 +65,7 @@ Suite padrão:
 npm test
 ```
 
-Na homologação de 18 de setembro de 2026, a suíte local executou **35 testes automatizados com 100% de aprovação**. Após a decisão de modelo único (13/10/2026), a suíte foi atualizada e executou **42 testes com 100% de aprovação** (37 em `smoke.test.js` + 5 em `templates.test.js`). A integração PostgreSQL destrutiva continua devendo usar banco exclusivo de teste quando aplicável.
+Na homologação de 18 de setembro de 2026, a suíte local executou **35 testes automatizados com 100% de aprovação**. Após a decisão de modelo único (13/10/2026), a suíte completa executou **55 testes aprovados, 0 falhas e 1 integração PostgreSQL ignorada** (sem `TEST_PG_URL`), incluindo 37 em `smoke.test.js` e 5 em `templates.test.js`. A integração PostgreSQL destrutiva continua devendo usar banco exclusivo de teste quando aplicável.
 
 Para executar também a integração destrutiva contra PostgreSQL, use **somente um banco exclusivo de teste**:
 

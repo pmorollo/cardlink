@@ -1,6 +1,6 @@
 # CardLink — Modelo único gratuito (decisão de 13/10/2026)
 
-**Status:** implementado no código em 20/10/2026
+**Status:** publicado em produção em 20/10/2026 (`master` `17e0aec`)
 **Decisão do proprietário:** 13/10/2026
 
 ## Decisão
@@ -62,13 +62,22 @@ Suíte local executada em 20/10/2026:
 
 - `smoke.test.js`: 37/37
 - `templates.test.js`: 5/5
-- Total: **42/42**
+- Total: **55 aprovados, 0 falhas; 1 integração PostgreSQL ignorada** (sem `TEST_PG_URL`)
 
 Cobertura nova/ajustada:
 
 - conta gratuita acessa QR, leads, contatos, PDF e galeria de 10 fotos;
 - cancelamento do selo mantém todos os recursos ativos;
 - upload de PDF aceito para conta gratuita.
+
+## Verificação em produção (20/10/2026)
+
+- Deploy no Railway confirmado; `master` em `17e0aec` (PRs #28, #29 e #30).
+- `https://cardlink.digitalnexoapp.com/` → HTTP 200; HTML servido idêntico ao `index.html` da `master`.
+- `/api/health` → 200 com `database: ok` e `email: configured`.
+- `service-worker.js` em `cardlink-v42`; scripts com versões novas para evitar cache antigo.
+- Carrossel com 8 slides; removidos os slides cujas imagens tinham preço ou chamada de assinatura.
+- Nenhum preço, “assinar” ou “Recurso Exclusivo” visível na landing; modal do Selo PRO oculto e acessível apenas pela função do painel.
 
 ## O que não muda
 
