@@ -739,7 +739,7 @@ async function handleResetPassword() {
 // Único caminho de cadastro anunciado na landing: nome, e-mail, nome do
 // negócio, descrição e template, tudo num único SALVAR. Sem senha e sem
 // confirmação por e-mail — a conta já nasce logada (ver
-// backend/routes/onboarding.js). Mesmo quem for assinar o Pro depois entra
+// backend/routes/onboarding.js). Mesmo quem ativar o Selo PRO depois entra
 // por aqui; a conversão acontece com a conta já criada.
 let quickCreateSelectedTemplate = 'institucional';
 let quickCreateLastSiteUrl = '';
@@ -951,11 +951,11 @@ function selectProModalPlan(plan) {
   if (plan === 'annual') {
     if (a) { a.style.border = '2px solid var(--accent)'; a.style.background = 'rgba(139,92,246,0.12)'; }
     if (m) { m.style.border = '1.5px solid var(--border-subtle)'; m.style.background = ''; }
-    if (btn) btn.textContent = '💳 Pagar R$ 99,00/ano na Cakto';
+    if (btn) btn.textContent = '⭐ Ativar Selo PRO — R$ 99,00/ano';
   } else {
     if (m) { m.style.border = '2px solid var(--accent)'; m.style.background = 'rgba(139,92,246,0.12)'; }
     if (a) { a.style.border = '1.5px solid var(--border-subtle)'; a.style.background = ''; }
-    if (btn) btn.textContent = '💳 Pagar R$ 12,90/mês na Cakto';
+    if (btn) btn.textContent = '⭐ Ativar Selo PRO — R$ 12,90/mês';
   }
 }
 

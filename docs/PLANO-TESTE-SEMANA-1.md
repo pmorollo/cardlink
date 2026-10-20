@@ -1,5 +1,7 @@
 # CardLink — Programa de Testes Operacionais — Semana 1
 
+> **Nota de vigência (20/10/2026):** este é um registro histórico de testes. O modelo Free/Pro descrito abaixo foi substituído em 13/10/2026 pelo modelo único gratuito com todos os recursos liberados e Selo PRO apenas visual. Ver `docs/DECISAO-MODELO-UNICO-2026-10-13.md`.
+
 ## Ponto de situação — 21/08/2026
 
 ### Concluído e validado em produção

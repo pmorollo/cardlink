@@ -7,13 +7,12 @@
 
 **Público:** pequenos negócios, lojas, profissionais liberais, autônomos e prestadores de serviços que precisam organizar sua presença comercial e facilitar o contato com clientes.
 
-**Oferta:**
-- **Free:** R$ 0, página pública ativa e link compartilhável
-- **Pro mensal:** R$ 12,90/mês
-- **Pro anual:** R$ 99,00/ano (equivalente a R$ 8,25/mês)
-- Upgrade Pro via **Cakto**
+**Oferta (decisão de 13/10/2026):**
+- **Versão única gratuita:** R$ 0, todos os recursos liberados
+- **Selo PRO opcional:** R$ 12,90/mês ou R$ 99,00/ano, apenas visual (3 estrelinhas), oferecido somente dentro do painel
+- Sem trial, sem bloqueio funcional e sem indução a assinatura na landing ou em criativos
 
-**Diferenciais comerciais:** serviços/produtos, fotos e portfólio, avaliações, localização, WhatsApp, redes sociais e link compartilhável no Free; QR Code integrado/rastreado, leads/mensagens, PDF e recursos premium no Pro.
+**Diferenciais comerciais:** serviços/produtos, fotos e portfólio, avaliações, localização, WhatsApp, redes sociais, link compartilhável, QR Code integrado/rastreado, leads/mensagens, PDF e todos os temas — disponíveis para todos.
 
 **Mecanismo comercial:**
 > Instagram · Facebook · QR Code → CardLink → WhatsApp

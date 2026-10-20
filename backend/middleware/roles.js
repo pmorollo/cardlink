@@ -1,5 +1,5 @@
 const { users } = require('../db/repository');
-const { hasActiveCustomerAccess, isProCustomer } = require('../utils/subscription');
+const { hasActiveCustomerAccess, hasFullAccess } = require('../utils/subscription');
 
 async function requireAdmin(req, res, next) {
   try {
@@ -45,10 +45,11 @@ async function requirePro(req, res, next) {
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado' });
     }
-    if (!isProCustomer(user)) {
+    // Modelo vigente: todos os clientes ativos têm acesso completo.
+    if (!hasFullAccess(user)) {
       return res.status(403).json({
-        error: 'pro_required',
-        message: 'Este recurso está disponível exclusivamente no Plano Pro.'
+        error: 'access_denied',
+        message: 'Este recurso não está disponível para esta conta.'
       });
     }
     req.currentUser = user;

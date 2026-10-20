@@ -55,7 +55,7 @@ Antes de gerar o ZIP, o script executa uma auditoria do diretório temporário. 
 - PostgreSQL: inicializado e ativo.
 - Cakto: checkouts sincronizados e webhook vinculado.
 - Webhook sem segredo: rejeitado com HTTP 401, conforme esperado.
-- Plano Free: página pública e link permanecem ativos.
-- Plano Pro: QR integrado/rastreado, leads/mensagens, PDF e demais recursos premium.
-- Cancelamento Pro: downgrade para Free, sem retirar a página pública.
+- Modelo vigente (13/10/2026): versão única gratuita com todos os recursos liberados.
+- Selo PRO: opcional, apenas visual (3 estrelinhas), sem bloquear ou limitar recursos.
+- Cancelamento/estorno do selo: remove o selo; a conta e todos os recursos continuam ativos.
 - Armazenamento atual de uploads: volume persistente Railway; R2 ainda não configurado.

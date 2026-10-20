@@ -620,10 +620,10 @@ O volume Railway atual não possui backup automático documentado. Esta é uma p
 ### 17.1 Portões antes de mídia paga
 
 1. Confirmar que Railway entrega o commit atual de `master` pelo domínio oficial.
-2. Executar cadastro Free real e validar edição → publicação → link público.
-3. Validar que recursos Pro permanecem bloqueados no Free.
-4. Executar compra controlada do Pro e validar checkout → webhook → privilégios Pro.
-5. Validar downgrade Pro → Free sem retirar a página pública.
+2. Executar cadastro gratuito real e validar edição → publicação → link público.
+3. Validar QR, mensagens/leads, PDF e todos os temas em uma conta gratuita.
+4. Executar compra controlada do Selo PRO e validar checkout → webhook → selo visual.
+5. Validar cancelamento/estorno do selo sem perda de recursos e sem retirar a página pública.
 6. Configurar e validar mensuração do funil antes de investir em anúncios.
 
 ### 17.2 Backlog técnico recomendado
@@ -658,7 +658,7 @@ Evoluções de produto, somente após estabilidade:
 ## 18. Regras para futuros desenvolvedores
 
 1. Preservar a definição do produto como site profissional.
-2. Preservar o modelo Free/Pro vigente; mudanças de limites ou recursos exigem decisão expressa do proprietário.
+2. Preservar o modelo único gratuito com todos os recursos (decisão de 13/10/2026); o plano Pro é apenas selo visual. Mudanças de escopo exigem decisão expressa do proprietário.
 3. Não liberar acesso por retorno do checkout; usar webhook validado.
 4. Não expor segredos em código, logs, commits, screenshots ou documentos.
 5. Não alterar pagamento, banco, domínio e frontend no mesmo deployment sem necessidade.
@@ -736,9 +736,9 @@ O responsável pela mudança técnica deve atualizar a documentação no mesmo p
 
 - **Card:** registro técnico que representa a página pública de um usuário.
 - **Slug:** parte única da URL pública do assinante.
-- **FREE:** conta com editor, página pública e link ativos.
-- **PRO/ACTIVE:** conta com assinatura válida e recursos premium.
-- **PENDING:** estado transitório de pagamento/ativação quando aplicável.
+- **FREE/ACTIVE:** conta ativa com editor, página pública, link e todos os recursos liberados.
+- **PRO/SELO:** estado cosmético opcional com 3 estrelinhas; não altera funcionalidades.
+- **PENDING:** estado transitório de ativação de conta criada via Cakto, quando aplicável.
 - **Internal test:** conta operacional sem venda, excluída das métricas comerciais.
 - **QR scan:** abertura pela rota de QR; métrica separada de visualização.
 - **Webhook:** notificação servidor a servidor usada como fonte de verdade do pagamento.

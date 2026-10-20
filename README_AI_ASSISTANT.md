@@ -1,5 +1,9 @@
 # CardLink — Assistente de conteúdo
 
+# CardLink — Assistente de conteúdo
+
+> **Fora da oferta comercial atual.** O Assistente permanece oculto e não integra a versão única gratuita. Este documento descreve apenas o código preservado para um subprojeto futuro. Ver `docs/DECISAO-MODELO-UNICO-2026-10-13.md`.
+
 O Assistente de conteúdo é uma ferramenta textual exclusiva da área autenticada do assinante PRO. Não utiliza skills ou perfis de tom nesta versão.
 
 ## Funcionamento

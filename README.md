@@ -34,10 +34,10 @@ Abra `http://localhost:3000`.
 ## Modelo de acesso
 
 - Existe cadastro público gratuito.
-- O plano **Free** permite criar, editar, publicar e compartilhar a página pública do CardLink.
-- O plano **Pro** adiciona recursos premium, incluindo QR integrado/rastreado, leads/mensagens, PDF e limites ampliados.
-- A Cakto é a fonte de verdade para ativação e manutenção dos privilégios Pro.
-- Cancelamento/estorno/chargeback do Pro rebaixa a conta para **Free**; a página pública e o link permanecem ativos.
+- **Modelo vigente (decisão de 13/10/2026): versão única gratuita, com todos os recursos liberados.**
+- QR Code/rastreamento, mensagens/leads, catálogo em PDF, galeria ampliada e todos os temas estão disponíveis para qualquer conta ativa.
+- O plano `pro` permanece apenas como **selo visual** (3 estrelinhas). O selo é opcional, oferecido somente dentro do painel, e não bloqueia, limita ou altera nenhuma funcionalidade.
+- A Cakto processa exclusivamente o apoio opcional do Selo PRO. Cancelamento/estorno/chargeback remove o selo; a conta e todos os recursos continuam ativos.
 - Existe uma conta administrativa separada, sem assinatura e sem site público.
 - Contas internas de teste usam `subscription_source=internal_test` e não são contabilizadas como vendas.
 
@@ -65,7 +65,7 @@ Suite padrão:
 npm test
 ```
 
-Na homologação de 18 de setembro de 2026, a suíte local executou **35 testes automatizados com 100% de aprovação**. A integração PostgreSQL destrutiva continua devendo usar banco exclusivo de teste quando aplicável.
+Na homologação de 18 de setembro de 2026, a suíte local executou **35 testes automatizados com 100% de aprovação**. Após a decisão de modelo único (13/10/2026), a suíte foi atualizada e executou **42 testes com 100% de aprovação** (37 em `smoke.test.js` + 5 em `templates.test.js`). A integração PostgreSQL destrutiva continua devendo usar banco exclusivo de teste quando aplicável.
 
 Para executar também a integração destrutiva contra PostgreSQL, use **somente um banco exclusivo de teste**:
 
@@ -75,7 +75,7 @@ TEST_PG_URL=postgres://usuario:senha@127.0.0.1:5432/cardlink_test npm test
 
 O workflow `.github/workflows/tests.yml` cria um PostgreSQL temporário e executa a suite completa em pull requests e por acionamento manual.
 
-Coberturas relevantes incluem: cadastro Free, isolamento admin/cliente, upgrade e downgrade Free/Pro, conta interna de teste, cancelamento, verificação e troca de e-mail, recuperação de senha, CORS, proteção de segredos, contatos/leads Pro, mensagens administrativas, métricas e QR Code.
+Coberturas relevantes incluem: cadastro gratuito, isolamento admin/cliente, acesso completo a QR/leads/PDF/temas, selo PRO cosmético, conta interna de teste, cancelamento sem perda de recursos, verificação e troca de e-mail, recuperação de senha, CORS, proteção de segredos, mensagens administrativas, métricas e QR Code.
 
 Auditoria de dependências usada no fechamento:
 
@@ -131,10 +131,10 @@ A `master` é a referência da versão corrente. Em **18/09/2026**, o serviço d
 
 Antes de abrir mídia paga:
 
-1. concluir um teste funcional real de cadastro Free → edição → publicação → link público;
-2. validar upgrade Pro com compra controlada na Cakto;
-3. confirmar webhook → privilégios Pro e depois downgrade Pro → Free sem derrubar a página;
-4. validar QR, leads/mensagens e PDF no Pro;
+1. concluir um teste funcional real de cadastro gratuito → edição → publicação → link público;
+2. validar QR, leads/mensagens, PDF e temas com uma conta gratuita;
+3. validar o selo PRO opcional na Cakto (compra controlada) e confirmar que ele não altera funcionalidades;
+4. confirmar cancelamento/estorno do selo sem perda de acesso ou derrubada da página;
 5. manter monitoramento do volume persistente de uploads enquanto R2 não estiver configurado.
 
 Mais detalhes: `docs/README.md`, `docs/DIRETRIZES-PRODUTO-MARKETING.md` e `docs/PLANO-TESTE-SEMANA-1.md`.

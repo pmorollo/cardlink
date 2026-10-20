@@ -609,12 +609,6 @@ async function saveCard() {
 // Theme
 // ============================================
 function selectTheme(theme) {
-  const isPro = currentUser && !currentUser.is_admin && currentUser.plan === 'pro';
-  if (!isPro && (theme === 'sunset' || theme === 'forest')) {
-    showToast('⭐', 'Os temas Sunset e Executivo são exclusivos do Plano Pro (R$ 12,90/mês). Faça o upgrade!');
-    openProPaymentModal();
-    return;
-  }
   currentTheme = theme;
   document.querySelectorAll('.theme-swatch').forEach(s => {
     s.classList.toggle('active', s.dataset.theme === theme);
