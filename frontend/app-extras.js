@@ -2,13 +2,6 @@
 // Contacts View
 // ============================================
 async function viewContacts(cardId, cardName) {
-  const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' &&
-    (currentUser.subscription_status || 'active') === 'active' && (currentUser.account_status || 'active') === 'active';
-  if (!isProUser) {
-    showToast('⭐', 'Mensagens e captura de leads estão disponíveis no Plano Pro.');
-    openProPaymentModal();
-    return;
-  }
   const nameEl = document.getElementById('contacts-card-name');
   const list   = document.getElementById('contacts-list');
   const count  = document.getElementById('contacts-count');
@@ -203,15 +196,9 @@ function addGallerySlot(existingUrl = '') {
   const grid = document.getElementById('gallery-upload-grid');
   if (!grid) return;
 
-  const isPro = currentUser && !currentUser.is_admin && currentUser.plan === 'pro';
-  const maxSlots = isPro ? 10 : 4;
+  const maxSlots = 10;
   if (!existingUrl && galleryUrls.length >= maxSlots) {
-    if (!isPro) {
-      showToast('⭐', 'O Plano Gratuito permite até 4 fotos. Assine o Pro para até 10 fotos!');
-      openProPaymentModal();
-    } else {
-      showToast('⚠️', 'Limite máximo de 10 fotos atingido.');
-    }
+    showToast('⚠️', 'Limite máximo de 10 fotos atingido.');
     return;
   }
 
@@ -268,14 +255,7 @@ async function handleGalleryPhotoUpload(input, idx) {
   const file = input.files[0];
   if (!file) return;
 
-  const isPro = currentUser && !currentUser.is_admin && currentUser.plan === 'pro';
   const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-  if (isPdf && !isPro) {
-    showToast('⭐', 'O upload de PDF na galeria é exclusivo do Plano Pro.');
-    openProPaymentModal();
-    input.value = '';
-    return;
-  }
 
   const slot = document.getElementById(`gallery-slot-${idx}`);
 

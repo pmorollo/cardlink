@@ -127,10 +127,6 @@ router.post('/', authMiddleware, requireCustomer, uploadLimiter, upload.single('
     const ext = safeUploadExtension(req.file);
     if (!ext) return res.status(400).json({ error: 'Tipo de arquivo inválido' });
     const isPdf = ext === '.pdf';
-    if (isPdf && req.currentUser?.plan !== 'pro') {
-      removeLocalUpload(req.file);
-      return res.status(403).json({ error: 'O upload de catálogo em PDF está disponível exclusivamente no Plano Pro.' });
-    }
     const realMime = detectedMime(readUploadBytes(req.file));
     if (realMime !== req.file.mimetype) {
       removeLocalUpload(req.file);

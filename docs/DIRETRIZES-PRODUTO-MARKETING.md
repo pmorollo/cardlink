@@ -41,41 +41,38 @@ O produto atende à necessidade de colocar uma loja, negócio ou atividade profi
 
 ## 3. Modelo de negócio
 
-O CardLink é **um único SaaS centralizado** com dois níveis de uso: **Free** e **Pro**. O aplicativo não é copiado para cada cliente.
+O CardLink é **um único SaaS centralizado** com **versão única gratuita**. O aplicativo não é copiado para cada cliente.
 
-### Plano Free — base funcional permanente
+**Decisão vigente (13/10/2026): todos os recursos são gratuitos e liberados para qualquer conta ativa.** Não há trial, não há bloqueio funcional e não há indução a assinatura na landing page ou em criativos.
 
-O usuário pode criar uma conta gratuitamente, sem cartão de crédito, e utilizar o núcleo do produto:
+### Versão gratuita — base funcional completa
+
+O usuário cria uma conta gratuitamente, sem cartão de crédito, e utiliza o produto completo:
 
 - criar e editar sua página profissional;
-- manter a página pública online;
-- compartilhar o link público;
+- manter a página pública online e compartilhar o link;
 - exibir WhatsApp, telefone, e-mail, endereço e redes sociais;
-- publicar produtos/serviços e até 4 fotos na galeria;
-- usar os temas gratuitos disponíveis.
-
-O Free **não inclui** captura de leads pelo formulário CardLink, painel de mensagens recebidas, QR Code integrado/rastreado, catálogo PDF, galeria ampliada, temas premium nem outros recursos identificados como Pro.
-
-### Plano Pro — R$ 12,90/mês ou plano anual vigente
-
-O Pro inclui tudo do Free e libera, entre outros recursos premium:
-
+- publicar produtos/serviços e galeria ampliada;
+- usar todos os temas disponíveis;
 - QR Code integrado com rastreamento;
 - formulário público de mensagens/leads e painel de contatos;
-- catálogo/cardápio em PDF;
-- galeria ampliada;
-- temas premium;
-- assistente de conteúdo e demais funcionalidades identificadas como Pro.
+- catálogo/cardápio em PDF.
 
-Fluxo comercial definido:
+### Selo PRO — opcional e apenas visual
 
-1. Visitante pode criar conta Free diretamente na landing page.
-2. O usuário cria, edita, publica e compartilha seu CardLink pelo link público.
-3. Quando desejar recursos premium, escolhe o Pro e realiza o pagamento pela Cakto.
-4. A Cakto confirma o pagamento e envia webhook ao CardLink.
-5. O CardLink promove a conta existente para Pro ou cria a conta Pro quando a compra ocorrer antes do cadastro.
-6. Enquanto o pagamento Pro estiver válido, os recursos premium ficam liberados.
-7. Em cancelamento, estorno ou chargeback do Pro, a conta **volta para o Free**; a página pública e o link permanecem ativos, enquanto os recursos premium são desabilitados.
+O selo PRO é uma oferta **opcional, apresentada somente dentro do painel**. Ele adiciona **3 estrelinhas de status visual** ao perfil e **não bloqueia, limita ou altera nenhuma funcionalidade**.
+
+- Mensal: R$ 12,90; anual: R$ 99,00, processados pela Cakto.
+- O selo não é pré-requisito para nada e não deve ser promovido na landing page ou em anúncios.
+- Em cancelamento, estorno ou chargeback, o selo é removido; a conta e todos os recursos continuam ativos.
+
+Fluxo vigente:
+
+1. Visitante cria conta gratuita pela landing page ou pelo CTA "Criar Cartão".
+2. O usuário cria, edita, publica e compartilha seu CardLink com todos os recursos.
+3. Se quiser apoiar o projeto, pode ativar o Selo PRO dentro do painel.
+4. A Cakto confirma o apoio e envia webhook ao CardLink; o selo é exibido.
+5. Cancelamento/estorno remove apenas o selo, sem afetar a conta, a página ou os recursos.
 
 ## 4. Papéis da plataforma
 
@@ -88,12 +85,12 @@ Fluxo comercial definido:
 - Gerencia usuários, assinaturas, pagamentos, mensagens/suporte e indicadores do negócio.
 - Se o proprietário da plataforma quiser publicar um site para um negócio próprio, deverá usar uma segunda conta comum de cliente.
 
-### Cliente Free ou Pro
+### Cliente (conta única)
 
 - Conta comum de usuário, sem acesso administrativo.
-- No Free, cria, edita, publica e compartilha a página pelo link público.
-- No Pro, mantém os recursos do Free e recebe as funcionalidades premium contratadas.
-- Cancelar o Pro não apaga nem derruba a página: a conta retorna ao Free.
+- Cria, edita, publica e compartilha a página pelo link público com todos os recursos liberados.
+- Pode ativar o Selo PRO opcional, que é apenas visual e não altera funcionalidades.
+- Cancelar o selo não apaga, não derruba e não limita a página nem a conta.
 
 
 ## 4.1. Contas internas de teste

@@ -1,10 +1,8 @@
 const express = require('express');
 const slugify = require('slugify');
-const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('../db/repository');
+const { cards: cardRepo, contacts: contactRepo } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
 const { requireCustomer } = require('../middleware/roles');
-const { isProCustomer } = require('../utils/subscription');
-const { FREE_THEMES } = require('../utils/themes');
 const { getTemplateByKey } = require('../utils/template-catalog');
 
 const router = express.Router();
@@ -87,8 +85,8 @@ router.get('/stats/summary', authMiddleware, requireCustomer, async (req, res) =
     return res.json({ hasCard: false, card: null, stats: { views: 0, contacts: 0, qrScans: 0 } });
   }
 
-  const isPro = isProCustomer(req.currentUser);
-  const contactList = isPro ? await contactRepo.findByCardId(card.id) : [];
+  // Modelo vigente: todos os clientes ativos têm acesso completo.
+  const contactList = await contactRepo.findByCardId(card.id);
   contactList.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   res.json({
@@ -96,12 +94,12 @@ router.get('/stats/summary', authMiddleware, requireCustomer, async (req, res) =
     card,
     stats: {
       views: card.views_count || 0,
-      contacts: isPro ? contactList.length : 0,
+      contacts: contactList.length,
       qrScans: card.qr_scans_count || 0,
-      recentContacts: isPro ? contactList.slice(0, 5) : []
+      recentContacts: contactList.slice(0, 5)
     },
     features: {
-      contacts: isPro,
+      contacts: true,
       qr: true,
       catalog_pdf: true
     }
@@ -120,22 +118,13 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
     return res.status(400).json({ error: 'Nome é obrigatório' });
   }
 
-  const user = req.currentUser || await userRepo.findById(req.userId);
-  const isPro = user && user.plan === 'pro';
-
   let productsToSave = req.body.products;
   let galleryToSave = req.body.gallery;
-  if (Array.isArray(galleryToSave) && !isPro && galleryToSave.length > 4) {
-    galleryToSave = galleryToSave.slice(0, 4);
-  }
 
   const template = resolveTemplateInput(req.body.template_key);
   const templateKeyToSave = req.body.template_key !== undefined ? (template?.template_key || null) : undefined;
 
   let themeToSave = template?.theme_key || req.body.theme;
-  if (themeToSave && !isPro && !FREE_THEMES.has(themeToSave)) {
-    themeToSave = 'midnight';
-  }
 
   let catalogPdfUrlToSave = req.body.catalog_pdf_url;
   let catalogPdfTitleToSave = req.body.catalog_pdf_title;
@@ -250,21 +239,12 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
     slug = await generateUniqueSlug(req.body.name, card.id);
   }
 
-  const user = req.currentUser || await userRepo.findById(req.userId);
-  const isPro = user && user.plan === 'pro';
-
   let galleryToSave = req.body.gallery !== undefined ? req.body.gallery : card.gallery;
-  if (Array.isArray(galleryToSave) && !isPro && galleryToSave.length > 4) {
-    galleryToSave = galleryToSave.slice(0, 4);
-  }
 
   const template = req.body.template_key !== undefined ? resolveTemplateInput(req.body.template_key) : null;
   const templateKeyToSave = req.body.template_key !== undefined ? (template?.template_key || null) : undefined;
 
   let themeToSave = template?.theme_key || (req.body.theme !== undefined ? req.body.theme : card.theme);
-  if (themeToSave && !isPro && !FREE_THEMES.has(themeToSave)) {
-    themeToSave = 'midnight';
-  }
 
   let catalogPdfUrlToSave = req.body.catalog_pdf_url !== undefined ? req.body.catalog_pdf_url : card.catalog_pdf_url;
   let catalogPdfTitleToSave = req.body.catalog_pdf_title !== undefined ? req.body.catalog_pdf_title : card.catalog_pdf_title;

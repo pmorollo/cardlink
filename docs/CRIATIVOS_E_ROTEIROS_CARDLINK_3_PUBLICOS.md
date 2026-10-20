@@ -151,4 +151,4 @@ Para que o teste dos 3 públicos seja 100% mensurável, utilize a parametrizaç�
 3. **CardCreated:** Criação dos primeiros dados do cartão.
 4. **CardPublished:** Página publicada e colocada no ar.
 5. **CardShared / QRScanned:** Página compartilhada ou QR Code escaneado.
-6. **InitiateCheckout / Purchase:** Assinatura do upgrade Pro.
+6. **Selo PRO (opcional, somente no painel):** não deve ser promovido em criativos. Se houver mensuração interna, separar como evento de apoio, nunca como condição de uso.

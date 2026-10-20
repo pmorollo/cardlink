@@ -194,7 +194,7 @@
           </div>
           <div class="feature-card animate-in">
             <div class="feature-icon">🎨</div>
-            <h3>6 Temas Premium</h3>
+            <h3>6 Temas exclusivos</h3>
             <p>Escolha entre temas elegantes: Midnight, Mel Claro, Sunset, Executivo Premium, Rose e Monochrome.</p>
           </div>
           <div class="feature-card animate-in">
@@ -347,7 +347,7 @@
       </div>
     </footer>
 
-    <a class="cardlink-support-whatsapp" href="https://wa.me/5511994551249?text=Ol%C3%A1%21%20Tenho%20uma%20d%C3%BAvida%20sobre%20o%20CardLink%20antes%20de%20assinar." target="_blank" rel="noopener" aria-label="Tirar dúvidas sobre o CardLink pelo WhatsApp">
+    <a class="cardlink-support-whatsapp" href="https://wa.me/5511994551249?text=Ol%C3%A1%21%20Tenho%20uma%20d%C3%BAvida%20sobre%20o%20CardLink." target="_blank" rel="noopener" aria-label="Tirar dúvidas sobre o CardLink pelo WhatsApp">
       <span class="cardlink-support-whatsapp-icon" aria-hidden="true">💬</span>
       <span>Dúvidas? Fale conosco</span>
     </a>
@@ -909,18 +909,6 @@
             </div>
           </div>
 
-          <!-- PRO Lock Section -->
-          <div class="form-section settings-section" data-settings-section="pro-lock" style="text-align:center;padding:40px 20px;background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);margin-bottom:var(--space-xl);">
-            <div style="font-size:3rem;margin-bottom:15px;">🔒</div>
-            <h3 style="font-size:1.4rem;color:var(--text-primary);margin-bottom:10px;" id="pro-lock-title">Recurso Exclusivo PRO</h3>
-            <p style="color:var(--text-secondary);font-size:0.95rem;line-height:1.6;margin-bottom:25px;max-width:400px;margin-left:auto;margin-right:auto;" id="pro-lock-desc">
-              Esta é uma funcionalidade premium do CardLink. Assine o plano PRO por apenas R$ 12,90/mês para desbloquear!
-            </p>
-            <button class="btn btn-primary" type="button" onclick="openProPaymentModal()" style="padding:12px 24px;font-size:1rem;font-weight:bold;margin:0 auto;">
-              Assinar Plano PRO — R$ 12,90/mês
-            </button>
-          </div>
-
           <!-- Generate Buttons -->
           <div class="generate-section">
             <button class="btn btn-primary btn-lg" onclick="saveCard()" id="generate-btn">
@@ -1259,7 +1247,7 @@
       
       <div class="form-group" style="margin-bottom:var(--space-md);">
         <label class="form-label" for="support-subject">Assunto</label>
-        <input class="form-input" type="text" id="support-subject" placeholder="Ex: Problema com imagens, dúvida sobre assinatura...">
+        <input class="form-input" type="text" id="support-subject" placeholder="Ex: Problema com imagens, dúvida sobre o selo PRO...">
       </div>
       <div class="form-group" style="margin-bottom:var(--space-md);">
         <label class="form-label" for="support-message">Mensagem *</label>
@@ -1273,40 +1261,39 @@
     </div>
   </div>
 
-  <!-- Modal de Assinatura CardLink -->
+  <!-- Modal do Selo PRO (opcional, somente dentro do painel) -->
   <div class="modal-overlay" id="pro-payment-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;">
     <div class="builder-form-panel" style="max-width:440px;width:90%;max-height:90vh;margin:10vh auto;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:var(--space-lg);text-align:center;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;text-align:left;">
-        <h2 class="builder-title" style="margin-bottom:0;font-size:1.25rem;"><span class="icon">👑</span> Plano <span class="text-gradient">Único</span></h2>
+        <h2 class="builder-title" style="margin-bottom:0;font-size:1.25rem;"><span class="icon">⭐</span> Selo <span class="text-gradient">PRO</span></h2>
         <button type="button" onclick="closeProPaymentModal()" style="background:none;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
       </div>
       
       <p style="color:var(--text-secondary);font-size:0.88rem;line-height:1.6;margin-bottom:20px;text-align:left;">
-        Assine o CardLink para reunir em uma apresentação profissional seus serviços, fotos, avaliações, contatos, redes sociais e WhatsApp, com divulgação por link ou QR Code.
+        O CardLink é <strong>gratuito</strong> e <strong>todos os recursos já estão liberados</strong>. O Selo PRO é apenas um apoio visual: <strong>3 estrelinhas</strong> no seu perfil. Nenhuma funcionalidade é bloqueada ou alterada.
       </p>
       
       <div style="background:rgba(139,92,246,0.06);border:1.5px dashed rgba(139,92,246,0.2);border-radius:var(--radius-lg);padding:16px;margin-bottom:16px;">
-        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--purple);font-weight:bold;margin-bottom:8px;">Valor da Assinatura</div>
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--purple);font-weight:bold;margin-bottom:8px;">Apoio opcional</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;" id="pro-modal-plans">
           <div id="pro-plan-m" onclick="selectProModalPlan('monthly')" style="border:2px solid var(--accent);border-radius:10px;padding:10px 8px;cursor:pointer;transition:all 0.2s;">
             <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-secondary);">Mensal</div>
             <div style="font-size:1.25rem;font-weight:800;color:var(--text-primary);">R$ 12,90<span style="font-size:0.65rem;font-weight:400;">/mês</span></div>
           </div>
-          <div id="pro-plan-a" onclick="selectProModalPlan('annual')" style="border:1.5px solid var(--border-subtle);border-radius:10px;padding:10px 8px;cursor:pointer;position:relative;transition:all 0.2s;">
-            <span style="position:absolute;top:-8px;right:6px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.55rem;font-weight:800;padding:2px 6px;border-radius:8px;text-transform:uppercase;">-36% OFF</span>
+          <div id="pro-plan-a" onclick="selectProModalPlan('annual')" style="border:1.5px solid var(--border-subtle);border-radius:10px;padding:10px 8px;cursor:pointer;transition:all 0.2s;">
             <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-secondary);">Anual</div>
             <div style="font-size:1.25rem;font-weight:800;color:var(--text-primary);">R$ 99,00<span style="font-size:0.65rem;font-weight:400;">/ano</span></div>
           </div>
         </div>
-        <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;" id="pro-modal-note">Mensal: R$ 12,90/mês · Anual: R$ 99,00/ano (equivalente a R$ 8,25/mês, economize R$ 55,80/ano).</div>
+        <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;" id="pro-modal-note">O selo não altera nenhum recurso. Você pode continuar usando tudo gratuitamente.</div>
       </div>
       
       <div style="display:flex;flex-direction:column;gap:12px;">
         <button class="btn btn-primary" onclick="redirectToProCheckout()" style="width:100%;padding:12px;font-size:0.95rem;font-weight:bold;text-align:center;" id="pro-modal-checkout-btn">
-          💳 Pagar R$ 12,90/mês na Cakto
+          ⭐ Ativar Selo PRO — R$ 12,90/mês
         </button>
         <button class="btn btn-secondary" onclick="closeProPaymentModal()" style="width:100%;">
-          Voltar depois
+          Continuar sem o selo
         </button>
       </div>
     </div>
@@ -1351,7 +1338,7 @@
         
         <div>
           <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>🛠️</span> Passo 1: Criar conta e primeiro acesso</h3>
-          <p style="margin:0;">Você pode criar uma conta <strong>Free</strong> diretamente, sem cartão de crédito, e publicar sua página pelo link. Se optar pelo <strong>Pro</strong>, o pagamento é confirmado pela Cakto e os recursos premium são liberados na sua conta. Compras Pro iniciadas antes do cadastro seguem o fluxo seguro de ativação por e-mail.</p>
+          <p style="margin:0;">Crie sua conta gratuitamente, sem cartão de crédito, e publique sua página pelo link. <strong>Todos os recursos já estão liberados.</strong> O Selo PRO é opcional, apenas visual (3 estrelinhas), e não altera nenhuma funcionalidade.</p>
         </div>
 
         <div>
@@ -1379,16 +1366,16 @@
         </div>
 
         <div>
-          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>📱</span> Passo 4: Compartilhamento e QR Code Pro</h3>
+          <h3 style="color:var(--text-primary);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>📱</span> Passo 4: Compartilhamento e QR Code</h3>
           <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;">
             <li><strong>Link Único:</strong> Copie o link exclusivo do seu CardLink para divulgar nas redes sociais, mensagens e materiais promocionais.</li>
-            <li><strong>QR Code Pro:</strong> no Plano Pro, abra a miniatura no painel para usar o QR integrado e acompanhar os escaneamentos. Ideal para balcão e materiais físicos.</li>
+            <li><strong>QR Code:</strong> abra a miniatura no painel para usar o QR Code e acompanhar os escaneamentos. Ideal para balcão e materiais físicos.</li>
           </ul>
         </div>
 
         <div style="background:rgba(124,58,237,0.06);border:1px dashed rgba(124,58,237,0.25);border-radius:var(--radius-lg);padding:14px;">
           <h3 style="color:var(--purple);font-size:1.05rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;margin-top:0;"><span>🚀</span> Passo 5: Publicação e uso</h3>
-          <p style="margin:0;font-size:0.88rem;">No Free, monte sua apresentação, revise as informações e compartilhe o link público. No Pro, você mantém a página e adiciona QR Code integrado, mensagens/leads, PDF e demais recursos premium.</p>
+          <p style="margin:0;font-size:0.88rem;"><strong>Todos os recursos estão liberados:</strong> monte sua apresentação, revise as informações e compartilhe o link público. QR Code, mensagens/leads, PDF e galeria ampliada estão disponíveis para todos.</p>
         </div>
 
       </div>
@@ -1425,16 +1412,16 @@
       
       <div class="legal-content" style="line-height:1.8;font-size:0.95rem;display:flex;flex-direction:column;gap:20px;text-align:left;">
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">1. Aceitação dos Termos</h3>
-        <p style="color:var(--text-secondary);">Ao criar uma conta Free, contratar o Pro ou utilizar o CardLink, você concorda com estes Termos de Uso. Se você não concorda com qualquer parte destes termos, não deve utilizar a plataforma.</p>
+        <p style="color:var(--text-secondary);">Ao criar uma conta ou utilizar o CardLink, você concorda com estes Termos de Uso. Se você não concorda com qualquer parte destes termos, não deve utilizar a plataforma.</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">2. Cadastro e Responsabilidade da Conta</h3>
-        <p style="color:var(--text-secondary);">Para utilizar o CardLink, o usuário deve fornecer dados válidos no cadastro e, quando contratar o Pro, no pagamento. A senha é pessoal e intransferível. O usuário é responsável pelas atividades e conteúdos publicados sob seu login e link público.</p>
+        <p style="color:var(--text-secondary);">Para utilizar o CardLink, o usuário deve fornecer dados válidos no cadastro. A senha é pessoal e intransferível. O usuário é responsável pelas atividades e conteúdos publicados sob seu login e link público.</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">3. Uso Permitido e Conteúdo</h3>
         <p style="color:var(--text-secondary);">É expressamente proibido utilizar o CardLink para publicar ou transmitir conteúdos ilegais, difamatórios, abusivos, ameaçadores, fraudulentos ou de cunho sexual explícito. O uso da plataforma para a prática de SPAM ou envio em massa de mensagens não autorizadas também resultará no banimento imediato da conta.</p>
         
-        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Planos e Assinatura CardLink</h3>
-        <p style="color:var(--text-secondary);">O CardLink possui Plano Free e Plano Pro. O Free mantém a página pública e o link compartilhável sem cobrança. O Pro adiciona funcionalidades premium e pode ser contratado nas opções mensal ou anual apresentadas no checkout, com pagamento processado pela Cakto. Em caso de cancelamento, estorno ou chargeback do Pro, a conta retorna ao Free e a página pública permanece ativa, enquanto os recursos premium são desabilitados.</p>
+        <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">4. Gratuidade e Selo PRO</h3>
+        <p style="color:var(--text-secondary);">O CardLink é gratuito e todos os recursos estão liberados para todos os usuários. Existe um <strong>Selo PRO opcional</strong>, oferecido apenas dentro do painel, que adiciona 3 estrelinhas de status visual ao perfil. O Selo PRO não bloqueia, limita ou altera nenhuma funcionalidade. O apoio é processado pela Cakto; em caso de cancelamento, estorno ou chargeback, o selo é removido e a conta continua ativa com todos os recursos.</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">5. Alterações nos Termos</h3>
         <p style="color:var(--text-secondary);">O CardLink reserva-se o direito de atualizar estes termos a qualquer momento. Modificações substanciais serão notificadas aos usuários ou publicadas com destaque em nosso website.</p>
@@ -1460,7 +1447,7 @@
         <p style="color:var(--text-secondary);">Coletamos os dados necessários para o fornecimento dos nossos serviços, incluindo seu nome, endereço de e-mail e senha criptografada. Também processamos e armazenamos quaisquer conteúdos que você insira ativamente no seu site profissional (ex: links de redes sociais, fotos, produtos, avaliações).</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">2. Finalidade do Tratamento de Dados (LGPD)</h3>
-        <p style="color:var(--text-secondary);">Seus dados são tratados para operar o CardLink, incluindo autenticação, geração e exibição pública da página profissional e gestão da conta. Para usuários Pro, o tratamento também pode abranger mensagens/leads recebidos pelo formulário e a gestão da assinatura Pro.</p>
+        <p style="color:var(--text-secondary);">Seus dados são tratados para operar o CardLink, incluindo autenticação, geração e exibição pública da página profissional, gestão da conta e mensagens/leads recebidos pelo formulário. Para usuários que ativam o Selo PRO, o tratamento também abrange a gestão desse apoio opcional.</p>
         
         <h3 style="font-size:1.15rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:5px;">3. Compartilhamento de Dados</h3>
         <p style="color:var(--text-secondary);">O CardLink não vende ou aluga seus dados a terceiros. Compartilhamos dados somente quando necessário para operar a plataforma, incluindo o processador de pagamentos Cakto, serviços de e-mail transacional e provedores de infraestrutura indispensáveis ao funcionamento do serviço.</p>

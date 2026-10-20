@@ -582,7 +582,7 @@ test('assistente usa NVIDIA como redundancia quando Gemini falha', async () => {
   }
 });
 
-test('cancelamento Cakto rebaixa Pro para Free e mantém a página pública ativa', async () => {
+test('cancelamento Cakto remove o selo e mantém todos os recursos ativos', async () => {
   const email = 'cancelado@example.com';
   const { token } = await payAndActivate(email, 'Cliente Cancelado');
 
@@ -600,12 +600,12 @@ test('cancelamento Cakto rebaixa Pro para Free e mantém a página pública ativ
 
   const oldTokenAccess = await api('GET', '/api/cards/stats/summary', null, token);
   assert.equal(oldTokenAccess.status, 200);
-  assert.equal(oldTokenAccess.data.features.contacts, false);
+  assert.equal(oldTokenAccess.data.features.contacts, true);
   assert.equal(oldTokenAccess.data.features.qr, true);
 
   const publicAfterCancel = await api('GET', `/api/public/${card.data.slug}`);
   assert.equal(publicAfterCancel.status, 200);
-  assert.equal(publicAfterCancel.data.features.contact_form, false);
+  assert.equal(publicAfterCancel.data.features.contact_form, true);
 
   const relogin = await login(email, 'SenhaCliente123!');
   assert.equal(relogin.status, 200);
@@ -908,7 +908,7 @@ test('login cria cookie HttpOnly e frontend nao persiste JWT em localStorage', a
   assert.equal(frontendJs.includes("localStorage.getItem('cardlink_token'"), false);
 });
 
-test('pagina publica e link funcionam no Free; leads e QR rastreado são Pro', async () => {
+test('pagina publica, leads e QR funcionam para todos os clientes ativos', async () => {
   const free = await users.insert({
     name: 'Cliente Free', email: 'free-public@example.com', whatsapp: null,
     password_hash: await bcrypt.hash('SenhaFree123!', 10), is_admin: false, plan: 'free',
@@ -922,10 +922,13 @@ test('pagina publica e link funcionam no Free; leads e QR rastreado são Pro', a
 
   const freePublic = await api('GET', `/api/public/${freeCard.data.slug}`);
   assert.equal(freePublic.status, 200);
-  assert.equal(freePublic.data.features.contact_form, false);
-  assert.equal(freePublic.data.features.qr_tracking, false);
-  assert.equal((await api('POST', `/api/public/${freeCard.data.slug}/contact`, { name: 'Visitante', message: 'Oi' })).status, 403);
-  assert.equal((await api('GET', `/api/cards/${freeCard.data.id}/contacts`, null, freeLogin.data.token)).status, 403);
+  assert.equal(freePublic.data.features.contact_form, true);
+  assert.equal(freePublic.data.features.qr_tracking, true);
+  assert.equal(freePublic.data.features.gallery_limit, 10);
+  assert.equal((await api('POST', `/api/public/${freeCard.data.slug}/contact`, { name: 'Visitante', message: 'Oi' })).status, 201);
+  const freeContacts = await api('GET', `/api/cards/${freeCard.data.id}/contacts`, null, freeLogin.data.token);
+  assert.equal(freeContacts.status, 200);
+  assert.equal(freeContacts.data.length, 1);
   const siteRes = await fetch(base + `/site/${freeCard.data.slug}`, { redirect: 'manual' });
   assert.equal(siteRes.status, 200);
 
@@ -938,7 +941,7 @@ test('pagina publica e link funcionam no Free; leads e QR rastreado são Pro', a
   assert.equal((await fetch(base + `/site/${proCard.data.slug}`)).status, 200);
 });
 
-test('upload de PDF bloqueia Free e aceita Pro; nome de upload e seguro', async () => {
+test('upload de PDF funciona para Free e Pro; nome de upload e seguro', async () => {
   const { _test } = require('../routes/upload');
   const generated = _test.buildUploadFilename({ originalname: 'catalogo.pdf', mimetype: 'application/pdf' });
   assert.match(generated, /^\d+-[0-9a-f-]{36}\.pdf$/i);
@@ -954,7 +957,11 @@ test('upload de PDF bloqueia Free e aceita Pro; nome de upload e seguro', async 
   const freeForm = new FormData();
   freeForm.append('photo', new Blob(['%PDF-1.4\n'], { type: 'application/pdf' }), 'catalogo.pdf');
   const freeUpload = await fetch(base + '/api/upload', { method: 'POST', headers: { Authorization: `Bearer ${freeLogin.data.token}` }, body: freeForm });
-  assert.equal(freeUpload.status, 403);
+  const freeData = await freeUpload.json();
+  assert.equal(freeUpload.status, 200);
+  assert.equal(freeData.isPdf, true);
+  const freeUploaded = path.join(__dirname, '..', freeData.url.replace(/^\/uploads\//, 'uploads/'));
+  fs.rmSync(freeUploaded, { force: true });
 
   await createActiveUser({ email: 'pdf-pro@example.com' });
   const proLogin = await login('pdf-pro@example.com', 'SenhaValida123!');

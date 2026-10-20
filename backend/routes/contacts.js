@@ -1,10 +1,9 @@
 const express = require('express');
 const { cards: cardRepo, contacts: contactRepo, users: userRepo } = require('../db/repository');
 const authMiddleware = require('../middleware/auth');
-const { requireCustomer, requirePro } = require('../middleware/roles');
+const { requireCustomer } = require('../middleware/roles');
 const { sendEmail } = require('../utils/email');
-const { hasActiveCustomerAccess, isProCustomer } = require('../utils/subscription');
-const { FREE_THEMES } = require('../utils/themes');
+const { hasActiveCustomerAccess } = require('../utils/subscription');
 
 const router = express.Router();
 
@@ -29,23 +28,14 @@ router.get('/public/:slug', async (req, res) => {
     return res.status(402).json({ error: 'account_inactive', message: 'Página temporariamente indisponível' });
   }
 
-  const isOwnerPro = isProCustomer(owner);
+  // Modelo vigente: todos os recursos são liberados para todos os clientes ativos.
   await cardRepo.incrementViews(card.id);
-
-  // Only expose fields needed for public display — never expose user_id or internals.
-  // Free pages remain public, but premium content/capabilities are projected out.
   const { user_id, views_count, created_at, updated_at, ...publicCard } = card;
-  if (!isOwnerPro) {
-    publicCard.catalog_pdf_url = '';
-    publicCard.catalog_pdf_title = '';
-    publicCard.gallery = Array.isArray(publicCard.gallery) ? publicCard.gallery.slice(0, 4) : [];
-    if (!FREE_THEMES.has(publicCard.theme)) publicCard.theme = 'midnight';
-  }
   publicCard.features = {
-    contact_form: isOwnerPro,
-    qr_tracking: isOwnerPro,
-    catalog_pdf: isOwnerPro,
-    gallery_limit: isOwnerPro ? 10 : 4
+    contact_form: true,
+    qr_tracking: true,
+    catalog_pdf: true,
+    gallery_limit: 10
   };
   res.json(publicCard);
 });
@@ -56,13 +46,10 @@ router.post('/public/:slug/contact', async (req, res) => {
     return res.status(404).json({ error: 'Cartão não encontrado' });
   }
 
-  // A página pública existe no Free, mas a captura de leads pelo formulário é exclusiva do Pro.
+  // Modelo vigente: todos os clientes ativos podem receber mensagens.
   const owner = await userRepo.findById(card.user_id);
   if (!hasActiveCustomerAccess(owner)) {
     return res.status(402).json({ error: 'account_inactive', message: 'Página temporariamente indisponível' });
-  }
-  if (!isProCustomer(owner)) {
-    return res.status(403).json({ error: 'pro_required', message: 'O formulário de mensagens está disponível exclusivamente no Plano Pro.' });
   }
 
   // Honeypot anti-spam check
@@ -126,7 +113,7 @@ router.post('/public/:slug/contact', async (req, res) => {
   res.status(201).json({ message: 'Contato enviado com sucesso!' });
 });
 
-router.get('/cards/:cardId/contacts', authMiddleware, requireCustomer, requirePro, async (req, res) => {
+router.get('/cards/:cardId/contacts', authMiddleware, requireCustomer, async (req, res) => {
   const cardId = Number(req.params.cardId);
   const card = await cardRepo.findByIdAndUser(cardId, req.userId);
   if (!card) {

@@ -94,45 +94,7 @@ async function loadDashboard() {
     const cardLink = window.location.origin + '/site/' + card.slug;
     const recentContacts = stats.recentContacts || [];
     const completion = getPageCompletion(card);
-    const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' && (currentUser.subscription_status || 'active') === 'active' && (currentUser.account_status || 'active') === 'active';
-    const isFreeUser = currentUser && !currentUser.is_admin && currentUser.plan === 'free' && (currentUser.account_status || 'active') === 'active';
-    const isInactiveSubscription = currentUser && !currentUser.is_admin && !isFreeUser && (!currentUser.subscription_status || currentUser.subscription_status !== 'active' || currentUser.account_status !== 'active');
     
-    let paywallBannerHtml = '';
-    if (isInactiveSubscription) {
-      paywallBannerHtml = `
-        <div class="form-section" style="display:flex;background:linear-gradient(135deg, rgba(239,68,68,0.06), rgba(220,38,38,0.1));border:1.5px solid rgba(239,68,68,0.25);border-radius:var(--radius-lg);padding:16px;margin-bottom:var(--space-lg);text-align:left;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%;">
-          <div style="flex:1;min-width:250px;">
-            <div style="font-weight:700;color:#ef4444;font-size:0.95rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
-              <span>❌</span> Assinatura inativa
-            </div>
-            <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.4;margin:0;">
-              Seu acesso de cliente está inativo e o link público foi suspenso. Regularize ou reative a assinatura para voltar a utilizar o CardLink.
-            </p>
-          </div>
-          <button type="button" class="btn btn-primary btn-sm" onclick="openProPaymentModal()" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;background:#ef4444;border:none;color:#ffffff;box-shadow: 0 4px 12px rgba(239,68,68,0.2);">
-            💳 Reativar assinatura
-          </button>
-        </div>
-      `;
-    } else if (isFreeUser) {
-      paywallBannerHtml = `
-        <div class="form-section" style="display:flex;background:linear-gradient(135deg, rgba(124,58,237,0.08), rgba(147,51,234,0.12));border:1.5px solid var(--accent);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:var(--space-lg);text-align:left;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%;">
-          <div style="flex:1;min-width:250px;">
-            <div style="font-weight:700;color:var(--accent);font-size:0.95rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
-              <span>🎁</span> Você está usando o Plano Gratuito
-            </div>
-            <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.4;margin:0;">
-              Sua página está 100% online e pode ser compartilhada por link. O Pro libera QR Code integrado, mensagens/leads, Catálogo em PDF e galeria ampliada.
-            </p>
-          </div>
-          <button type="button" class="btn btn-primary btn-sm" onclick="openProPaymentModal()" style="padding:8px 16px;font-size:0.82rem;font-weight:bold;flex-shrink:0;background:linear-gradient(135deg,var(--accent),#9333ea);border:none;color:#ffffff;box-shadow:0 4px 12px rgba(124,58,237,0.3);">
-            ⭐ Assinar Pro (R$ 12,90)
-          </button>
-        </div>
-      `;
-    }
-
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     let pwaBannerHtml = '';
@@ -164,7 +126,6 @@ async function loadDashboard() {
       </div>
 
       ${platformMessagesHtml}
-      ${paywallBannerHtml}
       ${pwaBannerHtml}
 
       <div class="page-status-card">
@@ -182,19 +143,11 @@ async function loadDashboard() {
           <div class="stat-value">${stats.views}</div>
           <div class="stat-label">Visualizações</div>
         </div>
-        ${isProUser ? `
-          <div class="stat-card">
-            <div class="stat-icon">📩</div>
-            <div class="stat-value">${stats.contacts}</div>
-            <div class="stat-label">Mensagens Recebidas</div>
-          </div>
-        ` : `
-          <div class="stat-card" onclick="openProPaymentModal()" style="cursor:pointer;">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-value" style="font-size:0.95rem;">PRO</div>
-            <div class="stat-label">Mensagens e Leads</div>
-          </div>
-        `}
+        <div class="stat-card">
+          <div class="stat-icon">📩</div>
+          <div class="stat-value">${stats.contacts}</div>
+          <div class="stat-label">Mensagens Recebidas</div>
+        </div>
         <div class="stat-card" onclick="openQrCodeModal('${escapeHtml(card.slug)}')" style="cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor=''">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin + '/site/' + card.slug + '/qr')}&bgcolor=ffffff&color=000000" style="width:48px;height:48px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border-subtle);" alt="QR Code">
           <div class="stat-value" style="font-size:1.05rem;line-height:1;margin-bottom:3px;">${stats.qrScans || 0}</div>
@@ -219,11 +172,11 @@ async function loadDashboard() {
 
         <div class="dash-card-actions-bar">
           <button class="btn btn-secondary btn-sm" onclick="shareCard('${escapeHtml(card.slug)}')">Compartilhar</button>
-          ${isProUser ? `<button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">Mensagens recebidas (${stats.contacts})</button>` : `<button class="btn btn-secondary btn-sm" onclick="openProPaymentModal()">⭐ Mensagens e leads — Pro</button>`}
+          <button class="btn btn-secondary btn-sm" onclick="viewContacts(${card.id}, '${escapeHtml(card.name)}')">Mensagens recebidas (${stats.contacts})</button>
         </div>
       </div>
 
-      ${isProUser && recentContacts.length > 0 ? `
+      ${recentContacts.length > 0 ? `
         <div style="margin-top:var(--space-xl);">
           <h3 style="font-family:var(--font-display);font-weight:700;margin-bottom:var(--space-md);">📩 Últimas Mensagens</h3>
           <div class="contacts-list">

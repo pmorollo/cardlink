@@ -46,8 +46,8 @@ function cleanWhatsapp(num) {
 
 function openCardLinkSupport(context = 'subscriber') {
   const message = context === 'prepurchase'
-    ? 'Olá! Tenho uma dúvida sobre o CardLink antes de assinar.'
-    : 'Olá! Sou assinante do CardLink e preciso de ajuda.';
+    ? 'Olá! Tenho uma dúvida sobre o CardLink.'
+    : 'Olá! Sou usuário do CardLink e preciso de ajuda.';
   window.open(`https://wa.me/${CARDLINK_SUPPORT_WHATSAPP}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
 }
 
@@ -138,8 +138,7 @@ function handleRoute() {
     if (bgAnimated) bgAnimated.style.display = 'none';
   }
 
-  const isCustomerActive = currentUser && !currentUser.is_admin && (currentUser.account_status || 'active') === 'active' && (currentUser.subscription_status || 'active') === 'active';
-  const isProUser = currentUser && !currentUser.is_admin && currentUser.plan === 'pro' && currentUser.subscription_status === 'active' && currentUser.account_status === 'active';
+  const isCustomerActive = currentUser && !currentUser.is_admin && (currentUser.account_status || 'active') === 'active';
 
   // Confirmação de novo e-mail pode ser aberta mesmo com outra sessão ativa.
   if (hash.startsWith('#verify-email')) {
@@ -169,33 +168,19 @@ function handleRoute() {
 
     document.getElementById('dashboard-content').innerHTML = `
       <div style="max-width:550px;margin:40px auto;padding:32px 24px;background:var(--surface);border:1.5px solid var(--border-subtle);border-radius:var(--radius-xl);text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.3);">
-        <div style="font-size:3.5rem;margin-bottom:16px;">✨</div>
+        <div style="font-size:3.5rem;margin-bottom:16px;">🔒</div>
         <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:12px;color:var(--text-primary);">
-          Assinatura <span class="text-gradient">CardLink</span>
+          Conta <span class="text-gradient">inativa</span>
         </h1>
         <p style="color:var(--text-secondary);font-size:0.95rem;line-height:1.6;margin-bottom:24px;">
-          Olá, <strong>${escapeHtml(currentUser.name)}</strong>! Seu acesso está inativo no momento. Regularize ou ative sua assinatura para continuar usando todos os recursos.
+          Olá, <strong>${escapeHtml(currentUser.name)}</strong>! Sua conta está inativa no momento. Fale com o suporte para reativar o acesso.
         </p>
 
-        <div style="background:rgba(139,92,246,0.08);border:1px dashed var(--accent);border-radius:var(--radius-md);padding:16px;margin-bottom:24px;text-align:left;">
-          <div style="font-weight:700;color:var(--accent);margin-bottom:8px;font-size:0.9rem;">🚀 O que está incluído no CardLink:</div>
-          <ul style="margin:0;padding-left:20px;font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">
-            <li>Editor do site com temas modernos</li>
-            <li>Galeria de fotos e vitrine de produtos</li>
-            <li>Captura de leads e contatos dos clientes</li>
-            <li>QR Code exclusivo para balcão e redes sociais</li>
-          </ul>
-        </div>
-
-        <a href="/checkout/cardlink-pro" class="btn btn-primary btn-lg" onclick="openProPaymentModal(); return false;" style="display:inline-block;width:100%;font-weight:bold;font-size:1rem;padding:14px;box-shadow:0 6px 20px rgba(124,58,237,0.3);margin-bottom:12px;text-decoration:none;">
-          💳 Reativar Assinatura CardLink
+        <a href="https://wa.me/${CARDLINK_SUPPORT_WHATSAPP}?text=${encodeURIComponent('Olá! Minha conta do CardLink está inativa e preciso de ajuda para reativar.')}" target="_blank" rel="noopener" class="btn btn-primary btn-lg" style="display:inline-block;width:100%;font-weight:bold;font-size:1rem;padding:14px;box-shadow:0 6px 20px rgba(124,58,237,0.3);margin-bottom:12px;text-decoration:none;">
+          💬 Falar com o suporte
         </a>
 
         <div style="display:flex;justify-content:center;gap:16px;margin-top:16px;font-size:0.85rem;">
-          <button type="button" onclick="checkSubscriptionStatus()" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-weight:600;">
-            🔄 Já pagou? Atualizar Status
-          </button>
-          <span style="color:var(--text-muted);">|</span>
           <button type="button" onclick="handleLogout()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;text-decoration:underline;">
             🚪 Sair da conta
           </button>
@@ -257,7 +242,6 @@ function handleRoute() {
   } else if (hash === '#contacts') {
     if (!authToken) { navigateTo('auth'); return; }
     if (currentUser?.is_admin) { navigateTo('admin'); return; }
-    if (!isProUser) { navigateTo('dashboard'); return; }
 
     document.getElementById('contacts-view').classList.add('active');
     if (navbar) navbar.style.display = '';
@@ -376,26 +360,6 @@ function applyLandingAudience() {
   }
 }
 
-async function checkSubscriptionStatus() {
-  showToast('⏳', 'Verificando assinatura...');
-  try {
-    currentUser = await api('/auth/me');
-    if (currentUser?.is_admin) {
-      showToast('ℹ️', 'Conta administrativa: assinaturas são geridas no painel.');
-      navigateTo('admin');
-      return;
-    }
-    if (currentUser && !currentUser.is_admin && currentUser.plan === 'pro') {
-      showToast('🎉', 'Assinatura CardLink confirmada! Redirecionando...');
-      handleRoute();
-    } else {
-      showToast('⚠️', 'Assinatura ainda pendente. Se você pagou agora, aguarde alguns instantes.');
-    }
-  } catch (err) {
-    showToast('❌', 'Erro ao verificar assinatura');
-  }
-}
-
 // ============================================
 // Navbar CTA
 // ============================================
@@ -405,12 +369,8 @@ function handleHeroCta() {
   } else if (authToken) {
     openPageSettings();
   } else {
-    openProPaymentModal();
+    openQuickCreateModal();
   }
-}
-
-function handlePricingCta(plan) {
-  redirectToCheckout(plan || 'monthly');
 }
 
 function openPageSettings(section = 'profile') {
@@ -442,15 +402,10 @@ function updateNavAuth() {
     const isPro = currentUser.plan === 'pro' && !currentUser.is_admin;
     navCta.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;">
-        ${!currentUser.is_admin && !isPro ? `
-          <button class="btn btn-primary btn-sm hide-mobile" onclick="openProPaymentModal()" style="background:linear-gradient(135deg,var(--accent),#9333ea);font-weight:700;font-size:0.8rem;padding:7px 12px;border-radius:8px;">
-            ⭐ Assinar Pro (R$ 12,90)
-          </button>
-        ` : ''}
         <div class="user-menu" id="user-menu" onclick="event.stopPropagation()">
           <button class="user-menu-trigger" type="button" onclick="toggleUserMenu(event)" aria-label="Abrir menu da conta">
             <span class="user-menu-avatar">${initials}</span>
-            <span class="user-menu-name">${escapeHtml(currentUser.name)}</span>
+            <span class="user-menu-name">${escapeHtml(currentUser.name)}${isPro ? ' <span title="Selo PRO" style="font-size:0.8rem;">⭐⭐⭐</span>' : ''}</span>
             <span class="user-menu-chevron">⌄</span>
           </button>
           <div class="user-menu-dropdown">
@@ -458,11 +413,11 @@ function updateNavAuth() {
               <button type="button" onclick="navigateTo('admin');closeUserMenu()" style="font-weight:bold;color:var(--purple);"><span>👑 Painel Administrativo</span></button>
               <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Segurança da conta</span></button>
             ` : `
-              ${!isPro ? `<button type="button" onclick="openProPaymentModal();closeUserMenu()" style="font-weight:bold;color:var(--accent);"><span>⭐ Fazer Upgrade para o Pro</span></button>` : ''}
               <button type="button" onclick="navigateTo('dashboard');closeUserMenu()"><span>Visão geral</span></button>
               <button type="button" onclick="openPageSettings();closeUserMenu()"><span>Configurações da página</span></button>
-              ${currentUserCardId && isPro ? `<button type="button" onclick="viewContacts(${currentUserCardId}, 'Minha página');closeUserMenu()"><span>Contatos recebidos</span></button>` : ''}
+              ${currentUserCardId ? `<button type="button" onclick="viewContacts(${currentUserCardId}, 'Minha página');closeUserMenu()"><span>Contatos recebidos</span></button>` : ''}
               <button type="button" onclick="navigateTo('account');closeUserMenu()"><span>Minha conta</span></button>
+              ${!isPro ? `<button type="button" onclick="openProPaymentModal();closeUserMenu()" style="color:var(--text-secondary);"><span>⭐ Selo PRO (opcional)</span></button>` : ''}
             `}
             <div class="user-menu-divider"></div>
             <button type="button" class="danger" onclick="handleLogout()"><span>Sair</span></button>

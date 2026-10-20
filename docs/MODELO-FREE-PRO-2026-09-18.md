@@ -1,5 +1,7 @@
 # CardLink — Modelo Free/Pro consolidado
 
+> **SUPERSEDIDO em 13/10/2026.** O modelo vigente é a versão única gratuita com todos os recursos liberados; o plano Pro permanece apenas como selo visual (3 estrelinhas), sem gating funcional. Ver `docs/DECISAO-MODELO-UNICO-2026-10-13.md`. Este documento fica mantido como registro histórico.
+
 **Data:** 18/09/2026
 
 Este documento registra a regra funcional vigente após a unificação do modelo Free/Pro.
