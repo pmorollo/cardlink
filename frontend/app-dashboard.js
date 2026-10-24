@@ -125,6 +125,7 @@ async function loadDashboard() {
         </div>
       </div>
 
+      ${!currentUser.email_verified_at ? '<div class="dash-card-full"><strong>Confirme seu e-mail para recuperar o acesso</strong><p>Sua sessão atual permite editar. Para entrar novamente, use Recuperar senha e o código enviado ao seu e-mail. Informar o endereço no cadastro não o confirma.</p><button class="btn btn-secondary" onclick="navigateTo(&quot;account&quot;)">Segurança da conta</button></div>' : ''}
       ${platformMessagesHtml}
       ${pwaBannerHtml}
 
@@ -132,11 +133,12 @@ async function loadDashboard() {
         <div>
           <span class="page-status-label">Situação da página</span>
           <strong>${completion >= 75 ? 'Publicada e bem configurada' : 'Publicada, mas ainda pode ser completada'}</strong>
-          <p>${completion}% das informações essenciais preenchidas</p>
+          <p>${completion}% das informações essenciais preenchidas. Visualizações e cliques não representam vendas.</p>
         </div>
         <div class="page-status-progress" aria-label="${completion}% concluído"><span style="width:${completion}%"></span></div>
       </div>
 
+      ${renderCompletionSteps(card)}
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon">👁️</div>
@@ -149,7 +151,7 @@ async function loadDashboard() {
           <div class="stat-label">Mensagens Recebidas</div>
         </div>
         <div class="stat-card" onclick="openQrCodeModal('${escapeHtml(card.slug)}')" style="cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor=''">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(window.location.origin + '/site/' + card.slug + '/qr')}&bgcolor=ffffff&color=000000" style="width:48px;height:48px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border-subtle);" alt="QR Code">
+          <img src="/api/qr/${encodeURIComponent(card.slug)}.png" style="width:48px;height:48px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border-subtle);" alt="QR Code">
           <div class="stat-value" style="font-size:1.05rem;line-height:1;margin-bottom:3px;">${stats.qrScans || 0}</div>
           <div class="stat-label" style="font-size:0.72rem;font-weight:bold;color:var(--text-secondary);">QR escaneados · abrir código</div>
         </div>

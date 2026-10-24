@@ -996,7 +996,10 @@ function openQrCodeModal(slug) {
 
   if (modal && modalImg && modalUrl) {
     const url = window.location.origin + '/site/' + slug + '/qr';
-    modalImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=000000`;
+    modalImg.src = "/api/qr/" + encodeURIComponent(slug) + ".png";
+    let download = document.getElementById("qr-download-png");
+    if (!download) { download=document.createElement("a"); download.id="qr-download-png"; download.textContent="Baixar PNG em alta resolução"; modalUrl.after(download); }
+    download.href=modalImg.src; download.download="cardlink-"+slug+".png";
     modalUrl.textContent = url;
     modal.style.display = 'flex';
   }

@@ -151,6 +151,11 @@ test('conta do cadastro fluido define a primeira senha e passa a logar com ela',
   const meAfter = await fetch(base + '/api/auth/me', { headers: auth }).then(r => r.json());
   assert.equal(meAfter.password_defined, true);
 
+  const pending = await api('POST', '/api/auth/login', { email, password: 'SenhaNova123' });
+  assert.equal(pending.status, 403, 'informar o e-mail não comprova sua posse');
+  const recovery = await api('POST', '/api/auth/forgot-password', { email });
+  const verified = await api('POST', '/api/auth/reset-password', { email, code: recovery.body.code, newPassword: 'SenhaNova123' });
+  assert.equal(verified.status, 200);
   const login = await api('POST', '/api/auth/login', { email, password: 'SenhaNova123' });
   assert.equal(login.status, 200);
 });

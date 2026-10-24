@@ -681,3 +681,5 @@ textarea.form-input {
 .template-option-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .template-option-name { font-weight: 700; font-size: 0.92rem; color: var(--text-primary); }
 .template-option-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.35; }
+
+#extra-builder-tools label{display:grid;gap:6px;margin:12px 0}#extra-builder-tools input,#extra-builder-tools select{font:inherit;color:var(--text-primary);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:8px;padding:10px;max-width:100%}#extra-builder-tools .document-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 0;border-bottom:1px solid var(--border-subtle)}#extra-builder-tools button{font:inherit;padding:9px;border:1px solid var(--border-subtle);border-radius:8px;cursor:pointer}#extra-builder-tools button:focus-visible{outline:2px solid var(--purple)}#extra-builder-tools p{color:var(--text-secondary);font-size:.85rem}@media(max-width:700px){#extra-builder-tools .document-row{grid-template-columns:1fr}.builder-actions{position:sticky;bottom:0;background:var(--bg-surface);z-index:20}}

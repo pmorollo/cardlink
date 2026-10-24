@@ -6,6 +6,13 @@ const { requireCustomer } = require('../middleware/roles');
 const { getTemplateByKey } = require('../utils/template-catalog');
 
 const router = express.Router();
+const { extendedFields } = require('../utils/card-content');
+router.use((req,res,next)=>{
+  if (['POST','PUT','PATCH'].includes(req.method)) {
+    try { extendedFields(req.body || {}); } catch (error) { return res.status(400).json({error:error.message}); }
+  }
+  next();
+});
 
 // Um template define a ORDEM DAS SEÇÕES da página pública (ver
 // template-catalog.js), não só a cor. Escolher um template continua
@@ -124,7 +131,7 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
   const template = resolveTemplateInput(req.body.template_key);
   const templateKeyToSave = req.body.template_key !== undefined ? (template?.template_key || null) : undefined;
 
-  let themeToSave = template?.theme_key || req.body.theme;
+  let themeToSave = req.body.theme || template?.theme_key;
 
   let catalogPdfUrlToSave = req.body.catalog_pdf_url;
   let catalogPdfTitleToSave = req.body.catalog_pdf_title;
@@ -134,11 +141,10 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
   const existing = await cardRepo.findOneByUserId(req.userId);
   if (existing) {
     let slug = existing.slug;
-    if (req.body.name && req.body.name !== existing.name) {
-      slug = await generateUniqueSlug(req.body.name, existing.id);
-    }
+
 
     const updated = await cardRepo.update(existing.id, {
+      ...extendedFields(req.body, existing),
       slug,
       name: (req.body.name || '').toString().substring(0, 100) || existing.name,
       business: req.body.business !== undefined ? sanitizeSocialUrl(req.body.business) : existing.business,
@@ -179,6 +185,7 @@ router.post('/', authMiddleware, requireCustomer, async (req, res) => {
   const slug = await generateUniqueSlug(name);
 
   const card = await cardRepo.insert({
+    ...extendedFields(req.body),
     user_id: req.userId,
     slug,
     name: String(name).substring(0, 100),
@@ -235,21 +242,20 @@ router.put('/:id', authMiddleware, requireCustomer, async (req, res) => {
   }
 
   let slug = card.slug;
-  if (req.body.name && req.body.name !== card.name) {
-    slug = await generateUniqueSlug(req.body.name, card.id);
-  }
+
 
   let galleryToSave = req.body.gallery !== undefined ? req.body.gallery : card.gallery;
 
   const template = req.body.template_key !== undefined ? resolveTemplateInput(req.body.template_key) : null;
   const templateKeyToSave = req.body.template_key !== undefined ? (template?.template_key || null) : undefined;
 
-  let themeToSave = template?.theme_key || (req.body.theme !== undefined ? req.body.theme : card.theme);
+  let themeToSave = req.body.theme !== undefined ? req.body.theme : (card.theme || template?.theme_key);
 
   let catalogPdfUrlToSave = req.body.catalog_pdf_url !== undefined ? req.body.catalog_pdf_url : card.catalog_pdf_url;
   let catalogPdfTitleToSave = req.body.catalog_pdf_title !== undefined ? req.body.catalog_pdf_title : card.catalog_pdf_title;
 
   const updated = await cardRepo.update(card.id, {
+    ...extendedFields(req.body, card),
     slug,
     name: (req.body.name || '').toString().substring(0, 100) || card.name,
     business: req.body.business !== undefined ? sanitizeSocialUrl(req.body.business) : card.business,
