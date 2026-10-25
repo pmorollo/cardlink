@@ -1319,3 +1319,5 @@ img {
   position: relative;
 }
 
+
+.cardlink-consent{position:fixed;bottom:12px;left:12px;right:12px;z-index:10000;background:#10202c;color:#fff;padding:18px;border:1px solid #83d9c8;border-radius:12px;box-shadow:0 4px 24px #0006;max-width:780px;margin:auto}.cardlink-consent[hidden]{display:none}.cardlink-consent p{margin:0 0 12px}.cardlink-consent button,.cardlink-consent a{display:inline-block;margin:4px;padding:10px;border-radius:6px}.cardlink-consent a{color:#9cebd6}.cardlink-privacy-preferences{position:fixed;bottom:6px;left:6px;z-index:9998;font-size:11px;padding:6px;border-radius:6px}

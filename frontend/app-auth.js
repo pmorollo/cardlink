@@ -297,6 +297,7 @@ async function handleDirectRegister() {
 
     authToken = 'session';
     currentUser = data.user;
+    window.CardLinkTracking?.registration();
     clearRegisterVerification();
     updateNavAuth();
     showToast('🎉', 'Conta criada com sucesso! Bem-vindo ao CardLink.');
@@ -453,6 +454,7 @@ async function handleVerifyAndRegister() {
 
     authToken = 'session';
     currentUser = data.user;
+    window.CardLinkTracking?.registration();
     clearRegisterVerification();
     updateNavAuth();
     showToast('🎉', 'E-mail confirmado com sucesso! Aproveite sua conta gratuita.');
@@ -839,6 +841,7 @@ async function submitQuickCreate() {
     currentUser = data.user;
     updateNavAuth();
 
+    window.CardLinkTracking?.registration();
     quickCreateLastCardId = data.card ? data.card.id : null;
     currentUserCardId = quickCreateLastCardId;
     quickCreateLastSiteUrl = data.site_url || (data.card ? `${window.location.origin}/site/${data.card.slug}` : '');
