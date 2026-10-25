@@ -9,6 +9,7 @@
     if (!enabled) return;
     if (!window.fbq) {
       const q = window.fbq = function () { q.callMethod ? q.callMethod.apply(q, arguments) : q.queue.push(arguments); };
+      if (!window._fbq) window._fbq = q;
       q.push = q; q.loaded = true; q.version = '2.0'; q.queue = [];
       const script = document.createElement('script'); script.async = true;
       script.src = 'https://connect.facebook.net/en_US/fbevents.js'; document.head.append(script);
