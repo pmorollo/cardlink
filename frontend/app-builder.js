@@ -1,3 +1,6 @@
+var currentTemplateKey = "";
+var builderSavedState = null;
+var builderSaving = false;
 // ============================================
 // Card Templates (4 professional styles)
 // ============================================
@@ -60,6 +63,7 @@ function applyNicheTemplate(nicheKey) {
   const tmpl = NICHE_TEMPLATES[nicheKey];
   if (!tmpl) return;
 
+  currentTemplateKey = nicheKey;
   if (tmpl.theme) {
     selectTheme(tmpl.theme);
   }
@@ -192,6 +196,8 @@ function applyPendingLandingNiche() {
 function createNewCard() {
   try {
     editingCardId = null;
+    currentTemplateKey = "institucional";
+    builderSavedState = null;
     ['field-name','field-business','field-business-complement','field-title','field-photo','field-logo','field-description',
      'field-message','field-phone','field-email','field-address','field-whatsapp',
      'field-whatsapp-group','field-instagram','field-facebook','field-linkedin',
@@ -199,6 +205,9 @@ function createNewCard() {
      'field-services-title','field-services-image'
     ].forEach(id => setFieldValue(id, ''));
     setFieldValue('field-services-mode', 'image');
+    setFieldValue('field-catalog-pdf-url', '');
+    setFieldValue('field-catalog-pdf-title', '');
+    syncCatalogPdfPreview('', '');
     syncServicesImagePreview('');
     toggleServicesMode();
 
@@ -218,6 +227,8 @@ function createNewCard() {
     if (logoImg) logoImg.style.display = 'none';
     if (logoPlaceholder) logoPlaceholder.style.display = '';
 
+    loadDocumentRows([]);
+    setFieldValue('field-whatsapp-message', '');
     selectTheme('institucional');
     updatePreview();
   } catch (err) {
@@ -306,6 +317,11 @@ async function editCard(id) {
       }
     }
 
+    ensureBuilderTools();
+    currentTemplateKey = card.template_key || (NICHE_TEMPLATES[card.theme] ? card.theme : "");
+    const layoutChoice=document.getElementById("layout-choice");if(layoutChoice)layoutChoice.value=currentTemplateKey;
+    setFieldValue("field-whatsapp-message", card.whatsapp_message || "");
+    loadDocumentRows(card.documents || []);
     selectTheme(card.theme || 'midnight');
     updatePreview();
   } catch (err) {
@@ -313,6 +329,8 @@ async function editCard(id) {
     showToast('❌', err.message);
   } finally {
     settingsLoadInProgress = false;
+    builderSavedState = JSON.stringify(getFormData());
+    updateBuilderSaveState();
   }
 }
 
@@ -542,14 +560,16 @@ function getFormData() {
   const data = {};
   document.querySelectorAll('[data-field]').forEach(input => {
     const value = input.value.trim();
-    if (value) data[input.dataset.field] = value;
+    data[input.dataset.field] = value;
   });
   data.theme = currentTheme;
   // O tema atual É a chave do template quando corresponde a um dos 4
   // modelos (institucional/pessoal/profissional/comercial); para um tema
   // legado/custom não ligado a nenhum template, fica vazio e a página
   // pública usa a ordem padrão de sempre (ver DEFAULT_SECTION_ORDER).
-  data.template_key = NICHE_TEMPLATES[currentTheme] ? currentTheme : '';
+  data.template_key = currentTemplateKey;
+  data.whatsapp_message = document.getElementById('field-whatsapp-message')?.value.trim() || '';
+  data.documents = getDocumentRows();
 
   const products = [];
   document.querySelectorAll('#builder-products-container .builder-item-row').forEach(row => {
@@ -577,6 +597,7 @@ function getFormData() {
 }
 
 async function saveCard() {
+  if (builderSaving) return;
   const data = getFormData();
   if (!data.name) {
     showToast('⚠️', 'Preencha pelo menos o nome!');
@@ -585,6 +606,7 @@ async function saveCard() {
   }
 
   const btn = document.getElementById('generate-btn');
+  builderSaving = true;
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
 
   try {
@@ -597,11 +619,13 @@ async function saveCard() {
       editingCardId = card.id;
       showToast('✅', 'Página criada com sucesso!');
     }
+    builderSavedState = JSON.stringify(data);
     navigateTo('dashboard');
   } catch (err) {
     showToast('❌', err.message || 'Erro ao salvar');
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Salvar alterações'; }
+    builderSaving = false;
+    updateBuilderSaveState();
   }
 }
 
@@ -622,6 +646,7 @@ function selectTheme(theme) {
 // Live Preview
 // ============================================
 function updatePreview() {
+  if (typeof document !== "undefined") updateBuilderSaveState();
   const previewEl = document.getElementById('preview-card');
   if (previewEl) {
     const data = getFormData();
@@ -647,7 +672,7 @@ async function loadPublicCard(slug) {
     rendered.innerHTML = renderCard(card, false);
 
     const qrImg = document.getElementById('qrCodeImg');
-    if (qrImg) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(getPrimaryPublicUrl(card.slug))}&bgcolor=ffffff&color=000000`;
+    if (qrImg) qrImg.src = '/api/qr/' + encodeURIComponent(card.slug) + '.png';
 
     const existingFab = document.querySelector('.fab-whatsapp');
     if (existingFab) existingFab.remove();
@@ -708,7 +733,7 @@ function renderCard(data, isPreview) {
   let contactButtons = '';
   if (phone)    contactButtons += `<a href="tel:${escapeHtml(phone)}" class="card-contact-btn"><span class="icon">📞</span><span>Ligar</span></a>`;
   if (email)    contactButtons += `<a href="mailto:${escapeHtml(email)}" class="card-contact-btn"><span class="icon">📧</span><span>Email</span></a>`;
-  if (whatsapp) contactButtons += `<a href="https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink. ✅')}" target="_blank" rel="noopener" class="card-contact-btn"><span class="icon">💬</span><span>WhatsApp</span></a>`;
+  if (whatsapp) contactButtons += `<a href="https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent(data.whatsapp_message || 'Olá! Vim pelo seu CardLink. ✅')}" target="_blank" rel="noopener" class="card-contact-btn"><span class="icon">💬</span><span>WhatsApp</span></a>`;
   if (address)  contactButtons += `<a href="https://www.google.com/maps/search/${encodeURIComponent(address)}" target="_blank" rel="noopener" class="card-contact-btn"><span class="icon">📍</span><span>Mapa</span></a>`;
 
   const socials = [
@@ -725,7 +750,7 @@ function renderCard(data, isPreview) {
   let whatsappSection = '';
   if (whatsapp || whatsappGroup) {
     whatsappSection = '<div class="card-whatsapp-section">';
-    if (whatsapp)      whatsappSection += `<a href="https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink. ✅')}" target="_blank" rel="noopener" class="btn btn-whatsapp">💬 Conversar no WhatsApp</a>`;
+    if (whatsapp)      whatsappSection += `<a href="https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent(data.whatsapp_message || 'Olá! Vim pelo seu CardLink. ✅')}" target="_blank" rel="noopener" class="btn btn-whatsapp">💬 Conversar no WhatsApp</a>`;
     if (whatsappGroup) whatsappSection += `<a href="${escapeHtml(whatsappGroup)}" target="_blank" rel="noopener" class="btn btn-whatsapp-group">👥 Entrar no Grupo WhatsApp</a>`;
     whatsappSection += '</div>';
   }
@@ -908,7 +933,7 @@ function renderCard(data, isPreview) {
   if (whatsapp) {
     ctaButtonsHtml = `
       <div style="display:flex;gap:12px;margin:15px 0;width:100%;">
-        <a href="https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent('Olá! Vim pelo seu CardLink. ✅')}" target="_blank" rel="noopener" class="btn btn-primary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:0.95rem;font-weight:bold;text-decoration:none;">
+        <a href="https://wa.me/${cleanWhatsapp(whatsapp)}?text=${encodeURIComponent(data.whatsapp_message || 'Olá! Vim pelo seu CardLink. ✅')}" target="_blank" rel="noopener" class="btn btn-primary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:0.95rem;font-weight:bold;text-decoration:none;">
           <span>💬</span> WhatsApp
         </a>
         <button type="button" class="btn btn-secondary" onclick="document.getElementById('contactFormSection')?.scrollIntoView({behavior:'smooth'})" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;font-size:0.95rem;font-weight:bold;background:none;border:1.5px solid var(--border-subtle);color:var(--text-primary);">
@@ -965,7 +990,8 @@ function renderCard(data, isPreview) {
   const descriptionHtml = (description ? `<p class="card-description" style="text-align:left;margin:10px 0 15px;font-size:0.9rem;line-height:1.6;color:var(--text-secondary);">${escapeHtml(description)}</p>` : '') + messageHtml;
   const ctaBlockHtml = ctaButtonsHtml + (whatsappGroup ? `<a href="${escapeHtml(whatsappGroup)}" target="_blank" rel="noopener" class="btn btn-whatsapp-group" style="width:100%;margin-bottom:15px;display:flex;align-items:center;justify-content:center;gap:8px;">👥 Grupo do WhatsApp</a>` : '');
   const socialBlockHtml = socialButtons ? `<div class="card-social-grid" style="margin-bottom:20px;">${socialButtons}</div>` : '';
-  const infoBlockHtml = infoGridHtml + (address ? `<div class="card-map-card" style="margin-top:16px;"><div class="card-map-label">📍 Como chegar</div><a href="https://www.google.com/maps/search/${encodeURIComponent(address)}" target="_blank" rel="noopener" class="card-map-preview">Toque para abrir no Google Maps</a></div>` : '');
+  const documentsHtml = (Array.isArray(data.documents) ? data.documents : []).filter(d => /^https?:\/\/|^\/uploads\//i.test(d.url || '')).map(d => `<a href="${escapeHtml(d.url)}" target="_blank" rel="noopener" class="btn btn-secondary">📄 ${escapeHtml(d.title || 'Documento PDF')}</a>`).join('');
+  const infoBlockHtml = documentsHtml + infoGridHtml + (address ? `<div class="card-map-card" style="margin-top:16px;"><div class="card-map-label">📍 Como chegar</div><a href="https://www.google.com/maps/search/${encodeURIComponent(address)}" target="_blank" rel="noopener" class="card-map-preview">Toque para abrir no Google Maps</a></div>` : '');
 
   // "vitrine" representa o bloco inteiro de produtos/galeria/depoimentos
   // (com seu próprio botão de "mostrar mais"), como UMA posição só — ele

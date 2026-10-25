@@ -393,6 +393,7 @@ function renderServices(d) {
   const mode = d.services_mode || (products.length ? 'list' : 'image');
   const sectionTitle = d.services_title || (mode === 'image' ? 'Destaque' : 'Meus Serviços');
   const servicesImageUrl = cleanText(d.services_image_url);
+  renderExtraDocuments(d);
   const catalogPdfUrl = cleanText(d.catalog_pdf_url);
   const catalogPdfTitle = cleanText(d.catalog_pdf_title) || 'Catálogo do Negócio';
   const hasImage = mode === 'image' && !!servicesImageUrl;
@@ -756,7 +757,7 @@ function renderContact(d) {
 
   const items = [];
   if (d.whatsapp) items.push({
-    href: `https://wa.me/${cleanPhone(d.whatsapp)}`,
+    href: `https://wa.me/${cleanPhone(d.whatsapp)}?text=${encodeURIComponent(d.whatsapp_message || "Olá! Vim pelo seu CardLink.")}`,
     icon: '💬', label: 'WhatsApp', value: d.whatsapp, target: '_blank'
   });
   if (d.phone) items.push({
@@ -788,7 +789,7 @@ function renderWhatsAppFab(d) {
 
   const fab = document.createElement('a');
   fab.className = 'fab-whatsapp';
-  fab.href = `https://wa.me/${whatsapp}`;
+  fab.href = `https://wa.me/${whatsapp}?text=${encodeURIComponent(d.whatsapp_message || "Olá! Vim pelo seu CardLink.")}`;
   fab.target = '_blank';
   fab.rel = 'noopener';
   fab.setAttribute('aria-label', 'Conversar pelo WhatsApp');
@@ -931,3 +932,14 @@ document.addEventListener('keydown', (e) => {
     }
   }
 });
+
+// Documents are independent from the services/gallery mode.
+function renderExtraDocuments(card) {
+  let section = document.getElementById('extra-documents');
+  if (!section) { section = document.createElement('section'); section.id='extra-documents';section.className='lp-section container';const contact=document.getElementById('contato');if(contact)contact.before(section);else (document.querySelector('main') || document.body).append(section); }
+  section.replaceChildren();
+  const docs = Array.isArray(card.documents) ? card.documents : [];
+  if (!docs.length) return;
+  const title=document.createElement('h2'); title.textContent='Documentos'; section.append(title);
+  for(const doc of docs){ if(!/^(https?:\/\/|\/uploads\/)/i.test(doc.url||''))continue;const a=document.createElement('a');a.href=doc.url;a.textContent='📄 '+doc.title;a.target='_blank';a.rel='noopener';a.className='btn btn-secondary';section.append(a); }
+}

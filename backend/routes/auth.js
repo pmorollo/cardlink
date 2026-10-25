@@ -614,6 +614,7 @@ router.post('/reset-password', passwordRecoveryLimiter, async (req, res) => {
   await users.update(user.id, {
     password_hash: await bcrypt.hash(newPassword, 10),
     password_defined: true,
+    email_verified_at: user.email_verified_at || new Date().toISOString(),
     reset_code: null,
     reset_code_hash: null,
     reset_expires: null,

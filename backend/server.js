@@ -157,6 +157,18 @@ app.use('/api/templates', apiLimiter, templateRoutes);
 app.use('/api/onboarding', authLimiter, onboardingRoutes);
 
 // Rotas /api desconhecidas não devem cair no SPA nem expor diagnósticos.
+app.get('/api/qr/:slug.png', apiLimiter, async (req, res) => {
+  try {
+    const slug = String(req.params.slug || '');
+    if (!/^[a-zA-Z0-9-]{1,200}$/.test(slug)) return res.status(400).json({ error: 'Página inválida' });
+    const card = await require('./db/repository').cards.findBySlug(slug);
+    if (!card) return res.status(404).json({ error: 'Página não encontrada' });
+    const origin = (process.env.PUBLIC_APP_URL || (process.env.NODE_ENV === 'production' ? 'https://cardlink.digitalnexoapp.com' : `${req.protocol}://${req.get('host')}`)).replace(/\/$/, '');
+    const png = await require('qrcode').toBuffer(`${origin}/site/${slug}/qr`, { width: 1024, margin: 4, errorCorrectionLevel: 'M' });
+    res.type('png').set('Cache-Control', 'public, max-age=3600').send(png);
+  } catch { res.status(500).json({ error: 'Não foi possível gerar o QR.' }); }
+});
+
 app.use('/api', (req, res) => {
   res.status(404).json({ error: 'Endpoint não encontrado' });
 });

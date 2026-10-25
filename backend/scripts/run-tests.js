@@ -56,7 +56,7 @@ for (const file of files) {
 
   const result = spawnSync(
     process.execPath,
-    ['--test', '--experimental-test-isolation=none', file],
+    ['--test', '--test-reporter=tap', '--experimental-test-isolation=none', file],
     { encoding: 'utf8' }
   );
 

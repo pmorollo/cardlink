@@ -107,7 +107,7 @@ router.post('/criar-cartao', quickCreateLimiter, async (req, res) => {
       subscription_source: 'free_tier',
       subscription_plan: 'free',
       trial_ends_at: null,
-      email_verified_at: now,
+      email_verified_at: null,
       subscription_updated_at: now,
       password_defined: false
     });

@@ -59,6 +59,8 @@ function normalizeCard(row) {
     catalog_pdf_url: row.catalog_pdf_url || '',
     catalog_pdf_title: row.catalog_pdf_title || '',
     template_key: row.template_key || '',
+    documents: typeof row.documents === 'string' ? JSON.parse(row.documents) : (row.documents || []),
+    whatsapp_message: row.whatsapp_message || '',
     gallery: typeof row.gallery === 'string' ? JSON.parse(row.gallery) : (row.gallery || []),
     testimonials: typeof row.testimonials === 'string' ? JSON.parse(row.testimonials) : (row.testimonials || []),
   };
@@ -391,9 +393,9 @@ const cards = {
            phone, email, address, whatsapp, whatsapp_group, instagram, facebook,
            linkedin, tiktok, youtube, twitter, theme, template_key, site_button_text, services_mode,
            services_title, services_image_url, catalog_pdf_url, catalog_pdf_title,
-           products, gallery, testimonials, views_count, qr_scans_count
+           products, gallery, testimonials, views_count, qr_scans_count, documents, whatsapp_message
          ) VALUES (
-           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34
+           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36
          ) RETURNING *`,
         [
           data.user_id, data.slug, data.name, data.business || null, data.business_complement || null, data.title || null, data.photo_url || null,
@@ -404,7 +406,7 @@ const cards = {
           data.services_mode || 'image', data.services_title || null, data.services_image_url || null,
           data.catalog_pdf_url || null, data.catalog_pdf_title || null,
           JSON.stringify(data.products || []), JSON.stringify(data.gallery || []), JSON.stringify(data.testimonials || []),
-          data.views_count || 0, data.qr_scans_count || 0
+          data.views_count || 0, data.qr_scans_count || 0, JSON.stringify(data.documents || []), data.whatsapp_message || ''
         ]
       );
       return normalizeCard(r.rows[0]);
@@ -435,9 +437,9 @@ const cards = {
         'address', 'whatsapp', 'whatsapp_group', 'instagram', 'facebook', 'linkedin', 'tiktok', 'youtube', 'twitter',
         'theme', 'template_key', 'site_button_text', 'services_mode', 'services_title', 'services_image_url',
         'catalog_pdf_url', 'catalog_pdf_title',
-        'products', 'gallery', 'testimonials', 'views_count', 'qr_scans_count']) {
+        'products', 'gallery', 'testimonials', 'views_count', 'qr_scans_count', 'documents', 'whatsapp_message']) {
         if (k in updates && updates[k] !== undefined) {
-          const val = ['products', 'gallery', 'testimonials'].includes(k) ? JSON.stringify(updates[k] || []) : updates[k];
+          const val = ['products', 'gallery', 'testimonials', 'documents'].includes(k) ? JSON.stringify(updates[k] || []) : updates[k];
           fields.push(`${k} = $${i++}`);
           values.push(val);
         }
