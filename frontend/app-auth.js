@@ -782,6 +782,9 @@ function showQuickCreateAlert(type, message) {
   alertBox.className = `auth-alert ${type}`;
   alertBox.innerHTML = `<span>${type === 'error' ? '❌' : 'ℹ️'}</span><div>${escapeHtml(message)}</div>`;
   alertBox.style.display = 'flex';
+  alertBox.style.color = '#7f1d1d';
+  alertBox.style.backgroundColor = '#fff1f2';
+  alertBox.style.flexWrap = 'wrap';
   alertBox.setAttribute('role', 'alert');
   alertBox.setAttribute('aria-live', 'assertive');
   alertBox.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -811,6 +814,7 @@ function showExistingQuickCreateActions() {
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = label;
+    button.style.cssText = 'padding:10px 12px;border:1px solid #9f1239;border-radius:8px;background:#fff;color:#881337;font-weight:600;cursor:pointer';
     button.addEventListener('click', () => continueExistingQuickCreate(form));
     actions.append(button);
   });
