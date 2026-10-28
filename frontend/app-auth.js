@@ -122,6 +122,15 @@ function clearAuthAlerts() {
 }
 
 function toggleAuthForm(form) {
+  // All registration entry points use the same passwordless card wizard.
+  if (form === 'register') {
+    toggleAuthForm('login');
+    openQuickCreateModal();
+    const email = document.getElementById('login-email')?.value || '';
+    const target = document.getElementById('qc-email');
+    if (target && email) target.value = email;
+    return;
+  }
   clearAuthAlerts();
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
@@ -201,19 +210,7 @@ function toggleAuthForm(form) {
 
 function beginFreeRegistration() {
   clearRegisterVerification();
-  const step1 = document.getElementById('register-step-1');
-  const step2 = document.getElementById('register-step-2');
-  if (step1) step1.style.display = 'block';
-  if (step2) step2.style.display = 'none';
-
-  const codeEl = document.getElementById('register-code');
-  if (codeEl) codeEl.value = '';
-
-  navigateTo('register');
-  window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
-
-  const nameEl = document.getElementById('register-name');
-  if (nameEl) window.setTimeout(() => nameEl.focus(), 80);
+  toggleAuthForm('register');
 }
 
 function backToRegisterStep1() {
@@ -785,6 +782,39 @@ function showQuickCreateAlert(type, message) {
   alertBox.className = `auth-alert ${type}`;
   alertBox.innerHTML = `<span>${type === 'error' ? '❌' : 'ℹ️'}</span><div>${escapeHtml(message)}</div>`;
   alertBox.style.display = 'flex';
+  alertBox.setAttribute('role', 'alert');
+  alertBox.setAttribute('aria-live', 'assertive');
+  alertBox.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function continueExistingQuickCreate(form) {
+  const email = document.getElementById('qc-email')?.value.trim() || '';
+  closeQuickCreateModal();
+  navigateTo('auth');
+  toggleAuthForm('login');
+  const loginEmail = document.getElementById('login-email');
+  if (loginEmail) loginEmail.value = email;
+  if (form === 'forgot') {
+    toggleAuthForm('forgot');
+  } else {
+    showAuthAlert('login', 'info', 'Sua conta já existe. Entre com sua senha ou use Esqueceu a senha? se ainda não definiu uma.');
+    document.getElementById('login-password')?.focus();
+  }
+}
+
+function showExistingQuickCreateActions() {
+  const alertBox = document.getElementById('quick-create-alert');
+  if (!alertBox) return;
+  const actions = document.createElement('div');
+  actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-top:8px';
+  [['Entrar na minha conta', 'login'], ['Recuperar acesso / definir senha', 'forgot']].forEach(([label, form]) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = label;
+    button.addEventListener('click', () => continueExistingQuickCreate(form));
+    actions.append(button);
+  });
+  alertBox.append(actions);
 }
 
 async function submitQuickCreate() {
@@ -850,6 +880,7 @@ async function submitQuickCreate() {
     openQuickCreateSuccessModal(quickCreateLastSiteUrl);
   } catch (err) {
     showQuickCreateAlert('error', err.message || 'Não foi possível criar seu site agora. Tente novamente.');
+    if (/já tem uma conta|já cadastrad|já existe/i.test(err.message || '')) showExistingQuickCreateActions();
   } finally {
     if (btn) {
       btn.disabled = false;
