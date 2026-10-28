@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardlink-v46';
+const CACHE_NAME = 'cardlink-v47';
 const PRECACHE = [
   '/',
   '/index.html',
