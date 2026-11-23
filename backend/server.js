@@ -80,6 +80,9 @@ app.use(helmet({
 
 // ─── CORS ────────────────────────────────────────────────────────
 app.use((req, res, next) => {
+  if (req.hostname === 'digitalnexoapp.com') {
+    return res.redirect(308, 'https://www.digitalnexoapp.com' + req.originalUrl);
+  }
   if (req.hostname !== 'www.digitalnexoapp.com') return next();
   if (!['GET', 'HEAD'].includes(req.method)) return res.sendStatus(405);
   if (req.path === '/') return res.sendFile(path.join(__dirname, 'pages', 'nexo-apps.html'));
