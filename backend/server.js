@@ -79,6 +79,19 @@ app.use(helmet({
 }));
 
 // ─── CORS ────────────────────────────────────────────────────────
+app.use((req, res, next) => {
+  if (req.hostname !== 'www.digitalnexoapp.com') return next();
+  if (!['GET', 'HEAD'].includes(req.method)) return res.sendStatus(405);
+  if (req.path === '/') return res.sendFile(path.join(__dirname, 'pages', 'nexo-apps.html'));
+  if (req.path === '/robots.txt') {
+    return res.type('text/plain').send('User-agent: *\nAllow: /\nSitemap: https://www.digitalnexoapp.com/sitemap.xml\n');
+  }
+  if (req.path === '/sitemap.xml') {
+    return res.type('application/xml').send('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://www.digitalnexoapp.com/</loc></url></urlset>');
+  }
+  return res.sendStatus(404);
+});
+
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin) return cb(null, true);
