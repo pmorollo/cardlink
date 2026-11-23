@@ -215,6 +215,8 @@ app.get('/uploads/:filename', async (req, res, next) => {
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
+const validationCardSlug = 'cardlink-validacao-p5';
+
 app.get('/sitemap.xml', async (req, res, next) => {
   try {
     const [cards, allUsers] = await Promise.all([cardRepo.all(), userRepo.all()]);
@@ -222,7 +224,7 @@ app.get('/sitemap.xml', async (req, res, next) => {
     const origin = `${req.protocol}://${req.get('host')}`;
     const escapeXml = value => String(value).replace(/[<>&'\"]/g, char => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[char]));
     const urls = [`${origin}/`, ...cards
-      .filter(card => hasActiveCustomerAccess(usersById.get(card.user_id)))
+      .filter(card => card.slug !== validationCardSlug && hasActiveCustomerAccess(usersById.get(card.user_id)))
       .map(card => `${origin}/site/${encodeURIComponent(card.slug)}`)];
     res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(url => `  <url><loc>${escapeXml(url)}</loc></url>`).join('\n')}\n</urlset>`);
   } catch (error) { next(error); }
@@ -263,6 +265,8 @@ app.get('/site/:slug', async (req, res, next) => {
     if (!card) return res.status(404).send('Cartão não encontrado');
     const owner = await userRepo.findById(card.user_id);
     if (!hasActiveCustomerAccess(owner)) return res.status(402).send('Página temporariamente indisponível');
+
+    if (card.slug === validationCardSlug) res.set('X-Robots-Tag', 'noindex');
 
     const escapeAttr = value => String(value || '')
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
