@@ -1,0 +1,32 @@
+name: Apply CardLink Week 1 Patch
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v4
+        with:
+          ref: test-week1-2026-08-16
+          fetch-depth: 0
+
+      - name: Apply validated CardLink patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .cardlink-patch/final-00.b64 .cardlink-patch/final-01.b64 .cardlink-patch/final-02.b64 \
+            | base64 -d | gzip -d > /tmp/cardlink.patch
+          git apply --check /tmp/cardlink.patch
+          git apply /tmp/cardlink.patch
+          rm -rf .cardlink-patch
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: prepare CardLink Week 1 internal test"
+          git push origin HEAD:test-week1-2026-08-16
